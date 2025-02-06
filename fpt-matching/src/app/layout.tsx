@@ -1,5 +1,6 @@
+import { QueryClient } from "@tanstack/react-query";
 import type { Metadata } from "next";
-import "./globals.css";
+import LayoutClient from "./layout-client";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -11,12 +12,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const queryClient = new QueryClient();
+  if (!queryClient) {
+    return null;
+  }
+
   return (
-    <html lang="en">
-      <body
-        className={`antialiased`}
-      >
-        {children}
+    <html suppressHydrationWarning={true} lang="en">
+      <body className={`antialiased`}>
+        <LayoutClient>{children}</LayoutClient>
       </body>
     </html>
   );
