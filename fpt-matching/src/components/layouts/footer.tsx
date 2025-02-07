@@ -73,54 +73,8 @@ function Footer() {
             </li>
           </TypographyList>
         </div>
-        <div className="space-y-4">
-          <TypographyH2 className="text-white uppercase">
-            Show room
-          </TypographyH2>
-          <div>
-            <TypographyLarge className="text-white uppercase">
-              Show room SG Nhà Bè
-            </TypographyLarge>
-            <TypographyP className="!mt-0">
-              1806 Huỳnh Tấn Phát, TT. Nhà Bè, Nhà Bè, Hồ Chí Minh, Vietnam
-            </TypographyP>
-          </div>
-        </div>
-        <div>
-          <TypographyH2 className="text-white uppercase">
-            Về Như My
-          </TypographyH2>
-          <TypographyList className="text-white mb-4">
-            <li>
-              <Link href="/about">
-                <span className="text-neutral-300 hover:text-white">
-                  Về Như My
-                </span>
-              </Link>
-            </li>
-            <li>
-              <Link href="/albums">
-                <span className="text-neutral-300 hover:text-white">
-                  Các bộ ảnh mẫu
-                </span>
-              </Link>
-            </li>
-            <li>
-              <Link href="#">
-                <span className="text-neutral-300 hover:text-white">
-                  Câu hỏi thường gặp
-                </span>
-              </Link>
-            </li>
-            <li>
-              <Link href="#">
-                <span className="text-neutral-300 hover:text-white">
-                  Thông tin sở hữu website
-                </span>
-              </Link>
-            </li>
-          </TypographyList>
-        </div>
+        
+        
       </div>
 
       <p className="text-white text-center text-xs pt-8">
