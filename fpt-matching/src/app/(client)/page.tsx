@@ -6,11 +6,10 @@ export default function HomePage() {
       className="relative flex justify-center items-center flex-col
    "
     >
-      <div className="h-full w-full">
+      <div className="container mx-auto">
         <div className="h-[1999px]">
-        <h1 className="text-4xl font-bold">Home Page</h1>
+          <h1 className="text-4xl font-bold">Home Page</h1>
         </div>
-       
       </div>
     </main>
   );

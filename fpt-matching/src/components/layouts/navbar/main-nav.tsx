@@ -1,121 +1,157 @@
-import { Icons } from "@/components/ui/icons";
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuIndicator,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import { cn } from "@/lib/utils";
-import { MainNavItem } from "@/types";
-import { User } from "@/types/user";
-import Link from "next/link";
-import * as React from "react";
-
-import { ProductsCombobox } from "@/components/_common/products-combobox";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import { Const } from "@/lib/constants/const";
-import { AuthDropdown } from "../../_common/auth-dropdown";
-import { ModeToggle } from "../../_common/mode-toggle";
+import Link from "next/link";
+import { ModeToggle } from "@/components/_common/mode-toggle";
+import { AuthDropdown } from "@/components/_common/auth-dropdown";
+import { ReactNode, useState } from "react";
+import { ChevronDown } from "lucide-react";
+import { User } from "@/types/user";
 
 interface MainNavProps {
-  items?: MainNavItem[];
   user?: User | null;
 }
 
-export function MainNav({ items, user = null }: MainNavProps) {
+export function MainNav({ user = null }: MainNavProps) {
   return (
-    <>
-      <div className="hidden gap-6 text-lg lg:flex justify-between mx-auto w-full">
-        <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="text-neutral-500 bg-transparent uppercase">
-                Thông tin
-              </NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <ul className="grid gap-x-2.5 p-[22px] sm:w-[600px] lg:grid-cols-1">
-                  <ListItem
-                    href={`${Const.SOCIAL_INSTAGRAM}`}
-                    title="Instagram"
-                  >
-                  </ListItem>
-                  <ListItem href={`${Const.SOCIAL_FACEBOOK}`} title="Facebook">
-                  </ListItem>
-                  <ListItem href={`${Const.SOCIAL_TIKTOK}`} title="Tiktok">
-                  </ListItem>
-                </ul>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-            <NavigationMenuIndicator />
-          </NavigationMenuList>
-        </NavigationMenu>
+    <div className="hidden lg:flex justify-between w-full mx-auto gap-6 text-lg">
+      <div className="flex gap-4">
+        <Dropdown label="Diễn đàn">
+          <DropdownItem href={"#"} title="Instagram" />
+          <DropdownItem href={"#"} title="Bài mới" />
+          <DropdownItem href={"#"} title="Tìm trong diễn đàn" />
+        </Dropdown>
 
-        <nav className="hidden bg-orange-600 lg:flex items-center justify-end space-x-4 w-fit px-4">
-          <ModeToggle />
-          <ProductsCombobox />
-          {/* <CartSheet /> */}
-          {/* <LocaleSwitcher /> */}
-          <AuthDropdown user={user} />
-        </nav>
+        <Dropdown label="Có gì mới">
+          <DropdownItem
+            href={"#"}
+            title="Featured content"
+          />
+          <DropdownItem href={"#"} title="Bài mới" />
+          <DropdownItem href={"#"} title="Ảnh mới" />
+        </Dropdown>
+
+        <Dropdown label="Học tập">
+          <DropdownItem href={"#"} title="Thư viện ảnh" />
+        </Dropdown>
+
+        <Dropdown label="Danh hiệu">
+          <DropdownItem href={"#"} title="Thành viên" />
+          <DropdownItem
+            href={"#"}
+            title="Người đang truy cập"
+          />
+        </Dropdown>
+
+        <Link
+          href="/shop"
+          className="text-orange-100 uppercase hover:underline"
+        >
+          Shop
+        </Link>
       </div>
-    </>
+
+      <nav className="hidden lg:flex items-center space-x-4 bg-orange-600 px-4">
+        <ModeToggle />
+        <AuthDropdown user={user} />
+      </nav>
+    </div>
   );
 }
 
-const ListItem = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, href, ...props }, ref) => {
-  return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          ref={ref}
-          href={String(href)}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
-        >
-          {title}
-          {children && (
-            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-              {children}
-            </p>
-          )}
-        </Link>
-      </NavigationMenuLink>
-    </li>
-  );
-});
-ListItem.displayName = "ListItem";
+interface DropdownProps {
+  label: string;
+  children: ReactNode;
+}
 
-const ListItemV2 = React.forwardRef<
-  React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, href, ...props }, ref) => {
+function Dropdown({ label, children }: { label: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+
   return (
-    <li>
-      <NavigationMenuLink asChild>
-        <Link
-          ref={ref}
-          href={String(href)}
-          className={cn(
-            "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent focus:bg-accent focus:text-accent-foreground",
-            className
-          )}
-          {...props}
+    <DropdownMenu open={open} onOpenChange={setOpen}>
+      <div
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="text-orange-100 uppercase data-[state=open]:bg-accent data-[state=open]:text-accent-foreground"
+          >
+            {label}
+            <ChevronDown
+              className="relative top-[1px] ml-1 h-3 w-3 transition duration-200 group-data-[state=open]:rotate-180"
+              aria-hidden="true"
+            />
+          </Button>
+        </DropdownMenuTrigger>
+
+        {/* Dropdown menu phải sát với trigger */}
+        <DropdownMenuContent
+          align="start"
+          sideOffset={0}
+          className={`absolute left-0 top-full w-48 transition-opacity ${
+            open
+              ? "opacity-100 pointer-events-none"
+              : "opacity-0 pointer-events-none"
+          }`}
         >
-          <p className="text-lg group relative w-max">
-            <span className="px-1 relative z-10 ">{title}</span>
-            <span className="absolute left-0 bottom-0 w-full h-[0.25px] bg-neutral-300 transition-transform duration-300 scale-x-0 origin-left group-hover:scale-x-100 z-0 group-hover:bg-neutral-300 group-hover:h-full"></span>
-          </p>
-        </Link>
-      </NavigationMenuLink>
-    </li>
+          {children}
+        </DropdownMenuContent>
+      </div>
+    </DropdownMenu>
   );
-});
-ListItemV2.displayName = "ListItemV2";
+}
+
+// interface DropdownProps {
+//   label: string;
+//   children: ReactNode;
+// }
+
+// function Dropdown({ label, children }: DropdownProps) {
+//   const [open, setOpen] = useState(false);
+
+//   return (
+//     <DropdownMenu open={open} onOpenChange={setOpen}>
+//       <DropdownMenuTrigger asChild>
+//         <Button
+//           variant="ghost"
+//           className="text-orange-100 uppercase data-[state=open]:bg-accent"
+//           onMouseEnter={() => setOpen(true)}
+//           onMouseLeave={() => setOpen(false)}
+//         >
+//           {label}
+//         </Button>
+//       </DropdownMenuTrigger>
+//       <DropdownMenuContent
+//         align="start"
+//         onMouseEnter={() => setOpen(true)}
+//         onMouseLeave={() => setOpen(false)}
+//       >
+//         {children}
+//       </DropdownMenuContent>
+//     </DropdownMenu>
+//   );
+// }
+interface DropdownItemProps {
+  href: string;
+  title: string;
+}
+
+function DropdownItem({ href, title }: DropdownItemProps) {
+  return (
+    <DropdownMenuItem asChild>
+      <Link
+        href={href}
+        className="w-full text-left block py-2 px-4 hover:bg-accent"
+      >
+        {title}
+      </Link>
+    </DropdownMenuItem>
+  );
+}

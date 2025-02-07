@@ -7,7 +7,7 @@ import {IoIosArrowRoundBack} from "react-icons/io";
 export const RegisterForm = () => {
     return (
         <div
-            className="bg-gray-900 z-[100] overflow-hidden bg-opacity-80 p-8 rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-500 max-w-md w-full">
+            className="bg-gray-900 overflow-hidden bg-opacity-80 p-8 rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-500 max-w-md w-full">
             <h1 className="text-4xl text-neutral-200 font-extrabold text-center mb-8 animate-[neon-pulse_1.5s_infinite_alternate]">
                 Đăng kí
             </h1>

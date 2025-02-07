@@ -16,11 +16,11 @@ export default function HomeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="">
       <Header />
       <AutoBreadcrumb />
       <Suspense fallback={<LoadingComponent />}>{children}</Suspense>
       <Footer />
-    </>
+    </div>
   );
 }

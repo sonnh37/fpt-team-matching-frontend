@@ -25,14 +25,14 @@ export const HeaderMain = ({ user }: HeaderMainProps) => {
   return (
     <div
       className={cn(
-        "sticky top-0 bg-primary z-[1000] w-full transition-colors duration-300 tracking-wider text-sm",
+        "sticky top-0 z-10 bg-primary w-full transition-colors duration-300 tracking-wider text-sm",
         "",
         "group backdrop-blur-3xl"
       )}
     >
       <div className="w-full flex justify-center">
         <div className="container flex h-14 items-center justify-between mx-auto">
-          <MainNav user={user} items={navbarConst.mainNav} />
+          <MainNav user={user}/>
           <MobileNav items={navbarConst.mainNav} user={user} />
         </div>
       </div>
