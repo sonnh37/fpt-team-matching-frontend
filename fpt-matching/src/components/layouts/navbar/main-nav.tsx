@@ -5,13 +5,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Const } from "@/lib/constants/const";
 import Link from "next/link";
 import { ModeToggle } from "@/components/_common/mode-toggle";
 import { AuthDropdown } from "@/components/_common/auth-dropdown";
 import { ReactNode, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { User } from "@/types/user";
+import { usePathname } from "next/navigation";
+import AutoBreadcrumb from "@/components/_common/breadcrumbs";
+import DynamicBreadcrumbs from "@/components/_common/breadcrumbs/dynamic-breadcrumbs";
+import { Search } from "@/components/_common/search";
 
 interface MainNavProps {
   user?: User | null;
@@ -19,47 +22,40 @@ interface MainNavProps {
 
 export function MainNav({ user = null }: MainNavProps) {
   return (
-    <div className="hidden lg:flex justify-between w-full mx-auto gap-6 text-lg">
-      <div className="flex gap-4">
-        <Dropdown label="Diễn đàn">
-          <DropdownItem href={"#"} title="Instagram" />
-          <DropdownItem href={"#"} title="Bài mới" />
-          <DropdownItem href={"#"} title="Tìm trong diễn đàn" />
-        </Dropdown>
+    <div className="flex flex-col w-full">
+      <div className="hidden lg:flex overflow-hidden justify-between w-full mx-auto gap-6 text-lg">
+        <div className="flex gap-4">
+          <LinkItem href="/" title="Trang chủ" />
+          <Dropdown label="Diễn đàn">
+            <DropdownItem href={"#"} title="Instagram" />
+            <DropdownItem href={"#"} title="Bài mới" />
+            <DropdownItem href={"#"} title="Tìm trong diễn đàn" />
+          </Dropdown>
 
-        <Dropdown label="Có gì mới">
-          <DropdownItem
-            href={"#"}
-            title="Featured content"
-          />
-          <DropdownItem href={"#"} title="Bài mới" />
-          <DropdownItem href={"#"} title="Ảnh mới" />
-        </Dropdown>
+          <Dropdown label="Có gì mới">
+            <DropdownItem href={"#"} title="Featured content" />
+            <DropdownItem href={"#"} title="Bài mới" />
+            <DropdownItem href={"#"} title="Ảnh mới" />
+          </Dropdown>
 
-        <Dropdown label="Học tập">
-          <DropdownItem href={"#"} title="Thư viện ảnh" />
-        </Dropdown>
+          <Dropdown label="Học tập">
+            <DropdownItem href={"#"} title="Thư viện ảnh" />
+          </Dropdown>
 
-        <Dropdown label="Danh hiệu">
-          <DropdownItem href={"#"} title="Thành viên" />
-          <DropdownItem
-            href={"#"}
-            title="Người đang truy cập"
-          />
-        </Dropdown>
+          <Dropdown label="Danh hiệu">
+            <DropdownItem href={"#"} title="Thành viên" />
+            <DropdownItem href={"#"} title="Người đang truy cập" />
+          </Dropdown>
 
-        <Link
-          href="/shop"
-          className="text-orange-100 uppercase hover:underline"
-        >
-          Shop
-        </Link>
+          <LinkItem href="#" title="Shop" />
+        </div>
+
+        <nav className="hidden lg:flex items-center bg-orange-400">
+          {/* <ModeToggle /> */}
+          <Search />
+          <AuthDropdown user={user} />
+        </nav>
       </div>
-
-      <nav className="hidden lg:flex items-center space-x-4 bg-orange-600 px-4">
-        <ModeToggle />
-        <AuthDropdown user={user} />
-      </nav>
     </div>
   );
 }
@@ -69,15 +65,12 @@ interface DropdownProps {
   children: ReactNode;
 }
 
-function Dropdown({ label, children }: { label: string; children: ReactNode }) {
+function Dropdown({ label, children }: DropdownProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <div
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-      >
+    <div onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
@@ -91,67 +84,49 @@ function Dropdown({ label, children }: { label: string; children: ReactNode }) {
           </Button>
         </DropdownMenuTrigger>
 
-        {/* Dropdown menu phải sát với trigger */}
-        <DropdownMenuContent
-          align="start"
-          sideOffset={0}
-          className={`absolute left-0 top-full w-48 transition-opacity ${
-            open
-              ? "opacity-100 pointer-events-none"
-              : "opacity-0 pointer-events-none"
-          }`}
-        >
+        <DropdownMenuContent align="start" sideOffset={0}>
           {children}
         </DropdownMenuContent>
-      </div>
-    </DropdownMenu>
+      </DropdownMenu>
+    </div>
   );
 }
 
-// interface DropdownProps {
-//   label: string;
-//   children: ReactNode;
-// }
-
-// function Dropdown({ label, children }: DropdownProps) {
-//   const [open, setOpen] = useState(false);
-
-//   return (
-//     <DropdownMenu open={open} onOpenChange={setOpen}>
-//       <DropdownMenuTrigger asChild>
-//         <Button
-//           variant="ghost"
-//           className="text-orange-100 uppercase data-[state=open]:bg-accent"
-//           onMouseEnter={() => setOpen(true)}
-//           onMouseLeave={() => setOpen(false)}
-//         >
-//           {label}
-//         </Button>
-//       </DropdownMenuTrigger>
-//       <DropdownMenuContent
-//         align="start"
-//         onMouseEnter={() => setOpen(true)}
-//         onMouseLeave={() => setOpen(false)}
-//       >
-//         {children}
-//       </DropdownMenuContent>
-//     </DropdownMenu>
-//   );
-// }
 interface DropdownItemProps {
   href: string;
   title: string;
 }
 
 function DropdownItem({ href, title }: DropdownItemProps) {
+  const pathname = usePathname();
+  const isActive = pathname === href;
+
   return (
     <DropdownMenuItem asChild>
       <Link
         href={href}
-        className="w-full text-left block py-2 px-4 hover:bg-accent"
+        className={`w-full text-left block py-2 px-4 hover:bg-accent ${
+          isActive ? "bg-accent text-accent-foreground" : ""
+        }`}
       >
         {title}
       </Link>
     </DropdownMenuItem>
+  );
+}
+function LinkItem({ href, title }: DropdownItemProps) {
+  const pathname = usePathname();
+  const isActive = pathname === href;
+
+  return (
+    <Button
+      asChild
+      variant="ghost"
+      className={`text-orange-100 uppercase data-[state=open]:bg-accent data-[state=open]:text-accent-foreground ${
+        isActive ? "bg-accent text-accent-foreground" : ""
+      }`}
+    >
+      <Link href={href}>{title}</Link>
+    </Button>
   );
 }

@@ -16,9 +16,8 @@ export default function HomeLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="">
+    <div className="bg-accent">
       <Header />
-      <AutoBreadcrumb />
       <Suspense fallback={<LoadingComponent />}>{children}</Suspense>
       <Footer />
     </div>

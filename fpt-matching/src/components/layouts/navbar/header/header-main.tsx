@@ -5,7 +5,6 @@ import { User } from "@/types/user";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 
-// Dynamically import MainNav and MobileNav with React.memo
 const MainNav = dynamic(
   () => import("../main-nav").then((mod) => mod.MainNav),
   { ssr: false }
@@ -25,13 +24,13 @@ export const HeaderMain = ({ user }: HeaderMainProps) => {
   return (
     <div
       className={cn(
-        "sticky top-0 z-10 bg-primary w-full transition-colors duration-300 tracking-wider text-sm",
+        "transition-colors duration-300 tracking-wider text-sm",
         "",
         "group backdrop-blur-3xl"
       )}
     >
       <div className="w-full flex justify-center">
-        <div className="container flex h-14 items-center justify-between mx-auto">
+        <div className="container flex  items-end justify-between mx-auto">
           <MainNav user={user}/>
           <MobileNav items={navbarConst.mainNav} user={user} />
         </div>
