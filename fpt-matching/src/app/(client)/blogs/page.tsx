@@ -1,10 +1,10 @@
 "use client";
 
+import ErrorSystem from "@/components/_common/errors/error-system";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import { TitleProvider } from "@/components/_common/title-component";
 import { Pagination } from "@/components/client/common/pagination";
 import { BlogsRecent } from "@/components/client/sites/blogs/blogs-recent";
-import ErrorSystem from "@/components/_common/errors/error-system";
-import {LoadingPageComponent} from "@/components/_common/loading-page";
-import { TitleProvider } from "@/components/_common/title-component";
 
 import { Button } from "@/components/ui/button";
 import { convertHtmlToPlainText, formatDate } from "@/lib/utils";
@@ -42,7 +42,7 @@ export default function AlbumPage() {
     },
   });
 
-  if (isLoading) return <LoadingPageComponent />;
+  if (isLoading) return <LoadingComponent />;
 
   if (isError) {
     console.log("Error fetching:", error);

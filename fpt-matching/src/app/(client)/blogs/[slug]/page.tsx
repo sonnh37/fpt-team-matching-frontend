@@ -1,22 +1,18 @@
 "use client";
-import { LoadingPageComponent } from "@/components/_common/loading-page";
-import { DisplayContent } from "@/components/client/common/display-content";
-import { createEditorState, formatDate } from "@/lib/utils";
 import { blogService } from "@/services/blog-service";
 import { Blog } from "@/types/blog";
 import { BlogGetAllQuery } from "@/types/queries/blog-query";
 import { useQuery } from "@tanstack/react-query";
 
 import ErrorSystem from "@/components/_common/errors/error-system";
-import PostReadingProgress from "@/components/shared/PostReadingProgress";
-import PostHeader from "@/components/shared/PostHeader";
-import PostSharing from "@/components/shared/PostSharing";
 import PostContent from "@/components/shared/PostContent";
+import PostHeader from "@/components/shared/PostHeader";
+import PostReadingProgress from "@/components/shared/PostReadingProgress";
+import PostSharing from "@/components/shared/PostSharing";
 import PostToc from "@/components/shared/PostToc";
+import TiptapRenderer from "@/components/TiptapRenderer/ClientRenderer";
 import Image from "next/image";
 import { useMemo } from "react";
-import TiptapRenderer from "@/components/TiptapRenderer/ClientRenderer";
-import { userService } from "@/services/user-serice";
 
 export default function Page({ params }: { params: { slug: string } }) {
   const { slug } = params;
@@ -52,7 +48,7 @@ export default function Page({ params }: { params: { slug: string } }) {
     return Math.ceil(wordCount / wpm);
   }, [post.content]);
 
-  if (isLoading) return <LoadingPageComponent />;
+  if (isLoading) return <LoadingComponent />;
 
   if (isError) {
     console.log("Error fetching:", error);

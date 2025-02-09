@@ -8,6 +8,7 @@ import "./globals.css";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { UserAccessControl } from "@/components/_common/user-access-control";
 export default function LayoutClient({
   children,
 }: {
@@ -35,7 +36,9 @@ export default function LayoutClient({
       <ThemeProvider attribute="class" enableSystem={true} defaultTheme="light">
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
-            <TooltipProvider delayDuration={100}>{children}</TooltipProvider>
+            <TooltipProvider delayDuration={100}>
+              <UserAccessControl>{children}</UserAccessControl>
+            </TooltipProvider>
           </QueryClientProvider>
         </Provider>
       </ThemeProvider>
