@@ -21,7 +21,10 @@ class AuthService {
     try {
       const response = await axios.post<BusinessResult<LoginResponse>>(
         `${process.env.NEXT_PUBLIC_API_BASE}/auth/login`,
-        { account: account, password: password }
+        { account: account, password: password },
+        {
+          withCredentials: true,
+        }
       );
       return response.data;
     } catch (error) {
