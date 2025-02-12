@@ -4,11 +4,11 @@ import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import { Provider } from "react-redux";
 import { Toaster } from "sonner";
-import "./globals.css";
-
+import { ProtectedRoute } from "@/components/_common/user-access-control";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { UserAccessControl } from "@/components/_common/user-access-control";
+import "./globals.css";
+
 export default function LayoutClient({
   children,
 }: {
@@ -37,7 +37,7 @@ export default function LayoutClient({
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider delayDuration={100}>
-              <UserAccessControl>{children}</UserAccessControl>
+              <ProtectedRoute>{children}</ProtectedRoute>
             </TooltipProvider>
           </QueryClientProvider>
         </Provider>
