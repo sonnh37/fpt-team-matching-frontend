@@ -4,7 +4,7 @@ import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import { Provider } from "react-redux";
 import { Toaster } from "sonner";
-import { ProtectedRoute } from "@/components/_common/user-access-control";
+import { AuthProvider } from "@/components/_common/auth-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./globals.css";
@@ -37,7 +37,7 @@ export default function LayoutClient({
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
             <TooltipProvider delayDuration={100}>
-              <ProtectedRoute>{children}</ProtectedRoute>
+              <AuthProvider>{children}</AuthProvider>
             </TooltipProvider>
           </QueryClientProvider>
         </Provider>

@@ -43,7 +43,7 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
   const handleLogout = () => {
     authService.logout().then((res) => {
       if (res.status == 1) {
-        window.location.href = "/";
+        window.location.reload();
       }
     });
   };

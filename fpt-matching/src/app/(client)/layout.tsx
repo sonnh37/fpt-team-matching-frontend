@@ -23,7 +23,7 @@ export default function HomeLayout({
 
   useEffect(() => {
     if (!user) {
-      router.replace("/login"); 
+      router.replace("/login");
     }
   }, [user, router]);
 
