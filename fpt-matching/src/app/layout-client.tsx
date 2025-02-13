@@ -18,6 +18,7 @@ export default function LayoutClient({
   if (!queryClient) {
     return null;
   }
+
   return (
     <>
       <NextTopLoader

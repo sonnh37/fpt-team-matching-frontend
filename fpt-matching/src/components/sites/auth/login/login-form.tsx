@@ -72,10 +72,15 @@ export const LoginForm = ({
                 </div>
                 {/* Login normal */}
                 <div className="grid gap-2">
-                  <FormInput name="account" label="Email" form={form} />
+                  <FormInput type="email" name="account" label="Email" form={form} />
                 </div>
                 <div className="grid gap-2">
-                  <FormInput name="password" label="Password" form={form} />
+                  <FormInput
+                    type="password"
+                    name="password"
+                    label="Password"
+                    form={form}
+                  />
                 </div>
                 <Button type="submit" className="w-full">
                   Login

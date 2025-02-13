@@ -40,23 +40,6 @@ import { useSelector } from "react-redux";
 
 // This is sample data.
 const data = {
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
   navMain: [
     {
       title: "Home",
@@ -66,7 +49,7 @@ const data = {
     },
     {
       title: "Social",
-      url: "#",
+      url: "social",
       icon: Globe,
     },
     {
