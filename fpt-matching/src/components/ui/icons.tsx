@@ -14,7 +14,6 @@ export const Icons = {
             alt="Nhu My Studio"
             className={cn("w-16", className)}
         />
-        <p className="font-spectral font-normal text-2xl">Team Matching</p>
         </>
     ),
     menu: ({...props}: IconProps) => (
