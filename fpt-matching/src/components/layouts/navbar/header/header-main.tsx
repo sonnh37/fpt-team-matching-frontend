@@ -25,7 +25,6 @@ export const HeaderMain = ({ user }: HeaderMainProps) => {
     <div
       className={cn(
         "transition-colors duration-300 tracking-wider text-sm",
-        "",
         "group backdrop-blur-3xl"
       )}
     >

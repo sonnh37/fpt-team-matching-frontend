@@ -10,12 +10,17 @@ import Link from "next/link";
 import { ModeToggle } from "@/components/_common/mode-toggle";
 import { AuthDropdown } from "@/components/_common/auth-dropdown";
 import { ReactNode, useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, SearchIcon } from "lucide-react";
 import { User } from "@/types/user";
 import { usePathname } from "next/navigation";
 import AutoBreadcrumb from "@/components/_common/breadcrumbs";
 import DynamicBreadcrumbs from "@/components/_common/breadcrumbs/dynamic-breadcrumbs";
 import { Search } from "@/components/_common/search";
+import { Icons } from "@/components/ui/icons";
+import { TypographyBlockquote } from "@/components/_common/typography/typography-blockquote";
+import { TypographyInlinecode } from "@/components/_common/typography/typography-inline-code";
+import { TypographyLarge } from "@/components/_common/typography/typography-large";
+import { Input } from "@/components/ui/input";
 
 interface MainNavProps {
   user?: User | null;
@@ -23,10 +28,25 @@ interface MainNavProps {
 
 export function MainNav({ user = null }: MainNavProps) {
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full py-2">
       <div className="hidden lg:flex overflow-hidden justify-between w-full mx-auto gap-6 text-lg">
-        <div className="flex gap-4">
-          <LinkItem href="/" title="Trang chủ" />
+        <div className="flex gap-4 w-full">
+          <div className="grid grid-flow-col items-center gap-2">
+            <Icons.logo className="w-24" />
+            <TypographyLarge className="tracking-wider">
+              TeamMatching
+            </TypographyLarge>
+          </div>
+          <div className="w-full border rounded-xl items-center text-center">
+            <Search />
+          </div>
+
+          <div className="flex items-center ">
+            {/* <ModeToggle /> */}
+
+            <AuthDropdown user={user} />
+          </div>
+          {/* <LinkItem href="/" title="Trang chủ" />
           <Dropdown label="Diễn đàn">
             <DropdownItem href={"#"} title="Instagram" />
             <DropdownItem href={"#"} title="Bài mới" />
@@ -48,14 +68,8 @@ export function MainNav({ user = null }: MainNavProps) {
             <DropdownItem href={"#"} title="Người đang truy cập" />
           </Dropdown>
 
-          <LinkItem href="#" title="Shop" />
+          <LinkItem href="#" title="Shop" /> */}
         </div>
-
-        <nav className="hidden lg:flex items-center bg-orange-400">
-          {/* <ModeToggle /> */}
-          <Search />
-          <AuthDropdown user={user} />
-        </nav>
       </div>
     </div>
   );

@@ -9,12 +9,11 @@ export function Header() {
 
   return (
     <>
-      <div className="bg-primary">
+      {/* <div className="bg-primary">
         <HeaderTop />
-      </div>
-      <div className="sticky top-0 z-10 w-full bg-primary shadow-md">
+      </div> */}
+      <div className="sticky top-0 z-10 w-full shadow-md">
         <HeaderMain user={user} />
-        <AutoBreadcrumb />
       </div>
     </>
   );
