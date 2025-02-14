@@ -48,8 +48,13 @@ export function NavMain({
             {item.items ? (
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title}>
-                    {item.icon && <item.icon />}
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    className="text-lg py-6 tracking-wide group-data-[collapsible=icon]:!p-1"
+                  >
+                    <div className="flex aspect-square size-5 items-center justify-start">
+                      {item.icon && <item.icon />}
+                    </div>
                     <span>{item.title}</span>
                     <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                   </SidebarMenuButton>
@@ -58,9 +63,14 @@ export function NavMain({
                   <SidebarMenuSub>
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
+                        <SidebarMenuSubButton
+                          className="text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-1"
+                          asChild
+                        >
                           <a href={subItem.url}>
-                            {subItem.icon && <subItem.icon />}
+                            <div className="flex aspect-square size-5 items-center justify-start">
+                              {subItem.icon && <subItem.icon />}
+                            </div>
                             <span>{subItem.title}</span>
                           </a>
                         </SidebarMenuSubButton>
@@ -71,9 +81,13 @@ export function NavMain({
               </SidebarMenuItem>
             ) : (
               <a href={item.url}>
-                <SidebarMenuButton tooltip={item.title}>
-                  {item.icon && <item.icon />}
-
+                <SidebarMenuButton
+                  className="text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-1"
+                  tooltip={item.title}
+                >
+                  <div className="flex aspect-square size-5 items-center justify-start">
+                    {item.icon && <item.icon />}
+                  </div>
                   <span>{item.title}</span>
                 </SidebarMenuButton>
               </a>

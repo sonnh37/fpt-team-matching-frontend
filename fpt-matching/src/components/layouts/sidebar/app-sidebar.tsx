@@ -29,6 +29,7 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
+  SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { NavMain } from "./nav-main";
@@ -37,6 +38,8 @@ import { NavUser } from "./nav-user";
 import { TeamSwitcher } from "./team-switcher";
 import { RootState } from "@/lib/redux/store";
 import { useSelector } from "react-redux";
+import { Icons } from "@/components/ui/icons";
+import { TypographyH4 } from "@/components/_common/typography/typography-h4";
 
 // This is sample data.
 const data = {
@@ -139,12 +142,23 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return null; // Hoặc hiển thị loading nếu muốn
   }
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" {...props} variant="inset">
       <SidebarHeader>
-        <TeamSwitcher />
+        <SidebarMenuButton
+          size="lg"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-3"
+        >
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
+            <Icons.logo />
+          </div>
+          <div className="grid flex-1 text-left text-sm tracking-wider">
+            <TypographyH4 className="truncate uppercase text-base text-primary tracking-wide">
+              Team matching
+            </TypographyH4>
+          </div>
+        </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
-
         <NavMain items={data.navMain} />
         {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
