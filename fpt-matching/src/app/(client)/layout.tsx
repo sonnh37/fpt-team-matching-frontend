@@ -1,26 +1,28 @@
 "use client";
-import AutoBreadcrumb from "@/components/_common/breadcrumbs";
-import { LoadingComponent } from "@/components/_common/loading-page";
-import Footer from "@/components/layouts/footer";
+import { RootState } from "@/lib/redux/store";
 
 import dynamic from "next/dynamic";
-import React, { Suspense } from "react";
-
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
+import { useSelector } from "react-redux";
 const Header = dynamic(
   () => import("@/components/layouts/navbar/header").then((mod) => mod.Header),
   { ssr: false }
 );
-export default function HomeLayout({
+export default function ClientLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="">
-      <Header />
-      <AutoBreadcrumb />
-      <Suspense fallback={<LoadingComponent />}>{children}</Suspense>
-      <Footer />
-    </div>
-  );
+  const router = useRouter();
+  const user = useSelector((state: RootState) => state.user.user);
+  useEffect(() => {
+    if (!user) {
+      router.replace("/login");
+    }
+  }, [user, router]);
+
+  if (!user) return null;
+
+  return <>{children}</>;
 }

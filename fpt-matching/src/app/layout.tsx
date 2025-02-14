@@ -1,4 +1,3 @@
-import { QueryClient } from "@tanstack/react-query";
 import type { Metadata } from "next";
 import LayoutClient from "./layout-client";
 
@@ -12,11 +11,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const queryClient = new QueryClient();
-  if (!queryClient) {
-    return null;
-  }
-
   return (
     <html suppressHydrationWarning={true} lang="en">
       <body className={`antialiased`}>

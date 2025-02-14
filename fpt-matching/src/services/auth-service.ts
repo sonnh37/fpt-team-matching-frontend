@@ -19,9 +19,12 @@ class AuthService {
     password: string
   ): Promise<BusinessResult<LoginResponse>> => {
     try {
-      const response = await axiosInstance.post<BusinessResult<LoginResponse>>(
-        `${this.endpoint}/login`,
-        { account: account, password: password }
+      const response = await axios.post<BusinessResult<LoginResponse>>(
+        `${process.env.NEXT_PUBLIC_API_BASE}/auth/login`,
+        { account: account, password: password },
+        {
+          withCredentials: true,
+        }
       );
       return response.data;
     } catch (error) {
@@ -31,8 +34,8 @@ class AuthService {
 
   public logout = async (): Promise<BusinessResult<null>> => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE}/auth/logout`,
+      const response = await axiosInstance.post(
+        `${this.endpoint}/logout`,
         {},
         { withCredentials: true }
       );
@@ -62,6 +65,9 @@ class AuthService {
 
   public getUserInfo = async (): Promise<BusinessResult<User>> => {
     try {
+      // const response = await axiosInstance.get<BusinessResult<User>>(
+      //   `${this.endpoint}/info`
+      // );
       const response = await axios.get<BusinessResult<User>>(
         `${process.env.NEXT_PUBLIC_API_BASE}/auth/info`,
         { withCredentials: true }

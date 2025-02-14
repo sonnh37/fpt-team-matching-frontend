@@ -1,17 +1,20 @@
+import { cn } from "@/lib/utils";
 import {AvatarIcon, ChevronLeftIcon, GearIcon, HomeIcon, ImageIcon,} from "@radix-ui/react-icons";
+import Image from "next/image";
 
 export type IconProps = React.HTMLAttributes<SVGElement>;
 
 export const Icons = {
     logo: ({className = "", ...props}: IconProps) => (
-        // <Image
-        //     src="/2.png"
-        //     width={500}
-        //     height={500}
-        //     alt="Nhu My Studio"
-        //     className={cn("size-11 rounded-lg", className)}
-        // />
-        <p className="font-spectral font-normal text-2xl">FPT Team Matching</p>
+        <>
+        <Image
+            src="/FPT_logo.png"
+            width={9999}
+            height={9999}
+            alt="Nhu My Studio"
+            className={cn("w-16", className)}
+        />
+        </>
     ),
     menu: ({...props}: IconProps) => (
         <svg

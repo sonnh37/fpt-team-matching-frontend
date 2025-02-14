@@ -24,7 +24,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -41,24 +40,28 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
 
-interface FormInputProps<TFieldValues extends FieldValues> {
+interface FormInputProps<TFieldValues extends FieldValues>
+  extends Omit<React.ComponentPropsWithoutRef<"input">, "form"> {
   label?: string;
   name: FieldPath<TFieldValues>;
-  placeholder?: string;
   description?: string;
   form: UseFormReturn<TFieldValues>;
-  className?: string;
-  disabled?: boolean;
 }
 
+interface BaseProps<TFieldValues extends FieldValues> {
+  label?: string;
+  name: FieldPath<TFieldValues>;
+  description?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  form: UseFormReturn<TFieldValues>;
+}
 export const FormInput = <TFieldValues extends FieldValues>({
   label,
   name,
-  placeholder = "",
   description,
   form,
-  className = "",
-  disabled = false,
+  ...props
 }: FormInputProps<TFieldValues>) => {
   return (
     <FormField
@@ -68,12 +71,7 @@ export const FormInput = <TFieldValues extends FieldValues>({
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Input
-              disabled={disabled}
-              placeholder={placeholder}
-              {...field}
-              className={className}
-            />
+            <Input {...field} {...props} />
           </FormControl>
           {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
@@ -83,14 +81,21 @@ export const FormInput = <TFieldValues extends FieldValues>({
   );
 };
 
+interface FormInputTextAreaProps<TFieldValues extends FieldValues>
+  extends Omit<React.ComponentPropsWithoutRef<"textarea">, "form"> {
+  label?: string;
+  name: FieldPath<TFieldValues>;
+  description?: string;
+  form: UseFormReturn<TFieldValues>;
+}
+
 export const FormInputTextArea = <TFieldValues extends FieldValues>({
   label,
   name,
-  placeholder = "",
   description,
   form,
-  className = "",
-}: FormInputProps<TFieldValues>) => {
+  ...props
+}: FormInputTextAreaProps<TFieldValues>) => {
   return (
     <FormField
       control={form.control}
@@ -99,11 +104,7 @@ export const FormInputTextArea = <TFieldValues extends FieldValues>({
         <FormItem>
           <FormLabel>{label}</FormLabel>
           <FormControl>
-            <Textarea
-              {...field}
-              placeholder={placeholder}
-              className={className}
-            />
+            <Textarea {...field} {...props} />
           </FormControl>
           {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
@@ -283,10 +284,9 @@ export const FormRadioGroup = <TFieldValues extends FieldValues>({
 export const FormInputNumber = <TFieldValues extends FieldValues>({
   label,
   name,
-  placeholder = "",
   description,
   form,
-  className = "",
+  ...props
 }: FormInputProps<TFieldValues>) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -301,9 +301,7 @@ export const FormInputNumber = <TFieldValues extends FieldValues>({
             <Input
               {...field}
               ref={inputRef}
-              placeholder={placeholder}
-              type="text"
-              className={className}
+              {...props}
               min="0"
               value={
                 field.value !== undefined ? formatCurrency(field.value) : ""
@@ -328,6 +326,7 @@ export const FormInputNumber = <TFieldValues extends FieldValues>({
               }}
             />
           </FormControl>
+          {description && <FormDescription>{description}</FormDescription>}
           <FormMessage />
         </FormItem>
       )}
@@ -338,11 +337,10 @@ export const FormInputNumber = <TFieldValues extends FieldValues>({
 export const FormSwitch = <TFieldValues extends FieldValues>({
   label,
   name,
-  description = "",
+  description,
+  disabled = false,
   form,
-}: FormInputProps<TFieldValues>) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-
+}: BaseProps<TFieldValues>) => {
   return (
     <div className="space-y-4">
       <FormField
@@ -352,10 +350,14 @@ export const FormSwitch = <TFieldValues extends FieldValues>({
           <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
             <div className="space-y-0.5">
               <FormLabel className="text-base">{label}</FormLabel>
-              <FormDescription>{description}</FormDescription>
+              {description && <FormDescription>{description}</FormDescription>}
             </div>
             <FormControl>
-              <Switch checked={field.value} onCheckedChange={field.onChange} />
+              <Switch
+                disabled={disabled}
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
             </FormControl>
           </FormItem>
         )}
@@ -479,9 +481,8 @@ export const FormInputDate = <TFieldValues extends FieldValues>({
   label,
   name,
   form,
-  placeholder = "",
   disabled = false,
-}: FormInputProps<TFieldValues>) => {
+}: BaseProps<TFieldValues>) => {
   return (
     <FormField
       control={form.control}
@@ -532,9 +533,9 @@ export const FormInputDateTimePicker = <TFieldValues extends FieldValues>({
   label,
   name,
   form,
-  placeholder = "",
+  placeholder,
   disabled = false,
-}: FormInputProps<TFieldValues>) => {
+}: BaseProps<TFieldValues>) => {
   const [time, setTime] = useState<string>("00:00");
   const [date, setDate] = useState<Date | null>(null);
   return (
@@ -598,9 +599,9 @@ export const FormInputDateRangePicker = <TFieldValues extends FieldValues>({
   label,
   name,
   form,
-  placeholder = "",
+  placeholder,
   disabled = false,
-}: FormInputProps<TFieldValues>) => {
+}: BaseProps<TFieldValues>) => {
   return (
     <div className="flex justify-start gap-3">
       <FormField

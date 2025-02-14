@@ -26,10 +26,7 @@ axiosInstance.interceptors.response.use(
         ).data as BusinessResult<LoginResponse>;
 
         if (refreshResponse.status !== 1) {
-          if (window.location.pathname.startsWith("/dashboard")) {
-            // admin, staff
-            window.location.href = "/login";
-          }
+          window.location.href = "/login";
           return Promise.reject(error);
         }
 

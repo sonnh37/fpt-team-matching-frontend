@@ -4,10 +4,11 @@ import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import { Provider } from "react-redux";
 import { Toaster } from "sonner";
-import "./globals.css";
-
+import { AuthProvider } from "@/components/_common/auth-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import "./globals.css";
+
 export default function LayoutClient({
   children,
 }: {
@@ -17,6 +18,7 @@ export default function LayoutClient({
   if (!queryClient) {
     return null;
   }
+
   return (
     <>
       <NextTopLoader
@@ -35,7 +37,9 @@ export default function LayoutClient({
       <ThemeProvider attribute="class" enableSystem={true} defaultTheme="light">
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
-            <TooltipProvider delayDuration={100}>{children}</TooltipProvider>
+            <TooltipProvider delayDuration={100}>
+              <AuthProvider>{children}</AuthProvider>
+            </TooltipProvider>
           </QueryClientProvider>
         </Provider>
       </ThemeProvider>
