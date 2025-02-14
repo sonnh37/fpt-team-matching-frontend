@@ -1,26 +1,22 @@
 "use client";
+import { AuthDropdown } from "@/components/_common/auth-dropdown";
+import { ChatPopover } from "@/components/_common/chat-popover";
+import { NotificationPopover } from "@/components/_common/notification-popover";
+import { Search } from "@/components/_common/search";
+import { TypographyLarge } from "@/components/_common/typography/typography-large";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { ModeToggle } from "@/components/_common/mode-toggle";
-import { AuthDropdown } from "@/components/_common/auth-dropdown";
-import { ReactNode, useState } from "react";
-import { ChevronDown, SearchIcon } from "lucide-react";
-import { User } from "@/types/user";
-import { usePathname } from "next/navigation";
-import AutoBreadcrumb from "@/components/_common/breadcrumbs";
-import DynamicBreadcrumbs from "@/components/_common/breadcrumbs/dynamic-breadcrumbs";
-import { Search } from "@/components/_common/search";
 import { Icons } from "@/components/ui/icons";
-import { TypographyBlockquote } from "@/components/_common/typography/typography-blockquote";
-import { TypographyInlinecode } from "@/components/_common/typography/typography-inline-code";
-import { TypographyLarge } from "@/components/_common/typography/typography-large";
-import { Input } from "@/components/ui/input";
+import { User } from "@/types/user";
+import { ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ReactNode, useState } from "react";
 
 interface MainNavProps {
   user?: User | null;
@@ -41,9 +37,10 @@ export function MainNav({ user = null }: MainNavProps) {
             <Search />
           </div>
 
-          <div className="flex items-center ">
+          <div className="flex items-center gap-2">
             {/* <ModeToggle /> */}
-
+            <ChatPopover />
+            <NotificationPopover />
             <AuthDropdown user={user} />
           </div>
           {/* <LinkItem href="/" title="Trang chủ" />

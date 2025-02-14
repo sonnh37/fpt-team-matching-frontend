@@ -36,8 +36,8 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
     );
   }
 
-  const initials = `${user.firstName?.charAt(0) ?? ""} ${
-    user.lastName?.charAt(0) ?? ""
+  const initials = `${user.firstName?.toUpperCase().charAt(0) ?? ""}${
+    user.lastName?.toUpperCase().charAt(0) ?? ""
   }`;
 
   const handleLogout = () => {
@@ -51,10 +51,10 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" className={cn("size-8 rounded-full")}>
+        <Button variant="outline" className={cn("size-8 rounded-full focus-visible:ring-0")}>
           <Avatar className="size-8">
             <AvatarImage src={user.avatar ?? ""} alt={user.username ?? ""} />
-            <AvatarFallback>{initials}</AvatarFallback>
+            <AvatarFallback className="bg-slate-200 hover:bg-slate-300">{initials}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -104,14 +104,14 @@ function AuthDropdownGroup({ user }: AuthDropdownGroupProps) {
       {user?.role !== Role.Customer ? (
         <>
           <DropdownMenuItem asChild>
-            <Link href={"/dashboard"}>
+            <Link href={"/"}>
               <DashboardIcon className="mr-2 size-4" aria-hidden="true" />
               Dashboard
               <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
-            <Link href="/dashboard/settings">
+            <Link href="/settings">
               <GearIcon className="mr-2 size-4" aria-hidden="true" />
               Settings
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
