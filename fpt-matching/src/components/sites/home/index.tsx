@@ -1,30 +1,40 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
 import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
+import { TypographyH2 } from "@/components/_common/typography/typography-h2";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { ideaService } from "@/services/idea-service";
+import { professionService } from "@/services/profession-service";
 import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
+import { Profession } from "@/types/profession";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
-  ColumnFiltersState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  PaginationState,
-  SortingState,
-  useReactTable,
-  VisibilityState,
+    ColumnFiltersState,
+    getCoreRowModel,
+    getFilteredRowModel,
+    PaginationState,
+    SortingState,
+    useReactTable,
+    VisibilityState,
 } from "@tanstack/react-table";
 import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -34,16 +44,16 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
-import { TypographyH2 } from "@/components/_common/typography/typography-h2";
 
 //#region INPUT
 const defaultSchema = z.object({
-  englishName: z.string().min(2, "Required for englishName"),
+  englishName: z.string().optional(),
   type: z.string().optional(),
   major: z.string().optional(),
+  specialtyId: z.string().optional(),
 });
 //#endregion
-export default function IdeaTable() {
+export default function IdeaSearchList() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -71,11 +81,7 @@ export default function IdeaTable() {
 
   const [submittedFilters, setSubmittedFilters] = useState<
     z.infer<typeof defaultSchema>
-  >({
-    englishName: "",
-    type: "",
-    major: "",
-  });
+  >({});
 
   const queryParams: IdeaGetAllQuery = useMemo(() => {
     return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
@@ -85,7 +91,6 @@ export default function IdeaTable() {
     queryKey: ["data", queryParams],
     queryFn: () => ideaService.fetchAll(queryParams),
     placeholderData: keepPreviousData,
-    // enabled: shouldFetch,
     refetchOnWindowFocus: false,
   });
 
@@ -109,6 +114,9 @@ export default function IdeaTable() {
   //#endregion
 
   //#region useEffect
+  const [professions, setProfessions] = useState<Profession[]>([]);
+  const [selectedProfession, setSelectedProfession] =
+    useState<Profession | null>(null);
   useEffect(() => {
     if (columnFilters.length > 0 || submittedFilters) {
       setPagination((prev) => ({
@@ -118,12 +126,28 @@ export default function IdeaTable() {
     }
   }, [columnFilters, submittedFilters]);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await professionService.fetchAll();
+        setProfessions(res.data?.results!);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    refetch();
+  }, [queryParams]);
+
   //#endregion
 
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-    queryParams.englishName = values.englishName;
-    toast.success("Onsubmitting");
-    // refetch();
+    setSubmittedFilters(values);
+    toast.success("Test_submitted");
   };
   return (
     <>
@@ -140,7 +164,7 @@ export default function IdeaTable() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Input Topic Name or Tags to search:</FormLabel>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center">
                       <FormControl>
                         <Input
                           placeholder=""
@@ -157,6 +181,72 @@ export default function IdeaTable() {
                   </FormItem>
                 )}
               />
+
+              <div className="flex gap-2">
+                <FormItem className="w-full">
+                  <FormLabel>Profession</FormLabel>
+                  <Select
+                    onValueChange={(value) => {
+                      const selected = professions.find(
+                        (cat) => cat.id === value
+                      );
+                      setSelectedProfession(selected ?? null);
+                    }}
+                    value={
+                      selectedProfession ? selectedProfession.id : undefined
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Profession" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {professions.map((p) => (
+                        <SelectItem key={p.id} value={p.id!}>
+                          {p.professionName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+
+                <FormField
+                  control={form.control}
+                  name="specialtyId"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Specialty</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={(value) => field.onChange(value)}
+                          value={field.value ?? undefined} // Ensure the value is set correctly
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select Specialty" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {selectedProfession ? (
+                              <>
+                                {selectedProfession?.specialties ? (
+                                  selectedProfession.specialties.map((spec) => (
+                                    <SelectItem key={spec.id} value={spec.id!}>
+                                      {spec.specialtyName}
+                                    </SelectItem>
+                                  ))
+                                ) : (
+                                  <></>
+                                )}
+                              </>
+                            ) : (
+                              <></>
+                            )}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             </form>
           </Form>
         </div>

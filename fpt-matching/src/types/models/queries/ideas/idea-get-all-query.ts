@@ -19,4 +19,6 @@ export interface IdeaGetAllQuery extends BaseQueryableQuery {
   isEnterpriseTopic?: boolean;
   enterpriseName?: string;
   maxTeamSize?: number;
+
+  professionId?: string;
 }

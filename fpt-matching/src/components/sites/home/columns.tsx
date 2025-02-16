@@ -88,13 +88,13 @@ export const columns: ColumnDef<Idea>[] = [
       );
     },
   },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-    cell: ({ row }) => {
-      return <Actions row={row} />;
-    },
-  },
+  // {
+  //   accessorKey: "actions",
+  //   header: "Actions",
+  //   cell: ({ row }) => {
+  //     return <Actions row={row} />;
+  //   },
+  // },
 ];
 
 interface ActionsProps {
