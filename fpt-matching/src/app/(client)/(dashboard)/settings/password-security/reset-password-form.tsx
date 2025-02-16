@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/form";
 import { PasswordInput } from "@/components/ui/password-input";
 import { userService } from "@/services/user-serice";
-import { UserUpdatePasswordCommand } from "@/types/commands/user-command";
+import { UserUpdatePasswordCommand } from "@/types/models/commands/user-command";
 import { User } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";

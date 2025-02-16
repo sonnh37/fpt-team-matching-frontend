@@ -1,38 +1,48 @@
 import { BaseEntity } from "./_base/base";
+import { Application } from "./application";
+import { Blog } from "./blog";
+import { Gender } from "./enums/user";
+import { Idea } from "./idea";
+import { IdeaReview } from "./idea-review";
+import { Invitation } from "./invitation";
+import { Like } from "./like";
+import { ProfileStudent } from "./profile-student";
+import { Project } from "./project";
+import { Rate } from "./rate";
+import { SkillProfile } from "./skill-profile";
+import { TeamMember } from "./team-member";
+import { UserXRole } from "./user-x-role";
 
 export interface User extends BaseEntity {
-    firstName?: string | null | undefined;
-    lastName?: string | null | undefined;
-    avatar?: string | null | undefined;
-    email?: string | null | undefined;
-    dob?: string | null | undefined;
-    address?: string | null | undefined;
-    gender?: Gender | null | undefined;
-    phone?: string | null | undefined;
-    username?: string | null | undefined;
-    password?: string | null | undefined;
-    role?: Role | null | undefined;
-    status?: UserStatus | null | undefined;
-    preferences?: string | null | undefined;
+    gender?: Gender;
+    cache?: string;
+    username?: string;
+    password?: string;
+    avatar?: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    dob?: string;
+    phone?: string;
+    address?: string;
+    department?: string;
+    blogs: Blog[];
+    ideaReviews: IdeaReview[];
+    ideaOfUsers: Idea[];
+    ideaOfSubMentors: Idea[];
+    userXRoles: UserXRole[];
+    comments: Comment[];
+    invitationOfSenders: Invitation[];
+    invitationOfReceivers: Invitation[];
+    applications: Application[];
+    likes: Like[];
+    notifications: Notification[];
+    profileStudent?: ProfileStudent;
+    projects: Project[];
+    projectOfLeaders: Project[];
+    rateBys: Rate[];
+    rateFors: Rate[];
+    // refreshTokens: RefreshToken[];
+    skillProfiles: SkillProfile[];
+    teamMembers: TeamMember[];
 }
-
-export enum Gender {
-    Male,
-    Female,
-    Other,
-}
-
-export enum Role {
-    Admin,
-    Staff,
-    Customer,
-}
-
-export enum UserStatus {
-    Active,
-    Inactive,
-    Suspended,
-}
-
-
-

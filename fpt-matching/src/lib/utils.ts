@@ -1,4 +1,4 @@
-import { BaseQueryableQuery } from "@/types/queries/_base/base-query";
+import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 

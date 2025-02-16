@@ -1,5 +1,5 @@
-import { BusinessResult } from "@/types/responses/business-result";
-import { LoginResponse } from "@/types/responses/login-response";
+import { BusinessResult } from "@/types/models/responses/business-result";
+import { LoginResponse } from "@/types/models/responses/login-response";
 import axios from "axios";
 
 const axiosInstance = axios.create({
