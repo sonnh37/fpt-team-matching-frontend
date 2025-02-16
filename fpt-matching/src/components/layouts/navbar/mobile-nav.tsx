@@ -1,6 +1,6 @@
 "use client";
 
-import type { MainNavItem } from "@/types";
+import type { MainNavItem } from "@/types/models";
 import Link from "next/link";
 import { useSelectedLayoutSegment } from "next/navigation";
 import * as React from "react";

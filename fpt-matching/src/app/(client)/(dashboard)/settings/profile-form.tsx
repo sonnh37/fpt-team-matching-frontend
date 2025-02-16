@@ -23,11 +23,11 @@ import { getEnumOptions } from "@/lib/utils";
 import { Gender, Role, User } from "@/types/user";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { UpdateCommand } from "@/types/commands/_base/base-command";
+import { UpdateCommand } from "@/types/models/commands/_base/base-command";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { userService } from "@/services/user-serice";
-import { UserUpdateCommand } from "@/types/commands/user-command";
+import { UserUpdateCommand } from "@/types/models/commands/user-command";
 
 const profileFormSchema = z.object({
   id: z.string().optional(),

@@ -1,5 +1,5 @@
 import { Const } from "@/lib/constants/const";
-import type { FooterItem, MainNavItem } from "@/types";
+import type { FooterItem, MainNavItem } from "@/types/models";
 
 export type NavbarConst = typeof navbarConst;
 
