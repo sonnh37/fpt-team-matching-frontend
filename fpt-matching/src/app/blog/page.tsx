@@ -36,6 +36,9 @@ export default function Blog() {
     e.preventDefault();
     // Xử lý logic khi submit form
     console.log('Post submitted:', post);
+
+
+
   };
 
   return (
@@ -47,11 +50,11 @@ export default function Blog() {
             <div className="py-3 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3">
               <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
               <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>
-              <a href=""> 
-              <div className='Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline'> Login</div>
+              <a href="">
+                <div className='Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline'> Login</div>
               </a>
               <a href="">
-              <div className='Register w-full mt-2 text-center  p-1 text-xl  hover:bg-blue-200 hover:underline'> Register</div>
+                <div className='Register w-full mt-2 text-center  p-1 text-xl  hover:bg-blue-200 hover:underline'> Register</div>
               </a>
             </div>
             <nav className="text-sm ">
@@ -63,7 +66,6 @@ export default function Blog() {
                       <path stroke-linecap="round" stroke-linejoin="round"
                         d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
                     </svg>
-
                     Trang chủ
                   </a>
                 </li>
@@ -80,7 +82,7 @@ export default function Blog() {
                 </li>
                 <li className="px-4 py-2 text-xs uppercase tracking-wider text-gray-500 font-bold">Blog Management</li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
-                  <a className="py-3 flex items-center" href="/">
+                  <a className="py-3 flex items-center" href="/blog/blogmanagerment">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                       stroke="currentColor" className="w-4 mr-3">
                       <path stroke-linecap="round" stroke-linejoin="round"
@@ -97,7 +99,6 @@ export default function Blog() {
                       <path stroke-linecap="round" stroke-linejoin="round"
                         d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
                     </svg>
-
                     Blog Sharing
                   </a>
                 </li>
@@ -108,7 +109,6 @@ export default function Blog() {
                       <path stroke-linecap="round" stroke-linejoin="round"
                         d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
                     </svg>
-
                     Blog Project
                   </a>
                 </li>
@@ -158,7 +158,7 @@ export default function Blog() {
                     </svg>
                     Term of use
                   </a>
-                </li> 
+                </li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 mr-3">
@@ -166,7 +166,7 @@ export default function Blog() {
                     </svg>
                     About
                   </a>
-                </li> 
+                </li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 mr-3">
@@ -174,7 +174,7 @@ export default function Blog() {
                     </svg>
                     Contact
                   </a>
-                </li> 
+                </li>
               </ul>
             </nav>
           </aside>
@@ -188,15 +188,63 @@ export default function Blog() {
                 <img
                   src="/meo.jpg"
                   alt="Avatar"
-                  className="w-10 h-10 rounded-full"
+                  className="w-12 h-12 rounded-full"
                 />
-                <input
-                  id="post"
-                  className="shadow appearance-none bg-slate-200   border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                  placeholder=" Quan đi, bạn đang nghĩ gì thế?"
-                  value={post}
-                  onChange={(e) => setPost(e.target.value)}
-                ></input>
+                <Modal>
+                  <ModalTrigger className='w-full'>
+                    <div className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
+                      Quan đi, bạn đang nghĩ gì thế?
+                    </div>
+
+                  </ModalTrigger>
+
+                  <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
+                    <ModalContent >
+                      <div className="header-blog mb-4 py-4 border-b-2 h-1/5">
+                        <h4 className='text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center' >
+                          Tạo bài viết của bạn đi
+                        </h4>
+                      </div>
+                      <div className='body-blog w-full h-4/5'>
+                        <div className='headerbody  flex items-center w-full h-1/4'>
+                          <img
+                            src="/user-avatardefault.jpg" // Replace with your avatar image
+                            alt="User Avatar"
+                            className="w-12 h-12 rounded-full"
+                          />
+                          <div className='w-full ml-3 '>
+                            <div className=' '>
+                              <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
+                            </div>
+                            <select className=' '>
+                              <option value="value1">Đăng chia sẻ</option>
+                              <option value="value2">Đăng tìm thành viên</option>
+                              <option value="value2">Đăng bốc phốt gì đó</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div className='body mt-3 h-3/4'>
+                          <div className='flex'>
+                            <div className='w-1/4 items-center p-2'>
+                              <h3 >Tiêu đề</h3>
+                            </div>
+                            <input className=' w-3/4' type="text" placeholder='Nhập tựa đề ở đây' />
+                          </div>
+                          <div className='flex mt-2 h-full'>
+                            <div className='w-1/4 items-center p-2 '>
+                              <h3 >Nội dung</h3>
+                            </div>
+                            <textarea className='w-3/4 h-40' placeholder='Viết nội dung ở đây' />
+                          </div>
+                        </div>
+                        <div className='flex h-14 items-center justify-center'>
+                          <button className='bg-blue-500 h-3/4 w-full mx-2 hover:bg-blue-400 hover:text-gray-400'>Post Bài</button>
+                        </div>
+                      </div>
+                    </ModalContent>
+                  </ModalBody>
+
+                </Modal>
               </div>
               <div className="flex ">
 
@@ -214,6 +262,8 @@ export default function Blog() {
               </div>
             </form>
           </div>
+
+          {/* filter blog */}
           <div className='header-button flex justify-start pt-3'>
             <span className='font-extrabold mx-1 px-2  hover:bg-white hover:text-blue-900'>Relevant</span>
             <span className=' px-2  hover:bg-white hover:text-blue-900'>Latest</span>
@@ -682,6 +732,7 @@ export default function Blog() {
                             </PopoverContent>
                           </Popover>
                         </div>
+                        {/* Comment */}
                         <div className='comment-content w-full px-3 pt-1'>
                           <div className='account flex p-2'>
                             <div className='img pr-1'>
