@@ -15,8 +15,8 @@ export interface IdeaGetAllQuery extends BaseQueryableQuery {
   englishName?: string;
   file?: string;
   status?: IdeaStatus;
-  isExistedTeam: boolean;
-  isEnterpriseTopic: boolean;
-  enterpriseName: string;
+  isExistedTeam?: boolean;
+  isEnterpriseTopic?: boolean;
+  enterpriseName?: string;
   maxTeamSize?: number;
 }

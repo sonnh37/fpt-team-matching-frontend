@@ -1,29 +1,20 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
 import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
 import {
+  Form,
   FormControl,
-  FormDescription,
+  FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { isDeleted_options } from "@/lib/filter-options";
-import { cn } from "@/lib/utils";
 import { ideaService } from "@/services/idea-service";
-import { FilterEnum } from "@/types/models/filter-enum";
-import { FormFilterAdvanced } from "@/types/models/form-filter-advanced";
+import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -35,109 +26,25 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
+import { TypographyH2 } from "@/components/_common/typography/typography-h2";
 
 //#region INPUT
-const formFilterAdvanceds: FormFilterAdvanced[] = [
-  {
-    name: "date",
-    label: "Date",
-    defaultValue: {
-      from: undefined,
-      to: undefined,
-    },
-    render: ({ field }: { field: any }) => (
-      <FormItem className="flex flex-col">
-        <FormLabel>Date</FormLabel>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              id="date"
-              variant={"outline"}
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !field.value?.from && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {field.value?.from ? (
-                field.value?.to ? (
-                  <>
-                    {format(field.value.from, "LLL dd, y")} -{" "}
-                    {format(field.value.to, "LLL dd, y")}
-                  </>
-                ) : (
-                  format(field.value.from, "LLL dd, y")
-                )
-              ) : (
-                <span>Pick a date</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              initialFocus
-              mode="range"
-              defaultMonth={field.value?.from}
-              selected={{
-                from: field.value?.from!,
-                to: field.value?.to,
-              }}
-              onSelect={field.onChange}
-              numberOfMonths={2}
-            />
-          </PopoverContent>
-        </Popover>
-        <FormDescription>
-          The date you want to add a comment for.
-        </FormDescription>
-        <FormMessage />
-      </FormItem>
-    ),
-  },
-  {
-    name: "name",
-    label: "Name",
-    defaultValue: "",
-    render: ({ field }: { field: any }) => (
-      <FormItem>
-        <FormLabel>Name</FormLabel>
-        <FormControl>
-          <Input placeholder="Product name..." {...field} />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    ),
-  },
-];
-
-const columnSearch = "name";
-const filterEnums: FilterEnum[] = [
-  { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
-];
-
 const defaultSchema = z.object({
-  id: z.string().nullable().optional(),
-  date: z
-    .object({
-      from: z.date().optional(),
-      to: z.date().optional(),
-    })
-    .refine((date) => !!date.to, { message: "End Date is required." })
-    .optional(),
-  isDeleted: z.boolean().nullable().optional(),
+  englishName: z.string().min(2, "Required for englishName"),
+  type: z.string().optional(),
+  major: z.string().optional(),
 });
 //#endregion
 export default function IdeaTable() {
   const searchParams = useSearchParams();
-  const queryParam = searchParams.get("q");
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
     {
@@ -154,35 +61,31 @@ export default function IdeaTable() {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [shouldFetch, setShouldFetch] = useState(true);
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   //#endregion
 
   //#region CREATE TABLE
   const form = useForm<z.infer<typeof defaultSchema>>({
     resolver: zodResolver(defaultSchema),
-    defaultValues: {},
   });
 
-  const formValues = useWatch({
-    control: form.control,
+  const [submittedFilters, setSubmittedFilters] = useState<
+    z.infer<typeof defaultSchema>
+  >({
+    englishName: "",
+    type: "",
+    major: "",
   });
 
-  const getQueryParams = useQueryParams(
-    formValues,
-    columnFilters,
-    pagination,
-    sorting
-  );
+  const queryParams: IdeaGetAllQuery = useMemo(() => {
+    return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
+  }, [submittedFilters, columnFilters, pagination, sorting]);
 
-  const queryParams = useMemo(() => getQueryParams(), [getQueryParams]);
-
-  const { data, isFetching, error } = useQuery({
+  const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: () => ideaService.fetchAll(queryParams),
     placeholderData: keepPreviousData,
-    enabled: shouldFetch,
+    // enabled: shouldFetch,
     refetchOnWindowFocus: false,
   });
 
@@ -207,55 +110,78 @@ export default function IdeaTable() {
 
   //#region useEffect
   useEffect(() => {
-    if (columnFilters.length > 0 || formValues) {
+    if (columnFilters.length > 0 || submittedFilters) {
       setPagination((prev) => ({
         ...prev,
         pageIndex: 0,
       }));
     }
-  }, [columnFilters, formValues]);
+  }, [columnFilters, submittedFilters]);
 
-  useEffect(() => {
-    const field = formValues[columnSearch as keyof typeof formValues] as
-      | string
-      | undefined;
-    if (field && field.length > 0) {
-      setIsTyping(true);
-    } else {
-      setIsTyping(false);
-    }
-  }, [formValues[columnSearch as keyof typeof formValues]]);
   //#endregion
 
-  const handleSheetChange = (open: boolean) => {
-    setIsSheetOpen(open);
-    if (open) {
-      setShouldFetch(false);
-    } else {
-      setShouldFetch(true);
-    }
+  const onSubmit = (values: z.infer<typeof defaultSchema>) => {
+    queryParams.englishName = values.englishName;
+    toast.success("Onsubmitting");
+    // refetch();
   };
-
   return (
-    <Card className="space-y-4 p-4">
-      {isFetching && !isTyping ? (
-        <DataTableSkeleton
-          columnCount={1}
-          showViewOptions={false}
-          withPagination={false}
-          rowCount={pagination.pageSize}
-          searchableColumnCount={0}
-          filterableColumnCount={0}
-          shrinkZero
-        />
-      ) : (
-        <DataTableComponent
-          deletePermanent={ideaService.deletePermanent}
-          restore={ideaService.restore}
-          table={table}
-        />
-      )}
-      <DataTablePagination table={table} />
-    </Card>
+    <>
+      <div className="container mx-auto space-y-8">
+        <div className="w-fit mx-auto space-y-4">
+          <TypographyH2 className="text-center tracking-wide">
+            Capstone Project / Thesis Proposal
+          </TypographyH2>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <FormField
+                control={form.control}
+                name="englishName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Input Topic Name or Tags to search:</FormLabel>
+                    <div className="flex items-center gap-1">
+                      <FormControl>
+                        <Input
+                          placeholder=""
+                          className="focus-visible:ring-none"
+                          type="text"
+                          {...field}
+                        />
+                      </FormControl>
+                      <Button type="submit" variant="outline" size="icon">
+                        <Search />
+                      </Button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </form>
+          </Form>
+        </div>
+
+        <Card className="space-y-4 p-4">
+          {isFetching && !isTyping ? (
+            <DataTableSkeleton
+              columnCount={1}
+              showViewOptions={false}
+              withPagination={false}
+              rowCount={pagination.pageSize}
+              searchableColumnCount={0}
+              filterableColumnCount={0}
+              shrinkZero
+            />
+          ) : (
+            <DataTableComponent
+              deletePermanent={ideaService.deletePermanent}
+              restore={ideaService.restore}
+              table={table}
+            />
+          )}
+          <DataTablePagination table={table} />
+        </Card>
+      </div>
+    </>
   );
 }

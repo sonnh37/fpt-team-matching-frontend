@@ -22,6 +22,10 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import IdeaTable from "./table";
+import { Select } from "@/components/ui/select";
+import { specialtyService } from "@/services/specialty-service";
+import { ideaService } from "@/services/idea-service";
+import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 const formSchema = z.object({
   englishName: z.string().min(1, "English name cannot be empty"),
   type: z.string(),
@@ -36,31 +40,6 @@ export default function HomePage() {
     },
   });
 
-  // const {
-  //   data: result,
-  //   isLoading,
-  //   isError,
-  //   error,
-  // } = useQuery({
-  //   queryKey: ["getType"],
-  //   queryFn: authService.getUserInfo,
-  //   refetchOnWindowFocus: false,
-  // });
-
-  // if (isLoading) return <LoadingComponent />;
-  // if (isError) {
-  //   console.error("Error fetching:", error);
-  //   return <ErrorSystem />;
-  // }
-
-  // if (result) {
-  //   if (result.status === 1) {
-  //     dispatch(setUser(result.data!));
-  //   } else {
-  //     dispatch(logout());
-  //   }
-  // }
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {};
   // Home page
   return (
@@ -68,107 +47,7 @@ export default function HomePage() {
       className="relative flex justify-center items-center flex-col
    "
     >
-      <div className="container mx-auto space-y-8">
-        <div className="w-fit mx-auto space-y-4">
-          <TypographyH2 className="text-center tracking-wide">
-            Capstone Project / Thesis Proposal
-          </TypographyH2>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              {/* <div>
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      const selectedCategory = categories.find(
-                        (cat) => cat.id === value
-                      );
-                      setSelectedCategory(selectedCategory ?? null);
-                    }}
-                    value={selectedCategory ? selectedCategory.id : undefined}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id!}>
-                          {category.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-
-                <FormField
-                  control={form.control}
-                  name="subCategoryId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>SubCategory</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={(value) => field.onChange(value)}
-                          value={field.value ?? undefined} // Ensure the value is set correctly
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select subcategory" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {selectedCategory ? (
-                              <>
-                                {selectedCategory?.subCategories!.map(
-                                  (subCategory) => (
-                                    <SelectItem
-                                      key={subCategory.id}
-                                      value={subCategory.id!}
-                                    >
-                                      {subCategory.name}
-                                    </SelectItem>
-                                  )
-                                )}
-                              </>
-                            ) : (
-                              <></>
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div> */}
-
-              <FormField
-                control={form.control}
-                name="englishName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Input Topic Name or Tags to search:</FormLabel>
-                    <div className="flex items-center gap-1">
-                      <FormControl>
-                        <Input
-                          placeholder=""
-                          className="focus-visible:ring-none"
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <Button type="submit" variant="outline" size="icon">
-                        <Search />
-                      </Button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-        </div>
-
-        <IdeaTable />
-      </div>
+      <IdeaTable />
     </main>
   );
 }
