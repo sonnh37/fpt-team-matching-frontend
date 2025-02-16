@@ -21,6 +21,7 @@ import { FormInput } from "@/lib/form-custom-shadcn";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import IdeaTable from "./table";
 const formSchema = z.object({
   englishName: z.string().min(1, "English name cannot be empty"),
   type: z.string(),
@@ -67,7 +68,7 @@ export default function HomePage() {
       className="relative flex justify-center items-center flex-col
    "
     >
-      <div className="container mx-auto">
+      <div className="container mx-auto space-y-8">
         <div className="w-fit mx-auto space-y-4">
           <TypographyH2 className="text-center tracking-wide">
             Capstone Project / Thesis Proposal
@@ -147,7 +148,12 @@ export default function HomePage() {
                     <FormLabel>Input Topic Name or Tags to search:</FormLabel>
                     <div className="flex items-center gap-1">
                       <FormControl>
-                        <Input placeholder="" className="focus-visible:ring-none" type="text" {...field} />
+                        <Input
+                          placeholder=""
+                          className="focus-visible:ring-none"
+                          type="text"
+                          {...field}
+                        />
                       </FormControl>
                       <Button type="submit" variant="outline" size="icon">
                         <Search />
@@ -160,6 +166,8 @@ export default function HomePage() {
             </form>
           </Form>
         </div>
+
+        <IdeaTable />
       </div>
     </main>
   );

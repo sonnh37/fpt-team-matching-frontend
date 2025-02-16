@@ -32,8 +32,8 @@ export const convertToISODate = (
 export const isValidImage = async (src: string): Promise<boolean> => {
   return new Promise((resolve) => {
     const img = new Image();
-    img.onload = () => resolve(true); 
-    img.onerror = () => resolve(false); 
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
     img.src = src;
   });
 };
@@ -78,11 +78,18 @@ export const formatDate = (date: Date | string | undefined | null) => {
   if (!date) return "Không có ngày"; // Xử lý khi giá trị không tồn tại
   const validDate = typeof date === "string" ? new Date(date) : date;
   if (isNaN(validDate.getTime())) return "Ngày không hợp lệ"; // Xử lý ngày không hợp lệ
-  return new Intl.DateTimeFormat("vi-VN", {
-    month: "long",
+
+  const options: Intl.DateTimeFormatOptions = {
+    month: "2-digit",
     day: "2-digit",
     year: "numeric",
-  }).format(validDate);
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+  };
+
+  return new Intl.DateTimeFormat("en-US", options).format(validDate);
 };
 
 export const formatPrice = (price: number) => {
@@ -111,59 +118,59 @@ export function toLocalISOString(date: Date) {
 }
 
 export const cleanQueryParams = (query: BaseQueryableQuery) => {
-    const cleanedQuery: Record<string, any> = {};
+  const cleanedQuery: Record<string, any> = {};
 
-    for (const key in query) {
-        const value = query[key as keyof BaseQueryableQuery];
+  for (const key in query) {
+    const value = query[key as keyof BaseQueryableQuery];
 
-        // Xử lý trường hợp các giá trị boolean
-        if (key.startsWith("is")) {
-            if (Array.isArray(value)) {
-                // Nếu chứa cả true và false, đặt là undefined
-                if (value.includes(true) && value.includes(false)) {
-                    // cleanedQuery[key] = null;
-                } else {
-                    cleanedQuery[key] = value
-                        .filter((item) => item !== null)
-                        .map((item) => item.toString());
-                }
-            } else if (value !== undefined && value !== null) {
-                cleanedQuery[key] = value.toString();
-            }
-        }
-        // Xử lý giá trị array thông thường
-        else if (Array.isArray(value)) {
-            const filteredArray = value.filter((item) => item !== null);
-            if (filteredArray.length > 0) {
-                filteredArray.forEach((item, index) => {
-                    cleanedQuery[`${key}[${index}]`] = item;
-                });
-            }
-        }
-        // Xử lý đối tượng: chuyển thành chuỗi JSON
-        else if (typeof value === 'object' && value !== null) {
-            // Convert object to JSON string
-            cleanedQuery[key] = JSON.stringify(value); // Convert object to string
-        }
-        // Xử lý giá trị không phải array hay object
-        else if (value !== undefined && value !== null) {
-            cleanedQuery[key] = value;
-        }
-    }
-
-    // Convert object cleanedQuery to query string
-    const params = new URLSearchParams();
-
-    for (const key in cleanedQuery) {
-        const value = cleanedQuery[key];
-        if (Array.isArray(value)) {
-            value.forEach((val) => {
-                params.append(key, val);
-            });
+    // Xử lý trường hợp các giá trị boolean
+    if (key.startsWith("is")) {
+      if (Array.isArray(value)) {
+        // Nếu chứa cả true và false, đặt là undefined
+        if (value.includes(true) && value.includes(false)) {
+          // cleanedQuery[key] = null;
         } else {
-            params.append(key, value.toString());
+          cleanedQuery[key] = value
+            .filter((item) => item !== null)
+            .map((item) => item.toString());
         }
+      } else if (value !== undefined && value !== null) {
+        cleanedQuery[key] = value.toString();
+      }
     }
+    // Xử lý giá trị array thông thường
+    else if (Array.isArray(value)) {
+      const filteredArray = value.filter((item) => item !== null);
+      if (filteredArray.length > 0) {
+        filteredArray.forEach((item, index) => {
+          cleanedQuery[`${key}[${index}]`] = item;
+        });
+      }
+    }
+    // Xử lý đối tượng: chuyển thành chuỗi JSON
+    else if (typeof value === "object" && value !== null) {
+      // Convert object to JSON string
+      cleanedQuery[key] = JSON.stringify(value); // Convert object to string
+    }
+    // Xử lý giá trị không phải array hay object
+    else if (value !== undefined && value !== null) {
+      cleanedQuery[key] = value;
+    }
+  }
 
-    return params.toString(); // Return as query string
+  // Convert object cleanedQuery to query string
+  const params = new URLSearchParams();
+
+  for (const key in cleanedQuery) {
+    const value = cleanedQuery[key];
+    if (Array.isArray(value)) {
+      value.forEach((val) => {
+        params.append(key, val);
+      });
+    } else {
+      params.append(key, value.toString());
+    }
+  }
+
+  return params.toString(); // Return as query string
 };

@@ -20,7 +20,9 @@ export interface Idea extends BaseEntity {
     englishName?: string;
     file?: string;
     status?: IdeaStatus;
-    isExistedTeam?: boolean;
+    isExistedTeam: boolean;
+    isEnterpriseTopic: boolean;
+    enterpriseName: string;
     maxTeamSize?: number;
     user?: User;
     subMentor?: User;

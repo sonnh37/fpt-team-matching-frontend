@@ -1,4 +1,7 @@
-
+import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
+import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
+import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card } from "@/components/ui/card";
@@ -18,6 +21,7 @@ import {
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isDeleted_options } from "@/lib/filter-options";
 import { cn } from "@/lib/utils";
+import { ideaService } from "@/services/idea-service";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { FormFilterAdvanced } from "@/types/models/form-filter-advanced";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,6 +42,7 @@ import * as React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+import { columns } from "./columns";
 
 //#region INPUT
 const formFilterAdvanceds: FormFilterAdvanced[] = [
@@ -130,8 +135,7 @@ const defaultSchema = z.object({
   isDeleted: z.boolean().nullable().optional(),
 });
 //#endregion
-export default function BlogTable() {
-  
+export default function IdeaTable() {
   const searchParams = useSearchParams();
   const queryParam = searchParams.get("q");
   //#region DEFAULT
@@ -176,7 +180,7 @@ export default function BlogTable() {
 
   const { data, isFetching, error } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => blogService.fetchAll(queryParams),
+    queryFn: () => ideaService.fetchAll(queryParams),
     placeholderData: keepPreviousData,
     enabled: shouldFetch,
     refetchOnWindowFocus: false,
@@ -234,17 +238,6 @@ export default function BlogTable() {
 
   return (
     <Card className="space-y-4 p-4">
-      <DataTableToolbar
-        form={form}
-        table={table}
-        filterEnums={filterEnums}
-        columnSearch={columnSearch}
-        deleteAll={blogService.delete}
-        isSheetOpen={isSheetOpen}
-        handleSheetChange={handleSheetChange}
-        formFilterAdvanceds={formFilterAdvanceds}
-      />
-
       {isFetching && !isTyping ? (
         <DataTableSkeleton
           columnCount={1}
@@ -257,8 +250,8 @@ export default function BlogTable() {
         />
       ) : (
         <DataTableComponent
-          deletePermanent={blogService.deletePermanent}
-          restore={blogService.restore}
+          deletePermanent={ideaService.deletePermanent}
+          restore={ideaService.restore}
           table={table}
         />
       )}

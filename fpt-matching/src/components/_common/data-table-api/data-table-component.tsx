@@ -40,10 +40,6 @@ export function DataTableComponent<TData>({
     .getHeaderGroups()
     .flatMap((group) => group.headers).length;
 
-  const tableWidth = useSelector(
-    (state: any) => state.widths.selectedWidths[0] || 100
-  );
-
   const handleRestore = async (model: any) => {
     if (restore) {
       try {
@@ -86,7 +82,6 @@ export function DataTableComponent<TData>({
           <TableRow
             key={headerGroup.id}
             style={{
-              transform: `scale(${tableWidth / 100})`,
               transformOrigin: "left",
             }}
           >
@@ -115,7 +110,6 @@ export function DataTableComponent<TData>({
                 data-state={row.getIsSelected() ? "selected" : undefined}
                 style={{
                   position: "relative",
-                  transform: `scale(${tableWidth / 100})`,
                   transformOrigin: "left",
                   pointerEvents: isDeleted ? "none" : "auto",
                 }}

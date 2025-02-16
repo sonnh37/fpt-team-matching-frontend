@@ -181,11 +181,6 @@ export function DataTableToolbar<TData>({
   };
   // redux
   const dispatch = useDispatch();
-  const tableWidth = useSelector(
-    (state: any) => state.widths.selectedWidths[0] || 100
-  ); // Get initial value from Redux
-
- 
 
   //end redux
   const renderFormFields = () => {
