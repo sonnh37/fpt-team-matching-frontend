@@ -18,7 +18,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { authService } from "@/services/auth-service";
-import { Role, User } from "@/types/user";
+import { User } from "@/types/user";
 import { Suspense } from "react";
 
 interface AuthDropdownProps
@@ -54,7 +54,7 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
         <Button variant="outline" className={cn("size-8 rounded-full focus-visible:ring-0")}>
           <Avatar className="size-8">
             <AvatarImage src={user.avatar ?? ""} alt={user.username ?? ""} />
-            <AvatarFallback className="bg-slate-200 hover:bg-slate-300">{initials}</AvatarFallback>
+            <AvatarFallback className="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500">{initials}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
@@ -101,7 +101,7 @@ interface AuthDropdownGroupProps {
 function AuthDropdownGroup({ user }: AuthDropdownGroupProps) {
   return (
     <DropdownMenuGroup>
-      {user?.role !== Role.Customer ? (
+      {user ? (
         <>
           <DropdownMenuItem asChild>
             <Link href={"/"}>

@@ -12,6 +12,7 @@ import { RootState } from "@/lib/redux/store";
 import dynamic from "next/dynamic";
 import React from "react";
 import { useSelector } from "react-redux";
+import { ModeToggle } from "@/components/_common/mode-toggle";
 const Header = dynamic(
   () => import("@/components/layouts/navbar/header").then((mod) => mod.Header),
   { ssr: false }
@@ -34,13 +35,12 @@ export default function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-2 px-4">
+            <ModeToggle />
             <NotificationPopover />
             <AuthDropdown user={user} />
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          {children}
-        </div>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );
