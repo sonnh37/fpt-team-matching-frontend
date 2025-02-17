@@ -22,7 +22,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" className={cn("size-8 rounded-full")}>
-          <Avatar className="size-8 bg-slate-200 hover:bg-slate-300 flex items-center justify-center">
+          <Avatar className="size-8 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500 flex items-center justify-center">
             <Bell className="!w-5 !h-5 text-foreground/80" />
           </Avatar>
         </Button>
