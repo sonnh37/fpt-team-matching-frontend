@@ -52,43 +52,43 @@ const data = {
     },
     {
       title: "Social",
-      url: "social",
+      url: "/social",
       icon: Globe,
     },
     {
       title: "Team",
-      url: "#",
+      url: "/#",
       icon: UsersRound,
     },
     {
       title: "My request",
-      url: "#",
+      url: "/#",
       icon: Send,
     },
     {
       title: "Create idea",
-      url: "#",
+      url: "/#",
       icon: Pencil,
     },
     {
       title: "Support",
-      url: "#",
+      url: "/#",
       icon: MessageCircleQuestion,
     },
     {
       title: "Supervisors",
-      url: "#",
+      url: "/#",
       icon: MdOutlineSupervisorAccount,
       items: [
         {
           title: "List",
           icon: Logs,
-          url: "#",
+          url: "/#",
         },
         {
           title: "Ideas",
           icon: Lightbulb,
-          url: "#",
+          url: "/#",
         },
       ],
     },

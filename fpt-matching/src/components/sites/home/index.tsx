@@ -5,20 +5,20 @@ import { TypographyH2 } from "@/components/_common/typography/typography-h2";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { ideaService } from "@/services/idea-service";
@@ -28,13 +28,13 @@ import { Profession } from "@/types/profession";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
-    ColumnFiltersState,
-    getCoreRowModel,
-    getFilteredRowModel,
-    PaginationState,
-    SortingState,
-    useReactTable,
-    VisibilityState,
+  ColumnFiltersState,
+  getCoreRowModel,
+  getFilteredRowModel,
+  PaginationState,
+  SortingState,
+  useReactTable,
+  VisibilityState,
 } from "@tanstack/react-table";
 import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
@@ -51,6 +51,7 @@ const defaultSchema = z.object({
   type: z.string().optional(),
   major: z.string().optional(),
   specialtyId: z.string().optional(),
+  professionId: z.string().optional(),
 });
 //#endregion
 export default function IdeaSearchList() {
@@ -139,9 +140,9 @@ export default function IdeaSearchList() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    refetch();
-  }, [queryParams]);
+  // useEffect(() => {
+  //   refetch();
+  // }, [queryParams]);
 
   //#endregion
 
@@ -183,32 +184,38 @@ export default function IdeaSearchList() {
               />
 
               <div className="flex gap-2">
-                <FormItem className="w-full">
-                  <FormLabel>Profession</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      const selected = professions.find(
-                        (cat) => cat.id === value
-                      );
-                      setSelectedProfession(selected ?? null);
-                    }}
-                    value={
-                      selectedProfession ? selectedProfession.id : undefined
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select Profession" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {professions.map((p) => (
-                        <SelectItem key={p.id} value={p.id!}>
-                          {p.professionName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-
+                <FormField
+                  control={form.control}
+                  name="professionId"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Profession</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          const selected = professions.find(
+                            (cat) => cat.id === value
+                          );
+                          setSelectedProfession(selected ?? null);
+                          field.onChange(value);
+                        }}
+                        value={
+                          field.value ?? undefined
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Profession" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {professions.map((p) => (
+                            <SelectItem key={p.id} value={p.id!}>
+                              {p.professionName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="specialtyId"
