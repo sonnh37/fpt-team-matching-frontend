@@ -2,8 +2,8 @@ import { Const } from "@/lib/constants/const";
 import axiosInstance from "@/lib/interceptors/axios-instance";
 import { logout, setUser } from "@/lib/redux/slices/userSlice";
 import store from "@/lib/redux/store";
-import { BusinessResult } from "@/types/responses/business-result";
-import { LoginResponse } from "@/types/responses/login-response";
+import { BusinessResult } from "@/types/models/responses/business-result";
+import { LoginResponse } from "@/types/models/responses/login-response";
 import { User } from "@/types/user";
 import axios from "axios";
 
@@ -20,7 +20,7 @@ class AuthService {
   ): Promise<BusinessResult<LoginResponse>> => {
     try {
       const response = await axios.post<BusinessResult<LoginResponse>>(
-        `${process.env.NEXT_PUBLIC_API_BASE}/auth/login`,
+        `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/login`,
         { account: account, password: password },
         {
           withCredentials: true,
@@ -35,9 +35,7 @@ class AuthService {
   public logout = async (): Promise<BusinessResult<null>> => {
     try {
       const response = await axiosInstance.post(
-        `${this.endpoint}/logout`,
-        {},
-        { withCredentials: true }
+        `${this.endpoint}/logout`
       );
       if (response.data.status === 1) {
         store.dispatch(logout());
@@ -69,7 +67,7 @@ class AuthService {
       //   `${this.endpoint}/info`
       // );
       const response = await axios.get<BusinessResult<User>>(
-        `${process.env.NEXT_PUBLIC_API_BASE}/auth/info`,
+        `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/info`,
         { withCredentials: true }
       );
       return response.data;
