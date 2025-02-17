@@ -1,6 +1,14 @@
 "use client";
 
 import { Tabs } from "@/components/ui/tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import React, { useState } from "react";
 
 const notifications = [
@@ -27,40 +35,49 @@ const chuadoc = [
   { id: 9, avatar: "https://via.placeholder.com/50", name: "Nguyễn C", action: "đã thích bài viết của bạn", time: "1 tháng trước", type: "like" },
 ];
 const Notification = () => {
-//   const [showAll, setShowAll] = useState(false);
+  //   const [showAll, setShowAll] = useState(false);
 
-//   const handleShowAll = () => {
-//     setShowAll(!showAll);
-//   };
+  //   const handleShowAll = () => {
+  //     setShowAll(!showAll);
+  //   };
 
-// const visibleNotifications = showAll ? notifications : notifications.slice(0, 6);
+  // const visibleNotifications = showAll ? notifications : notifications.slice(0, 6);
 
-const tabs = [
-  {
-    title: "Tất cả",
-    value: "tatca",
-    content: (
-      <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-black bg-white">
-        <p>Tất cả</p>
-        <p className="text-xl font-semibold mb-4">Trước đó</p>
+  const tabs = [
+    {
+      title: "Tất cả",
+      value: "tatca",
+      content: (
+        <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-black bg-white">
+          <p>Tất cả</p>
+          <p className="text-xl font-semibold mb-4">Trước đó</p>
 
-        {/* Danh sách thông báo */}
-        <div className={`space-y-4 max-h-96 overflow-y-auto`}>
-          {notifications.map((noti) => (
-            <div key={noti.id} className="flex items-start space-x-3 p-3 hover:bg-gray-100 rounded-lg">
-              <img className="w-10 h-10 rounded-full" src={noti.avatar} alt={noti.name} />
-              <div className="flex-1">
-                <p className="text-gray-800 text-sm">
-                  <span className="font-semibold">{noti.name}</span> {noti.action}{" "}
-                  {noti.target && <span className="font-semibold">{noti.target}</span>}.
-                </p>
-                <p className="text-gray-500 text-xs">{noti.time}</p>
+          {/* Danh sách thông báo */}
+          <div className={`space-y-4 max-h-96 overflow-y-auto`}>
+            {notifications.map((noti) => (
+              <div key={noti.id} className="flex items-start space-x-3 p-3 hover:bg-gray-100 rounded-lg">
+                <img className="w-10 h-10 rounded-full" src={noti.avatar} alt={noti.name} />
+                <div className="flex-1">
+                  <p className="text-gray-800 text-sm">
+                    <span className="font-semibold">{noti.name}</span> {noti.action}{" "}
+                    {noti.target && <span className="font-semibold">{noti.target}</span>}.
+                  </p>
+                  <p className="text-gray-500 text-xs">{noti.time}</p>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Thông báo của bạn</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Xóa thông báo</DropdownMenuItem>
+                    <DropdownMenuItem>Ghim thông báo</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {/* Nút "Xem thêm" / "Thu gọn"
+          {/* Nút "Xem thêm" / "Thu gọn"
           {notifications.length > 6 && (
             <button
               className="mt-4 px-4 py-2 bg-gray-200 text-black text-sm rounded-lg w-full hover:bg-gray-300"
@@ -69,44 +86,53 @@ const tabs = [
               {showAll ? "Thu gọn" : "Xem thêm"}
             </button>
           )} */}
-      </div>
-    ),
-  },
-  {
-    title: "Chưa đọc",
-    value: "chuadoc",
-    content: (
-      <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-black bg-white">
-      <p>Tất cả</p>
-      <p className="text-xl font-semibold mb-4">Trước đó</p>
+        </div>
+      ),
+    },
+    {
+      title: "Chưa đọc",
+      value: "chuadoc",
+      content: (
+        <div className="w-full overflow-hidden relative h-full rounded-2xl p-10 text-xl md:text-4xl font-bold text-black bg-white">
+          <p>Tất cả</p>
+          <p className="text-xl font-semibold mb-4">Trước đó</p>
 
-      {/* Danh sách thông báo */}
-      <div className={`space-y-4 max-h-96 overflow-y-auto`}>
-        {chuadoc.map((noti) => (
-          <div key={noti.id} className="flex items-start space-x-3 p-3 hover:bg-gray-100 rounded-lg">
-            <img className="w-10 h-10 rounded-full" src={noti.avatar} alt={noti.name} />
-            <div className="flex-1">
-              <p className="text-gray-800 text-sm">
-                <span className="font-semibold">{noti.name}</span> {noti.action}{" "}
-                {noti.target && <span className="font-semibold">{noti.target}</span>}.
-              </p>
-              <p className="text-gray-500 text-xs">{noti.time}</p>
-            </div>
+          {/* Danh sách thông báo */}
+          <div className={`space-y-4 max-h-96 overflow-y-auto`}>
+            {chuadoc.map((noti) => (
+              <div key={noti.id} className="flex items-start space-x-3 p-3 hover:bg-gray-100 rounded-lg">
+                <img className="w-10 h-10 rounded-full" src={noti.avatar} alt={noti.name} />
+                <div className="flex-1">
+                  <p className="text-gray-800 text-sm">
+                    <span className="font-semibold">{noti.name}</span> {noti.action}{" "}
+                    {noti.target && <span className="font-semibold">{noti.target}</span>}.
+                  </p>
+                  <p className="text-gray-500 text-xs">{noti.time}</p>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuLabel>Thông báo của bạn</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>Xóa thông báo</DropdownMenuItem>
+                    <DropdownMenuItem>Ghim thông báo</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      </div>
-    ),
-  },
-];
+        </div>
+      ),
+    },
+  ];
 
-return (
-  <div className="bg-slate-200 pb-10">
-    <div className="h-[20rem] md:h-[40rem] [perspective:1000px] relative flex flex-col max-w-5xl mx-auto w-full items-start justify-start pt-4">
-      <Tabs tabs={tabs} />
+  return (
+    <div className="bg-slate-200 pb-10">
+      <div className="h-[20rem] md:h-[40rem] [perspective:1000px] relative flex flex-col max-w-5xl mx-auto w-full items-start justify-start pt-4">
+        <Tabs tabs={tabs} />
+      </div>
     </div>
-  </div>
-);
+  );
 };
 
 export default Notification;

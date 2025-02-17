@@ -32,7 +32,7 @@ import { Meteors } from '@/components/ui/meteors'
 export default function Blog() {
 
   const [post, setPost] = useState('');
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     // Xử lý logic khi submit form
     console.log('Post submitted:', post);
