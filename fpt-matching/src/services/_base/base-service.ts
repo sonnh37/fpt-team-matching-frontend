@@ -1,8 +1,8 @@
 import axiosInstance from "@/lib/interceptors/axios-instance";
 import {cleanQueryParams} from "@/lib/utils";
-import { BusinessResult } from "@/types/responses/business-result";
-import { BaseQueryableQuery } from "@/types/queries/_base/base-query";
-import { CreateCommand, UpdateCommand } from "@/types/commands/_base/base-command";
+import { BusinessResult } from "@/types/models/responses/business-result";
+import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
+import { CreateCommand, UpdateCommand } from "@/types/models/commands/_base/base-command";
 
 export class BaseService<T> {
     public endpoint: string;
