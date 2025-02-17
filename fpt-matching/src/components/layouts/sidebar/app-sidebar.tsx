@@ -57,7 +57,7 @@ const data = {
     },
     {
       title: "Team",
-      url: "/#",
+      url: "/project",
       icon: UsersRound,
     },
     {
