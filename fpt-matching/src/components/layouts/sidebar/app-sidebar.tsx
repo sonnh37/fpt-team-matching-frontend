@@ -40,6 +40,8 @@ import { RootState } from "@/lib/redux/store";
 import { useSelector } from "react-redux";
 import { Icons } from "@/components/ui/icons";
 import { TypographyH4 } from "@/components/_common/typography/typography-h4";
+import Link from "next/link";
+import { TypographyLarge } from "@/components/_common/typography/typography-large";
 
 // This is sample data.
 const data = {
@@ -52,7 +54,7 @@ const data = {
     },
     {
       title: "Social",
-      url: "/social",
+      url: "/social/blog",
       icon: Globe,
     },
     {
@@ -145,17 +147,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props} variant="inset">
       <SidebarHeader>
         <SidebarMenuButton
+          asChild
           size="lg"
-          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-3"
+          className="overflow-visible data-[state=open]:bg-sidebar-accent  data-[state=open]:text-sidebar-accent-foreground gap-3"
         >
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground">
-            <Icons.logo />
-          </div>
-          <div className="grid flex-1 text-left text-sm tracking-wider">
-            <TypographyH4 className="truncate uppercase text-base text-primary tracking-wide">
-              Team matching
-            </TypographyH4>
-          </div>
+          <Link href={"/"}>
+            <div className="flex aspect-square size-10 items-center justify-center rounded-lg text-sidebar-primary-foreground">
+              <Icons.logo />
+            </div>
+            <div className="grid flex-1 text-left text-sm tracking-wider">
+              <TypographyLarge className="truncate tracking-wide">
+                {"Team Matching"}
+              </TypographyLarge>
+            </div>
+          </Link>
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>

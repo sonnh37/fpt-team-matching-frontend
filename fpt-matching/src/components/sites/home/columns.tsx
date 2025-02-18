@@ -34,11 +34,12 @@ import { TypographyMuted } from "@/components/_common/typography/typography-mute
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/utils";
 import { TypographyH3 } from "@/components/_common/typography/typography-h3";
+import { TypographyLead } from "@/components/_common/typography/typography-lead";
 export const columns: ColumnDef<Idea>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      null
     ),
     cell: ({ row }) => {
       const model = row.original;

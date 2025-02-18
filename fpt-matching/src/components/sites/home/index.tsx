@@ -162,25 +162,31 @@ export default function IdeaSearchList() {
               <FormField
                 control={form.control}
                 name="englishName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Input Topic Name or Tags to search:</FormLabel>
-                    <div className="flex items-center">
-                      <FormControl>
-                        <Input
-                          placeholder=""
-                          className="focus-visible:ring-none"
-                          type="text"
-                          {...field}
-                        />
-                      </FormControl>
-                      <Button type="submit" variant="outline" size="icon">
-                        <Search />
-                      </Button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                render={({ field }) => {
+                  return (
+                    <FormItem>
+                      <FormLabel>Input Topic Name or Tags to search:</FormLabel>
+                      <div className="flex items-center gap-2">
+                        <FormControl>
+                          <Input
+                            placeholder=""
+                            className="focus-visible:ring-none"
+                            type="text"
+                            {...field}
+                          />
+                        </FormControl>
+                        <Button
+                          type="submit"
+                          variant="default"
+                          size="icon"
+                        >
+                          <Search />
+                        </Button>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
               />
 
               <div className="flex gap-2">
@@ -198,9 +204,7 @@ export default function IdeaSearchList() {
                           setSelectedProfession(selected ?? null);
                           field.onChange(value);
                         }}
-                        value={
-                          field.value ?? undefined
-                        }
+                        value={field.value ?? undefined}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select Profession" />

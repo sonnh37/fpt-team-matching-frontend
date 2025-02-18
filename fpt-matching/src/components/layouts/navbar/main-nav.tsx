@@ -3,6 +3,8 @@ import { AuthDropdown } from "@/components/_common/auth-dropdown";
 import { ChatPopover } from "@/components/_common/chat-popover";
 import { NotificationPopover } from "@/components/_common/notification-popover";
 import { Search } from "@/components/_common/search";
+import { TypographyH4 } from "@/components/_common/typography/typography-h4";
+import { TypographyInlinecode } from "@/components/_common/typography/typography-inline-code";
 import { TypographyLarge } from "@/components/_common/typography/typography-large";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,13 +27,17 @@ interface MainNavProps {
 export function MainNav({ user = null }: MainNavProps) {
   return (
     <div className="flex flex-col w-full py-2">
-      <div className="hidden lg:flex overflow-hidden justify-between w-full mx-auto gap-6 text-lg">
-        <div className="flex gap-4 w-full">
-          <div className="grid grid-flow-col items-center gap-2">
-            <Icons.logo className="w-24" />
-            <TypographyLarge className="tracking-wider">
-              TeamMatching
-            </TypographyLarge>
+      <div className="hidden lg:flex overflow-hidden w-full justify-between mx-auto gap-6 text-lg">
+        <div className="flex flex-row gap-4 w-full">
+          <div className="">
+            <Button asChild variant={"ghost"}>
+              <Link href={"/"} className="px-6">
+                <Icons.logo className="w-12" />
+                <TypographyLarge className="tracking-wider">
+                   {"Team Matching"}
+                </TypographyLarge>
+              </Link>
+            </Button>
           </div>
           <div className="w-full border rounded-xl items-center text-center">
             <Search />

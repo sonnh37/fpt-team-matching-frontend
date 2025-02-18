@@ -9,6 +9,11 @@ export const isDeleted_options = [
     {label: "Deactivated", value: true},
 ];
 
+export const isExistedTeam_options = [
+    {label: "Available", value: false},
+    {label: "Registed", value: true},
+];
+
 export const isActive_options = [
     {label: "Displaying", value: false},
     {label: "Not show", value: true},
