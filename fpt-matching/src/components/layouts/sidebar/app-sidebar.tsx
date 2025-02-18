@@ -52,12 +52,12 @@ const data = {
     },
     {
       title: "Social",
-      url: "/social",
+      url: "/blog",
       icon: Globe,
     },
     {
       title: "Team",
-      url: "/#",
+      url: "/team",
       icon: UsersRound,
     },
     {
@@ -67,7 +67,7 @@ const data = {
     },
     {
       title: "Create idea",
-      url: "/#",
+      url: "/idea",
       icon: Pencil,
     },
     {
