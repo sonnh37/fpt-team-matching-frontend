@@ -26,7 +26,7 @@ import { useEffect, useState } from "react";
 import { UpdateCommand } from "@/types/models/commands/_base/base-command";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { userService } from "@/services/user-serice";
+import { userService } from "@/services/user-service";
 import { UserUpdateCommand } from "@/types/models/commands/user-command";
 
 const profileFormSchema = z.object({

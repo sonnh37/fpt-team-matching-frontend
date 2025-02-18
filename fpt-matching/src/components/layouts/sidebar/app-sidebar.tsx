@@ -77,18 +77,18 @@ const data = {
     },
     {
       title: "Supervisors",
-      url: "/#",
+      url: "/supervisors",
       icon: MdOutlineSupervisorAccount,
       items: [
         {
           title: "List",
           icon: Logs,
-          url: "/#",
+          url: "/supervisors",
         },
         {
           title: "Ideas",
           icon: Lightbulb,
-          url: "/#",
+          url: "/supervisors/ideas",
         },
       ],
     },

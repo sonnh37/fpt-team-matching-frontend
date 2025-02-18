@@ -41,7 +41,9 @@ export function NavMain({
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          const isActive = pathName === item.url;
+          const isActive =
+            pathName === item.url ||
+            (item.url !== "/" && pathName.startsWith(item.url + "/"));
           return (
             <Collapsible
               key={item.title}
@@ -66,22 +68,25 @@ export function NavMain({
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton
-                            className="text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-1"
-                            asChild
-                            isActive={isActive}
-                          >
-                            <a href={subItem.url}>
-                              <div className="flex aspect-square size-5 items-center justify-start">
-                                {subItem.icon && <subItem.icon />}
-                              </div>
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
+                      {item.items?.map((subItem) => {
+                        const isActiveSub = pathName === subItem.url;
+                        return (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton
+                              className="text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-1"
+                              asChild
+                              isActive={isActiveSub}
+                            >
+                              <a href={subItem.url}>
+                                <div className="flex aspect-square size-5 items-center justify-start">
+                                  {subItem.icon && <subItem.icon />}
+                                </div>
+                                <span>{subItem.title}</span>
+                              </a>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        );
+                      })}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
