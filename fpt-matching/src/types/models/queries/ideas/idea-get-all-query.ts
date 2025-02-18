@@ -21,4 +21,5 @@ export interface IdeaGetAllQuery extends BaseQueryableQuery {
   maxTeamSize?: number;
 
   professionId?: string;
+  role?: string;
 }

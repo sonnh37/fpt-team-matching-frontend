@@ -2,11 +2,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { RootState } from "@/lib/redux/store";
-import { getEnumLabel } from "@/lib/utils";
-import { Role } from "@/types/user";
 import { format } from "date-fns";
 import { useSelector } from "react-redux";
 import { ProfileForm } from "./profile-form";
+import { formatDate, getEnumLabel } from "@/lib/utils";
 
 export default function SettingsProfilePage() {
   const user = useSelector((state: RootState) => state.user.user);
@@ -16,14 +15,13 @@ export default function SettingsProfilePage() {
         <div className="flex flex-row items-center gap-3">
           <h3 className="text-lg font-medium">Profile</h3>
           <Badge className="!rounded-2xl">
-            {getEnumLabel(Role, user?.role!)}
+            {user?.userXRoles
+              .map((element) => element.role?.roleName)
+              .join(", ")}
           </Badge>
         </div>
         <p className="text-sm text-muted-foreground">
-          Last updated date:{" "}
-          {user?.lastUpdatedDate
-            ? format(new Date(user.lastUpdatedDate), "yyyy-MM-dd HH:mm:ss")
-            : "No date available"}
+          Updated date: {formatDate(user?.updatedDate)}
         </p>
       </div>
       <Separator />

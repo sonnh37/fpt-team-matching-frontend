@@ -44,14 +44,20 @@ import { z } from "zod";
 import { columns } from "./columns";
 import { userService } from "@/services/user-service";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
+import { ideaService } from "@/services/idea-service";
+import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
+import { IdeaType } from "@/types/enums/idea";
+import { FilterEnum } from "@/types/models/filter-enum";
+import { isDeleted_options, isExistedTeam_options } from "@/lib/filter-options";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 
 //#region INPUT
 const defaultSchema = z.object({
-  emailOrFullname: z.string().optional(),
-  role: z.string().optional(),
+  englishName: z.string().optional(),
+  type: z.nativeEnum(IdeaType).optional(),
 });
 //#endregion
-export default function SupervisorsTable() {
+export default function IdeasOfSupervisorsTableTable() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -79,15 +85,15 @@ export default function SupervisorsTable() {
 
   const [submittedFilters, setSubmittedFilters] = useState<
     z.infer<typeof defaultSchema>
-  >({ role: "Lecturer" });
+  >({ type: IdeaType.Lecturer });
 
-  const queryParams: UserGetAllQuery = useMemo(() => {
+  const queryParams: IdeaGetAllQuery = useMemo(() => {
     return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
   }, [submittedFilters, columnFilters, pagination, sorting]);
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => userService.fetchAll(queryParams),
+    queryFn: () => ideaService.fetchAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -112,9 +118,6 @@ export default function SupervisorsTable() {
   //#endregion
 
   //#region useEffect
-  const [professions, setProfessions] = useState<Profession[]>([]);
-  const [selectedProfession, setSelectedProfession] =
-    useState<Profession | null>(null);
   useEffect(() => {
     if (columnFilters.length > 0 || submittedFilters) {
       setPagination((prev) => ({
@@ -124,19 +127,6 @@ export default function SupervisorsTable() {
     }
   }, [columnFilters, submittedFilters]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await professionService.fetchAll();
-        setProfessions(res.data?.results!);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   // useEffect(() => {
   //   refetch();
   // }, [queryParams]);
@@ -144,26 +134,34 @@ export default function SupervisorsTable() {
   //#endregion
 
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-    values.role = "Lecturer";
+    values.type = IdeaType.Lecturer;
     setSubmittedFilters(values);
     toast.success("Test_submitted");
   };
+
+  const filterEnums: FilterEnum[] = [
+    {
+      columnId: "isExistedTeam",
+      title: "Slot register",
+      options: isExistedTeam_options,
+    },
+  ];
   return (
     <>
       <div className="container mx-auto space-y-8">
         <div className="w-fit mx-auto space-y-4">
           <TypographyH2 className="text-center tracking-wide">
-            The list of Supervisor in this Semester
+            The list of Supervisor's Ideas
           </TypographyH2>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="emailOrFullname"
+                name="englishName"
                 render={({ field }) => {
                   return (
                     <FormItem>
-                      <FormLabel>FE Email or Name</FormLabel>
+                      <FormLabel>English name:</FormLabel>
                       <div className="flex items-center gap-2">
                         <FormControl>
                           <Input
@@ -191,21 +189,26 @@ export default function SupervisorsTable() {
         </div>
 
         <div className="">
-          <Card className="space-y-4 p-4 w-[70%] mx-auto">
-            {isFetching && !isTyping ? (
-              <DataTableSkeleton
-                columnCount={1}
-                showViewOptions={false}
-                withPagination={false}
-                rowCount={pagination.pageSize}
-                searchableColumnCount={0}
-                filterableColumnCount={0}
-                shrinkZero
-              />
-            ) : (
-              <DataTableComponent table={table} />
-            )}
-            <DataTablePagination table={table} />
+          <Card className="space-y-4 p-4 w-full">
+          <DataTableToolbar
+            form={form}
+            table={table}
+            filterEnums={filterEnums}
+          />
+          {isFetching && !isTyping ? (
+            <DataTableSkeleton
+              columnCount={1}
+              showViewOptions={false}
+              withPagination={false}
+              rowCount={pagination.pageSize}
+              searchableColumnCount={0}
+              filterableColumnCount={0}
+              shrinkZero
+            />
+          ) : (
+            <DataTableComponent table={table} />
+          )}
+          <DataTablePagination table={table} />
           </Card>
         </div>
       </div>
