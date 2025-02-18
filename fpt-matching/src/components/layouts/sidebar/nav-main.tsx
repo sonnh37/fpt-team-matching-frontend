@@ -57,8 +57,10 @@ export function NavMain({
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton
                       tooltip={item.title}
-                      isActive={isActive}
-                      className="text-lg py-6 tracking-wide group-data-[collapsible=icon]:!p-1"
+                      className={cn(
+                        "text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
+                        isActive ? "!bg-orange-500 !text-white" : ""
+                      )}
                     >
                       <div className="flex aspect-square size-5 items-center justify-start">
                         {item.icon && <item.icon />}
@@ -74,9 +76,11 @@ export function NavMain({
                         return (
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton
-                              className="text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-1"
+                              className={cn(
+                                "text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
+                                isActiveSub ? "!bg-orange-500 !text-white" : ""
+                              )}
                               asChild
-                              isActive={isActiveSub}
                             >
                               <a href={subItem.url}>
                                 <div className="flex aspect-square size-5 items-center justify-start">
@@ -93,10 +97,13 @@ export function NavMain({
                 </SidebarMenuItem>
               ) : (
                 <SidebarMenuButton
-                  className="text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-1"
+                  className={cn(
+                    "text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
+                    isActive ? "!bg-orange-500 !text-white" : ""
+                  )}
                   tooltip={item.title}
                   asChild
-                  isActive={isActive}
+                  // isActive={isActive}
                 >
                   <a href={item.url}>
                     <div className="flex aspect-square size-5 items-center justify-start">
