@@ -1,36 +1,57 @@
 ﻿import MessageContainer from "@/components/chat/MessageContainer";
 import SendMessageForm from "@/components/chat/SendMessageForm";
-import {useEffect} from "react";
+import {useEffect, useRef, useState} from "react";
 import {HubConnection} from "@microsoft/signalr";
-interface MessageModel {
-    content: string;
-    conversationId: string;
-    createdDate: Date;
-    id: string;
-    sendById: string;
-}
-const ChatRoom = ({conn, messages, setMessage} : { conn: HubConnection, messages: string[], setMessage: any}) => {
+import {messageService} from "@/services/message-service";
+import {MessageModel} from "@/types/message-model";
+const ChatRoom = ({conn, messages, setMessages, chatRoom} : { conn: HubConnection, messages: MessageModel[], setMessages: any, chatRoom: string | undefined}) => {
+    const [pageNumber, setPageNumber] = useState(1)
+    const [loading, setLoading] = useState(true);
+    const [hasMore, setHasMore] = useState(true);
+    const [lastHeight, setLastHeight] = useState<number>(0);
+
+    const observer = useRef<IntersectionObserver>();
+    const containerRef = useRef<HTMLDivElement | null>(null);
+
+    const getMessageInDay = async () => {
+        if(chatRoom){
+            const result = await messageService.fetchMessageInDay(chatRoom)
+            setMessages(result.data)
+            if (result.data == null || result.data.length < 10) {
+                const messageConversation = await messageService.fetchMessageByConversationId(chatRoom, 15, pageNumber)
+                setMessages((messages: MessageModel[]) => [...messageConversation.data!, ...messages]);
+            }
+        }
+    }
+
+    const fetchMessage = async () => {
+        if(chatRoom){
+            const messageConversation = await messageService.fetchMessageByConversationId(chatRoom, 15, pageNumber)
+            if (messageConversation.data?.length == 0) {
+                setHasMore(false);
+                return;
+            }
+            setMessages((messages: MessageModel[]) => [...messageConversation.data!, ...messages]);
+        }
+    }
     useEffect(() => {
-        fetch("http://localhost:5045/api/message/0f3f44a4-4d3a-49ae-b5c6-c136257db5e7")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP errsor! Sstatus: ${response.status}`);
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                if (pageNumber === 1) {
+                    await getMessageInDay();
+                } else {
+                    await fetchMessage();
                 }
-                return response.json();
-            })
-            .then((data) => {
-                console.log(data.result.data);
-                const listMessage: string[] = [];
-                data.result.data.map((x : MessageModel)=> {
-                    listMessage.push(x.content)
-                })
-                setMessage(listMessage);
-                return data.result.data;
-            })
-            .catch(error => {
-                console.error("Error fetching data:", error);
-            });
-    }, [setMessage])
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [pageNumber])
 
 
     const sendMessage = async (message: string) => {
@@ -40,18 +61,36 @@ const ChatRoom = ({conn, messages, setMessage} : { conn: HubConnection, messages
             console.error(e);
         }
     }
+    const lasMessageElementRef = (node:HTMLDivElement) => {
+        if (loading) return;
+        observer.current = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && hasMore) {
+                setPageNumber(prevState => prevState + 1);
+            }
+        });
+        if (node) observer.current.observe(node);
+        return () => observer.current?.disconnect();
+    }
 
+    const scrollHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const chat = event.target;
+        if (chat.scrollTop === 0) {
+            const { scrollHeight } = containerRef.current!;
+            setLastHeight(scrollHeight);
+        }
+    };
     return (
-        <div className={"min-h-screen"}>
+        <div className={"h-screen"}>
             <div className={""}>
                 <div className={"w-full bg-white min-h-[10vh] text-center leading-[5rem] font-bold text-2xl"}>
-                    User name
+                    {}
                 </div>
             </div>
-            <div className={"min-h-[90vh] flex flex-col justify-between"}>
-                <MessageContainer messages={messages} />
-                <SendMessageForm sendMessage={sendMessage} />
+            <div className={"h-full flex flex-col"}>
+                <MessageContainer containerRef={containerRef} scrollHandler={scrollHandler} lastHeight={lastHeight}  messages={messages} refer={lasMessageElementRef} />
+                <SendMessageForm sendMessage={sendMessage}  />
             </div>
+            <div>{loading && 'Loading...'}</div>
         </div>
     )
 }

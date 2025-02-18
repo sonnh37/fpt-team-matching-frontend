@@ -9,8 +9,8 @@ const WaitingRoom = ({joinChatRoom}: { joinChatRoom : any }) => {
             e.preventDefault();
             joinChatRoom(username, partner ,chatroom);
         }}
-              className={"min-h-screen"}>
-            <div className={"p-5"}>
+              className={"h-3/4"}>
+            <div >
                 <div>
                     <input placeholder={"UserId"} className={"text-red-500 m-5"}
                            onChange={e => setUsername(e.target.value)}/>
