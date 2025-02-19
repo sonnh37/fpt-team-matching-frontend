@@ -66,7 +66,7 @@ const CreateProjectForm = () => {
 
   return (
     <Form  {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-6 bg-white shadow-md rounded-lg">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-4 bg-white shadow-md rounded-lg">
         <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-xl">
           <h2 className="text-2xl font-semibold text-center mb-6">Create New Project</h2>
           <h3 className="text-xl text-purple-300">How Would You Classify This Project?</h3>

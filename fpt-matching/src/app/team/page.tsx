@@ -4,14 +4,21 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalTrigger,
+  ModalClose,
+} from "@/components/ui/animated-modal";
 
-
+import CreateProjectForm
+ from "../idea/page";
 const groupData = {
   title: "FPT Team Matching - Social networking for students project teams",
   createdAt: "1/2/2025 7:25:37 PM",
@@ -39,16 +46,46 @@ export default function TeamInfo() {
       <div className="text-3xl ml-4 text-blue-600 font-sans " >My Group</div>
       <Card className="m-5 p-6 bg-white shadow-lg rounded-lg">
         <CardContent className="space-y-4">
-        <div className="flex justify-between items-center">
-          {/* Tiêu đề nhóm */}
-          <div className="title">
-          <h2 className="text-xl font-semibold">{groupData.title}</h2>
-          <p className="text-sm text-gray-500">Created at: {groupData.createdAt}</p>
-          </div>
-          <div className="button0act flex ml-4">
-            <button className="border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white">+ Update Idea</button>
-            <button className="border-purple-400 border-4 p-1 text-sm  hover:bg-purple-700 hover:text-white">Delete Idea</button>
-          </div>
+          <div className="flex justify-between items-center">
+            {/* Tiêu đề nhóm */}
+            <div className="title">
+              <h2 className="text-xl font-semibold">{groupData.title}</h2>
+              <p className="text-sm text-gray-500">Created at: {groupData.createdAt}</p>
+            </div>
+            <div className="button0act flex ml-4">
+              <Modal>
+                <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
+                  <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
+                   +Update Idea
+                  </button>
+
+                </ModalTrigger>
+
+                <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
+                  <ModalContent>
+                   <CreateProjectForm />
+                  </ModalContent>x
+                </ModalBody>
+
+              </Modal>
+             
+              <Modal>
+                <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
+                  <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
+                   +Delete Idea
+                  </button>
+
+                </ModalTrigger>
+
+                <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
+                  <ModalContent>
+                   <CreateProjectForm />
+                  </ModalContent>x
+                </ModalBody>
+
+              </Modal>
+
+            </div>
           </div>
 
           {/* Abbreviation & Vietnamese Title */}
@@ -105,7 +142,7 @@ export default function TeamInfo() {
                 <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
                   <div className="flex items-center space-x-3">
                     <Avatar>
-                      <AvatarImage src="" alt={member.name}  />
+                      <AvatarImage src="" alt={member.name} />
                       <AvatarFallback className="">{member.avatar || member.name.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div>
