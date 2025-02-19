@@ -54,12 +54,12 @@ const data = {
     },
     {
       title: "Social",
-      url: "/social/blog",
+      url: "/blog",
       icon: Globe,
     },
     {
       title: "Team",
-      url: "/project",
+      url: "/team",
       icon: UsersRound,
     },
     {
@@ -69,7 +69,7 @@ const data = {
     },
     {
       title: "Create idea",
-      url: "/#",
+      url: "/idea",
       icon: Pencil,
     },
     {
