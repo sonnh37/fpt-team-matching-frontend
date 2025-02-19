@@ -21,9 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { ideaService } from "@/services/idea-service";
 import { professionService } from "@/services/profession-service";
-import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { Profession } from "@/types/profession";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -44,17 +42,16 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
+import { userService } from "@/services/user-service";
+import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 
 //#region INPUT
 const defaultSchema = z.object({
-  englishName: z.string().optional(),
-  type: z.string().optional(),
-  major: z.string().optional(),
-  specialtyId: z.string().optional(),
-  professionId: z.string().optional(),
+  emailOrFullname: z.string().optional(),
+  role: z.string().optional(),
 });
 //#endregion
-export default function IdeaSearchList() {
+export default function SupervisorsTable() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -82,15 +79,15 @@ export default function IdeaSearchList() {
 
   const [submittedFilters, setSubmittedFilters] = useState<
     z.infer<typeof defaultSchema>
-  >({});
+  >({ role: "Lecturer" });
 
-  const queryParams: IdeaGetAllQuery = useMemo(() => {
+  const queryParams: UserGetAllQuery = useMemo(() => {
     return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
   }, [submittedFilters, columnFilters, pagination, sorting]);
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaService.fetchAll(queryParams),
+    queryFn: () => userService.fetchAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -147,6 +144,7 @@ export default function IdeaSearchList() {
   //#endregion
 
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {
+    values.role = "Lecturer";
     setSubmittedFilters(values);
     toast.success("Test_submitted");
   };
@@ -155,17 +153,17 @@ export default function IdeaSearchList() {
       <div className="container mx-auto space-y-8">
         <div className="w-fit mx-auto space-y-4">
           <TypographyH2 className="text-center tracking-wide">
-            Capstone Project / Thesis Proposal
+            The list of Supervisor in this Semester
           </TypographyH2>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="englishName"
+                name="emailOrFullname"
                 render={({ field }) => {
                   return (
                     <FormItem>
-                      <FormLabel>Input Topic Name or Tags to search:</FormLabel>
+                      <FormLabel>FE Email or Name</FormLabel>
                       <div className="flex items-center gap-2">
                         <FormControl>
                           <Input
@@ -188,100 +186,28 @@ export default function IdeaSearchList() {
                   );
                 }}
               />
-
-              <div className="flex gap-2">
-                <FormField
-                  control={form.control}
-                  name="professionId"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Profession</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          const selected = professions.find(
-                            (cat) => cat.id === value
-                          );
-                          setSelectedProfession(selected ?? null);
-                          field.onChange(value);
-                        }}
-                        value={field.value ?? undefined}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Profession" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {professions.map((p) => (
-                            <SelectItem key={p.id} value={p.id!}>
-                              {p.professionName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="specialtyId"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Specialty</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={(value) => field.onChange(value)}
-                          value={field.value ?? undefined} // Ensure the value is set correctly
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select Specialty" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {selectedProfession ? (
-                              <>
-                                {selectedProfession?.specialties ? (
-                                  selectedProfession.specialties.map((spec) => (
-                                    <SelectItem key={spec.id} value={spec.id!}>
-                                      {spec.specialtyName}
-                                    </SelectItem>
-                                  ))
-                                ) : (
-                                  <></>
-                                )}
-                              </>
-                            ) : (
-                              <></>
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
             </form>
           </Form>
         </div>
 
-        <Card className="space-y-4 p-4">
-          {isFetching && !isTyping ? (
-            <DataTableSkeleton
-              columnCount={1}
-              showViewOptions={false}
-              withPagination={false}
-              rowCount={pagination.pageSize}
-              searchableColumnCount={0}
-              filterableColumnCount={0}
-              shrinkZero
-            />
-          ) : (
-            <DataTableComponent
-              deletePermanent={ideaService.deletePermanent}
-              restore={ideaService.restore}
-              table={table}
-            />
-          )}
-          <DataTablePagination table={table} />
-        </Card>
+        <div className="">
+          <Card className="space-y-4 p-4 w-[70%] mx-auto">
+            {isFetching && !isTyping ? (
+              <DataTableSkeleton
+                columnCount={1}
+                showViewOptions={false}
+                withPagination={false}
+                rowCount={pagination.pageSize}
+                searchableColumnCount={0}
+                filterableColumnCount={0}
+                shrinkZero
+              />
+            ) : (
+              <DataTableComponent table={table} />
+            )}
+            <DataTablePagination table={table} />
+          </Card>
+        </div>
       </div>
     </>
   );

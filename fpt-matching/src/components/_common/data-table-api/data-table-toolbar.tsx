@@ -1,3 +1,4 @@
+"use client"
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -56,8 +57,9 @@ interface DataTableToolbarProps<TData> {
   table: Table<TData>;
   filterEnums: FilterEnum[];
   deleteAll?: (id: string) => Promise<BusinessResult<null>>;
-  isSheetOpen: boolean;
-  columnSearch: string;
+  isSheetOpen?: boolean;
+  isDownloadCsv?: boolean;
+  columnSearch?: string;
   handleSheetChange?: (open: boolean) => void;
   formFilterAdvanceds?: FormFilterAdvanced[];
   childrenLeftUI?: ReactNode;
@@ -106,9 +108,10 @@ export function DataTableToolbar<TData>({
   form,
   table,
   filterEnums,
-  columnSearch,
+  columnSearch = undefined,
   deleteAll = undefined,
   isSheetOpen = false,
+  isDownloadCsv = false,
   handleSheetChange = undefined,
   formFilterAdvanceds = [],
   childrenLeftUI = null,
@@ -204,14 +207,16 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
         <>
-          <Input
-            placeholder={`Enter ${columnSearch}...`}
-            value={(form.getValues(columnSearch) as string) ?? ""}
-            onChange={(event) =>
-              form.setValue(columnSearch, event.target.value)
-            }
-            className="h-8 w-[150px] lg:w-[250px]"
-          />
+          {columnSearch ? (
+            <Input
+              placeholder={`Enter ${columnSearch}...`}
+              value={(form.getValues(columnSearch) as string) ?? ""}
+              onChange={(event) =>
+                form.setValue(columnSearch, event.target.value)
+              }
+              className="h-8 w-[150px] lg:w-[250px]"
+            />
+          ) : null}
           {filterEnums.map((filter: any) => {
             const column = table.getColumn(filter.columnId);
             if (column) {
@@ -377,16 +382,18 @@ export function DataTableToolbar<TData>({
               })}
             </PopoverContent>
           </Popover>
-          <CSVLink
-            filename="export_data.csv"
-            data={JSON.stringify(getCurrentTableData() || [])}
-            target="_blank"
-          >
-            <Button size="sm" variant="outline" className="h-8 gap-1">
-              <MdOutlineFileDownload className="h-4 w-4" />
-              Download csv
-            </Button>
-          </CSVLink>
+          {isDownloadCsv ? (
+            <CSVLink
+              filename="export_data.csv"
+              data={JSON.stringify(getCurrentTableData() || [])}
+              target="_blank"
+            >
+              <Button size="sm" variant="outline" className="h-8 gap-1">
+                <MdOutlineFileDownload className="h-4 w-4" />
+                Download csv
+              </Button>
+            </CSVLink>
+          ) : null}
 
           {fields.length > 0 && (
             <Link

@@ -76,7 +76,7 @@ export function DataTableComponent<TData>({
   };
 
   return (
-    <Table style={{ width: "100%" }}>
+    <Table className={className}>
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow

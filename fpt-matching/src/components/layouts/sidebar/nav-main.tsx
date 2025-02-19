@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import { IconType } from "react-icons/lib";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export function NavMain({
   items,
@@ -41,12 +42,14 @@ export function NavMain({
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          const isActive = pathName === item.url;
+          const isActive =
+            pathName === item.url ||
+            (item.url !== "/" && pathName.startsWith(item.url + "/"));
           return (
             <Collapsible
               key={item.title}
               asChild
-              defaultOpen={item.isActive}
+              defaultOpen={isActive}
               className="group/collapsible"
             >
               {item.items ? (
@@ -54,8 +57,10 @@ export function NavMain({
                   <CollapsibleTrigger asChild>
                     <SidebarMenuButton
                       tooltip={item.title}
-                      isActive={isActive}
-                      className="text-lg py-6 tracking-wide group-data-[collapsible=icon]:!p-1"
+                      className={cn(
+                        "text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
+                        isActive ? "!bg-orange-500 !text-white" : ""
+                      )}
                     >
                       <div className="flex aspect-square size-5 items-center justify-start">
                         {item.icon && <item.icon />}
@@ -64,33 +69,41 @@ export function NavMain({
                       <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
-                  <CollapsibleContent>
+                  <CollapsibleContent className="overflow-hidden text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
                     <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton
-                            className="text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-1"
-                            asChild
-                            isActive={isActive}
-                          >
-                            <a href={subItem.url}>
-                              <div className="flex aspect-square size-5 items-center justify-start">
-                                {subItem.icon && <subItem.icon />}
-                              </div>
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
+                      {item.items?.map((subItem) => {
+                        const isActiveSub = pathName === subItem.url;
+                        return (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton
+                              className={cn(
+                                "text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
+                                isActiveSub ? "!bg-orange-500 !text-white" : ""
+                              )}
+                              asChild
+                            >
+                              <a href={subItem.url}>
+                                <div className="flex aspect-square size-5 items-center justify-start">
+                                  {subItem.icon && <subItem.icon />}
+                                </div>
+                                <span>{subItem.title}</span>
+                              </a>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        );
+                      })}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </SidebarMenuItem>
               ) : (
                 <SidebarMenuButton
-                  className="text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-1"
+                  className={cn(
+                    "text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
+                    isActive ? "!bg-orange-500 !text-white" : ""
+                  )}
                   tooltip={item.title}
                   asChild
-                  isActive={isActive}
+                  // isActive={isActive}
                 >
                   <a href={item.url}>
                     <div className="flex aspect-square size-5 items-center justify-start">

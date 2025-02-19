@@ -20,14 +20,15 @@ import {
   FormRadioGroup,
 } from "@/lib/form-custom-shadcn";
 import { getEnumOptions } from "@/lib/utils";
-import { Gender, Role, User } from "@/types/user";
+import { User } from "@/types/user";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { UpdateCommand } from "@/types/models/commands/_base/base-command";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { userService } from "@/services/user-serice";
+import { userService } from "@/services/user-service";
 import { UserUpdateCommand } from "@/types/models/commands/user-command";
+import { Gender } from "@/types/enums/user";
 
 const profileFormSchema = z.object({
   id: z.string().optional(),
@@ -80,11 +81,6 @@ const profileFormSchema = z.object({
   password: z
     .string()
     .min(6, { message: "Password must be at least 6 characters." })
-    .nullable()
-    .optional(),
-
-  role: z
-    .nativeEnum(Role) // Thay thế các giá trị phù hợp với Role ở backend
     .nullable()
     .optional(),
 });

@@ -8,7 +8,7 @@ export interface BaseQueryableQuery {
     toDate?: string | null | undefined;
     id?: string | null | undefined;
     createdBy?: string | null | undefined;
-    lastUpdatedBy?: string | null | undefined;
+    updatedBy?: string | null | undefined;
     isDeleted?: boolean | null | undefined;
 }
 

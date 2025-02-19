@@ -10,7 +10,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { PasswordInput } from "@/components/ui/password-input";
-import { userService } from "@/services/user-serice";
+import { userService } from "@/services/user-service";
 import { UserUpdatePasswordCommand } from "@/types/models/commands/user-command";
 import { User } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";

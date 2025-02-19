@@ -21,9 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { ideaService } from "@/services/idea-service";
 import { professionService } from "@/services/profession-service";
-import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { Profession } from "@/types/profession";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -44,17 +42,22 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
+import { userService } from "@/services/user-service";
+import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
+import { ideaService } from "@/services/idea-service";
+import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
+import { IdeaType } from "@/types/enums/idea";
+import { FilterEnum } from "@/types/models/filter-enum";
+import { isDeleted_options, isExistedTeam_options } from "@/lib/filter-options";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 
 //#region INPUT
 const defaultSchema = z.object({
   englishName: z.string().optional(),
-  type: z.string().optional(),
-  major: z.string().optional(),
-  specialtyId: z.string().optional(),
-  professionId: z.string().optional(),
+  type: z.nativeEnum(IdeaType).optional(),
 });
 //#endregion
-export default function IdeaSearchList() {
+export default function IdeasOfSupervisorsTableTable() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -82,7 +85,7 @@ export default function IdeaSearchList() {
 
   const [submittedFilters, setSubmittedFilters] = useState<
     z.infer<typeof defaultSchema>
-  >({});
+  >({ type: IdeaType.Lecturer });
 
   const queryParams: IdeaGetAllQuery = useMemo(() => {
     return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
@@ -115,9 +118,6 @@ export default function IdeaSearchList() {
   //#endregion
 
   //#region useEffect
-  const [professions, setProfessions] = useState<Profession[]>([]);
-  const [selectedProfession, setSelectedProfession] =
-    useState<Profession | null>(null);
   useEffect(() => {
     if (columnFilters.length > 0 || submittedFilters) {
       setPagination((prev) => ({
@@ -127,19 +127,6 @@ export default function IdeaSearchList() {
     }
   }, [columnFilters, submittedFilters]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await professionService.fetchAll();
-        setProfessions(res.data?.results!);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   // useEffect(() => {
   //   refetch();
   // }, [queryParams]);
@@ -147,15 +134,24 @@ export default function IdeaSearchList() {
   //#endregion
 
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {
+    values.type = IdeaType.Lecturer;
     setSubmittedFilters(values);
     toast.success("Test_submitted");
   };
+
+  const filterEnums: FilterEnum[] = [
+    {
+      columnId: "isExistedTeam",
+      title: "Slot register",
+      options: isExistedTeam_options,
+    },
+  ];
   return (
     <>
       <div className="container mx-auto space-y-8">
         <div className="w-fit mx-auto space-y-4">
           <TypographyH2 className="text-center tracking-wide">
-            Capstone Project / Thesis Proposal
+            The list of Supervisor's Ideas
           </TypographyH2>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -165,7 +161,7 @@ export default function IdeaSearchList() {
                 render={({ field }) => {
                   return (
                     <FormItem>
-                      <FormLabel>Input Topic Name or Tags to search:</FormLabel>
+                      <FormLabel>English name:</FormLabel>
                       <div className="flex items-center gap-2">
                         <FormControl>
                           <Input
@@ -188,81 +184,17 @@ export default function IdeaSearchList() {
                   );
                 }}
               />
-
-              <div className="flex gap-2">
-                <FormField
-                  control={form.control}
-                  name="professionId"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Profession</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          const selected = professions.find(
-                            (cat) => cat.id === value
-                          );
-                          setSelectedProfession(selected ?? null);
-                          field.onChange(value);
-                        }}
-                        value={field.value ?? undefined}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Profession" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {professions.map((p) => (
-                            <SelectItem key={p.id} value={p.id!}>
-                              {p.professionName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="specialtyId"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Specialty</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={(value) => field.onChange(value)}
-                          value={field.value ?? undefined} // Ensure the value is set correctly
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select Specialty" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {selectedProfession ? (
-                              <>
-                                {selectedProfession?.specialties ? (
-                                  selectedProfession.specialties.map((spec) => (
-                                    <SelectItem key={spec.id} value={spec.id!}>
-                                      {spec.specialtyName}
-                                    </SelectItem>
-                                  ))
-                                ) : (
-                                  <></>
-                                )}
-                              </>
-                            ) : (
-                              <></>
-                            )}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
             </form>
           </Form>
         </div>
 
-        <Card className="space-y-4 p-4">
+        <div className="">
+          <Card className="space-y-4 p-4 w-full">
+          <DataTableToolbar
+            form={form}
+            table={table}
+            filterEnums={filterEnums}
+          />
           {isFetching && !isTyping ? (
             <DataTableSkeleton
               columnCount={1}
@@ -274,14 +206,11 @@ export default function IdeaSearchList() {
               shrinkZero
             />
           ) : (
-            <DataTableComponent
-              deletePermanent={ideaService.deletePermanent}
-              restore={ideaService.restore}
-              table={table}
-            />
+            <DataTableComponent table={table} />
           )}
           <DataTablePagination table={table} />
-        </Card>
+          </Card>
+        </div>
       </div>
     </>
   );
