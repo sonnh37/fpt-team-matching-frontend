@@ -64,7 +64,7 @@ const data = {
     },
     {
       title: "My request",
-      url: "/#",
+      url: "/my-request",
       icon: Send,
     },
     {

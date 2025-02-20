@@ -5,6 +5,6 @@ export enum InvitationStatus {
 }
 
 export enum InvitationType {
-    Invite,
+    RequestToJoin,
     JoinRequest,
 }
