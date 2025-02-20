@@ -43,14 +43,7 @@ const CreateProjectForm = () => {
   })
 
 
-  const [tagInput, setTagInput] = useState("")
 
-  const addTag = () => {
-    if (tagInput.trim()) {
-      form.setValue("tags", [...form.getValues("tags"), tagInput.trim()])
-      setTagInput("")
-    }
-  }
   const [teamMembers, setTeamMembers] = useState([
     { email: "thainhthe150042@fpt.edu.vn", role: "Owner" },
   ]);
@@ -141,27 +134,7 @@ const CreateProjectForm = () => {
             )}
           />
 
-          {/* Project Tags */}
-          <FormItem>
-            <FormLabel>Project Tags (Up to 10)</FormLabel>
-            <div className="flex space-x-2">
-              <Input
-                placeholder="Enter tag"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-              />
-              <Button type="button" onClick={addTag}>Add</Button>
-            </div>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {form.watch("tags").map((tag, index) => (
-                <span key={index} className="px-2 py-1 bg-gray-200 rounded">
-                  {tag}
-                </span>
-              ))}
-            </div>
-            <FormMessage />
-          </FormItem>
-
+        
           {/* Team Members */}
           <div className="mb-4">
             <p className="text-sm font-medium">Team Members</p>

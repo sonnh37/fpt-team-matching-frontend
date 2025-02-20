@@ -1,7 +1,6 @@
 "use client";
 import { AppSidebar } from "@/components/layouts/sidebar/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-
 import { AuthDropdown } from "@/components/_common/auth-dropdown";
 import DynamicBreadcrumbs from "@/components/_common/breadcrumbs/dynamic-breadcrumbs";
 import { ChatPopover } from "@/components/_common/chat-popover";
@@ -13,6 +12,7 @@ import dynamic from "next/dynamic";
 import React from "react";
 import { useSelector } from "react-redux";
 import { ModeToggle } from "@/components/_common/mode-toggle";
+import { ConfirmProvider } from "@/components/_common/formdelete/confirm-context";
 const Header = dynamic(
   () => import("@/components/layouts/navbar/header").then((mod) => mod.Header),
   { ssr: false }
@@ -40,7 +40,10 @@ export default function DashboardLayout({
             <AuthDropdown user={user} />
           </div>
         </header>
+        {/* boc no trong form delete */}
+        <ConfirmProvider>
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+        </ConfirmProvider>
       </SidebarInset>
     </SidebarProvider>
   );

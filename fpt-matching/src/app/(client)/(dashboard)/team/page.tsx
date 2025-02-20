@@ -1,3 +1,4 @@
+'use client'
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -16,9 +17,11 @@ import {
   ModalTrigger,
   ModalClose,
 } from "@/components/ui/animated-modal";
-
 import CreateProjectForm
- from "../idea/page";
+  from "../idea/page";
+import { useConfirm } from "@/components/_common/formdelete/confirm-context";
+import { toast } from "sonner";
+
 const groupData = {
   title: "FPT Team Matching - Social networking for students project teams",
   createdAt: "1/2/2025 7:25:37 PM",
@@ -41,6 +44,25 @@ const groupData = {
 export default function TeamInfo() {
   const availableSlots = groupData.maxMembers - groupData.members.length;
 
+  const confirm = useConfirm()
+  async function handleDelete() {
+    // Gọi confirm để mở dialog
+    const confirmed = await confirm({
+      title: "Delete Item",
+      description: "Are you sure you want to delete this item?",
+      confirmText: "Yes, delete it",
+      cancelText: "No",
+    })
+
+    if (confirmed) {
+      // Người dùng chọn Yes
+      toast("Item deleted!")
+      // Thực hiện xóa
+    } else {
+      // Người dùng chọn No
+      toast("User canceled!")
+    }
+  }
   return (
     <div>
       <div className="text-3xl ml-4 text-blue-600 font-sans " >My Group</div>
@@ -56,20 +78,23 @@ export default function TeamInfo() {
               <Modal>
                 <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
                   <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
-                   +Update Idea
+                    +Update Idea
                   </button>
 
                 </ModalTrigger>
 
                 <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
                   <ModalContent>
-                   <CreateProjectForm />
+                    <CreateProjectForm />
                   </ModalContent>x
                 </ModalBody>
 
               </Modal>
-             
-              <Modal>
+              <button className="border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white  rounded-md" onClick={handleDelete}>
+                +Delete idea
+              </button>
+
+              {/* <Modal>
                 <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
                   <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
                    +Delete Idea
@@ -83,7 +108,7 @@ export default function TeamInfo() {
                   </ModalContent>x
                 </ModalBody>
 
-              </Modal>
+              </Modal> */}
 
             </div>
           </div>
@@ -118,17 +143,7 @@ export default function TeamInfo() {
             <p className="italic">{groupData.description}</p>
           </div>
 
-          {/* Keywords */}
-          <div>
-            <p className="text-gray-500">Keywords</p>
-            <div className="flex flex-wrap gap-2">
-              {groupData.keywords.map((keyword, index) => (
-                <span key={index} className="px-2 py-1 text-sm bg-gray-200 rounded">
-                  {keyword}
-                </span>
-              ))}
-            </div>
-          </div>
+
 
           {/* Members */}
           <div>
