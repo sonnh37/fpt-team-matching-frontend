@@ -1,5 +1,5 @@
 import { BaseEntity } from "./_base/base";
-import { Application } from "./application";
+import { Application } from "./blog-cv";
 import { Blog } from "./blog";
 import { Gender } from "./enums/user";
 import { Idea } from "./idea";
