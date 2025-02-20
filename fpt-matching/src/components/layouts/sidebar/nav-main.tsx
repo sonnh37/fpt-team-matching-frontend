@@ -20,6 +20,7 @@ import {
 import { IconType } from "react-icons/lib";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export function NavMain({
   items,
@@ -82,12 +83,12 @@ export function NavMain({
                               )}
                               asChild
                             >
-                              <a href={subItem.url}>
+                              <Link href={subItem.url}>
                                 <div className="flex aspect-square size-5 items-center justify-start">
                                   {subItem.icon && <subItem.icon />}
                                 </div>
                                 <span>{subItem.title}</span>
-                              </a>
+                              </Link>
                             </SidebarMenuSubButton>
                           </SidebarMenuSubItem>
                         );
@@ -105,12 +106,12 @@ export function NavMain({
                   asChild
                   // isActive={isActive}
                 >
-                  <a href={item.url}>
+                  <Link href={item.url}>
                     <div className="flex aspect-square size-5 items-center justify-start">
                       {item.icon && <item.icon />}
                     </div>
                     <span>{item.title}</span>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
               )}
             </Collapsible>

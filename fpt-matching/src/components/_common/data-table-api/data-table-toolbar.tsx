@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -55,7 +55,7 @@ interface DataTableToolbarProps<TData> {
     undefined
   >;
   table: Table<TData>;
-  filterEnums: FilterEnum[];
+  filterEnums?: FilterEnum[];
   deleteAll?: (id: string) => Promise<BusinessResult<null>>;
   isSheetOpen?: boolean;
   isDownloadCsv?: boolean;
@@ -107,7 +107,7 @@ const DraggableColumnItem = ({ column, onToggleVisibility }: any) => {
 export function DataTableToolbar<TData>({
   form,
   table,
-  filterEnums,
+  filterEnums = undefined,
   columnSearch = undefined,
   deleteAll = undefined,
   isSheetOpen = false,
@@ -217,20 +217,22 @@ export function DataTableToolbar<TData>({
               className="h-8 w-[150px] lg:w-[250px]"
             />
           ) : null}
-          {filterEnums.map((filter: any) => {
-            const column = table.getColumn(filter.columnId);
-            if (column) {
-              return (
-                <DataTableFacetedFilter
-                  key={filter.columnId}
-                  column={column}
-                  title={filter.title}
-                  options={filter.options}
-                />
-              );
-            }
-            return null;
-          })}
+          {filterEnums
+            ? filterEnums.map((filter: any) => {
+                const column = table.getColumn(filter.columnId);
+                if (column) {
+                  return (
+                    <DataTableFacetedFilter
+                      key={filter.columnId}
+                      column={column}
+                      title={filter.title}
+                      options={filter.options}
+                    />
+                  );
+                }
+                return null;
+              })
+            : null}
 
           {table.getState().columnFilters.length > 0 && (
             <Button
