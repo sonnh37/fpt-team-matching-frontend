@@ -31,7 +31,7 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
   if (user == null) {
     return (
       <Link href="/login" className="uppercase text-xs">
-        <Button className="bg-transparent text-orange-100" >Đăng nhập</Button>
+        <Button className="bg-transparent text-orange-100">Đăng nhập</Button>
       </Link>
     );
   }
@@ -51,10 +51,20 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className={cn("size-8 rounded-full focus-visible:ring-0")}>
+        <Button variant="outline" className={cn("size-8 focus-visible:ring-0")}>
           <Avatar className="size-8">
-            <AvatarImage src={user.avatar ?? ""} alt={user.username ?? ""} />
-            <AvatarFallback className="bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500">{initials}</AvatarFallback>
+            <AvatarImage
+              src={
+                user.avatar && user.avatar.trim() !== ""
+                  ? user.avatar
+                  : undefined
+              }
+              alt={user.username ?? ""}
+              onError={(e) => (e.currentTarget.style.display = "none")}
+            />
+            <AvatarFallback className="bg-slate-200 rounded hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500">
+              {initials}
+            </AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

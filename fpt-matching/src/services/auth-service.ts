@@ -2,6 +2,7 @@ import { Const } from "@/lib/constants/const";
 import axiosInstance from "@/lib/interceptors/axios-instance";
 import { logout, setUser } from "@/lib/redux/slices/userSlice";
 import store from "@/lib/redux/store";
+import { Department } from "@/types/enums/user";
 import { BusinessResult } from "@/types/models/responses/business-result";
 import { LoginResponse } from "@/types/models/responses/login-response";
 import { User } from "@/types/user";
@@ -17,9 +18,9 @@ class AuthService {
   public login = async (
     account: string,
     password: string
-  ): Promise<BusinessResult<LoginResponse>> => {
+  ): Promise<BusinessResult<null>> => {
     try {
-      const response = await axios.post<BusinessResult<LoginResponse>>(
+      const response = await axios.post<BusinessResult<null>>(
         `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/login`,
         { account: account, password: password },
         {
@@ -32,32 +33,33 @@ class AuthService {
     }
   };
 
-  public logout = async (): Promise<BusinessResult<null>> => {
+  public loginByGoogle = async (
+    token: string,
+    department: Department
+  ): Promise<BusinessResult<null>> => {
     try {
-      const response = await axiosInstance.post(
-        `${this.endpoint}/logout`
+      const response = await axios.post<BusinessResult<null>>(
+        `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/login-by-google`,
+        { token: token, department: department },
+        {
+          withCredentials: true,
+        }
       );
-      if (response.data.status === 1) {
-        store.dispatch(logout());
-      }
       return response.data;
     } catch (error) {
       return this.handleError(error);
     }
   };
 
-  public loginByGoogle = async (
-    token: string
-  ): Promise<BusinessResult<LoginResponse>> => {
+  public logout = async (): Promise<BusinessResult<null>> => {
     try {
-      const response = await axiosInstance.post<BusinessResult<LoginResponse>>(
-        `${this.endpoint}/login-by-google`,
-        { token: token }
-      );
+      const response = await axiosInstance.post(`${this.endpoint}/logout`);
+      if (response.data.status === 1) {
+        store.dispatch(logout());
+      }
       return response.data;
     } catch (error) {
-      this.handleError(error);
-      return Promise.reject(error);
+      return this.handleError(error);
     }
   };
 

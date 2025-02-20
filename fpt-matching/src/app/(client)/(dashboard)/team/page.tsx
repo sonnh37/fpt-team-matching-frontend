@@ -16,9 +16,8 @@ import {
   ModalTrigger,
   ModalClose,
 } from "@/components/ui/animated-modal";
+import CreateProjectForm from "@/app/idea/page";
 
-import CreateProjectForm
- from "../idea/page";
 const groupData = {
   title: "FPT Team Matching - Social networking for students project teams",
   createdAt: "1/2/2025 7:25:37 PM",

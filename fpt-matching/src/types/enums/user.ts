@@ -7,3 +7,11 @@ export enum Gender {
 export enum UserStatus {
     
 }
+
+export enum Department {
+    HoaLac,
+    CanTho,
+    HoChiMinh,
+    DaNang,
+    QuyNhon
+}
