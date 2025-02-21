@@ -22,7 +22,7 @@ const formSchema = z.object({
   abbreviation: z.string().max(20, { message: "Abbreviation must be less than 20 characters." }),
   vietnameseTitle: z.string().min(2, { message: "Vietnamese Title must be at least 2 characters." }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
-  tags: z.array(z.string()).max(10, { message: "You can add up to 10 tags." }),
+  // tags: z.array(z.string()).max(10, { message: "You can add up to 10 tags." }),
   inviteEmail: z.string().email({ message: "Invalid email format." }),
 })
 
@@ -37,7 +37,7 @@ const CreateProjectForm = () => {
       abbreviation: "",
       vietnameseTitle: "",
       description: "",
-      tags: [],
+      // tags: [],
       inviteEmail: "",
     },
   })
