@@ -54,7 +54,7 @@ const data = {
     },
     {
       title: "Social",
-      url: "/blog",
+      url: "social/blog",
       icon: Globe,
     },
     {
