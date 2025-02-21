@@ -117,29 +117,14 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText(model.id!)}
-          >
-            Copy model ID
-          </DropdownMenuItem>
-          {/*<DropdownMenuItem onClick={handleUsersClick}>*/}
-          {/*    View photos*/}
-          {/*</DropdownMenuItem>*/}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleViewDetailsClick}>
-            View details
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+       <div className="isolate flex -space-x-px">
+        <Button className="rounded-r-none focus:z-10">
+          Accept
+        </Button>
+        <Button variant="outline" className="rounded-l-none focus:z-10">
+          Cancel
+        </Button>
+      </div>
     </>
   );
 };
