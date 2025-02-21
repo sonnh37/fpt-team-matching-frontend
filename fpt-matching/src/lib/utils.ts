@@ -54,10 +54,10 @@ export const formatCurrency = (value: number | undefined): string => {
 
 export function getEnumOptions(enumObject: any) {
   return Object.keys(enumObject)
-    .filter((key) => isNaN(Number(key))) // Lọc để chỉ lấy tên (không lấy số index)
+    .filter((key) => isNaN(Number(key)))
     .map((key) => ({
       label: key,
-      value: enumObject[key].toString(),
+      value: enumObject[key],
     }));
 }
 

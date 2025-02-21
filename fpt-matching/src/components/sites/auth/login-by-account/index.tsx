@@ -11,9 +11,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { IoIosArrowRoundBack } from "react-icons/io";
 import { toast } from "sonner";
 import { z } from "zod";
-import { IoIosArrowRoundBack } from "react-icons/io";
 
 const emailSchema = z.string().email("Email không hợp lệ");
 const usernameSchema = z
@@ -24,7 +24,9 @@ const usernameSchema = z
 const loginSchema = z.object({
   account: z.union([emailSchema, usernameSchema]),
   password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
-  department: z.nativeEnum(Department).nullable().optional(),
+  department: z.nativeEnum(Department).refine((val) => val !== undefined, {
+    message: "Vui lòng chọn Campus trước khi đăng nhập.",
+  }),
 });
 
 export const LoginAccountForm = ({
@@ -33,27 +35,34 @@ export const LoginAccountForm = ({
 }: React.ComponentProps<"div">) => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const form = useForm({
+  type FormSchema = z.infer<typeof loginSchema>;
+
+  const form = useForm<FormSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       account: "",
       password: "",
-      department: null,
+      department: undefined,
     },
   });
 
-  type FormSchema = z.infer<typeof loginSchema>;
-
   const onSubmit = (data: FormSchema) => {
     try {
-      authService.login(data.account, data.password).then((res) => {
-        if (res.status != 1) {
-          toast.warning(res.message);
-          return;
-        }
-        toast.success("Chào mừng bạn đã đến với FPT Team Matching");
-        window.location.href = "/";
-      });
+      if (data.department === null || data.department === undefined) {
+        toast.warning("Vui lòng chọn Campus trước khi đăng nhập.");
+        return;
+      }
+
+      authService
+        .login(data.account, data.password, data.department!)
+        .then((res) => {
+          if (res.status != 1) {
+            toast.warning(res.message);
+            return;
+          }
+          toast.success("Chào mừng bạn đã đến với FPT Team Matching");
+          window.location.href = "/";
+        });
     } catch (error: any) {
       console.error(error);
       toast.error(error.message);
@@ -70,12 +79,12 @@ export const LoginAccountForm = ({
                 <div className="flex w-full justify-center items-center gap-2">
                   <Icons.logo></Icons.logo>
                 </div>
-                {/* Login normal */}
                 <div className="grid gap-2">
                   <FormSelectEnum
                     name="department"
                     label="Select Campus"
                     form={form}
+                    placeholder="Select a campus"
                     enumOptions={getEnumOptions(Department)}
                   />
                 </div>
