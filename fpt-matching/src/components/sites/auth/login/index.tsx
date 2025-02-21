@@ -3,33 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { Icons } from "@/components/ui/icons";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { FormInput, FormSelectEnum } from "@/lib/form-custom-shadcn";
-import { RootState } from "@/lib/redux/store";
+import { FormSelectEnum } from "@/lib/form-custom-shadcn";
 import { cn, getEnumOptions } from "@/lib/utils";
 import { authService } from "@/services/auth-service";
 import { Department } from "@/types/enums/user";
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  useGoogleLogin
+} from "@react-oauth/google";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { z } from "zod";
-import { jwtDecode } from "jwt-decode";
-import {
-  GoogleOAuthProvider,
-  GoogleLogin,
-  useGoogleLogin,
-} from "@react-oauth/google";
+
 const loginSchema = z.object({
-  department: z
-    .nativeEnum(Department)
-    .nullable()
-    .refine((val) => val !== null, {
-      message: "Vui lòng chọn Campus trước khi đăng nhập.",
-    }),
+  department: z.nativeEnum(Department).refine((val) => val !== undefined, {
+    message: "Vui lòng chọn Campus trước khi đăng nhập.",
+  }),
 });
 
 export const LoginGoogleForm = ({
@@ -38,25 +29,24 @@ export const LoginGoogleForm = ({
 }: React.ComponentProps<"div">) => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  type FormSchema = z.infer<typeof loginSchema>;
+
   const form = useForm<FormSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      department: null,
+      department: undefined,
     },
   });
-
-  type FormSchema = z.infer<typeof loginSchema>;
 
   const googleLogin = useGoogleLogin({
     scope:
       "openid email profile https://www.googleapis.com/auth/user.birthday.read https://www.googleapis.com/auth/user.phonenumbers.read https://www.googleapis.com/auth/user.addresses.read",
     onSuccess: (response) => {
       const department = form.getValues("department");
-      if (!department) {
+      if (department === undefined || department === null) {
         toast.warning("Vui lòng chọn Campus trước khi đăng nhập.");
         return;
       }
-      console.log("check_depart", department)
       authService
         .loginByGoogle(response.access_token, department)
         .then((res) => {
@@ -72,11 +62,11 @@ export const LoginGoogleForm = ({
 
   const onSubmit = (data: FormSchema) => {
     try {
-      if (data.department === null) {
+      if (data.department === null || data.department === undefined) {
         toast.warning("Vui lòng chọn Campus trước khi đăng nhập.");
         return;
       }
-      googleLogin(); // Gọi googleLogin từ đây
+      googleLogin();
     } catch (error: any) {
       console.error(error);
       toast.error(error.message);
@@ -93,11 +83,11 @@ export const LoginGoogleForm = ({
                 <div className="flex w-full justify-center items-center gap-2">
                   <Icons.logo></Icons.logo>
                 </div>
-                {/* Login normal */}
                 <div className="grid gap-2">
                   <FormSelectEnum
                     name="department"
-                    label="Select Campus"
+                    label="Campus"
+                    placeholder="Select a campus"
                     form={form}
                     enumOptions={getEnumOptions(Department)}
                   />
