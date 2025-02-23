@@ -8,6 +8,7 @@ import { AuthProvider } from "@/components/_common/auth-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./globals.css";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export default function LayoutClient({
   children,
@@ -37,9 +38,11 @@ export default function LayoutClient({
       <ThemeProvider attribute="class" enableSystem={true} defaultTheme="light">
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
             <TooltipProvider delayDuration={100}>
               <AuthProvider>{children}</AuthProvider>
             </TooltipProvider>
+            </GoogleOAuthProvider>
           </QueryClientProvider>
         </Provider>
       </ThemeProvider>

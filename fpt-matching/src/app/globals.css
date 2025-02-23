@@ -6,8 +6,6 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -106,4 +104,14 @@ body {
     scrollbar-width: none; /* Firefox */
     -ms-overflow-style: none; /* IE and Edge */
   }
+}
+
+.no-visible-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+ 
+.no-visible-scrollbar::-webkit-scrollbar {
+  display: none;
 }

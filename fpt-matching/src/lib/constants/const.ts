@@ -13,6 +13,7 @@ export class Const {
     static readonly BLOG = "blogs";
     static readonly USER = "users";
     static readonly IDEA = "ideas";
+    static readonly INVITATION = "invitations";
     static readonly SPECIALTY = "specialties";
     static readonly PROFESSION = "professions";
     static readonly AUTH = "auth";

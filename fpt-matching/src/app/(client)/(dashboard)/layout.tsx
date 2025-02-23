@@ -12,7 +12,8 @@ import dynamic from "next/dynamic";
 import React from "react";
 import { useSelector } from "react-redux";
 import { ModeToggle } from "@/components/_common/mode-toggle";
-import { ConfirmProvider } from "@/components/_common/formdelete/confirm-context";
+import PageContainer from "@/components/layouts/page-container";
+
 const Header = dynamic(
   () => import("@/components/layouts/navbar/header").then((mod) => mod.Header),
   { ssr: false }
@@ -24,9 +25,9 @@ export default function DashboardLayout({
 }) {
   const user = useSelector((state: RootState) => state.user.user);
   return (
-    <SidebarProvider>
+    <SidebarProvider className="h-screen overflow-hidden">
       <AppSidebar />
-      <SidebarInset className="">
+      <SidebarInset>
         <header className="flex h-16 shrink-0 items-center justify-between gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
           <div className="flex items-center gap-2 px-4">
             <SidebarTrigger className="-ml-1" />
@@ -40,10 +41,11 @@ export default function DashboardLayout({
             <AuthDropdown user={user} />
           </div>
         </header>
-        {/* boc no trong form delete */}
-        <ConfirmProvider>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
-        </ConfirmProvider>
+
+        <Separator />
+        <div className="flex flex-1 flex-col gap-4 overflow-hidden">
+          <PageContainer>{children}</PageContainer>
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

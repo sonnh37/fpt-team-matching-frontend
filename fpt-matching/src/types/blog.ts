@@ -1,5 +1,5 @@
 import { BaseEntity } from "./_base/base";
-import { Application } from "./application";
+import { Application } from "./blog-cv";
 import { BlogType } from "./enums/blog";
 import { Like } from "./like";
 import { User } from "./user";
