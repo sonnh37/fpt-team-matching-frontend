@@ -9,6 +9,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import { ConfirmProvider } from "@/components/_common/formdelete/confirm-context";
 
 export default function LayoutClient({
   children,
@@ -38,10 +39,14 @@ export default function LayoutClient({
       <ThemeProvider attribute="class" enableSystem={true} defaultTheme="light">
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
-          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-            <TooltipProvider delayDuration={100}>
-              <AuthProvider>{children}</AuthProvider>
-            </TooltipProvider>
+            <GoogleOAuthProvider
+              clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+            >
+              <TooltipProvider delayDuration={100}>
+                <AuthProvider>
+                  <ConfirmProvider>{children}</ConfirmProvider>
+                </AuthProvider>
+              </TooltipProvider>
             </GoogleOAuthProvider>
           </QueryClientProvider>
         </Provider>
