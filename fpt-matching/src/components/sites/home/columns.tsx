@@ -38,9 +38,7 @@ import { TypographyLead } from "@/components/_common/typography/typography-lead"
 export const columns: ColumnDef<Idea>[] = [
   {
     accessorKey: "name",
-    header: ({ column }) => (
-      null
-    ),
+    header: ({ column }) => null,
     cell: ({ row }) => {
       const model = row.original;
 
@@ -48,13 +46,18 @@ export const columns: ColumnDef<Idea>[] = [
       const englishName = model.englishName;
       const vietNamName = model.vietNamName;
       const createdDate = model.createdDate;
+      const user = model.user!;
       const createdBy = model.createdBy;
+
+      const initials = `${user.firstName?.charAt(0).toUpperCase() ?? ""}${
+        user.lastName?.charAt(0).toUpperCase() ?? ""
+      }`;
       return (
         <div className="flex flex-row gap-4">
           <div>
-            <Avatar className="rounded-xl">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
+            <Avatar className="h-10 rounded-lg">
+              <AvatarImage src={user.avatar!} alt={user.email!} />
+              <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
             </Avatar>
           </div>
           <div>

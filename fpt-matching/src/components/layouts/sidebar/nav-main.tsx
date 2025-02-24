@@ -45,7 +45,8 @@ export function NavMain({
         {items.map((item) => {
           const isActive =
             pathName === item.url ||
-            (item.url !== "/" && pathName.startsWith(item.url + "/"));
+            (pathName.startsWith(item.url + "/"));
+            
           return (
             <Collapsible
               key={item.title}

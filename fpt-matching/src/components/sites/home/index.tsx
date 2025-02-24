@@ -72,7 +72,6 @@ export default function IdeaSearchList() {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [isTyping, setIsTyping] = useState(false);
   //#endregion
 
   //#region CREATE TABLE
@@ -263,7 +262,7 @@ export default function IdeaSearchList() {
         </div>
 
         <Card className="space-y-4 p-4">
-          {isFetching && !isTyping ? (
+          {isFetching ? (
             <DataTableSkeleton
               columnCount={1}
               showViewOptions={false}
