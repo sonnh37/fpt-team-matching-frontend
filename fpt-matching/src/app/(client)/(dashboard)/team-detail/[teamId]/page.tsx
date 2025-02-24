@@ -17,8 +17,6 @@ import {
   ModalTrigger,
   ModalClose,
 } from "@/components/ui/animated-modal";
-import UpdateProjectTeam
-  from "../idea/updateidea/page";
 import { useConfirm } from "@/components/_common/formdelete/confirm-context";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
@@ -31,6 +29,8 @@ import { TeamMemberRole } from "@/types/enums/team-member";
 import { teardownHeapProfiler } from "next/dist/build/swc";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
+import { useParams } from "next/navigation";
+
 
 // const groupData = {
 //   title: "FPT Team Matching - Social networking for students project teams",
@@ -51,7 +51,9 @@ import { RootState } from "@/lib/redux/store";
 //   maxMembers: 5,
 // };
 
-export default function TeamInfo() {
+export default function TeamInfoDetail() {
+    const {teamId} = useParams();
+    console.log("sonngu",teamId);
   //lay thong tin tu redux luc dang nhap
   const user = useSelector((state: RootState) => state.user.user)
   //goi api bang tanstack
@@ -61,8 +63,8 @@ export default function TeamInfo() {
     isError,
     error,
   } = useQuery({
-    queryKey: ["getTeamInfo"],
-    queryFn: projectService.getProjectInfo,
+    queryKey: ["getTeamInfo", teamId], // Thêm `teamId` vào queryKey để caching tốt hơn
+    queryFn: () => projectService.fetchById(teamId.toString()), // ✅ Đúng: Truyền một hàm
     refetchOnWindowFocus: false,
   });
 
@@ -75,8 +77,9 @@ export default function TeamInfo() {
     return <ErrorSystem />;
   }
 
-  //check xem thang dang nhap coi no phai member va la leader khong
-  const checkRole = result?.data?.teamMembers?.find(member => member.userId === user?.id)?.role === TeamMemberRole.Leader;
+  
+
+
   // sap xep lai member
   const sortedMembers = result?.data?.teamMembers
     ?.slice() // Tạo bản sao để tránh thay đổi dữ liệu gốc
@@ -112,7 +115,7 @@ export default function TeamInfo() {
     <div>
       <div className="flex flex-row">
         <div className="basic-3/5">
-          <div className=" text-3xl ml-4 text-blue-600 font-sans " >My Group</div>
+          <div className=" text-3xl ml-4 text-blue-600 font-sans " >Group Detail</div>
           <Card className="mt-5 p-6 bg-white shadow-lg rounded-lg ">
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
@@ -121,43 +124,7 @@ export default function TeamInfo() {
                   <h2 className="text-xl font-semibold">{result.data.name}</h2>
                   <p className="text-sm text-gray-500">Created at: {formatDate(result.data.createdDate)}</p>
                 </div>
-                <div className="button0act flex ml-4">
-                  <Modal>
-                    <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
-                      <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
-                        +Update Idea
-                      </button>
-
-                    </ModalTrigger>
-
-                    <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
-                      <ModalContent>
-                        <UpdateProjectTeam />
-                      </ModalContent>x
-                    </ModalBody>
-
-                  </Modal>
-                  <button className="border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white  rounded-md" onClick={handleDelete}>
-                    +Delete idea
-                  </button>
-
-                  {/* <Modal>
-                <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
-                  <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
-                   +Delete Idea
-                  </button>
-
-                </ModalTrigger>
-
-                <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
-                  <ModalContent>
-                   <CreateProjectForm />
-                  </ModalContent>x
-                </ModalBody>
-
-              </Modal> */}
-
-                </div>
+          
               </div>
 
               {/* Abbreviation & Vietnamese Title */}
@@ -199,10 +166,7 @@ export default function TeamInfo() {
                   <p className="text-gray-500">Available Slot: {availableSlots}</p>
                 </div>
 
-                {
-                  // user?.email == member.user?.email &&
-                  checkRole ? (
-                    <div className="space-y-3 mt-2">
+                <div className="space-y-3 mt-2">
                       {sortedMembers.map((member, index) => {
 
                         const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
@@ -230,94 +194,25 @@ export default function TeamInfo() {
                                 <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</p>
                               )}
                               <div className="relative ml-3">
-                                {user?.email == member.user?.email ? (
+                               
                                   <DropdownMenu>
                                     <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
                                     <DropdownMenuContent>
                                       <DropdownMenuItem>View profile</DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
-                                ) : (
-
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                      <DropdownMenuItem>Xóa thành viên</DropdownMenuItem>
-                                      <DropdownMenuItem>Xem profile</DropdownMenuItem>
-                                      <DropdownMenuItem>Phân chức leader</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                )
-                                }
                               </div>
                             </div>
                           </div>
                         )
                       })}
                     </div>
-                  ) : (
-                    <div className="space-y-3 mt-2">
-                      {result.data.teamMembers.map((member, index) => {
-                        const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                          }`;
-                        return (
-                          <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
-                            <div className="flex items-center space-x-3">
-                              <Avatar className="h-10 rounded-lg">
-                                <AvatarImage src={member.user?.avatar!} alt={member.user?.email!} />
-                                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
-                              </Avatar>
-
-                              <div>
-                                <p className="font-semibold">{member.user?.email}</p>
-                                <p className="text-sm text-gray-500">{member.user?.firstName}</p>
-                              </div>
-                            </div>
-                            <div className="flex">
-                              {member.role === TeamMemberRole.Leader ? (
-                                <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Origin</p>
-
-                              ) : (
-                                <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</p>
-                              )}
-                              <div className="relative ml-3">
-
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem>View profile</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )}
 
               </div>
             </CardContent>
           </Card>
         </div>
-        <div className=" basis-2/5">
-          <div className=" text-2xl ml-4 text-blue-600 font-sans " >Register Group</div>
-          <Card className="mt-5 ml-2 p-1 pt-6 bg-white shadow-lg rounded-lg ">
-            <CardContent className="flex flex-col justify-center items-center space-y-3">
-              <div className=" text-blue-600 font-bold"> Submit Registation </div>
-              <div className=" font-bold text-sm"> NOTICE: Registration request will be informed to other members</div>
-              <button className="bg-blue-600 text-white">Submit</button>
-            </CardContent>
-          </Card>
-          <div className=" text-2xl my-4 ml-2 text-blue-600 font-sans " >Request to the project</div>
-          <Card className="mt-5 ml-2 p-1 pt-6 bg-white shadow-lg rounded-lg  ">
-            <CardContent className="flex flex-col justify-center items-center space-y-3">
-              <div className=" text-blue-600 font-bold"> Any request </div>
-              <div className=" font-bold text-sm"> NOTICE: Registration request will be informed to other members</div>
-              <button className="bg-blue-600 text-white">Submit</button>
-            </CardContent>
-          </Card>
-        </div>
+      
       </div>
 
     </div>
