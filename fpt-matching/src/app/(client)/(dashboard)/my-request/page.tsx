@@ -1,6 +1,6 @@
 "use client";
-import InvitationJoinRequestTable from "@/components/sites/my-request/join-request";
-import InvitationRequestToJoinTable from "@/components/sites/my-request/request-to-join";
+import InvitationSentByMeTable from "@/components/sites/my-request/sent-by-me";
+import InvitationReceivedByTeamTable from "@/components/sites/my-request/received-by-team";
 import {
   Tabs,
   TabsContent,
@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/tabs-shadcn";
 
 export default function Page() {
-  const tab_1 = "Request to join";
-  const tab_2 = "Join request";
+  const tab_1 = "Sent by me";
+  const tab_2 = "Received by team";
   return (
     <>
       <Tabs defaultValue={tab_1} className="w-full container mx-auto">
@@ -19,10 +19,10 @@ export default function Page() {
           <TabsTrigger value={tab_2}>{tab_2}</TabsTrigger>
         </TabsList>
         <TabsContent value={tab_1}>
-          <InvitationRequestToJoinTable />
+          <InvitationSentByMeTable />
         </TabsContent>
         <TabsContent value={tab_2}>
-          <InvitationJoinRequestTable />
+          <InvitationReceivedByTeamTable />
         </TabsContent>
       </Tabs>
     </>

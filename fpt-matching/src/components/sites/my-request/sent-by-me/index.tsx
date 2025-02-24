@@ -34,7 +34,7 @@ const defaultSchema = z.object({
   type: z.nativeEnum(InvitationType).optional(),
 });
 //#endregion
-export default function InvitationJoinRequestTable() {
+export default function InvitationSentByMeTable() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -62,7 +62,7 @@ export default function InvitationJoinRequestTable() {
 
   const [submittedFilters, setSubmittedFilters] = useState<
     z.infer<typeof defaultSchema> & BaseQueryableQuery
-  >({ type: InvitationType.JoinRequest, isPagination: false });
+  >({ type: InvitationType.SentByMe, isPagination: false });
 
   const queryParams: InvitationGetByTypeQuery = useMemo(() => {
     return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
