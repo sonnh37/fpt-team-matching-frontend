@@ -62,7 +62,7 @@ export const columns: ColumnDef<Idea>[] = [
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                    <Link href={"/project?id=" + id}>
+                  <Link href={`/team-detail/${model.project?.id}`}>
                       <TypographyH3>{englishName}</TypographyH3>
                     </Link>
                   </TooltipTrigger>
