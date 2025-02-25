@@ -109,39 +109,39 @@ export default function TeamInfo() {
 
   return (
 
-    <div>
-      <div className="flex flex-row">
-        <div className="basic-3/5">
-          <div className=" text-3xl ml-4 text-blue-600 font-sans " >My Group</div>
-          <Card className="mt-5 p-6 bg-white shadow-lg rounded-lg ">
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                {/* Tiêu đề nhóm */}
-                <div className="title">
-                  <h2 className="text-xl font-semibold">{result.data.name}</h2>
-                  <p className="text-sm text-gray-500">Created at: {formatDate(result.data.createdDate)}</p>
-                </div>
-                <div className="button0act flex ml-4">
-                  <Modal>
-                    <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
-                      <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
-                        +Update Idea
-                      </button>
 
-                    </ModalTrigger>
+    <div className="flex flex-row max-h-max">
+      <div className="w-4/5">
+        <div className=" text-3xl ml-4 text-blue-600 font-sans " >My Group</div>
+        <Card className="mt-5 p-6 bg-white shadow-lg rounded-lg ">
+          <CardContent className="space-y-4">
+            <div className="flex justify-between items-center">
+              {/* Tiêu đề nhóm */}
+              <div className="title">
+                <h2 className="text-xl font-semibold">{result.data.name}</h2>
+                <p className="text-sm text-gray-500">Created at: {formatDate(result.data.createdDate)}</p>
+              </div>
+              <div className="button0act flex ml-4">
+                <Modal>
+                  <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
+                    <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
+                      +Update Idea
+                    </button>
 
-                    <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
-                      <ModalContent>
-                        <UpdateProjectTeam />
-                      </ModalContent>x
-                    </ModalBody>
+                  </ModalTrigger>
 
-                  </Modal>
-                  <button className="border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white  rounded-md" onClick={handleDelete}>
-                    +Delete idea
-                  </button>
+                  <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
+                    <ModalContent>
+                      <UpdateProjectTeam />
+                    </ModalContent>x
+                  </ModalBody>
 
-                  {/* <Modal>
+                </Modal>
+                <button className="border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white  rounded-md" onClick={handleDelete}>
+                  +Delete idea
+                </button>
+
+                {/* <Modal>
                 <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
                   <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
                    +Delete Idea
@@ -157,152 +157,150 @@ export default function TeamInfo() {
 
               </Modal> */}
 
-                </div>
               </div>
+            </div>
 
-              {/* Abbreviation & Vietnamese Title */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-gray-500">Abbreviations</p>
-                  <p className="font-semibold italic">{result.data.idea?.abbreviations}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Vietnamese Title</p>
-                  <p className="font-semibold italic">{result.data.idea?.vietNamName}</p>
-                </div>
-              </div>
-
-              {/* Profession & Specialty */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-gray-500">Profession</p>
-                  <p className="font-semibold italic">{result.data.idea?.specialty?.profession?.professionName}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Specialty</p>
-                  <p className="font-semibold italic">{result.data.idea?.specialty?.specialtyName}</p>
-                </div>
-              </div>
-
-              {/* Description */}
+            {/* Abbreviation & Vietnamese Title */}
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-gray-500">Description</p>
-                <p className="italic">{result.data?.idea?.description}</p>
+                <p className="text-gray-500">Abbreviations</p>
+                <p className="font-semibold italic">{result.data.idea?.abbreviations}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Vietnamese Title</p>
+                <p className="font-semibold italic">{result.data.idea?.vietNamName}</p>
+              </div>
+            </div>
+
+            {/* Profession & Specialty */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-gray-500">Profession</p>
+                <p className="font-semibold italic">{result.data.idea?.specialty?.profession?.professionName}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Specialty</p>
+                <p className="font-semibold italic">{result.data.idea?.specialty?.specialtyName}</p>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div>
+              <p className="text-gray-500">Description</p>
+              <p className="italic">{result.data?.idea?.description}</p>
+            </div>
+            {/* Members */}
+            <div>
+              <div className="flex justify-between">
+                <p className="text-gray-500">Members</p>
+                <p className="text-gray-500">Available Slot: {availableSlots}</p>
               </div>
 
+              {
+                // user?.email == member.user?.email &&
+                checkRole ? (
+                  <div className="space-y-3 mt-2">
+                    {sortedMembers.map((member, index) => {
+
+                      const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
+                        }`;
 
 
-              {/* Members */}
-              <div>
-                <div className="flex justify-between">
-                  <p className="text-gray-500">Members</p>
-                  <p className="text-gray-500">Available Slot: {availableSlots}</p>
-                </div>
+                      return (
+                        <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="h-10 rounded-lg">
+                              <AvatarImage src={member.user?.avatar!} alt={member.user?.email!} />
+                              <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+                            </Avatar>
 
-                {
-                  // user?.email == member.user?.email &&
-                  checkRole ? (
-                    <div className="space-y-3 mt-2">
-                      {sortedMembers.map((member, index) => {
-
-                        const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                          }`;
-
-
-                        return (
-                          <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
-                            <div className="flex items-center space-x-3">
-                              <Avatar className="h-10 rounded-lg">
-                                <AvatarImage src={member.user?.avatar!} alt={member.user?.email!} />
-                                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
-                              </Avatar>
-
-                              <div>
-                                <p className="font-semibold">{member.user?.email}</p>
-                                <p className="text-sm text-gray-500">{member.user?.firstName}</p>
-                              </div>
-                            </div>
-                            <div className="flex">
-                              {member.role === TeamMemberRole.Leader ? (
-                                <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Origin</p>
-
-                              ) : (
-                                <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</p>
-                              )}
-                              <div className="relative ml-3">
-                                {user?.email == member.user?.email ? (
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                      <DropdownMenuItem>View profile</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                ) : (
-
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                      <DropdownMenuItem>Xóa thành viên</DropdownMenuItem>
-                                      <DropdownMenuItem>Xem profile</DropdownMenuItem>
-                                      <DropdownMenuItem>Phân chức leader</DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                )
-                                }
-                              </div>
+                            <div>
+                              <p className="font-semibold">{member.user?.email}</p>
+                              <p className="text-sm text-gray-500">{member.user?.firstName}</p>
                             </div>
                           </div>
-                        )
-                      })}
-                    </div>
-                  ) : (
-                    <div className="space-y-3 mt-2">
-                      {result.data.teamMembers.map((member, index) => {
-                        const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                          }`;
-                        return (
-                          <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
-                            <div className="flex items-center space-x-3">
-                              <Avatar className="h-10 rounded-lg">
-                                <AvatarImage src={member.user?.avatar!} alt={member.user?.email!} />
-                                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
-                              </Avatar>
+                          <div className="flex">
+                            {member.role === TeamMemberRole.Leader ? (
+                              <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Owner</p>
 
-                              <div>
-                                <p className="font-semibold">{member.user?.email}</p>
-                                <p className="text-sm text-gray-500">{member.user?.firstName}</p>
-                              </div>
-                            </div>
-                            <div className="flex">
-                              {member.role === TeamMemberRole.Leader ? (
-                                <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Origin</p>
-
-                              ) : (
-                                <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</p>
-                              )}
-                              <div className="relative ml-3">
-
+                            ) : (
+                              <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</p>
+                            )}
+                            <div className="relative ml-3">
+                              {user?.email == member.user?.email ? (
                                 <DropdownMenu>
                                   <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
                                   <DropdownMenuContent>
                                     <DropdownMenuItem>View profile</DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
-                              </div>
+                              ) : (
+
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem>Xóa thành viên</DropdownMenuItem>
+                                    <DropdownMenuItem>Xem profile</DropdownMenuItem>
+                                    <DropdownMenuItem>Phân chức leader</DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )
+                              }
                             </div>
                           </div>
-                        )
-                      })}
-                    </div>
-                  )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="space-y-3 mt-2">
+                    {result.data.teamMembers.map((member, index) => {
+                      const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
+                        }`;
+                      return (
+                        <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="h-10 rounded-lg">
+                              <AvatarImage src={member.user?.avatar!} alt={member.user?.email!} />
+                              <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+                            </Avatar>
 
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        <div className=" basis-2/5">
-          <div className=" text-2xl ml-4 text-blue-600 font-sans " >Register Group</div>
-          <Card className="mt-5 ml-2 p-1 pt-6 bg-white shadow-lg rounded-lg ">
+                            <div>
+                              <p className="font-semibold">{member.user?.email}</p>
+                              <p className="text-sm text-gray-500">{member.user?.firstName}</p>
+                            </div>
+                          </div>
+                          <div className="flex">
+                            {member.role === TeamMemberRole.Leader ? (
+                              <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Owner</p>
+
+                            ) : (
+                              <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</p>
+                            )}
+                            <div className="relative ml-3">
+
+                              <DropdownMenu>
+                                <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem>View profile</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+      <div className=" w-1/5">
+        <div className=" text-2xl ml-4 text-blue-600 font-sans " >Register Group</div>
+        <div className="h-full w-full">
+          <Card className="mt-5 ml-2 p-1 pt-6 bg-white shadow-lg rounded-lg  max-w">
             <CardContent className="flex flex-col justify-center items-center space-y-3">
               <div className=" text-blue-600 font-bold"> Submit Registation </div>
               <div className=" font-bold text-sm"> NOTICE: Registration request will be informed to other members</div>
@@ -319,7 +317,8 @@ export default function TeamInfo() {
           </Card>
         </div>
       </div>
-
     </div>
+
+
   );
 }
