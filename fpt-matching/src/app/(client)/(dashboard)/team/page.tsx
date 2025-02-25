@@ -31,6 +31,8 @@ import { TeamMemberRole } from "@/types/enums/team-member";
 import { teardownHeapProfiler } from "next/dist/build/swc";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
+import { TypographyLarge } from "@/components/_common/typography/typography-large";
+import { TypographyP } from "@/components/_common/typography/typography-p";
 
 // const groupData = {
 //   title: "FPT Team Matching - Social networking for students project teams",
@@ -62,17 +64,18 @@ export default function TeamInfo() {
     error,
   } = useQuery({
     queryKey: ["getTeamInfo"],
-    queryFn: projectService.getProjectInfo,
+    queryFn: projectService.getProjectInfo ,
     refetchOnWindowFocus: false,
   });
 
   if (isLoading) return <LoadingComponent />;
-  if (isError) {
+  if (!result || isError) {
     console.error("Error fetching:", error);
     return <ErrorSystem />;
   }
-  if (!result || !result.data) {
-    return <ErrorSystem />;
+
+  if (result?.status == -2) {
+    return <TypographyP>Bạn chưa có team. Kiếm team ra trường nhanh giùm đi!</TypographyP>;
   }
 
   //check xem thang dang nhap coi no phai member va la leader khong
@@ -118,8 +121,8 @@ export default function TeamInfo() {
               <div className="flex justify-between items-center">
                 {/* Tiêu đề nhóm */}
                 <div className="title">
-                  <h2 className="text-xl font-semibold">{result.data.name}</h2>
-                  <p className="text-sm text-gray-500">Created at: {formatDate(result.data.createdDate)}</p>
+                  <h2 className="text-xl font-semibold">{result?.data?.name}</h2>
+                  <p className="text-sm text-gray-500">Created at: {formatDate(result?.data?.createdDate)}</p>
                 </div>
                 <div className="button0act flex ml-4">
                   <Modal>
@@ -164,11 +167,11 @@ export default function TeamInfo() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-gray-500">Abbreviations</p>
-                  <p className="font-semibold italic">{result.data.idea?.abbreviations}</p>
+                  <p className="font-semibold italic">{result?.data?.idea?.abbreviations}</p>
                 </div>
                 <div>
                   <p className="text-gray-500">Vietnamese Title</p>
-                  <p className="font-semibold italic">{result.data.idea?.vietNamName}</p>
+                  <p className="font-semibold italic">{result?.data?.idea?.vietNamName}</p>
                 </div>
               </div>
 
@@ -176,11 +179,11 @@ export default function TeamInfo() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-gray-500">Profession</p>
-                  <p className="font-semibold italic">{result.data.idea?.specialty?.profession?.professionName}</p>
+                  <p className="font-semibold italic">{result?.data?.idea?.specialty?.profession?.professionName}</p>
                 </div>
                 <div>
                   <p className="text-gray-500">Specialty</p>
-                  <p className="font-semibold italic">{result.data.idea?.specialty?.specialtyName}</p>
+                  <p className="font-semibold italic">{result?.data?.idea?.specialty?.specialtyName}</p>
                 </div>
               </div>
 
@@ -203,7 +206,7 @@ export default function TeamInfo() {
                   // user?.email == member.user?.email &&
                   checkRole ? (
                     <div className="space-y-3 mt-2">
-                      {sortedMembers.map((member, index) => {
+                      {sortedMembers?.map((member, index) => {
 
                         const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
                           }`;
@@ -257,7 +260,7 @@ export default function TeamInfo() {
                     </div>
                   ) : (
                     <div className="space-y-3 mt-2">
-                      {result.data.teamMembers.map((member, index) => {
+                      {result?.data?.teamMembers.map((member, index) => {
                         const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
                           }`;
                         return (
