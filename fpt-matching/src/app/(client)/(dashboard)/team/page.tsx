@@ -31,6 +31,8 @@ import { TeamMemberRole } from "@/types/enums/team-member";
 import { teardownHeapProfiler } from "next/dist/build/swc";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
+import { TypographyLarge } from "@/components/_common/typography/typography-large";
+import { TypographyP } from "@/components/_common/typography/typography-p";
 
 // const groupData = {
 //   title: "FPT Team Matching - Social networking for students project teams",
@@ -62,17 +64,18 @@ export default function TeamInfo() {
     error,
   } = useQuery({
     queryKey: ["getTeamInfo"],
-    queryFn: projectService.getProjectInfo,
+    queryFn: projectService.getProjectInfo ,
     refetchOnWindowFocus: false,
   });
 
   if (isLoading) return <LoadingComponent />;
-  if (isError) {
+  if (!result || isError) {
     console.error("Error fetching:", error);
     return <ErrorSystem />;
   }
-  if (!result || !result.data) {
-    return <ErrorSystem />;
+
+  if (result?.status == -2) {
+    return <TypographyP>Bạn chưa có team. Kiếm team ra trường nhanh giùm đi!</TypographyP>;
   }
 
   //check xem thang dang nhap coi no phai member va la leader khong

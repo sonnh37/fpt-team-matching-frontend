@@ -45,7 +45,8 @@ export function NavMain({
         {items.map((item) => {
           const isActive =
             pathName === item.url ||
-            (item.url !== "/" && pathName.startsWith(item.url + "/"));
+            (pathName.startsWith(item.url + "/"));
+            
           return (
             <Collapsible
               key={item.title}
@@ -78,7 +79,7 @@ export function NavMain({
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton
                               className={cn(
-                                "text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
+                                "text-base tracking-wide py-4 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
                                 isActiveSub ? "!bg-orange-500 !text-white" : ""
                               )}
                               asChild

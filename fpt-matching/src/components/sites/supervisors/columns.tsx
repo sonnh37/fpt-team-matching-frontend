@@ -71,7 +71,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText(model.id!)}
+            onClick={() => navigator.clipboard.writeText(model.avatar!)}
           >
             Copy model ID
           </DropdownMenuItem>
