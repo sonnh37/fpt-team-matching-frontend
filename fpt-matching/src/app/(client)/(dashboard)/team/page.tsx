@@ -133,7 +133,7 @@ export default function TeamInfo() {
                     <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
                       <ModalContent>
                         <UpdateProjectTeam />
-                      </ModalContent>x
+                      </ModalContent>
                     </ModalBody>
 
                   </Modal>

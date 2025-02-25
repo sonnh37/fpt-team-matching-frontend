@@ -7,7 +7,7 @@ import {
 
 // hooks/useQueryParams.ts
 export const useQueryParams = (
-  formValues: any,
+  formValues: any = {},
   columnFilters: ColumnFiltersState,
   pagination: PaginationState,
   sorting: SortingState

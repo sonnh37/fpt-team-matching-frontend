@@ -1,6 +1,7 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
 import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 import { TypographyH2 } from "@/components/_common/typography/typography-h2";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,16 +14,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { professionService } from "@/services/profession-service";
-import { Profession } from "@/types/profession";
+import { isExistedTeam_options } from "@/lib/filter-options";
+import { ideaService } from "@/services/idea-service";
+import { IdeaType } from "@/types/enums/idea";
+import { FilterEnum } from "@/types/models/filter-enum";
+import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -39,26 +36,23 @@ import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
-import { userService } from "@/services/user-service";
-import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
-import { ideaService } from "@/services/idea-service";
-import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
-import { IdeaType } from "@/types/enums/idea";
-import { FilterEnum } from "@/types/models/filter-enum";
-import { isDeleted_options, isExistedTeam_options } from "@/lib/filter-options";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 
 //#region INPUT
 const defaultSchema = z.object({
   englishName: z.string().optional(),
-  type: z.nativeEnum(IdeaType).optional(),
 });
 //#endregion
 export default function IdeasOfSupervisorsTableTable() {
   const searchParams = useSearchParams();
+  const filterEnums: FilterEnum[] = [
+    {
+      columnId: "isExistedTeam",
+      title: "Slot register",
+      options: isExistedTeam_options,
+    },
+  ];
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
     {
@@ -75,7 +69,6 @@ export default function IdeasOfSupervisorsTableTable() {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [isTyping, setIsTyping] = useState(false);
   //#endregion
 
   //#region CREATE TABLE
@@ -83,13 +76,32 @@ export default function IdeasOfSupervisorsTableTable() {
     resolver: zodResolver(defaultSchema),
   });
 
-  const [submittedFilters, setSubmittedFilters] = useState<
-    z.infer<typeof defaultSchema>
-  >({ type: IdeaType.Lecturer });
+  // input field
+  const [inputFields, setInputFields] =
+    useState<z.infer<typeof defaultSchema>>();
 
-  const queryParams: IdeaGetAllQuery = useMemo(() => {
-    return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
-  }, [submittedFilters, columnFilters, pagination, sorting]);
+  // default field in table
+  const queryParams = useMemo(() => {
+    const params: IdeaGetAllQuery = useQueryParams(
+      inputFields,
+      columnFilters,
+      pagination,
+      sorting
+    );
+
+    params.type = IdeaType.Lecturer;
+
+    return { ...params };
+  }, [inputFields, columnFilters, pagination, sorting]);
+
+  useEffect(() => {
+    if (columnFilters.length > 0 || inputFields) {
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
+    }
+  }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
@@ -114,38 +126,12 @@ export default function IdeasOfSupervisorsTableTable() {
     manualPagination: true,
     debugTable: true,
   });
-
-  //#endregion
-
-  //#region useEffect
-  useEffect(() => {
-    if (columnFilters.length > 0 || submittedFilters) {
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex: 0,
-      }));
-    }
-  }, [columnFilters, submittedFilters]);
-
-  // useEffect(() => {
-  //   refetch();
-  // }, [queryParams]);
-
   //#endregion
 
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-    values.type = IdeaType.Lecturer;
-    setSubmittedFilters(values);
-    toast.success("Test_submitted");
+    setInputFields(values);
   };
 
-  const filterEnums: FilterEnum[] = [
-    {
-      columnId: "isExistedTeam",
-      title: "Slot register",
-      options: isExistedTeam_options,
-    },
-  ];
   return (
     <>
       <div className="container mx-auto space-y-8">
@@ -171,11 +157,7 @@ export default function IdeasOfSupervisorsTableTable() {
                             {...field}
                           />
                         </FormControl>
-                        <Button
-                          type="submit"
-                          variant="default"
-                          size="icon"
-                        >
+                        <Button type="submit" variant="default" size="icon">
                           <Search />
                         </Button>
                       </div>
@@ -190,25 +172,25 @@ export default function IdeasOfSupervisorsTableTable() {
 
         <div className="">
           <Card className="space-y-4 p-4 w-full">
-          <DataTableToolbar
-            form={form}
-            table={table}
-            filterEnums={filterEnums}
-          />
-          {isFetching && !isTyping ? (
-            <DataTableSkeleton
-              columnCount={1}
-              showViewOptions={false}
-              withPagination={false}
-              rowCount={pagination.pageSize}
-              searchableColumnCount={0}
-              filterableColumnCount={0}
-              shrinkZero
+            <DataTableToolbar
+              form={form}
+              table={table}
+              filterEnums={filterEnums}
             />
-          ) : (
-            <DataTableComponent table={table} />
-          )}
-          <DataTablePagination table={table} />
+            {isFetching ? (
+              <DataTableSkeleton
+                columnCount={1}
+                showViewOptions={false}
+                withPagination={false}
+                rowCount={pagination.pageSize}
+                searchableColumnCount={0}
+                filterableColumnCount={0}
+                shrinkZero
+              />
+            ) : (
+              <DataTableComponent table={table} />
+            )}
+            <DataTablePagination table={table} />
           </Card>
         </div>
       </div>

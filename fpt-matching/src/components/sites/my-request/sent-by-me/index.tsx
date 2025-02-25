@@ -30,11 +30,9 @@ import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/inv
 import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 
 //#region INPUT
-const defaultSchema = z.object({
-  type: z.nativeEnum(InvitationType).optional(),
-});
+const defaultSchema = z.object({});
 //#endregion
-export default function InvitationRequestToJoinTable() {
+export default function InvitationSentByMeTable() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -60,13 +58,32 @@ export default function InvitationRequestToJoinTable() {
     resolver: zodResolver(defaultSchema),
   });
 
-  const [submittedFilters, setSubmittedFilters] = useState<
-    z.infer<typeof defaultSchema> & BaseQueryableQuery
-  >({ type: InvitationType.RequestToJoin, isPagination: false });
+  // input field
+  const [inputFields, setInputFields] =
+    useState<z.infer<typeof defaultSchema>>();
 
-  const queryParams: InvitationGetByTypeQuery = useMemo(() => {
-    return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
-  }, [submittedFilters, columnFilters, pagination, sorting]);
+  // default field in table
+  const queryParams = useMemo(() => {
+    const params: InvitationGetByTypeQuery = useQueryParams(
+      inputFields,
+      columnFilters,
+      pagination,
+      sorting
+    );
+
+    params.type = InvitationType.SentByMe;
+
+    return { ...params };
+  }, [inputFields, columnFilters, pagination, sorting]);
+
+  useEffect(() => {
+    if (columnFilters.length > 0 || inputFields) {
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
+    }
+  }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
@@ -94,27 +111,11 @@ export default function InvitationRequestToJoinTable() {
 
   //#endregion
 
-  //#region useEffect
-  useEffect(() => {
-    if (columnFilters.length > 0 || submittedFilters) {
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex: 0,
-      }));
-    }
-  }, [columnFilters, submittedFilters]);
-
-  // useEffect(() => {
-  //   refetch();
-  // }, [queryParams]);
-
-  //#endregion
-
   return (
     <>
       <div className="space-y-8">
         <div className="">
-            <DataTableComponent table={table} />
+          <DataTableComponent table={table} />
         </div>
       </div>
     </>
