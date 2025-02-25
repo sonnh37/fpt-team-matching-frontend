@@ -42,6 +42,8 @@ import { Icons } from "@/components/ui/icons";
 import { TypographyH4 } from "@/components/_common/typography/typography-h4";
 import Link from "next/link";
 import { TypographyLarge } from "@/components/_common/typography/typography-large";
+import { GiWideArrowDunk } from "react-icons/gi";
+import { PiUserList } from "react-icons/pi";
 
 // This is sample data.
 const data = {
@@ -68,55 +70,50 @@ const data = {
       icon: Send,
     },
     {
-      title: "Create idea",
+      title: "Idea",
       url: "/idea",
-      icon: Pencil,
+      icon: Lightbulb,
+      items: [
+        {
+          title: "Create Idea",
+          icon: Pencil,
+          url: "/idea/create",
+        },
+        {
+          title: "Request Idea",
+          icon: GiWideArrowDunk,
+          url: "/idea/request",
+        },
+        {
+          title: "Ideas of Supervisor",
+          icon: PiUserList,
+          url: "/idea/supervisors",
+        },
+      ],
+    },
+   
+    {
+      title: "List supervisors",
+      url: "/supervisors",
+      icon: MdOutlineSupervisorAccount,
+      // items: [
+      //   {
+      //     title: "List",
+      //     icon: Logs,
+      //     url: "/supervisors",
+      //   },
+      //   {
+      //     title: "Ideas",
+      //     icon: Lightbulb,
+      //     url: "/supervisors/ideas",
+      //   },
+      // ],
     },
     {
       title: "Support",
       url: "/#",
       icon: MessageCircleQuestion,
     },
-    {
-      title: "Supervisors",
-      url: "/supervisors",
-      icon: MdOutlineSupervisorAccount,
-      items: [
-        {
-          title: "List",
-          icon: Logs,
-          url: "/supervisors",
-        },
-        {
-          title: "Ideas",
-          icon: Lightbulb,
-          url: "/supervisors/ideas",
-        },
-      ],
-    },
-    // {
-    //   title: "Settings",
-    //   url: "#",
-    //   icon: Settings2,
-    //   items: [
-    //     {
-    //       title: "General",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Team",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Billing",
-    //       url: "#",
-    //     },
-    //     {
-    //       title: "Limits",
-    //       url: "#",
-    //     },
-    //   ],
-    // },
   ],
   projects: [
     {

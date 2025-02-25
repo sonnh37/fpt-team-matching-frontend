@@ -41,9 +41,9 @@ import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
+import { IdeaStatus } from "@/types/enums/idea";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -70,8 +70,28 @@ export default function IdeaSearchList() {
     React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 5,
   });
+  //#endregion
+
+  //#region useEffect
+  const [professions, setProfessions] = useState<Profession[]>([]);
+  const [selectedProfession, setSelectedProfession] =
+    useState<Profession | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await professionService.fetchAll();
+        setProfessions(res.data?.results!);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   //#endregion
 
   //#region CREATE TABLE
@@ -79,19 +99,41 @@ export default function IdeaSearchList() {
     resolver: zodResolver(defaultSchema),
   });
 
-  const [submittedFilters, setSubmittedFilters] = useState<
-    z.infer<typeof defaultSchema>
-  >({});
+  // input field
+  const [inputFields, setInputFields] =
+    useState<z.infer<typeof defaultSchema>>();
 
-  const queryParams: IdeaGetAllQuery = useMemo(() => {
-    return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
-  }, [submittedFilters, columnFilters, pagination, sorting]);
+  // default field in table
+  const queryParams = useMemo(() => {
+    const params: IdeaGetAllQuery = useQueryParams(
+      inputFields,
+      columnFilters,
+      pagination,
+      sorting
+    );
+
+    params.isExistedTeam = true;
+    params.status = IdeaStatus.Approved;
+
+    return { ...params };
+  }, [inputFields, columnFilters, pagination, sorting]);
+
+  useEffect(() => {
+    if (columnFilters.length > 0 || inputFields) {
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
+    }
+  }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: () => ideaService.fetchAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
+    refetchOnMount: false, // Không gọi lại khi component remount
+    refetchOnReconnect: false, // Không tự động gọi lại khi mạng reconnect
   });
 
   if (error) return <div>Error loading data</div>;
@@ -113,41 +155,8 @@ export default function IdeaSearchList() {
 
   //#endregion
 
-  //#region useEffect
-  const [professions, setProfessions] = useState<Profession[]>([]);
-  const [selectedProfession, setSelectedProfession] =
-    useState<Profession | null>(null);
-  useEffect(() => {
-    if (columnFilters.length > 0 || submittedFilters) {
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex: 0,
-      }));
-    }
-  }, [columnFilters, submittedFilters]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await professionService.fetchAll();
-        setProfessions(res.data?.results!);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  // useEffect(() => {
-  //   refetch();
-  // }, [queryParams]);
-
-  //#endregion
-
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-    setSubmittedFilters(values);
-    toast.success("Test_submitted");
+    setInputFields(values);
   };
   return (
     <>
@@ -174,11 +183,7 @@ export default function IdeaSearchList() {
                             {...field}
                           />
                         </FormControl>
-                        <Button
-                          type="submit"
-                          variant="default"
-                          size="icon"
-                        >
+                        <Button type="submit" variant="default" size="icon">
                           <Search />
                         </Button>
                       </div>

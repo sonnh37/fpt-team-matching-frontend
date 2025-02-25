@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { DashboardIcon, ExitIcon, GearIcon } from "@radix-ui/react-icons";
 
-import MenuAnimationButton from "@/components/_common/hovers/buttons/menu-animation-button/menu-animation-button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import {
@@ -47,7 +46,7 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
       }
     });
   };
-
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

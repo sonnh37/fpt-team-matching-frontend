@@ -48,7 +48,6 @@ import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query
 //#region INPUT
 const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
-  role: z.string().optional(),
 });
 //#endregion
 export default function SupervisorsTable() {
@@ -77,13 +76,32 @@ export default function SupervisorsTable() {
     resolver: zodResolver(defaultSchema),
   });
 
-  const [submittedFilters, setSubmittedFilters] = useState<
-    z.infer<typeof defaultSchema>
-  >({ role: "Lecturer" });
+  // input field
+  const [inputFields, setInputFields] =
+    useState<z.infer<typeof defaultSchema>>();
 
-  const queryParams: UserGetAllQuery = useMemo(() => {
-    return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
-  }, [submittedFilters, columnFilters, pagination, sorting]);
+  // default field in table
+  const queryParams = useMemo(() => {
+    const params: UserGetAllQuery = useQueryParams(
+      inputFields,
+      columnFilters,
+      pagination,
+      sorting
+    );
+
+    params.role = "Lecturer";
+
+    return { ...params };
+  }, [inputFields, columnFilters, pagination, sorting]);
+
+  useEffect(() => {
+    if (columnFilters.length > 0 || inputFields) {
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
+    }
+  }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
@@ -111,43 +129,10 @@ export default function SupervisorsTable() {
 
   //#endregion
 
-  //#region useEffect
-  const [professions, setProfessions] = useState<Profession[]>([]);
-  const [selectedProfession, setSelectedProfession] =
-    useState<Profession | null>(null);
-  useEffect(() => {
-    if (columnFilters.length > 0 || submittedFilters) {
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex: 0,
-      }));
-    }
-  }, [columnFilters, submittedFilters]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await professionService.fetchAll();
-        setProfessions(res.data?.results!);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  // useEffect(() => {
-  //   refetch();
-  // }, [queryParams]);
-
-  //#endregion
-
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-    values.role = "Lecturer";
-    setSubmittedFilters(values);
-    toast.success("Test_submitted");
+    setInputFields(values);
   };
+
   return (
     <>
       <div className="container mx-auto space-y-8">
@@ -173,11 +158,7 @@ export default function SupervisorsTable() {
                             {...field}
                           />
                         </FormControl>
-                        <Button
-                          type="submit"
-                          variant="default"
-                          size="icon"
-                        >
+                        <Button type="submit" variant="default" size="icon">
                           <Search />
                         </Button>
                       </div>

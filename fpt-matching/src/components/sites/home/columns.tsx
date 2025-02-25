@@ -46,7 +46,7 @@ export const columns: ColumnDef<Idea>[] = [
       const englishName = model.englishName;
       const vietNamName = model.vietNamName;
       const createdDate = model.createdDate;
-      const user = model.user!;
+      const user = model.owner!;
       const createdBy = model.createdBy;
 
       const initials = `${user.firstName?.charAt(0).toUpperCase() ?? ""}${

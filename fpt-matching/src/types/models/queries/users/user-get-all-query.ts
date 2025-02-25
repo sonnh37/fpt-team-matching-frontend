@@ -1,4 +1,4 @@
-import { Gender } from "@/types/enums/user";
+import { Department, Gender } from "@/types/enums/user";
 import { BaseQueryableQuery } from "../_base/base-query";
 
 export interface UserGetAllQuery extends BaseQueryableQuery {
@@ -13,6 +13,6 @@ export interface UserGetAllQuery extends BaseQueryableQuery {
   dob?: string;
   phone?: string;
   address?: string;
-  department?: string;
+  department?: Department;
   role?: string;
 }

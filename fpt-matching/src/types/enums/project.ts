@@ -1,7 +1,6 @@
-export enum ProjectType {
-
-}
-
 export enum ProjectStatus {
-    
+    Pending,       
+    InProgress,    
+    Completed,
+    Canceled   
 }

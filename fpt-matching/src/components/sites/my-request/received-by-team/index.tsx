@@ -1,14 +1,8 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
-import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import { Card } from "@/components/ui/card";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { isExistedTeam_options } from "@/lib/filter-options";
 import { invitationService } from "@/services/invitation-service";
 import { InvitationType } from "@/types/enums/invitation";
-import { FilterEnum } from "@/types/models/filter-enum";
-import { InvitationGetAllQuery } from "@/types/models/queries/invitations/invitation-get-all-query";
+import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -26,8 +20,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
-import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
-import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -60,14 +52,32 @@ export default function InvitationReceivedByTeamTable() {
     resolver: zodResolver(defaultSchema),
   });
 
-  const [submittedFilters, setSubmittedFilters] = useState<
-    z.infer<typeof defaultSchema> & BaseQueryableQuery
-  >({ type: InvitationType.ReceivedByTeam, isPagination: false });
+  // input field
+  const [inputFields, setInputFields] =
+    useState<z.infer<typeof defaultSchema>>();
 
-  const queryParams: InvitationGetByTypeQuery = useMemo(() => {
-    return useQueryParams(submittedFilters, columnFilters, pagination, sorting);
-  }, [submittedFilters, columnFilters, pagination, sorting]);
+  // default field in table
+  const queryParams = useMemo(() => {
+    const params: InvitationGetByTypeQuery = useQueryParams(
+      inputFields,
+      columnFilters,
+      pagination,
+      sorting
+    );
 
+    params.type = InvitationType.ReceivedByTeam;
+
+    return { ...params };
+  }, [inputFields, columnFilters, pagination, sorting]);
+
+  useEffect(() => {
+    if (columnFilters.length > 0 || inputFields) {
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
+    }
+  }, [columnFilters, inputFields]);
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: () => invitationService.getUserInvitationsByType(queryParams),
@@ -94,27 +104,11 @@ export default function InvitationReceivedByTeamTable() {
 
   //#endregion
 
-  //#region useEffect
-  useEffect(() => {
-    if (columnFilters.length > 0 || submittedFilters) {
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex: 0,
-      }));
-    }
-  }, [columnFilters, submittedFilters]);
-
-  // useEffect(() => {
-  //   refetch();
-  // }, [queryParams]);
-
-  //#endregion
-
   return (
     <>
       <div className="space-y-8">
         <div className="">
-            <DataTableComponent table={table} />
+          <DataTableComponent table={table} />
         </div>
       </div>
     </>
