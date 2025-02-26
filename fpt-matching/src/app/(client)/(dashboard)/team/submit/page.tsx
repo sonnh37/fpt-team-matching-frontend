@@ -40,8 +40,6 @@ const SubmitIdea = () => {
     },
   })
 
-
-
   const [teamMembers, setTeamMembers] = useState([
     { email: "thainhthe150042@fpt.edu.vn", role: "Owner" },
   ]);
@@ -131,12 +129,37 @@ const SubmitIdea = () => {
             name="inviteEmail"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>TYou can choose 2 supervisor and one of their ideas for you Capstone Project(Optional)</FormLabel>
-                <p className="text-gray-500 text-xs mb-2">
-                  You have to fill fullname in the following form: fullname(FPT Mail) ex: Nguyen Van Anh(anhntv@fpt.edu.vn)
+                <FormLabel>You can choose 2 supervisor and one of their ideas for you Capstone Project(Optional)</FormLabel>
+                <p className="text-black text-xs mb-2 font-bold">
+                  You have to fill fullname in the following form: fullname(FPT Mail) <p className="text-red-600">ex: Nguyen Van Anh(anhntv@fpt.edu.vn)</p> 
                 </p>
+                <FormLabel className="text-base text-purple-500">Supervisor 1</FormLabel>
+                <div className="text-xs text-gray-500">FullName</div>
                 <FormControl>
                   <div className="flex space-x-2">
+                  <Input placeholder="ex: Nguyen Van Anh(anhntv@fpt.edu.vn)" {...field} />
+                 <select name="" id="">
+                  <option value="">Nguyen Van A</option>
+                  <option value="">Nguyen Van B</option>
+                  <option value="">Nguyen Van C</option>
+                 </select>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+            <FormField
+            control={form.control}
+            name="inviteEmail"
+            render={({ field }) => (
+              <FormItem>
+               
+                <FormLabel className="text-base text-purple-500">Supervisor 2</FormLabel>
+                <div className="text-xs text-gray-500">FullName</div>
+                <FormControl>
+                  <div className="flex space-x-2">
+                  <Input placeholder="ex: Nguyen Van Anh(anhntv@fpt.edu.vn)" {...field} />
                  <select name="" id="">
                   <option value="">Nguyen Van A</option>
                   <option value="">Nguyen Van B</option>

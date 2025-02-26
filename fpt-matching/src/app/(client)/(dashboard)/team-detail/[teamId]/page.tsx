@@ -188,7 +188,7 @@ export default function TeamInfoDetail() {
                             </div>
                             <div className="flex">
                               {member.role === TeamMemberRole.Leader ? (
-                                <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Origin</p>
+                                <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Owner</p>
 
                               ) : (
                                 <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</p>
