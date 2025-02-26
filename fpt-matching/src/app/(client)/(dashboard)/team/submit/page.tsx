@@ -40,8 +40,6 @@ const SubmitIdea = () => {
     },
   })
 
-
-
   const [teamMembers, setTeamMembers] = useState([
     { email: "thainhthe150042@fpt.edu.vn", role: "Owner" },
   ]);

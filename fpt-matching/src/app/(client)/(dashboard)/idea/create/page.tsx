@@ -15,20 +15,36 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form";
+import { UserCreateCommand } from "@/types/models/commands/users/user-create-command";
 
+
+// Các đuôi file cho phép
+const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
 const formSchema = z.object({
   englishTitle: z.string().min(2, { message: "English Title must be at least 2 characters." }),
+  teamsize: z
+    .number({ invalid_type_error: "Team size must be a number." }) // Báo lỗi nếu nhập ký tự
+    // .int({ message: "Team size must be an integer." }) // Chỉ cho phép số nguyên
+    .gte(2, { message: "Team size must be at least 2." }),// Phải >= 2
   abbreviation: z.string().max(20, { message: "Abbreviation must be less than 20 characters." }),
   vietnameseTitle: z.string().min(2, { message: "Vietnamese Title must be at least 2 characters." }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
   // tags: z.array(z.string()).max(10, { message: "You can add up to 10 tags." }),
-  inviteEmail: z.string().email({ message: "Invalid email format." }),
+  // inviteEmail: z.string().email({ message: "Invalid email format." }),
+
+  fileschema: z.custom<File>((val) => val instanceof File) // Xác định đây là kiểu File
+    .refine((file) => {
+      const fileName = file.name.toLowerCase();
+      return ALLOWED_EXTENSIONS.some((ext) => fileName.endsWith(ext));
+    }, {
+      message: "File must be .doc, .docx, or .pdf",
+    })
+
 })
 
 
 const CreateProjectForm = () => {
-
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,8 +53,8 @@ const CreateProjectForm = () => {
       abbreviation: "",
       vietnameseTitle: "",
       description: "",
-      // tags: [],
-      inviteEmail: "",
+      fileschema: undefined,
+      teamsize: 2
     },
   })
 
@@ -49,13 +65,12 @@ const CreateProjectForm = () => {
   ]);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Form submitted:", values)
+      const usercreate: UserCreateCommand = {
+  
+      }
   }
 
 
-  const handleInvite = () => {
-
-  };
 
   return (
     <Form  {...form}>
@@ -133,8 +148,49 @@ const CreateProjectForm = () => {
               </FormItem>
             )}
           />
+          {/* File */}
+          <FormField
+            control={form.control}
+            name="fileschema"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>File Upload</FormLabel>
+                <FormControl>
+                  <input
+                    type="file"
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) {
+                        field.onChange(e.target.files[0])
+                      }
+                    }}
+                  // Không set value, vì file input không cho phép
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        
+          {/* TeamMember */}
+          <FormField
+            control={form.control}
+            name="teamsize"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Team size</FormLabel>
+                <FormControl>
+                  <select name="" id="">
+                    <option value="">2</option>
+                    <option value="">3</option>
+                    <option value="">4</option>
+                    <option value="">5</option>
+                    <option value="">6</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           {/* Team Members */}
           <div className="mb-4">
             <p className="text-sm font-medium">Team Members</p>
@@ -148,8 +204,7 @@ const CreateProjectForm = () => {
           </div>
 
 
-
-          <FormField
+          {/* <FormField
             control={form.control}
             name="inviteEmail"
             render={({ field }) => (
@@ -167,7 +222,7 @@ const CreateProjectForm = () => {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
           {/* Submit Button */}
           <button className="w-full bg-purple-400 text-white mt-6 p-3 rounded-lg hover:bg-purple-500 transition">
             Create

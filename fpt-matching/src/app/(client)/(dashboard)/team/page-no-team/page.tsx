@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Pagenoteam = () => {
+const PageNoTeam = () => {
     return (
         <div className='bg-gray-300 flex flex-col justify-center items-center h-screen w-full m-0'>
             <div className='text-3xl text-red-500 pb-4'>You don't have any team Let's find your team hurry-up broo</div>
@@ -11,4 +11,4 @@ const Pagenoteam = () => {
     )
 }
 
-export default Pagenoteam
+export default PageNoTeam
