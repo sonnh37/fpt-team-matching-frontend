@@ -93,6 +93,8 @@ export default function TeamInfo() {
   // mot check saooo t hua lam
 
 
+
+  //Đây là form delete trả về true false tái sử dụng được
   const confirm = useConfirm()
   async function handleDelete() {
     // Gọi confirm để mở dialog
@@ -130,7 +132,7 @@ export default function TeamInfo() {
     if (confirmed) {
       teammemberService.deletePermanent(id)
       // Người dùng chọn Yes
-      toast("Item deleted!")
+      toast("Member is deleted!")
       // Thực hiện xóa
     } else {
       // Người dùng chọn No

@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { z } from "zod"
+import { useState, useEffect } from "react";
+import { string, z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import {
@@ -19,12 +19,16 @@ import { IdeaCreateCommand } from "@/types/models/commands/idea/idea-create-comm
 import { ideaService } from "@/services/idea-service";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
+import { userService } from "@/services/user-service";
+import { User } from "@/types/user";
+import { useQuery } from "@tanstack/react-query";
 
 
 // Các đuôi file cho phép
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
 const formSchema = z.object({
+  inviteEmail: z.string().email({ message: "Invalid email format." }),
   englishTitle: z.string().min(2, { message: "English Title must be at least 2 characters." }),
   teamsize: z
     .number({ invalid_type_error: "Team size must be a number." }) // Báo lỗi nếu nhập ký tự
@@ -45,8 +49,25 @@ const formSchema = z.object({
 
 const CreateProjectForm = () => {
 
-   //lay thong tin tu redux luc dang nhap
-   const user = useSelector((state: RootState) => state.user.user)
+
+  const role = "Lecture"; // Hoặc role nào đó bạn muốn truyền vào
+
+  //goi api bang tanstack
+  const { data: result } = useQuery({
+    queryKey: ["getUsersByRole", role],
+    queryFn: () => userService.fetchAll(),
+    refetchOnWindowFocus: false,
+  });
+
+  // Lấy danh sách users từ API response
+const users = result?.data?.results ?? []; // Nếu `results` là `undefined`, dùng mảng rỗng
+
+// Lọc user có Role là "Lecture"
+const lectureUsers = users.filter(user => 
+  user.userXRoles?.some(x => x.role?.roleName === "Lecture") // Kiểm tra nếu user có role "Lecture"
+);
+  //lay thong tin tu redux luc dang nhap
+  const user = useSelector((state: RootState) => state.user.user)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -61,28 +82,26 @@ const CreateProjectForm = () => {
   })
 
 
-
-
-
+  //Tao idea
   function onSubmit(values: z.infer<typeof formSchema>) {
-      const ideacreate: IdeaCreateCommand = {
-        ownerId: user?.id,
-        description: values.description,
-        abbreviations: values.abbreviation,
-        vietNamName: values.vietnameseTitle,
-        englishName: values.englishTitle,
-        maxTeamSize: values.teamsize,
-        semesterId: "",
-        mentorId: "",
-        subMentorId: "",
-        specialtyId: "",
-        // file: values.fileschema
-        isExistedTeam: false, // Hoặc true nếu cần
-        isEnterpriseTopic: false, // Hoặc true nếu cần
-      }
+    const ideacreate: IdeaCreateCommand = {
+      ownerId: user?.id,
+      description: values.description,
+      abbreviations: values.abbreviation,
+      vietNamName: values.vietnameseTitle,
+      englishName: values.englishTitle,
+      maxTeamSize: values.teamsize,
+      semesterId: "",
+      mentorId: "",
+      subMentorId: "",
+      specialtyId: "",
+      // file: values.fileschema
+      isExistedTeam: false, // Hoặc true nếu cần
+      isEnterpriseTopic: false, // Hoặc true nếu cần
+    }
 
-      ideaService.create(ideacreate);
-   
+    ideaService.create(ideacreate);
+
   }
 
 
@@ -206,6 +225,35 @@ const CreateProjectForm = () => {
               </FormItem>
             )}
           />
+
+
+          <FormField
+            control={form.control}
+            name="inviteEmail"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>You can choose 2 supervisor and one of their ideas for you Capstone Project(Optional)</FormLabel>
+                <p className="text-black text-xs mb-2 font-bold">
+                  You have to fill fullname in the following form: fullname(FPT Mail) <p className="text-red-600">ex: Nguyen Van Anh(anhntv@fpt.edu.vn)</p>
+                </p>
+                <FormLabel className="text-base text-purple-500">Supervisor 1</FormLabel>
+                <div className="text-xs text-gray-500">FullName</div>
+                <FormControl>
+                  <div className="flex space-x-2">
+                    <Input placeholder="ex: Nguyen Van Anh(anhntv@fpt.edu.vn)" {...field} />
+                    <select>
+                      {users?.map((user) => (
+                        <option key={user.id} value={user.id}>
+                          {user.email}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           {/* Team Members */}
           <div className="mb-4">
             <p className="text-sm font-medium">Team Members</p>
@@ -216,10 +264,10 @@ const CreateProjectForm = () => {
                 <span className="text-xs text-gray-500">{member.role}</span>
               </div>
             ))} */}
-                 <div className="flex items-center justify-between bg-gray-100 p-2 rounded-lg mt-2">
-                <span className="text-sm">{user?.email}</span>
-                <span className="text-xs text-gray-500">Owner</span>
-              </div>
+            <div className="flex items-center justify-between bg-gray-100 p-2 rounded-lg mt-2">
+              <span className="text-sm">{user?.email}</span>
+              <span className="text-xs text-gray-500">Owner</span>
+            </div>
           </div>
 
 
