@@ -15,7 +15,10 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form";
-import { UserCreateCommand } from "@/types/models/commands/users/user-create-command";
+import { IdeaCreateCommand } from "@/types/models/commands/idea/idea-create-command";
+import { ideaService } from "@/services/idea-service";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/redux/store";
 
 
 // Các đuôi file cho phép
@@ -25,14 +28,10 @@ const formSchema = z.object({
   englishTitle: z.string().min(2, { message: "English Title must be at least 2 characters." }),
   teamsize: z
     .number({ invalid_type_error: "Team size must be a number." }) // Báo lỗi nếu nhập ký tự
-    // .int({ message: "Team size must be an integer." }) // Chỉ cho phép số nguyên
     .gte(2, { message: "Team size must be at least 2." }),// Phải >= 2
   abbreviation: z.string().max(20, { message: "Abbreviation must be less than 20 characters." }),
   vietnameseTitle: z.string().min(2, { message: "Vietnamese Title must be at least 2 characters." }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
-  // tags: z.array(z.string()).max(10, { message: "You can add up to 10 tags." }),
-  // inviteEmail: z.string().email({ message: "Invalid email format." }),
-
   fileschema: z.custom<File>((val) => val instanceof File) // Xác định đây là kiểu File
     .refine((file) => {
       const fileName = file.name.toLowerCase();
@@ -45,6 +44,9 @@ const formSchema = z.object({
 
 
 const CreateProjectForm = () => {
+
+   //lay thong tin tu redux luc dang nhap
+   const user = useSelector((state: RootState) => state.user.user)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -60,14 +62,27 @@ const CreateProjectForm = () => {
 
 
 
-  const [teamMembers, setTeamMembers] = useState([
-    { email: "thainhthe150042@fpt.edu.vn", role: "Owner" },
-  ]);
+
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-      const usercreate: UserCreateCommand = {
-  
+      const ideacreate: IdeaCreateCommand = {
+        ownerId: user?.id,
+        description: values.description,
+        abbreviations: values.abbreviation,
+        vietNamName: values.vietnameseTitle,
+        englishName: values.englishTitle,
+        maxTeamSize: values.teamsize,
+        semesterId: "",
+        mentorId: "",
+        subMentorId: "",
+        specialtyId: "",
+        // file: values.fileschema
+        isExistedTeam: false, // Hoặc true nếu cần
+        isEnterpriseTopic: false, // Hoặc true nếu cần
       }
+
+      ideaService.create(ideacreate);
+   
   }
 
 
@@ -195,12 +210,16 @@ const CreateProjectForm = () => {
           <div className="mb-4">
             <p className="text-sm font-medium">Team Members</p>
             <p className="text-gray-500 text-sm">Existed Members</p>
-            {teamMembers.map((member, index) => (
+            {/* {teamMembers.map((member, index) => (
               <div key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded-lg mt-2">
                 <span className="text-sm">{member.email}</span>
                 <span className="text-xs text-gray-500">{member.role}</span>
               </div>
-            ))}
+            ))} */}
+                 <div className="flex items-center justify-between bg-gray-100 p-2 rounded-lg mt-2">
+                <span className="text-sm">{user?.email}</span>
+                <span className="text-xs text-gray-500">Owner</span>
+              </div>
           </div>
 
 
