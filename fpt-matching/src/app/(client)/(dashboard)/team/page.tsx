@@ -78,7 +78,7 @@ export default function TeamInfo() {
   }
 
   if (result?.status == -2) {
-    return <TypographyP>Bạn chưa có team. Kiếm team ra trường nhanh giùm đi!</TypographyP>;
+    return <TypographyP className="text-red-500 pl-4">You have not team yet</TypographyP>;
   }
 
   //check xem thang dang nhap coi no phai member va la leader khong
