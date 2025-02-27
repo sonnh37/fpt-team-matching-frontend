@@ -21,6 +21,7 @@ import {
   Settings2,
   SquareTerminal,
   UsersRound,
+  SquareUserRound,
 } from "lucide-react";
 import * as React from "react";
 
@@ -52,6 +53,12 @@ const data = {
       title: "Home",
       url: "/",
       icon: Home,
+      isActive: true,
+    },
+    {
+      title: "Profile",
+      url: "/profile",
+      icon: SquareUserRound,
       isActive: true,
     },
     {
