@@ -32,7 +32,7 @@ import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 //#region INPUT
 const defaultSchema = z.object({});
 //#endregion
-export default function InvitationSentByMeTable() {
+export default function InvitationSentByStudentTable() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -71,7 +71,7 @@ export default function InvitationSentByMeTable() {
       sorting
     );
 
-    params.type = InvitationType.SentByMe;
+    params.type = InvitationType.SentByStudent;
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);

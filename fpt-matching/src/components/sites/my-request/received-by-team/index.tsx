@@ -26,7 +26,7 @@ const defaultSchema = z.object({
   type: z.nativeEnum(InvitationType).optional(),
 });
 //#endregion
-export default function InvitationReceivedByTeamTable() {
+export default function InvitationSendByTeamTable() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -65,7 +65,7 @@ export default function InvitationReceivedByTeamTable() {
       sorting
     );
 
-    params.type = InvitationType.ReceivedByTeam;
+    params.type = InvitationType.SendByTeam;
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);

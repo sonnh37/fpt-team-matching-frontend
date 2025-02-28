@@ -1,8 +1,8 @@
 "use client";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingPage } from "@/components/_common/loading-page";
-import InvitationReceivedByTeamTable from "@/components/sites/my-request/received-by-team";
-import InvitationSentByMeTable from "@/components/sites/my-request/sent-by-me";
+import InvitationSendByTeamTable from "@/components/sites/my-request/received-by-team";
+import InvitationSentByStudentTable from "@/components/sites/my-request/sent-by-me";
 import {
   Tabs,
   TabsContent,
@@ -125,13 +125,13 @@ export default function Page() {
           </Popover>
         </div>
         <TabsContent value={tab_1}>
-          <InvitationSentByMeTable />
+          <InvitationSentByStudentTable />
         </TabsContent>
         <TabsContent value={tab_2}>
-          <InvitationReceivedByTeamTable />
+          <InvitationSendByTeamTable />
         </TabsContent>
         <TabsContent value={tab_3}>
-          <InvitationReceivedByTeamTable />
+          <InvitationSendByTeamTable />
         </TabsContent>
       </Tabs>
     </>

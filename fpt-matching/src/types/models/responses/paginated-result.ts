@@ -1,5 +1,5 @@
-interface PagedResponse<TData> {
-    results?: TData[];
+interface PaginatedResult<TResult> {
+    results?: TResult[];
     totalPages?: number;
     totalRecordsPerPage?: number;
     totalRecords?: number;
