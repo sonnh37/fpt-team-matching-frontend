@@ -11,6 +11,7 @@ export class Const {
     static readonly BASE_URL = `${process.env.NEXT_PUBLIC_SITE_URL}`;
     //#endregion
     static readonly BLOG = "blogs";
+    static readonly TEAMMEMBER = "team-members";
     static readonly PROJECT = "projects";
     static readonly USER = "users";
     static readonly IDEA = "ideas";

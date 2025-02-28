@@ -78,7 +78,7 @@ export class BaseService<T> {
 
   public delete = (id: string): Promise<BusinessResult<null>> => {
     return axiosInstance
-      .delete<BusinessResult<null>>(`${this.endpoint}?id=${id}`)
+      .delete<BusinessResult<null>>(`${this.endpoint}?id=${id}&isPermanent=false`)
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };

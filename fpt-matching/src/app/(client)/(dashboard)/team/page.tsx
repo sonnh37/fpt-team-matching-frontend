@@ -24,7 +24,6 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { projectService } from "@/services/project-service";
 import { LoadingComponent } from "@/components/_common/loading-page";
-import ErrorSystem from "@/components/_common/errors/error-system";
 import { format } from "path";
 import { formatDate } from "@/lib/utils";
 import { TeamMemberRole } from "@/types/enums/team-member";
@@ -34,6 +33,8 @@ import { RootState } from "@/lib/redux/store";
 import { TypographyLarge } from "@/components/_common/typography/typography-large";
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { useRouter } from "next/navigation"
+import { teammemberService } from "@/services/team-member-service";
+import ErrorSystem from "@/components/_common/errors/error-system";
 
 
 // const groupData = {
@@ -74,11 +75,11 @@ export default function TeamInfo() {
   if (isLoading) return <LoadingComponent />;
   if (!result || isError) {
     console.error("Error fetching:", error);
-    router.push("/page-no-team")
+    return <ErrorSystem />;
   }
 
   if (result?.status == -2) {
-    return <TypographyP className="text-red-500 pl-4">You have not team yet</TypographyP>;
+      return router.push("/page-no-team");
   }
 
   //check xem thang dang nhap coi no phai member va la leader khong
@@ -92,6 +93,8 @@ export default function TeamInfo() {
   // mot check saooo t hua lam
 
 
+
+  //Đây là form delete trả về true false tái sử dụng được
   const confirm = useConfirm()
   async function handleDelete() {
     // Gọi confirm để mở dialog
@@ -111,6 +114,33 @@ export default function TeamInfo() {
       toast("User canceled!")
     }
   }
+
+  async function handleDeleteMember(id: string){
+    console.log("testid",id)
+    if (!id) {
+      toast("Invalid member ID!");
+      return;
+    }
+    // Gọi confirm để mở dialog
+    const confirmed = await confirm({
+      title: "Delete Member",
+      description: "Are you sure you want to delete your member?",
+      confirmText: "Yes, delete it",
+      cancelText: "No, cancel it",
+    })
+
+    if (confirmed) {
+      teammemberService.deletePermanent(id)
+      // Người dùng chọn Yes
+      toast("Member is deleted!")
+      // Thực hiện xóa
+    } else {
+      // Người dùng chọn No
+      toast("User canceled!")
+    }
+  }
+  
+ 
 
 
   return (
@@ -245,7 +275,7 @@ export default function TeamInfo() {
                                 <DropdownMenu>
                                   <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
                                   <DropdownMenuContent>
-                                    <DropdownMenuItem>Xóa thành viên</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={()=>handleDeleteMember(member?.id ?? "" )}>Xóa thành viên</DropdownMenuItem>
                                     <DropdownMenuItem>Xem profile</DropdownMenuItem>
                                     <DropdownMenuItem>Phân chức leader</DropdownMenuItem>
                                   </DropdownMenuContent>

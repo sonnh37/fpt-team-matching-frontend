@@ -48,6 +48,21 @@ class UserService extends BaseService<User> {
     }
   };
 
+  // public fetchUserByRole= async (
+  //   role: string
+  // ): Promise<BusinessResult<User>> => {
+  //   try {
+  //     const response = await axiosInstance.get<BusinessResult<User>>(
+  //       `${this.endpoint}/Role=${role}&IsPagination=false`
+  //     );
+  //     return response.data;
+  //   } catch (error) {
+  //     this.handleError(error);
+  //     return Promise.reject(error);
+  //   }
+  // };
+
+
   public findAccountRegisteredByGoogle = async (
     token: string
   ): Promise<BusinessResult<null>> => {

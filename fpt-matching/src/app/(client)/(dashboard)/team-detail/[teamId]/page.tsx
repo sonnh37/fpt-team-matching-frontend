@@ -30,6 +30,7 @@ import { teardownHeapProfiler } from "next/dist/build/swc";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
 import { useParams } from "next/navigation";
+import { teammemberService } from "@/services/team-member-service";
 
 
 // const groupData = {
@@ -52,63 +53,50 @@ import { useParams } from "next/navigation";
 // };
 
 export default function TeamInfoDetail() {
-    const {teamId} = useParams();
-    console.log("sonngu",teamId);
-  //lay thong tin tu redux luc dang nhap
-  const user = useSelector((state: RootState) => state.user.user)
-  //goi api bang tanstack
+  const { teamId } = useParams();
+  console.log("sonngu", teamId);
+
+  // Lấy thông tin user từ Redux store
+  const user = useSelector((state: RootState) => state.user.user);
+
+  // 🛠️ ✅ Gọi API lấy thông tin team bằng useQuery (đúng cách)
   const {
     data: result,
     isLoading,
     isError,
     error,
   } = useQuery({
-    queryKey: ["getTeamInfo", teamId], // Thêm `teamId` vào queryKey để caching tốt hơn
-    queryFn: () => projectService.fetchById(teamId.toString()), // ✅ Đúng: Truyền một hàm
+    queryKey: ["getTeamInfo", teamId], // `teamId` vào key để caching đúng
+    queryFn: () => projectService.fetchById(teamId?.toString() ?? ""), // ✅ Phải là một function
     refetchOnWindowFocus: false,
+    enabled: !!teamId, // ✅ Chỉ chạy query nếu có `teamId`
   });
 
+  // Nếu đang load hoặc có lỗi thì return sớm
   if (isLoading) return <LoadingComponent />;
-  if (isError) {
+  if (isError || !result?.data) {
     console.error("Error fetching:", error);
     return <ErrorSystem />;
   }
-  if (!result || !result.data) {
-    return <ErrorSystem />;
-  }
 
-  
+  // 🛠️ ✅ Gọi API lấy team member của user (Đúng cách)
+  const { data: result1 } = useQuery({
+    queryKey: ["getTeammemberById", user?.id], // Định danh dữ liệu đúng
+    queryFn: () => teammemberService.fetchById(user?.id ?? ""),
+    refetchOnWindowFocus: false,
+    enabled: !!user?.id, // ✅ Chỉ chạy nếu `user?.id` tồn tại
+  });
 
+  // 🛠️ ✅ Kiểm tra `hasTeam` đúng cách
+  const hasTeam = !!result1?.data; // ✅ Chuyển đổi thành boolean
 
-  // sap xep lai member
-  const sortedMembers = result?.data?.teamMembers
-    ?.slice() // Tạo bản sao để tránh thay đổi dữ liệu gốc
+  // 🛠️ ✅ Xử lý logic sắp xếp
+  const sortedMembers = result.data.teamMembers
+    ?.slice()
     .sort((a, b) => (a.role === TeamMemberRole.Leader ? -1 : b.role === TeamMemberRole.Leader ? 1 : 0));
 
-  const availableSlots = (result?.data?.teamSize ?? 0) - (result?.data?.teamMembers?.length ?? 0);
-  // mot check saooo t hua lam
-
-
-  const confirm = useConfirm()
-  async function handleDelete() {
-    // Gọi confirm để mở dialog
-    const confirmed = await confirm({
-      title: "Delete Item",
-      description: "Are you sure you want to delete this item?",
-      confirmText: "Yes, delete it",
-      cancelText: "No",
-    })
-
-    if (confirmed) {
-      // Người dùng chọn Yes
-      toast("Item deleted!")
-      // Thực hiện xóa
-    } else {
-      // Người dùng chọn No
-      toast("User canceled!")
-    }
-  }
-
+  // 🛠️ ✅ Tính số slot trống
+  const availableSlots = (result.data.teamSize ?? 0) - (result.data.teamMembers?.length ?? 0)
 
   return (
 
@@ -124,6 +112,16 @@ export default function TeamInfoDetail() {
                   <h2 className="text-xl font-semibold">{result.data.name}</h2>
                   <p className="text-sm text-gray-500">Created at: {formatDate(result.data.createdDate)}</p>
                 </div>
+
+                <div className="button-request"> 
+               
+               { availableSlots>0  ?(
+               <button>Request</button>):(
+                <button>Cancel</button>)
+
+               }
+                </div>
+  
           
               </div>
 
