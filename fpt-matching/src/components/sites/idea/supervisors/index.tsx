@@ -105,7 +105,7 @@ export default function IdeasOfSupervisorsTableTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaService.fetchAll(queryParams),
+    queryFn: () => ideaService.fetchPaginated(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

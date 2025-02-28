@@ -4,7 +4,6 @@ import { logout } from "@/lib/redux/slices/userSlice";
 import store from "@/lib/redux/store";
 import { Department } from "@/types/enums/user";
 import { BusinessResult } from "@/types/models/responses/business-result";
-import { LoginResponse } from "@/types/models/responses/login-response";
 import { User } from "@/types/user";
 import axios from "axios";
 
@@ -83,9 +82,9 @@ class AuthService {
   public registerByGoogle = async (
     token: string,
     password: string
-  ): Promise<BusinessResult<LoginResponse>> => {
+  ): Promise<BusinessResult<null>> => {
     try {
-      const response = await axiosInstance.post<BusinessResult<LoginResponse>>(
+      const response = await axiosInstance.post<BusinessResult<null>>(
         `${this.endpoint}/register-by-google`,
         { token: token, password: password }
       );
@@ -96,11 +95,9 @@ class AuthService {
     }
   };
 
-  public register = async (
-    auth: User
-  ): Promise<BusinessResult<LoginResponse>> => {
+  public register = async (auth: User): Promise<BusinessResult<null>> => {
     try {
-      const response = await axiosInstance.post<BusinessResult<LoginResponse>>(
+      const response = await axiosInstance.post<BusinessResult<null>>(
         `${this.endpoint}/register`,
         auth
       );

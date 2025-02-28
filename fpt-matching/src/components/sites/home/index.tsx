@@ -83,7 +83,7 @@ export default function IdeaSearchList() {
     const fetchData = async () => {
       try {
         const res = await professionService.fetchAll();
-        setProfessions(res.data?.results!);
+        setProfessions(res.data ?? []);
       } catch (error) {
         console.error(error);
       }
@@ -129,7 +129,7 @@ export default function IdeaSearchList() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaService.fetchAll(queryParams),
+    queryFn: () => ideaService.fetchPaginated(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
     refetchOnMount: false, // Không gọi lại khi component remount

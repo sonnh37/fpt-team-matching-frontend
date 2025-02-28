@@ -12,22 +12,19 @@ class InvitationService extends BaseService<Invitation> {
   }
   public getUserInvitationsByType = (
     query?: InvitationGetByTypeQuery
-): Promise<BusinessResult<PagedResponse<Invitation>>> => {
-    if (query == null) {
-        query = {
-            isPagination: false,
-        };
-    }
+  ): Promise<BusinessResult<PaginatedResult<Invitation>>> => {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
-        .get<BusinessResult<PagedResponse<Invitation>>>(`${this.endpoint}/get-user-invitations-by-type?${cleanedQuery}`)
-        .then((response) => {
-            return response.data; // Đảm bảo rằng nó trả về dữ liệu
-        })
-        .catch((error) => {
-            return this.handleError(error); // Xử lý lỗi
-        });
-};
+      .get<BusinessResult<PaginatedResult<Invitation>>>(
+        `${this.endpoint}/get-user-invitations-by-type?isPagination=true&${cleanedQuery}`
+      )
+      .then((response) => {
+        return response.data; // Đảm bảo rằng nó trả về dữ liệu
+      })
+      .catch((error) => {
+        return this.handleError(error); // Xử lý lỗi
+      });
+  };
 }
 
 export const invitationService = new InvitationService();
