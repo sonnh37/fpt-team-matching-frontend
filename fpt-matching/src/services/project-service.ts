@@ -12,7 +12,7 @@ class ProjectSerivce extends BaseService<Project> {
   public getProjectInfo = async (): Promise<BusinessResult<Project>> => {
     try {
       const response = await axiosInstance.get<BusinessResult<Project>>(
-        `${this.endpoint}/get-by-userId-login`
+        `${this.endpoint}/get-by-user-id`
       );
       return response.data;
     } catch (error) {
