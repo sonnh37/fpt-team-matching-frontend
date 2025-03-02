@@ -74,20 +74,29 @@ export function getEnumLabel<T extends EnumType>(
   return found ? found[0] : "Unknown";
 }
 
-export const formatDate = (date: Date | string | undefined | null) => {
+export const formatDate = (
+  date: Date | string | undefined | null,
+  isShowTime: boolean = true
+) => {
   if (!date) return "Không có ngày"; // Xử lý khi giá trị không tồn tại
   const validDate = typeof date === "string" ? new Date(date) : date;
   if (isNaN(validDate.getTime())) return "Ngày không hợp lệ"; // Xử lý ngày không hợp lệ
 
-  const options: Intl.DateTimeFormatOptions = {
-    month: "2-digit",
-    day: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  };
+  const options: Intl.DateTimeFormatOptions = isShowTime
+    ? {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
+      }
+    : {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
+      };
 
   return new Intl.DateTimeFormat("en-US", options).format(validDate);
 };
