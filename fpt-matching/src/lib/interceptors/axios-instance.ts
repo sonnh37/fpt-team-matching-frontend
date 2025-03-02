@@ -1,5 +1,4 @@
 import { BusinessResult } from "@/types/models/responses/business-result";
-import { LoginResponse } from "@/types/models/responses/login-response";
 import axios from "axios";
 
 const axiosInstance = axios.create({
@@ -23,7 +22,7 @@ axiosInstance.interceptors.response.use(
             {},
             { withCredentials: true }
           )
-        ).data as BusinessResult<LoginResponse>;
+        ).data as BusinessResult<null>;
 
         if (refreshResponse.status !== 1) {
           window.location.href = "/login";
@@ -32,7 +31,6 @@ axiosInstance.interceptors.response.use(
 
         return axiosInstance(originalRequest); // Gửi lại yêu cầu ban đầu với token mới
       } catch (refreshError) {
-        // Nếu refresh thất bại, người dùng có thể cần đăng nhập lại
         console.error("Refresh token failed:", refreshError);
         // if (window.location.pathname.startsWith("/dashboard")) {
         //   window.location.href = "/login";

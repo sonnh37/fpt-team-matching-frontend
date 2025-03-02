@@ -1,6 +1,6 @@
 "use client";
-import InvitationSentByMeTable from "@/components/sites/my-request/sent-by-me";
-import InvitationReceivedByTeamTable from "@/components/sites/my-request/received-by-team";
+import InvitationSentByStudentTable from "@/components/sites/my-request/sent-by-me";
+import InvitationSendByTeamTable from "@/components/sites/my-request/received-by-team";
 import {
   Tabs,
   TabsContent,
@@ -19,10 +19,10 @@ export default function Page() {
           <TabsTrigger value={tab_2}>{tab_2}</TabsTrigger>
         </TabsList>
         <TabsContent value={tab_1}>
-          <InvitationSentByMeTable />
+          <InvitationSentByStudentTable />
         </TabsContent>
         <TabsContent value={tab_2}>
-          <InvitationReceivedByTeamTable />
+          <InvitationSendByTeamTable />
         </TabsContent>
       </Tabs>
     </>

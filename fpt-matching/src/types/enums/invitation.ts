@@ -5,6 +5,6 @@ export enum InvitationStatus {
 }
 
 export enum InvitationType {
-    SentByMe,       
-    ReceivedByTeam
+    SentByStudent,       
+    SendByTeam
 }

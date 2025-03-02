@@ -31,7 +31,6 @@ export const useQueryParams = (
   });
 
   return {
-    isPagination: true,
     pageNumber: pagination.pageIndex + 1,
     pageSize: pagination.pageSize,
     sortField: sorting[0]?.id || "CreatedDate",

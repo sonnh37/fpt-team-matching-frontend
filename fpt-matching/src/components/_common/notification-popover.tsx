@@ -1,13 +1,13 @@
 import Link from "next/link";
 
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { User } from "@/types/user";
 import { Bell } from "lucide-react";
 import {
@@ -21,6 +21,15 @@ import {
 import { ScrollArea } from "../ui/scroll-area";
 import { useRouter } from "next/navigation";
 import { TypographyP } from "./typography/typography-p";
+import useNotification from "@/hooks/use-notification";
+import { NotificationGetAllByCurrentUserQuery } from "@/types/models/queries/notifications/notifications-get-all-by-current-user-query";
+import { TypographyH1 } from "./typography/typography-h1";
+import { TypographyH3 } from "./typography/typography-h3";
+import { TypographyMuted } from "./typography/typography-muted";
+import { TypographySmall } from "./typography/typography-small";
+import { Separator } from "../ui/separator";
+import { TypographyLarge } from "./typography/typography-large";
+import { Badge } from "../ui/badge";
 
 const notifications = [
   {
@@ -105,67 +114,98 @@ interface NotificationPopoverProps
 }
 
 export function NotificationPopover({ user = null }: NotificationPopoverProps) {
+  const query: NotificationGetAllByCurrentUserQuery = {
+    pageSize: 5,
+  };
+
   const router = useRouter();
+  const notificationHub = useNotification(query);
+  const businessResult = notificationHub.businessResult;
+
+  const notifications = businessResult?.data?.results ?? [];
+
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" className={cn("size-8 rounded-full")}>
-          <Avatar className="size-8 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500 flex items-center justify-center">
+          <Avatar className="size-8 overflow-visible bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500 flex items-center justify-center">
             <Bell className="!w-5 !h-5 text-foreground/80" />
+            <Badge className="absolute inline-flex items-center justify-center w-4 h-4 font-bold text-white bg-red-500 border-1 border-white -top-2 -end-2 dark:border-gray-900">
+              {businessResult?.data?.totalRecords}
+            </Badge>
           </Avatar>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end" forceMount>
+      <PopoverContent className="w-80 p-0" align="end" forceMount>
         {/* list notification */}
-        <div className="grid gap-2">
-          <p className="text-xl">Notification</p>
-          <div className="w-full flex justify-between text-center items-center">
-            <TypographyP>Before</TypographyP>
-            <Button
-              variant={"outline"}
-              onClick={() => router.push("/social/blog/notification")}
-              className="border-none -mr-1 p-2 shadow-none text-blue-600 dark:text-white font-semibold w-fit"
-            >
-              See all
-            </Button>
-          </div>
+        <div className="grid">
+          <TypographyH3 className="p-4 pb-2 tracking-[0.015em]">
+            Notification
+          </TypographyH3>
+
+          <Separator className="" />
           {/* Danh sách thông báo */}
-          <ScrollArea className="h-[50vh] w-72">
-            {notifications.map((noti) => (
-              <div
-                key={noti.id}
-                className="flex items-start space-x-3 p-3 hover:bg-gray-100 rounded-lg"
-              >
-                <img
-                  className="w-10 h-10 rounded-full"
-                  src={noti.avatar}
-                  alt={noti.name}
-                />
-                <div className="flex-1">
-                  <p className="text-gray-800 text-sm">
-                    <span className="font-semibold">{noti.name}</span>{" "}
-                    {noti.action}{" "}
-                    {noti.target && (
-                      <span className="font-semibold">{noti.target}</span>
-                    )}
-                    .
-                  </p>
-                  <p className="text-gray-500 text-xs">{noti.time}</p>
+          <ScrollArea className="max-h-[50vh] w-full">
+            {notifications.map((noti) => {
+              const initials = `${
+                noti.user?.firstName?.toUpperCase().charAt(0) ?? ""
+              }${noti.user?.lastName?.toUpperCase().charAt(0) ?? ""}`;
+              return (
+                <div
+                  key={noti.id}
+                  className="flex items-start px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none"
+                >
+                  {noti.user != null ? (
+                    <Avatar className="size-8">
+                      <AvatarImage
+                        src={
+                          noti.user?.avatar && noti.user?.avatar.trim() !== ""
+                            ? noti.user?.avatar
+                            : undefined
+                        }
+                        alt={noti.user?.username ?? ""}
+                        onError={(e) =>
+                          (e.currentTarget.style.display = "none")
+                        }
+                      />
+                      <AvatarFallback className="bg-slate-200 rounded hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500">
+                        {initials}
+                      </AvatarFallback>
+                    </Avatar>
+                  ) : null}
+                  <div className="flex-1">
+                    <TypographyP className="tracking-[0.015em]">
+                      {noti.description}
+                    </TypographyP>
+                    <TypographyMuted>
+                      {formatDate(noti.createdDate)}
+                    </TypographyMuted>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="text-xl">
+                      ...
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>Thông báo của bạn</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem>Xóa thông báo</DropdownMenuItem>
+                      <DropdownMenuItem>Ghim thông báo</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="text-xl">
-                    ...
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent>
-                    <DropdownMenuLabel>Thông báo của bạn</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>Xóa thông báo</DropdownMenuItem>
-                    <DropdownMenuItem>Ghim thông báo</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            ))}
+              );
+            })}
           </ScrollArea>
+
+          <Separator />
+
+          <Button
+            variant={"link"}
+            onClick={() => window.location.href = "/social/blog/notification"}
+            className="w-fit h-fit"
+          >
+            See all
+          </Button>
         </div>
       </PopoverContent>
     </Popover>
