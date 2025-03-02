@@ -267,7 +267,9 @@ export default function TeamInfo() {
                                 <DropdownMenu>
                                   <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
                                   <DropdownMenuContent>
-                                    <DropdownMenuItem>View profile</DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                    <a href={`/profile-detail/${member.user?.id}`}>Xem profile</a>
+                                    </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
                               ) : (
@@ -276,7 +278,7 @@ export default function TeamInfo() {
                                   <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
                                   <DropdownMenuContent>
                                     <DropdownMenuItem onClick={()=>handleDeleteMember(member?.id ?? "" )}>Xóa thành viên</DropdownMenuItem>
-                                    <DropdownMenuItem>Xem profile</DropdownMenuItem>
+                                    <DropdownMenuItem>  <a href={`/profile-detail/${member.user?.id}`}>Xem profile</a></DropdownMenuItem>
                                     <DropdownMenuItem>Phân chức leader</DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
