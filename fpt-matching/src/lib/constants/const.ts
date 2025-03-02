@@ -19,6 +19,7 @@ export class Const {
     static readonly SPECIALTY = "specialties";
     static readonly PROFESSION = "professions";
     static readonly NOTIFICATION = "notifications";
+    static readonly PROFILE_STUDENT = "profile-students";
     static readonly AUTH = "auth";
 
     static readonly DASHBOARD = "dashboard";

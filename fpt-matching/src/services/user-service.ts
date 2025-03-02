@@ -1,9 +1,9 @@
 import { Const } from "@/lib/constants/const";
 import axiosInstance from "@/lib/interceptors/axios-instance";
-import { User } from "@/types/user";
-import { BaseService } from "./_base/base-service";
 import { UserUpdatePasswordCommand } from "@/types/models/commands/user-command";
 import { BusinessResult } from "@/types/models/responses/business-result";
+import { User } from "@/types/user";
+import { BaseService } from "./_base/base-service";
 
 class UserService extends BaseService<User> {
   constructor() {
@@ -61,7 +61,6 @@ class UserService extends BaseService<User> {
   //     return Promise.reject(error);
   //   }
   // };
-
 
   public findAccountRegisteredByGoogle = async (
     token: string

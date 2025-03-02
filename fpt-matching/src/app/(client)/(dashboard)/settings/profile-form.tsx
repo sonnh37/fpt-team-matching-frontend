@@ -19,6 +19,15 @@ import {
   FormInputPhone,
   FormRadioGroup,
 } from "@/lib/form-custom-shadcn";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { getEnumOptions } from "@/lib/utils";
 import { userService } from "@/services/user-service";
 import { Gender } from "@/types/enums/user";
@@ -29,6 +38,7 @@ import { CldImage, CldUploadWidget } from "next-cloudinary";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Image from "next/image";
+import { ProfileStudentForm } from "./profile-student";
 
 const profileFormSchema = z.object({
   id: z.string().optional(),
@@ -101,12 +111,12 @@ export function ProfileForm({ user }: { user?: User }) {
       form.reset(user);
       setImageUrl(user.avatar || "");
     }
-  
+
     const subscription = form.watch((values) => {
       const hasChanged = JSON.stringify(values) !== JSON.stringify(user);
       setIsChanged(hasChanged);
     });
-  
+
     return () => subscription.unsubscribe();
   }, [user, form]);
   async function onSubmit(data: ProfileFormValues) {
@@ -115,7 +125,6 @@ export function ProfileForm({ user }: { user?: User }) {
       dob: data.dob instanceof Date ? data.dob.toISOString() : data.dob,
     };
 
-    console.log("check_valueuser", updatedValues);
     const response = await userService.update(updatedValues);
     if (response.status !== 1) throw new Error(response.message);
 
@@ -126,6 +135,22 @@ export function ProfileForm({ user }: { user?: User }) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Cv */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline">Edit cv profile</Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit cv profile</DialogTitle>
+              <DialogDescription>
+                <ProfileStudentForm user={user}/>
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4"></div>
+          
+          </DialogContent>
+        </Dialog>
         {/* Avatar */}
         <FormField
           control={form.control}
@@ -200,10 +225,21 @@ export function ProfileForm({ user }: { user?: User }) {
         {/* Các trường input khác */}
         <FormInput label="First name" name="firstName" form={form} />
         <FormInput label="Last name" name="lastName" form={form} />
-        <FormInput type="email" disabled label="Email" name="email" form={form} />
+        <FormInput
+          type="email"
+          disabled
+          label="Email"
+          name="email"
+          form={form}
+        />
         <FormInputDateTimePicker label="Date" name="dob" form={form} />
         <FormInputPhone label="Phone" name="phone" form={form} />
-        <FormRadioGroup label="Sex" name="gender" form={form} enumOptions={getEnumOptions(Gender)} />
+        <FormRadioGroup
+          label="Sex"
+          name="gender"
+          form={form}
+          enumOptions={getEnumOptions(Gender)}
+        />
         <FormInput label="Address" name="address" form={form} />
 
         {/* Nút Submit */}
