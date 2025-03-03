@@ -226,7 +226,7 @@ export default function TeamInfoDetail() {
                                   <DropdownMenu>
                                     <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
                                     <DropdownMenuContent>
-                                      <DropdownMenuItem>View profile</DropdownMenuItem>
+                                      <DropdownMenuItem><a href={`/profile-detail/${member.user?.id}`}>Xem profile</a></DropdownMenuItem>
                                     </DropdownMenuContent>
                                   </DropdownMenu>
                               </div>
