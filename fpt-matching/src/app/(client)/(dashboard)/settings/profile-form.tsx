@@ -140,14 +140,16 @@ export function ProfileForm({ user }: { user?: User }) {
           <DialogTrigger asChild>
             <Button variant="outline">Edit cv profile</Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
+          <DialogContent className="sm:min-w-[70%] sm:max-w-fit max-h-screen overflow-y-auto">
+          <DialogHeader>
               <DialogTitle>Edit cv profile</DialogTitle>
               <DialogDescription>
-                <ProfileStudentForm user={user}/>
+                
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4"></div>
+            <div >
+            <ProfileStudentForm user={user}/>
+            </div>
           
           </DialogContent>
         </Dialog>

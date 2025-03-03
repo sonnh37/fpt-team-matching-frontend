@@ -31,7 +31,7 @@ export function LoadingPage() {
 
 export function LoadingComponent() {
   return (
-   <div className="flex items-center justify-center min-h-screen">
+   <div className="flex items-center justify-center">
      <div className="text-center">
       <div role="status" className="flex items-center justify-center gap-2">
         <svg

@@ -35,6 +35,7 @@ import { TypographyP } from "@/components/_common/typography/typography-p";
 import { useRouter } from "next/navigation"
 import { teammemberService } from "@/services/team-member-service";
 import ErrorSystem from "@/components/_common/errors/error-system";
+import PageNoTeam from "./page-no-team/page";
 
 
 // const groupData = {
@@ -79,7 +80,7 @@ export default function TeamInfo() {
   }
 
   if (result?.status == -2) {
-      return router.push("/page-no-team");
+      return <PageNoTeam/>
   }
 
   //check xem thang dang nhap coi no phai member va la leader khong
