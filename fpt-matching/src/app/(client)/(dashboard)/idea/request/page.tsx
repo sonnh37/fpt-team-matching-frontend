@@ -1,8 +1,6 @@
 "use client";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingPage } from "@/components/_common/loading-page";
-import InvitationSendByTeamTable from "@/components/sites/my-request/send-by-team";
-import InvitationSentByStudentTable from "@/components/sites/my-request/sent-by-student";
 import {
   Tabs,
   TabsContent,
@@ -13,26 +11,10 @@ import { projectService } from "@/services/project-service";
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 
-import { Avatar } from "@/components/ui/avatar";
+import IdeaRequestApprovedTable from "@/components/sites/idea/request/approved";
+import IdeaRequestPendingTable from "@/components/sites/idea/request/pending";
+import IdeaRequestRejectedTable from "@/components/sites/idea/request/rejected";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { Bell, HistoryIcon } from "lucide-react";
-import { Project } from "@/types/project";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Idea } from "@/types/idea";
 import {
   Card,
   CardContent,
@@ -40,8 +22,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@radix-ui/react-select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { Idea } from "@/types/idea";
+import { Project } from "@/types/project";
+import { Separator } from "@radix-ui/react-select";
+import { HistoryIcon } from "lucide-react";
 export default function Page() {
   const dispatch = useDispatch();
 
@@ -125,13 +116,13 @@ export default function Page() {
           </Popover>
         </div>
         <TabsContent value={tab_1}>
-          <InvitationSentByStudentTable />
+          <IdeaRequestPendingTable />
         </TabsContent>
         <TabsContent value={tab_2}>
-          <InvitationSendByTeamTable />
+          <IdeaRequestApprovedTable />
         </TabsContent>
         <TabsContent value={tab_3}>
-          <InvitationSendByTeamTable />
+          <IdeaRequestRejectedTable />
         </TabsContent>
       </Tabs>
     </>

@@ -81,7 +81,7 @@ export default function IdeasOfSupervisorsTableTable() {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams = useMemo(() => {
+  const queryParams: IdeaGetAllQuery = useMemo(() => {
     const params: IdeaGetAllQuery = useQueryParams(
       inputFields,
       columnFilters,

@@ -2,13 +2,24 @@ import { DataTableComponent } from "@/components/_common/data-table-api/data-tab
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
 import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
 import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
+import { TypographyH2 } from "@/components/_common/typography/typography-h2";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
-import { invitationService } from "@/services/invitation-service";
-import { InvitationType } from "@/types/enums/invitation";
+import { ideaService } from "@/services/idea-service";
+import { IdeaType } from "@/types/enums/idea";
 import { FilterEnum } from "@/types/models/filter-enum";
-import { InvitationGetAllQuery } from "@/types/models/queries/invitations/invitation-get-all-query";
+import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -20,25 +31,37 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
-import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
-import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
+import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-query";
+import { ideaRequestService } from "@/services/idea-request-service";
+import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { IdeaRequestGetAllByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-gey-all-by-status-query";
 
 //#region INPUT
-const defaultSchema = z.object({});
+const defaultSchema = z.object({
+  // englishName: z.string().optional(),
+});
 //#endregion
-export default function InvitationSentByStudentTable() {
+export default function IdeaRequestRejectedTable() {
   const searchParams = useSearchParams();
+  const filterEnums: FilterEnum[] = [
+    {
+      columnId: "isExistedTeam",
+      title: "Slot register",
+      options: isExistedTeam_options,
+    },
+  ];
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
     {
       id: "createdDate",
-      desc: true, 
+      desc: true,
     },
   ]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -48,9 +71,8 @@ export default function InvitationSentByStudentTable() {
     React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 1000,
+    pageSize: 10,
   });
-  const [isTyping, setIsTyping] = useState(false);
   //#endregion
 
   //#region CREATE TABLE
@@ -63,15 +85,15 @@ export default function InvitationSentByStudentTable() {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams = useMemo(() => {
-    const params: InvitationGetByTypeQuery = useQueryParams(
+  const queryParams: IdeaRequestGetAllByStatusQuery = useMemo(() => {
+    const params: IdeaRequestGetAllByStatusQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
 
-    params.type = InvitationType.SentByStudent;
+    params.statusList = [IdeaRequestStatus.MentorRejected, IdeaRequestStatus.CouncilRejected]
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -87,7 +109,7 @@ export default function InvitationSentByStudentTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => invitationService.getUserInvitationsByType(queryParams),
+    queryFn: () => ideaRequestService.fetchPaginatedByStatus(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -108,14 +130,18 @@ export default function InvitationSentByStudentTable() {
     manualPagination: true,
     debugTable: true,
   });
-
   //#endregion
+
+  const onSubmit = (values: z.infer<typeof defaultSchema>) => {
+    setInputFields(values);
+  };
 
   return (
     <>
       <div className="space-y-8">
         <div className="">
           <DataTableComponent table={table} />
+          <DataTablePagination table={table} />
         </div>
       </div>
     </>

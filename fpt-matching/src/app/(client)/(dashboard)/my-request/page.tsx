@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/tabs-shadcn";
 
 export default function Page() {
-  const tab_1 = "Sent by me";
-  const tab_2 = "Received by team";
+  const tab_1 = "By student";
+  const tab_2 = "By team";
   return (
     <>
       <Tabs defaultValue={tab_1} className="w-full container mx-auto">
