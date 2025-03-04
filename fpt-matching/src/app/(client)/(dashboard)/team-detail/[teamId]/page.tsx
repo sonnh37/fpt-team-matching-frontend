@@ -34,6 +34,7 @@ import { teammemberService } from "@/services/team-member-service";
 import { useEffect, useState } from "react";
 import { TeamMember } from "@/types/team-member";
 import { Project } from "@/types/project";
+import { invitationService } from "@/services/invitation-service";
 
 
 
@@ -76,7 +77,7 @@ export default function TeamInfoDetail() {
   // //  Kiểm tra `hasTeam` đúng cách
   // const hasTeam = !!result1?.data; // ✅ Chuyển đổi thành boolean
 
-    // Xử lý logic sắp xếp
+  // Xử lý logic sắp xếp
   //   const sortedMembers = result.data.teamMembers
   //   ?.slice()
   //   .sort((a, b) => (a.role === TeamMemberRole.Leader ? -1 : b.role === TeamMemberRole.Leader ? 1 : 0));
@@ -86,43 +87,54 @@ export default function TeamInfoDetail() {
 
   const { teamId } = useParams();
   const user = useSelector((state: RootState) => state.user.user);
-   //  State lưu dữ liệu từ API
-   const [teamInfo, setTeamInfo] = useState<Project | null>(null);
-   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
-   const [userTeam, setUserTeam] = useState(null);
-   const [loading, setLoading] = useState(true);
-   const [error, setError] = useState(null);
+  //  State lưu dữ liệu từ API
+  const [teamInfo, setTeamInfo] = useState<Project | null>(null);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [userTeam, setUserTeam] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  //  Gọi API lấy thông tin team
+  useEffect(() => {
+    if (!teamId) return;
+    setLoading(true);
+    projectService
+      .fetchById(teamId?.toString())
+      .then((res) => {
+        setTeamInfo(res?.data ?? null);
+        setTeamMembers(res.data?.teamMembers || []);
+      })
+      .catch((err) => setError(err))
+      .finally(() => setLoading(false));
+  }, [teamId]);
+
+  const [isInvited, setIsInvited] = useState<boolean | null>(null);
+
+  console.log("test", teamInfo?.id?.toString())
+
+  useEffect(() => {
+    
+    const checkInvitation = async () => {
+      if(teamInfo?.id?.toString()){
+      const result = await invitationService.checkMemberProject(teamInfo?.id?.toString());
+      setIsInvited(result);
+      }
+      setIsInvited(null);
+    };
+
+    checkInvitation();
+  }, [teamInfo?.id]);
+
+
+  const check = teamMembers.find(x => x.user?.email == user?.email);
  
-   //  Gọi API lấy thông tin team
-   useEffect(() => {
-     if (!teamId) return;
-     setLoading(true);
-     projectService
-       .fetchById(teamId?.toString())
-       .then((res) => {
-         setTeamInfo(res?.data ?? null);
-         setTeamMembers(res.data?.teamMembers || []);
-       })
-       .catch((err) => setError(err))
-       .finally(() => setLoading(false));
-   }, [teamId]);
- 
-   //  Gọi API lấy thông tin user trong team
-  //  useEffect(() => {
-  //    if (!user?.id) return;
-  //    teammemberService
-  //      .fetchById(user.teamMembers.id)
-  //      .then((res) => setUserTeam(res.data))
-  //      .catch((err) => console.error("Error fetching user team:", err));
-  //  }, [user?.id]);
- 
-   //  Kiểm tra user có trong team không
-   const hasTeam = !!userTeam;
+
+  const hasTeam = !!userTeam;
 
 
   // Sắp xếp leader lên đầu
   const sortedMembers = [...teamMembers].sort((a, b) =>
-    a.role === TeamMemberRole.Leader  ? -1 : b.role === TeamMemberRole.Leader  ? 1 : 0
+    a.role === TeamMemberRole.Leader ? -1 : b.role === TeamMemberRole.Leader ? 1 : 0
   );
 
   //  Tính số slot trống
@@ -143,16 +155,20 @@ export default function TeamInfoDetail() {
                   <p className="text-sm text-gray-500">Created at: {formatDate(teamInfo?.createdDate)}</p>
                 </div>
 
-                <div className="button-request"> 
-               
-               { availableSlots>0  ?(
-               <button>Request</button>):(
-                <button>Cancel</button>)
+                <div className="button-request">
 
-               }
+                  {
+                  (availableSlots > 0 && !check ) && (
+                    isInvited ? (
+                      <button className="bg-blue-500 text-xl p-2 hover:bg-blue-200">Cancel</button>
+                    ) : (
+                      <button className="bg-blue-500- text-xl p-2  hover:bg-blue-200">Request</button>
+                    )
+                  )
+                  }
                 </div>
-  
-          
+
+
               </div>
 
               {/* Abbreviation & Vietnamese Title */}
@@ -195,52 +211,52 @@ export default function TeamInfoDetail() {
                 </div>
 
                 <div className="space-y-3 mt-2">
-                      {sortedMembers.map((member, index) => {
+                  {sortedMembers.map((member, index) => {
 
-                        const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                          }`;
+                    const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
+                      }`;
 
 
-                        return (
-                          <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
-                            <div className="flex items-center space-x-3">
-                              <Avatar className="h-10 rounded-lg">
-                                <AvatarImage src={member.user?.avatar!} alt={member.user?.email!} />
-                                <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
-                              </Avatar>
+                    return (
+                      <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <Avatar className="h-10 rounded-lg">
+                            <AvatarImage src={member.user?.avatar!} alt={member.user?.email!} />
+                            <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
+                          </Avatar>
 
-                              <div>
-                                <p className="font-semibold">{member.user?.email}</p>
-                                <p className="text-sm text-gray-500">{member.user?.firstName}</p>
-                              </div>
-                            </div>
-                            <div className="flex">
-                              {member.role === TeamMemberRole.Leader ? (
-                                <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Owner</p>
-
-                              ) : (
-                                <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</p>
-                              )}
-                              <div className="relative ml-3">
-                               
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                      <DropdownMenuItem><a href={`/profile-detail/${member.user?.id}`}>Xem profile</a></DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                              </div>
-                            </div>
+                          <div>
+                            <p className="font-semibold">{member.user?.email}</p>
+                            <p className="text-sm text-gray-500">{member.user?.firstName}</p>
                           </div>
-                        )
-                      })}
-                    </div>
+                        </div>
+                        <div className="flex">
+                          {member.role === TeamMemberRole.Leader ? (
+                            <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Owner</p>
+
+                          ) : (
+                            <p className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</p>
+                          )}
+                          <div className="relative ml-3">
+
+                            <DropdownMenu>
+                              <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
+                              <DropdownMenuContent>
+                                <DropdownMenuItem><a href={`/profile-detail/${member.user?.id}`}>Xem profile</a></DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
 
               </div>
             </CardContent>
           </Card>
         </div>
-      
+
       </div>
 
     </div>

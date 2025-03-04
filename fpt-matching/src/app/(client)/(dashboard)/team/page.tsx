@@ -293,8 +293,7 @@ export default function TeamInfo() {
                 ) : (
                   <div className="space-y-3 mt-2">
                     {result?.data?.teamMembers.map((member, index) => {
-                      const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                        }`;
+                      const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? "" }`;
                       return (
                         <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
                           <div className="flex items-center space-x-3">
