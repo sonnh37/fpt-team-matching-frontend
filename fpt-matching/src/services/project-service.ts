@@ -20,6 +20,9 @@ class ProjectSerivce extends BaseService<Project> {
       return Promise.reject(error);
     }
   };
+
+
+  
 }
 
 export const projectService = new ProjectSerivce();
