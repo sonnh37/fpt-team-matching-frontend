@@ -48,13 +48,12 @@ const formSchema = z.object({
 
 })
 
-console.log("test1" , formSchema);
+console.log("test1", formSchema);
 
 const CreateProjectForm = () => {
 
 
   const query: UserGetAllQuery = {
-    isPagination: false,
     role: "Lecturer"
   }
   //goi api bang tanstack
@@ -65,13 +64,13 @@ const CreateProjectForm = () => {
   });
 
   // Lấy danh sách users từ API response
-const users = result?.data?.results ?? []; // Nếu `results` là `undefined`, dùng mảng rỗng
+  const users = result?.data ?? []; // Nếu `results` là `undefined`, dùng mảng rỗng
 
-// console.log("check_users", users)
-// // Lọc user có Role là "Lecture"
-// const lectureUsers = users.filter(user => 
-//   user.userXRoles?.some(x => x.role?.roleName === "Lecture") // Kiểm tra nếu user có role "Lecture"
-// );
+  // console.log("check_users", users)
+  // // Lọc user có Role là "Lecture"
+  // const lectureUsers = users.filter(user => 
+  //   user.userXRoles?.some(x => x.role?.roleName === "Lecture") // Kiểm tra nếu user có role "Lecture"
+  // );
   //lay thong tin tu redux luc dang nhap
   const user = useSelector((state: RootState) => state.user.user)
 
@@ -89,7 +88,7 @@ const users = result?.data?.results ?? []; // Nếu `results` là `undefined`, d
 
 
   //Tao idea
-  function onSubmit(values: z.infer<typeof formSchema>) { 
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     const ideacreate: IdeaCreateCommand = {
       // ownerId: user?.id,
       mentorId: selectedUserId?.toString(),
@@ -100,19 +99,22 @@ const users = result?.data?.results ?? []; // Nếu `results` là `undefined`, d
       maxTeamSize: values.teamsize,
       // semesterId: "",
       // subMentorId: "",
-      specialtyId: "",
+      specialtyId: undefined,
       file: "",
       ideaCode: ""
     }
 
-    ideaService.createIdea(ideacreate);
-    toast("Bạn đã tạo idea thành công");
+    const res = await ideaService.createIdea(ideacreate);
+    if (res.status == 1) {
+      toast("Bạn đã tạo idea thành công");
+    }
+
   }
-  
+
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   useEffect(() => {
     // Nếu có users, chọn user đầu tiên làm mặc định
-    if (users.length > 0  && users[0].id !== undefined) {
+    if (users.length > 0 && users[0].id !== undefined) {
       setSelectedUserId(users[0].id);
     }
   }, [users]); // Chạy lại khi danh sách users thay đổi
@@ -245,27 +247,27 @@ const users = result?.data?.results ?? []; // Nếu `results` là `undefined`, d
           />
 
 
-         
-              <div>
-                <p className="text-black text-xs mb-2 font-bold">
-                  You have to fill fullname in the following form: fullname(FPT Mail) <p className="text-red-600">ex: Nguyen Van Anh(anhntv@fpt.edu.vn)</p>
-                </p>
-                <label className="text-base text-purple-500">Supervisor 1</label>
-                <div className="text-xs text-gray-500">FullName</div>
-                <FormControl>
-                  <div className="flex space-x-2">
+
+          <div>
+            <p className="text-black text-xs mb-2 font-bold">
+              You have to fill fullname in the following form: fullname(FPT Mail) <p className="text-red-600">ex: Nguyen Van Anh(anhntv@fpt.edu.vn)</p>
+            </p>
+            <label className="text-base text-purple-500">Supervisor 1</label>
+            <div className="text-xs text-gray-500">FullName</div>
+            <FormControl>
+              <div className="flex space-x-2">
                 {/* <  input type="text" value={inputValue} placeholder="ex: Nguyen Van Anh(anhntv@fpt.edu.vn)"  ></input> */}
-                    <select   onChange={handleSelectChange}  >
-                      {users?.map((user) => (
-                        <option key={user.id} value={user.id}>
-                         {user.lastName} {user.firstName} {user.email}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </FormControl>
+                <select onChange={handleSelectChange}  >
+                  {users?.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.lastName} {user.firstName} {user.email}
+                    </option>
+                  ))}
+                </select>
               </div>
-           
+            </FormControl>
+          </div>
+
           {/* Team Members */}
           <div className="mb-4">
             <p className="text-sm font-medium">Team Members</p>
