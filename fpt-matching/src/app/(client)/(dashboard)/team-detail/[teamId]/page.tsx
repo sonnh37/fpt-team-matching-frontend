@@ -127,10 +127,6 @@ export default function TeamInfoDetail() {
 
 
   const check = teamMembers.find(x => x.user?.email == user?.email);
- 
-
-  const hasTeam = !!userTeam;
-
 
   // Sắp xếp leader lên đầu
   const sortedMembers = [...teamMembers].sort((a, b) =>

@@ -16,9 +16,9 @@ class IdeaService extends BaseService<Idea> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-  public getIdeaByUser = (): Promise<BusinessResult<Idea>> => {
+  public getIdeaByUser = (): Promise<BusinessResult<Idea[]>> => {
     return axiosInstance
-        .get<BusinessResult<Idea>>(`${this.endpoint}/get-by-user-id`)
+        .get<BusinessResult<Idea[]>>(`${this.endpoint}/get-by-user-id`)
         .then((response) => response.data)
         .catch((error) => this.handleError(error)); // Xử lý lỗi
 };
