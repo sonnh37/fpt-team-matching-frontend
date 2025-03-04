@@ -1,6 +1,6 @@
 "use client";
-import InvitationSentByStudentTable from "@/components/sites/my-request/sent-by-me";
-import InvitationSendByTeamTable from "@/components/sites/my-request/received-by-team";
+import InvitationSentByStudentTable from "@/components/sites/my-request/sent-by-student";
+import InvitationSendByTeamTable from "@/components/sites/my-request/send-by-team";
 import {
   Tabs,
   TabsContent,

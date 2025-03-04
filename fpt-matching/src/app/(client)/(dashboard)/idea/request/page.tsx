@@ -1,8 +1,8 @@
 "use client";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingPage } from "@/components/_common/loading-page";
-import InvitationSendByTeamTable from "@/components/sites/my-request/received-by-team";
-import InvitationSentByStudentTable from "@/components/sites/my-request/sent-by-me";
+import InvitationSendByTeamTable from "@/components/sites/my-request/send-by-team";
+import InvitationSentByStudentTable from "@/components/sites/my-request/sent-by-student";
 import {
   Tabs,
   TabsContent,
