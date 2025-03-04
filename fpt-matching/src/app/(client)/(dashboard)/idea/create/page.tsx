@@ -24,6 +24,10 @@ import { User } from "@/types/user";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
+import { useRouter } from "next/navigation";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import { resolve } from "path";
+import { projectService } from "@/services/project-service";
 
 
 // Các đuôi file cho phép
@@ -66,13 +70,23 @@ const CreateProjectForm = () => {
   // Lấy danh sách users từ API response
   const users = result?.data ?? []; // Nếu `results` là `undefined`, dùng mảng rỗng
 
-  // console.log("check_users", users)
-  // // Lọc user có Role là "Lecture"
-  // const lectureUsers = users.filter(user => 
-  //   user.userXRoles?.some(x => x.role?.roleName === "Lecture") // Kiểm tra nếu user có role "Lecture"
-  // );
   //lay thong tin tu redux luc dang nhap
   const user = useSelector((state: RootState) => state.user.user)
+
+  //check xem no da tao idea chua
+  const router = useRouter()
+  useEffect(() => {
+    const checkIdea = async () => {
+      const ideaExists = await ideaService.getIdeaByUser();
+      const teamExist = await projectService.getProjectInfo();
+
+      if (ideaExists) {
+      return router.push("/idea/idea-is-exist");
+      }
+    };
+    checkIdea();
+  }, []); //chay lai khi gi thay doi thi bo vao trong []
+  
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -107,6 +121,8 @@ const CreateProjectForm = () => {
     const res = await ideaService.createIdea(ideacreate);
     if (res.status == 1) {
       toast("Bạn đã tạo idea thành công");
+      await new Promise((resolve) => setTimeout(resolve,2000));
+      router.push("/idea/idea-is-exist");
     }
 
   }

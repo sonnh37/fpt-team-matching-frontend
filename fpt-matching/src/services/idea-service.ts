@@ -11,13 +11,20 @@ class IdeaService extends BaseService<Idea> {
   }
   public createIdea = (command: IdeaCreateCommand): Promise<BusinessResult<Idea>> => {
     return axiosInstance
-        .post<BusinessResult<Idea>>(`${this.endpoint}/student-create-pending`, command)
+      .post<BusinessResult<Idea>>(`${this.endpoint}/student-create-pending`, command)
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public getIdeaByUser = (): Promise<BusinessResult<Idea>> => {
+    return axiosInstance
+        .get<BusinessResult<Idea>>(`${this.endpoint}/get-by-user-id`)
         .then((response) => response.data)
         .catch((error) => this.handleError(error)); // Xử lý lỗi
 };
 }
- 
-  
- 
+
+
+
 
 export const ideaService = new IdeaService();
