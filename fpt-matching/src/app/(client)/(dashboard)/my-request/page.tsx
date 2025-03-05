@@ -1,6 +1,6 @@
 "use client";
-import InvitationSentByStudentTable from "@/components/sites/my-request/sent-by-me";
-import InvitationSendByTeamTable from "@/components/sites/my-request/received-by-team";
+import InvitationSentByStudentTable from "@/components/sites/my-request/sent-by-student";
+import InvitationSendByTeamTable from "@/components/sites/my-request/send-by-team";
 import {
   Tabs,
   TabsContent,
@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/tabs-shadcn";
 
 export default function Page() {
-  const tab_1 = "Sent by me";
-  const tab_2 = "Received by team";
+  const tab_1 = "By student";
+  const tab_2 = "By team";
   return (
     <>
       <Tabs defaultValue={tab_1} className="w-full container mx-auto">

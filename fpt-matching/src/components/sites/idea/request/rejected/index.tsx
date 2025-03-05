@@ -38,13 +38,17 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
+import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-query";
+import { ideaRequestService } from "@/services/idea-request-service";
+import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { IdeaRequestGetAllByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-gey-all-by-status-query";
 
 //#region INPUT
 const defaultSchema = z.object({
-  englishName: z.string().optional(),
+  // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeasOfSupervisorsTableTable() {
+export default function IdeaRequestRejectedTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -81,15 +85,15 @@ export default function IdeasOfSupervisorsTableTable() {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaGetAllQuery = useMemo(() => {
-    const params: IdeaGetAllQuery = useQueryParams(
+  const queryParams: IdeaRequestGetAllByStatusQuery = useMemo(() => {
+    const params: IdeaRequestGetAllByStatusQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
 
-    params.type = IdeaType.Lecturer;
+    params.statusList = [IdeaRequestStatus.MentorRejected, IdeaRequestStatus.CouncilRejected]
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -105,7 +109,7 @@ export default function IdeasOfSupervisorsTableTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaService.fetchPaginated(queryParams),
+    queryFn: () => ideaRequestService.fetchPaginatedByStatus(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -134,64 +138,10 @@ export default function IdeasOfSupervisorsTableTable() {
 
   return (
     <>
-      <div className="container mx-auto space-y-8">
-        <div className="w-fit mx-auto space-y-4">
-          <TypographyH2 className="text-center tracking-wide">
-            The list of Supervisor's Ideas
-          </TypographyH2>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="englishName"
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>English name:</FormLabel>
-                      <div className="flex items-center gap-2">
-                        <FormControl>
-                          <Input
-                            placeholder=""
-                            className="focus-visible:ring-none"
-                            type="text"
-                            {...field}
-                          />
-                        </FormControl>
-                        <Button type="submit" variant="default" size="icon">
-                          <Search />
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
-              />
-            </form>
-          </Form>
-        </div>
-
+      <div className="space-y-8">
         <div className="">
-          <Card className="space-y-4 p-4 w-full">
-            <DataTableToolbar
-              form={form}
-              table={table}
-              filterEnums={filterEnums}
-            />
-            {isFetching ? (
-              <DataTableSkeleton
-                columnCount={1}
-                showViewOptions={false}
-                withPagination={false}
-                rowCount={pagination.pageSize}
-                searchableColumnCount={0}
-                filterableColumnCount={0}
-                shrinkZero
-              />
-            ) : (
-              <DataTableComponent table={table} />
-            )}
-            <DataTablePagination table={table} />
-          </Card>
+          <DataTableComponent table={table} />
+          <DataTablePagination table={table} />
         </div>
       </div>
     </>

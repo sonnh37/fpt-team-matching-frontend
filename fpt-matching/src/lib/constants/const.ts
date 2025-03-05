@@ -14,7 +14,9 @@ export class Const {
     static readonly TEAMMEMBER = "team-members";
     static readonly PROJECT = "projects";
     static readonly USER = "users";
+    static readonly SEMESTER = "semesters";
     static readonly IDEA = "ideas";
+    static readonly IDEA_REQUEST = "idea-requests";
     static readonly INVITATION = "invitations";
     static readonly SPECIALTY = "specialties";
     static readonly PROFESSION = "professions";
