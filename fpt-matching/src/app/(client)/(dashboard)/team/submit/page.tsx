@@ -22,7 +22,7 @@ const formSchema = z.object({
   abbreviation: z.string().max(20, { message: "Abbreviation must be less than 20 characters." }),
   vietnameseTitle: z.string().min(2, { message: "Vietnamese Title must be at least 2 characters." }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
-  inviteEmail: z.string().email({ message:  "Invalid email format." }),
+  inviteEmail: z.string().email({ message: "Invalid email format." }),
 })
 
 
@@ -115,7 +115,7 @@ const SubmitIdea = () => {
             )}
           />
 
-        
+
           {/* Team Members */}
           <div className="mb-4">
             <p className="text-sm font-medium">Team Members</p>
@@ -131,40 +131,40 @@ const SubmitIdea = () => {
               <FormItem>
                 <FormLabel>You can choose 2 supervisor and one of their ideas for you Capstone Project(Optional)</FormLabel>
                 <p className="text-black text-xs mb-2 font-bold">
-                  You have to fill fullname in the following form: fullname(FPT Mail) <p className="text-red-600">ex: Nguyen Van Anh(anhntv@fpt.edu.vn)</p> 
+                  You have to fill fullname in the following form: fullname(FPT Mail) <p className="text-red-600">ex: Nguyen Van Anh(anhntv@fpt.edu.vn)</p>
                 </p>
                 <FormLabel className="text-base text-purple-500">Supervisor 1</FormLabel>
                 <div className="text-xs text-gray-500">FullName</div>
                 <FormControl>
                   <div className="flex space-x-2">
-                  <Input placeholder="ex: Nguyen Van Anh(anhntv@fpt.edu.vn)" {...field} />
-                 <select name="" id="">
-                  <option value="">Nguyen Van A</option>
-                  <option value="">Nguyen Van B</option>
-                  <option value="">Nguyen Van C</option>
-                 </select>
+                    <Input placeholder="ex: Nguyen Van Anh(anhntv@fpt.edu.vn)" {...field} />
+                    <select name="" id="">
+                      <option value="">Nguyen Van A</option>
+                      <option value="">Nguyen Van B</option>
+                      <option value="">Nguyen Van C</option>
+                    </select>
                   </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-            <FormField
+          <FormField
             control={form.control}
             name="inviteEmail"
             render={({ field }) => (
               <FormItem>
-               
+
                 <FormLabel className="text-base text-purple-500">Supervisor 2</FormLabel>
                 <div className="text-xs text-gray-500">FullName</div>
                 <FormControl>
                   <div className="flex space-x-2">
-                  <Input placeholder="ex: Nguyen Van Anh(anhntv@fpt.edu.vn)" {...field} />
-                 <select name="" id="">
-                  <option value="">Nguyen Van A</option>
-                  <option value="">Nguyen Van B</option>
-                  <option value="">Nguyen Van C</option>
-                 </select>
+                    <Input placeholder="ex: Nguyen Van Anh(anhntv@fpt.edu.vn)" {...field} />
+                    <select name="" id="">
+                      <option value="">Nguyen Van A</option>
+                      <option value="">Nguyen Van B</option>
+                      <option value="">Nguyen Van C</option>
+                    </select>
                   </div>
                 </FormControl>
                 <FormMessage />

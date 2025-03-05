@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -15,6 +15,11 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/redux/store";
+import { useQuery } from "@tanstack/react-query";
+import { projectService } from "@/services/project-service";
+import { TeamMemberRole } from "@/types/enums/team-member";
 
 
 const formSchema = z.object({
@@ -28,7 +33,8 @@ const formSchema = z.object({
 
 const UpdateProjectTeam = () => {
 
-
+  const user = useSelector((state: RootState) => state.user.user);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -39,13 +45,24 @@ const UpdateProjectTeam = () => {
       inviteEmail: "",
     },
   })
+    //goi api bang tanstack
+    const {
+      data: result,
+      
+    } = useQuery({
+      queryKey: ["getTeamInfo"],
+      queryFn: projectService.getProjectInfo ,
+      refetchOnWindowFocus: false,
+    });
+  
 
 
-
-  const [teamMembers, setTeamMembers] = useState([
-    { email: "thainhthe150042@fpt.edu.vn", role: "Owner" },
-  ]);
-
+   // sap xep lai member
+   const sortedMembers = result?.data?.teamMembers
+     ?.slice() // Tạo bản sao để tránh thay đổi dữ liệu gốc
+     .sort((a, b) => (a.role === TeamMemberRole.Leader ? -1 : b.role === TeamMemberRole.Leader ? 1 : 0));
+ 
+   const availableSlots = (result?.data?.teamSize ?? 0) - (result?.data?.teamMembers?.length ?? 0);
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Form submitted:", values)
   }
@@ -79,7 +96,7 @@ const UpdateProjectTeam = () => {
               <FormItem>
                 <FormLabel>English Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="What's your idea?" {...field} />
+                  <Input placeholder="What's your idea? "  {...field}  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -136,9 +153,9 @@ const UpdateProjectTeam = () => {
           <div className="mb-4">
             <p className="text-sm font-medium">Team Members</p>
             <p className="text-gray-500 text-sm">Existed Members</p>
-            {teamMembers.map((member, index) => (
+            {sortedMembers.map((member, index) => (
               <div key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded-lg mt-2">
-                <span className="text-sm">{member.email}</span>
+                <span className="text-sm">{member.user?.email}</span>
                 <span className="text-xs text-gray-500">{member.role}</span>
               </div>
             ))}

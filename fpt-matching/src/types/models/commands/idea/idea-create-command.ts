@@ -8,14 +8,15 @@ export interface IdeaCreateCommand extends CreateCommand {
   semesterId?: string;
   mentorId?: string;
   subMentorId?: string;
+  ideaCode?: string;
   specialtyId?: string;
   description?: string;
   abbreviations?: string;
   vietNamName?: string;
   englishName?: string;
   file?: string;
-  isExistedTeam: boolean;
-  isEnterpriseTopic: boolean;
+  isExistedTeam?: boolean;
+  isEnterpriseTopic?: boolean;
   enterpriseName?: string;
   maxTeamSize?: number;
   }
