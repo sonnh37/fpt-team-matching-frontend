@@ -79,7 +79,7 @@ export default function TeamInfo() {
   }
 
   if (result?.status == -2) {
-      return router.push("/page-no-team");
+      return router.push("/team/page-no-team");
   }
 
   //check xem thang dang nhap coi no phai member va la leader khong

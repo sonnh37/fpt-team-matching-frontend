@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { string, z } from "zod"
+import { boolean, string, z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
 import {
@@ -28,6 +28,7 @@ import { useRouter } from "next/navigation";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import { resolve } from "path";
 import { projectService } from "@/services/project-service";
+import { IdeaStatus } from "@/types/enums/idea";
 
 
 // Các đuôi file cho phép
@@ -79,14 +80,15 @@ const CreateProjectForm = () => {
     const checkIdea = async () => {
       const ideaExists = await ideaService.getIdeaByUser();
       const teamExist = await projectService.getProjectInfo();
-
-      if (ideaExists) {
-      return router.push("/idea/idea-is-exist");
+      //check xem user co idea nao dang pending or Done khong
+      const isPendingOrDone = ideaExists.data?.some(m=> m.status !== IdeaStatus.Rejected)
+      if ((ideaExists.data && isPendingOrDone) || teamExist.data) {
+        return router.push("/idea/idea-is-exist");
       }
     };
     checkIdea();
   }, []); //chay lai khi gi thay doi thi bo vao trong []
-  
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -121,7 +123,7 @@ const CreateProjectForm = () => {
     const res = await ideaService.createIdea(ideacreate);
     if (res.status == 1) {
       toast("Bạn đã tạo idea thành công");
-      await new Promise((resolve) => setTimeout(resolve,2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       router.push("/idea/idea-is-exist");
     }
 
