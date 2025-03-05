@@ -17,7 +17,7 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
 
     return axiosInstance
       .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
-        `${this.endpoint}/get-all-by-status?${cleanedQuery}&isPagination=true`
+        `${this.endpoint}/by-status-and-idea-id?${cleanedQuery}&isPagination=true`
       )
       .then((response) => {
         return response.data;

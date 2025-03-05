@@ -42,13 +42,15 @@ import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/ide
 import { ideaRequestService } from "@/services/idea-request-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { IdeaRequestGetAllByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-gey-all-by-status-query";
+import { Idea } from "@/types/idea";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaRequestPendingTable() {
+export function IdeaRequestPendingTable({ idea }: { idea: Idea }) {
+  if(!idea) return null;
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -93,6 +95,7 @@ export default function IdeaRequestPendingTable() {
       sorting
     );
 
+    params.ideaId = idea.id;
     params.statusList = [IdeaRequestStatus.MentorPending, IdeaRequestStatus.CouncilPending]
 
     return { ...params };
