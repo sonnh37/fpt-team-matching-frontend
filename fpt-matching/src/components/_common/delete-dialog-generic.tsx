@@ -36,6 +36,9 @@ interface DeleteBaseEntitysDialogProps<TData>
   showTrigger?: boolean;
   list: Row<TData>["original"][];
   onSuccess?: () => void;
+  titleMessasge?: string;
+  buttonLeftMessage?: string;
+  buttonRightMessage?: string;
   deleteById?: (id: string) => Promise<BusinessResult<null>>;
 }
 
@@ -43,6 +46,9 @@ export function DeleteBaseEntitysDialog<TData>({
   showTrigger = true,
   list,
   onSuccess,
+  titleMessasge = "Are you absolutely sure?",
+  buttonLeftMessage = "Cancel",
+  buttonRightMessage = "Delete",
   deleteById,
   ...props
 }: DeleteBaseEntitysDialogProps<TData>) {
@@ -99,16 +105,11 @@ export function DeleteBaseEntitysDialog<TData>({
 
         <DialogContent className="shadow-lg">
           <DialogHeader>
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently deleteById
-              your <span className="font-medium">{list.length}</span>
-              {list.length === 1 ? " task" : " list"} from our servers.
-            </DialogDescription>
+            <DialogTitle>{titleMessasge}</DialogTitle>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:space-x-0">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{buttonRightMessage}</Button>
             </DialogClose>
             <Button
               aria-label="Delete selected rows"
@@ -122,7 +123,7 @@ export function DeleteBaseEntitysDialog<TData>({
                   aria-hidden="true"
                 />
               )}
-              Delete
+              {buttonLeftMessage}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -131,16 +132,11 @@ export function DeleteBaseEntitysDialog<TData>({
       <Dialog {...props}>
         <DialogContent className="shadow-lg">
           <DialogHeader>
-            <DialogTitle>Are you absolutely sure?</DialogTitle>
-            <DialogDescription>
-              This action cannot be undone. This will permanently deleteById
-              your <span className="font-medium">{list.length}</span>
-              {list.length === 1 ? " task" : " list"} from our servers.
-            </DialogDescription>
+            <DialogTitle>{titleMessasge}</DialogTitle>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:space-x-0">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{buttonRightMessage}</Button>
             </DialogClose>
             <Button
               aria-label="Delete selected rows"
@@ -154,7 +150,7 @@ export function DeleteBaseEntitysDialog<TData>({
                   aria-hidden="true"
                 />
               )}
-              Delete
+              {buttonLeftMessage}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -174,7 +170,7 @@ export function DeleteBaseEntitysDialog<TData>({
       ) : null}
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Are you absolutely sure?</DrawerTitle>
+          <DrawerTitle>{titleMessasge}</DrawerTitle>
           <DrawerDescription>
             This action cannot be undone. This will permanently deleteById your{" "}
             <span className="font-medium">{list.length}</span>
@@ -183,7 +179,7 @@ export function DeleteBaseEntitysDialog<TData>({
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">{buttonRightMessage}</Button>
           </DrawerClose>
           <Button
             aria-label="Delete selected rows"
@@ -197,7 +193,7 @@ export function DeleteBaseEntitysDialog<TData>({
                 aria-hidden="true"
               />
             )}
-            Delete
+            {buttonLeftMessage}
           </Button>
         </DrawerFooter>
       </DrawerContent>

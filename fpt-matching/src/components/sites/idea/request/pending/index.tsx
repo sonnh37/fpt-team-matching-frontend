@@ -50,7 +50,7 @@ const defaultSchema = z.object({
 });
 //#endregion
 export function IdeaRequestPendingTable({ idea }: { idea: Idea }) {
-  if(!idea) return null;
+  if (!idea) return null;
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -96,7 +96,10 @@ export function IdeaRequestPendingTable({ idea }: { idea: Idea }) {
     );
 
     params.ideaId = idea.id;
-    params.statusList = [IdeaRequestStatus.MentorPending, IdeaRequestStatus.CouncilPending]
+    params.statusList = [
+      IdeaRequestStatus.MentorPending,
+      IdeaRequestStatus.CouncilPending,
+    ];
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -143,7 +146,11 @@ export function IdeaRequestPendingTable({ idea }: { idea: Idea }) {
     <>
       <div className="space-y-8">
         <div className="">
-          <DataTableComponent table={table} />
+          <DataTableComponent
+            table={table}
+            restore={ideaRequestService.restore}
+            deletePermanent={ideaRequestService.deletePermanent}
+          />
           <DataTablePagination table={table} />
         </div>
       </div>

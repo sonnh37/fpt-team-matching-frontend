@@ -77,7 +77,7 @@ export default function Page() {
             <TabsTrigger value={tab_3}>{tab_3}</TabsTrigger>
           </TabsList>
 
-          <Popover>
+          {/* <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size={"icon"}>
                 <HistoryIcon />
@@ -114,16 +114,16 @@ export default function Page() {
                 </div>
               </ScrollArea>
             </PopoverContent>
-          </Popover>
+          </Popover> */}
         </div>
         <TabsContent value={tab_1}>
           <IdeaRequestPendingTable idea={idea}/>
         </TabsContent>
         <TabsContent value={tab_2}>
-          <IdeaRequestApprovedTable />
+          <IdeaRequestApprovedTable  idea={idea}/>
         </TabsContent>
         <TabsContent value={tab_3}>
-          <IdeaRequestRejectedTable />
+          <IdeaRequestRejectedTable idea={idea} />
         </TabsContent>
       </Tabs>
     </>

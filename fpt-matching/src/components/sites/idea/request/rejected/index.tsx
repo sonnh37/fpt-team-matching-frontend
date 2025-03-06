@@ -42,13 +42,14 @@ import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/ide
 import { ideaRequestService } from "@/services/idea-request-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { IdeaRequestGetAllByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-gey-all-by-status-query";
+import { Idea } from "@/types/idea";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaRequestRejectedTable() {
+export default function IdeaRequestRejectedTable({ idea }: { idea: Idea }) {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -92,7 +93,8 @@ export default function IdeaRequestRejectedTable() {
       pagination,
       sorting
     );
-
+    
+    params.ideaId = idea.id;
     params.statusList = [IdeaRequestStatus.MentorRejected, IdeaRequestStatus.CouncilRejected]
 
     return { ...params };
