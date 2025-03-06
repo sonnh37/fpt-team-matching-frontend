@@ -12,7 +12,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 
 import IdeaRequestApprovedTable from "@/components/sites/idea/request/approved";
-import IdeaRequestPendingTable from "@/components/sites/idea/request/pending";
 import IdeaRequestRejectedTable from "@/components/sites/idea/request/rejected";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,6 +32,9 @@ import { Idea } from "@/types/idea";
 import { Project } from "@/types/project";
 import { Separator } from "@radix-ui/react-select";
 import { HistoryIcon } from "lucide-react";
+import { IdeaRequestPendingTable } from "@/components/sites/idea/request/pending";
+import { ideaService } from "@/services/idea-service";
+import { IdeaStatus, IdeaType } from "@/types/enums/idea";
 export default function Page() {
   const dispatch = useDispatch();
 
@@ -43,7 +45,7 @@ export default function Page() {
     error,
   } = useQuery({
     queryKey: ["getProjectInfo"],
-    queryFn: projectService.getProjectInfo,
+    queryFn: ideaService.getIdeaByUser,
     refetchOnWindowFocus: false,
   });
 
@@ -60,9 +62,8 @@ export default function Page() {
   //     }
   //   }
 
-  const project = result?.data ?? ({} as Project);
-  const idea = project.idea ?? ({} as Idea);
-
+  const ideas = result?.data ?? []
+  const idea = ideas.find(m => m.status === IdeaStatus.Pending && !m.isDeleted) ?? {} as Idea;
   const tab_1 = "Pending";
   const tab_2 = "Approved";
   const tab_3 = "rejected";
@@ -76,7 +77,7 @@ export default function Page() {
             <TabsTrigger value={tab_3}>{tab_3}</TabsTrigger>
           </TabsList>
 
-          <Popover>
+          {/* <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" size={"icon"}>
                 <HistoryIcon />
@@ -113,16 +114,16 @@ export default function Page() {
                 </div>
               </ScrollArea>
             </PopoverContent>
-          </Popover>
+          </Popover> */}
         </div>
         <TabsContent value={tab_1}>
-          <IdeaRequestPendingTable />
+          <IdeaRequestPendingTable idea={idea}/>
         </TabsContent>
         <TabsContent value={tab_2}>
-          <IdeaRequestApprovedTable />
+          <IdeaRequestApprovedTable  idea={idea}/>
         </TabsContent>
         <TabsContent value={tab_3}>
-          <IdeaRequestRejectedTable />
+          <IdeaRequestRejectedTable idea={idea} />
         </TabsContent>
       </Tabs>
     </>
