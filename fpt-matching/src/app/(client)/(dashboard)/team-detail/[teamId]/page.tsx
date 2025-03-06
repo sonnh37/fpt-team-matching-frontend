@@ -35,7 +35,19 @@ import { useEffect, useState } from "react";
 import { TeamMember } from "@/types/team-member";
 import { Project } from "@/types/project";
 import { invitationService } from "@/services/invitation-service";
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { boolean } from "zod";
+import { StudentInvitationCommand } from "@/types/models/commands/invitation/invitation-student-command";
 
 
 
@@ -102,30 +114,33 @@ export default function TeamInfoDetail() {
       .fetchById(teamId?.toString())
       .then((res) => {
         setTeamInfo(res?.data ?? null);
-        setTeamMembers(res.data?.teamMembers || []);
+        const activeTeamMembers = res?.data?.teamMembers.filter(x => !x.isDeleted) ?? [];
+        setTeamMembers(activeTeamMembers);
       })
       .catch((err) => setError(err))
       .finally(() => setLoading(false));
   }, [teamId]);
 
-  const [isInvited, setIsInvited] = useState<boolean | null>(null);
+  const [isInvited, setIsInvited] = useState<boolean | null>();
 
-  console.log("test", teamInfo?.id?.toString())
+
 
   useEffect(() => {
-    
+
     const checkInvitation = async () => {
-      if(teamInfo?.id?.toString()){
-      const result = await invitationService.checkMemberProject(teamInfo?.id?.toString());
-      setIsInvited(result);
+      if (teamInfo?.id) {
+        const result = await invitationService.checkMemberProject(teamInfo?.id?.toString());
+        setIsInvited(result?.data || null);
+        console.log("test1", result?.data)
       }
-      setIsInvited(null);
+     
     };
 
     checkInvitation();
   }, [teamInfo?.id]);
 
 
+  //gọi ra coi nó có trong team prj này không
   const check = teamMembers.find(x => x.user?.email == user?.email);
 
   // Sắp xếp leader lên đầu
@@ -135,6 +150,27 @@ export default function TeamInfoDetail() {
 
   //  Tính số slot trống
   const availableSlots = (teamInfo?.teamSize ?? 0) - (teamMembers.length ?? 0);
+
+  const requestJoinTeam = async (id: string) => {
+    const ideacreate: StudentInvitationCommand = {
+      projectId: id,
+      content: "Muốn tham gia vào nhóm bạn"
+    }
+    const result = await invitationService.sendByStudent(ideacreate);
+    if (result) {
+      toast("Bạn đã gửi thành công ")
+    } else {
+      toast("Bạn đã gửi thất bại ")
+    }
+
+  }
+
+
+  const cancelRequest = async () => {
+
+  }
+
+
 
   return (
 
@@ -154,13 +190,31 @@ export default function TeamInfoDetail() {
                 <div className="button-request">
 
                   {
-                  (availableSlots > 0 && !check ) && (
-                    isInvited ? (
-                      <button className="bg-blue-500 text-xl p-2 hover:bg-blue-200">Cancel</button>
-                    ) : (
-                      <button className="bg-blue-500- text-xl p-2  hover:bg-blue-200">Request</button>
+                    //check xem con slot khong va no khog co trong team nay
+                    (availableSlots > 0 && !check) && (
+                      //Check xem da gui moi chua
+                      isInvited ? (
+                        <button className="bg-blue-500 text-base p-2  bg-blue-500 hover:bg-blue-200" onChange={() => cancelRequest()}>Cancel</button>
+                      ) : (
+                        // <button className="bg-blue-500- text-xl p-2 bg-blue-500  hover:bg-blue-200" onChange={() => requestJoinTeam()}>Request</button>
+                        <AlertDialog>
+                          <AlertDialogTrigger className="bg-blue-500 text-base p-2  bg-blue-500 hover:bg-blue-200">Request</AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Are you want to join the team {teamInfo?.name} sure?</AlertDialogTitle>
+                              <AlertDialogDescription className="text-gray-500">
+                                {teamInfo?.idea?.description}
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => requestJoinTeam(teamInfo?.id || "")}>Join</AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+
+                      )
                     )
-                  )
                   }
                 </div>
 
