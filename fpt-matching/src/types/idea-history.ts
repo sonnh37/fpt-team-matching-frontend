@@ -1,4 +1,5 @@
 import { BaseEntity } from "./_base/base";
+import { IdeaHistoryStatus } from "./enums/idea-history";
 import { IdeaRequestStatus } from "./enums/idea-request";
 import { Idea } from "./idea";
 import { IdeaHistoryRequest } from "./idea-history-request";
@@ -8,7 +9,7 @@ export interface IdeaHistory extends BaseEntity {
   ideaId?: string;
   councilId?: string;
   fileUpdate?: string;
-  status?: IdeaRequestStatus;
+  status?: IdeaHistoryStatus;
   reviewStage: number;
   idea?: Idea;
   council?: User;
