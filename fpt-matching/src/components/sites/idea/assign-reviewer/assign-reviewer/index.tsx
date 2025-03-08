@@ -1,25 +1,10 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import { TypographyH2 } from "@/components/_common/typography/typography-h2";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
-import { ideaService } from "@/services/idea-service";
-import { IdeaType } from "@/types/enums/idea";
+import { ideaRequestService } from "@/services/idea-request-service";
 import { FilterEnum } from "@/types/models/filter-enum";
-import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
+import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -31,27 +16,23 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
-import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-query";
-import { ideaRequestService } from "@/services/idea-request-service";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
-import { Idea } from "@/types/idea";
-import { IdeaRequestGetAllByListStatusAndIdeaIdQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-and-idea-id-query";
+import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
+import { setTotalAssignReviewer, setTotalPending } from "@/lib/redux/slices/ideaRequestSlice";
+import { useDispatch } from "react-redux";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function IdeaRequestPendingTable({ idea }: { idea: Idea }) {
-  if (!idea) return null;
-  const searchParams = useSearchParams();
+export function AssignReviewerIdeaRequestTable() {
+  const dispatch = useDispatch();
   const filterEnums: FilterEnum[] = [
     {
       columnId: "isExistedTeam",
@@ -87,19 +68,13 @@ export function IdeaRequestPendingTable({ idea }: { idea: Idea }) {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaRequestGetAllByListStatusAndIdeaIdQuery = useMemo(() => {
-    const params: IdeaRequestGetAllByListStatusAndIdeaIdQuery = useQueryParams(
+  const queryParams: BaseQueryableQuery = useMemo(() => {
+    const params: BaseQueryableQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
-
-    params.ideaId = idea.id;
-    params.statusList = [
-      IdeaRequestStatus.MentorPending,
-      IdeaRequestStatus.CouncilPending,
-    ];
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -114,13 +89,20 @@ export function IdeaRequestPendingTable({ idea }: { idea: Idea }) {
   }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
-    queryKey: ["data", queryParams],
-    queryFn: () => ideaRequestService.fetchPaginatedByListStatusAndIdeaId(queryParams),
+    queryKey: ["dataWithoutReviewer"],
+    queryFn: () =>
+      ideaRequestService.fetchPaginatedWithoutReviewer(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
   if (error) return <div>Error loading data</div>;
+
+  useEffect(() => {
+    if (data?.data?.totalRecords !== undefined) {
+      dispatch(setTotalAssignReviewer(data?.data?.totalRecords));
+    }
+  }, [data, dispatch]);
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
