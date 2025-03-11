@@ -1,4 +1,5 @@
 import { BaseEntity } from "./_base/base";
+import { Blog } from "./blog";
 import { ProjectStatus } from "./enums/project";
 import { Idea } from "./idea";
 import { Invitation } from "./invitation";
@@ -21,4 +22,5 @@ export interface Project extends BaseEntity {
   invitations: Invitation[];
   reviews: Review[];
   teamMembers: TeamMember[];
+  blogs: Blog[]
 }

@@ -2,24 +2,42 @@ import { Const } from "@/lib/constants/const";
 import axiosInstance from "@/lib/interceptors/axios-instance";
 import { cleanQueryParams } from "@/lib/utils";
 import { IdeaRequest } from "@/types/idea-request";
-import { IdeaRequestGetAllByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-gey-all-by-status-query";
 import { BusinessResult } from "@/types/models/responses/business-result";
 import { BaseService } from "./_base/base-service";
 import { ideaService } from "./idea-service";
 import { Idea } from "@/types/idea";
+import { IdeaRequestGetAllByListStatusAndIdeaIdQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-and-idea-id-query";
+import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 
 class IdeaRequestService extends BaseService<IdeaRequest> {
   constructor() {
     super(Const.IDEA_REQUEST);
   }
-  public fetchPaginatedByStatus = (
-    query?: IdeaRequestGetAllByStatusQuery
+  public fetchPaginatedByListStatusAndIdeaId = (
+    query?: IdeaRequestGetAllByListStatusAndIdeaIdQuery
   ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
     const cleanedQuery = cleanQueryParams(query ?? {});
 
     return axiosInstance
       .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
-        `${this.endpoint}/by-status-and-idea-id?${cleanedQuery}&isPagination=true`
+        `${this.endpoint}/by-list-status-and-idea-id?${cleanedQuery}&isPagination=true`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
+
+  public fetchPaginatedWithoutReviewer = (
+    query?: BaseQueryableQuery
+  ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
+    const cleanedQuery = cleanQueryParams(query ?? {});
+
+    return axiosInstance
+      .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
+        `${this.endpoint}/without-reviewer?${cleanedQuery}&isPagination=true`
       )
       .then((response) => {
         return response.data;

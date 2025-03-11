@@ -2,51 +2,33 @@
 import { MdOutlineSupervisorAccount } from "react-icons/md";
 
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
   Globe,
   Home,
   Lightbulb,
-  Logs,
-  Mails,
-  Map,
   MessageCircleQuestion,
   Pencil,
-  PieChart,
   Send,
-  Settings2,
-  SquareTerminal,
-  UsersRound,
   SquareUserRound,
+  UsersRound,
 } from "lucide-react";
 import * as React from "react";
 
+import { TypographyLarge } from "@/components/_common/typography/typography-large";
+import { Icons } from "@/components/ui/icons";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { NavMain } from "./nav-main";
-import { NavProjects } from "./nav-project";
-import { NavUser } from "./nav-user";
-import { TeamSwitcher } from "./team-switcher";
 import { RootState } from "@/lib/redux/store";
-import { useSelector } from "react-redux";
-import { Icons } from "@/components/ui/icons";
-import { TypographyH4 } from "@/components/_common/typography/typography-h4";
 import Link from "next/link";
-import { TypographyLarge } from "@/components/_common/typography/typography-large";
 import { GiWideArrowDunk } from "react-icons/gi";
 import { PiUserList } from "react-icons/pi";
+import { useSelector } from "react-redux";
+import { NavMain } from "./nav-main";
 
-// This is sample data.
 const data = {
   navMain: [
     {
@@ -98,45 +80,15 @@ const data = {
         },
       ],
     },
-   
     {
       title: "List supervisors",
       url: "/supervisors",
       icon: MdOutlineSupervisorAccount,
-      // items: [
-      //   {
-      //     title: "List",
-      //     icon: Logs,
-      //     url: "/supervisors",
-      //   },
-      //   {
-      //     title: "Ideas",
-      //     icon: Lightbulb,
-      //     url: "/supervisors/ideas",
-      //   },
-      // ],
     },
     {
       title: "Support",
       url: "/#",
       icon: MessageCircleQuestion,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
     },
   ],
 };
@@ -145,8 +97,60 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useSelector((state: RootState) => state.user.user);
 
   if (!user) {
-    return null; // Hoặc hiển thị loading nếu muốn
+    return null;
   }
+
+  const isReviewer = user.userXRoles.some(
+    (m) => m.role?.roleName === "Reviewer"
+  );
+
+  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
+
+  const navMain = data.navMain.map((item) => {
+    if (item.title === "Idea") {
+      return {
+        ...item,
+        items: isCouncil
+          ? [
+              { title: "Assign reviewer", icon: Lightbulb, url: "/idea/assign-reviewer" },
+              {
+                title: "Ideas of Supervisor",
+                icon: PiUserList,
+                url: "/idea/supervisors",
+              },
+            ]
+          : isReviewer
+          ? [
+              { title: "Create Idea", icon: Pencil, url: "/idea/create" },
+              {
+                title: "Request Idea",
+                icon: GiWideArrowDunk,
+                url: "/idea/request",
+              },
+              { title: "Approve Idea", icon: Lightbulb, url: "/idea/approve" },
+              {
+                title: "Ideas of Supervisor",
+                icon: PiUserList,
+                url: "/idea/supervisors",
+              },
+            ]
+          : [
+              { title: "Create Idea", icon: Pencil, url: "/idea/create" },
+              {
+                title: "Request Idea",
+                icon: GiWideArrowDunk,
+                url: "/idea/request",
+              },
+              {
+                title: "Ideas of Supervisor",
+                icon: PiUserList,
+                url: "/idea/supervisors",
+              },
+            ],
+      };
+    }
+    return item;
+  });
   return (
     <Sidebar collapsible="icon" {...props} variant="inset">
       <SidebarHeader>
@@ -168,7 +172,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenuButton>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={navMain} />
         {/* <NavProjects projects={data.projects} /> */}
       </SidebarContent>
       {/* <SidebarFooter>

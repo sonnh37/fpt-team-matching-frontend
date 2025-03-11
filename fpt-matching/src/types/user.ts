@@ -46,8 +46,6 @@ export interface User extends BaseEntity {
   profileStudent?: ProfileStudent;
   projects: Project[];
   projectOfLeaders: Project[];
-  rateBys: Rate[];
-  rateFors: Rate[];
   refreshTokens: RefreshToken[];
   skillProfiles: SkillProfile[];
   teamMembers: TeamMember[];
