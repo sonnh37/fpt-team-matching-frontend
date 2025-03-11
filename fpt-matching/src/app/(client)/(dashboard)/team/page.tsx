@@ -78,9 +78,9 @@ export default function TeamInfo() {
     return <ErrorSystem />;
   }
 
-  if (result?.status == -2) {
-      return router.push("/team/page-no-team");
-  }
+  // if (result?.status == -2) {
+  //     return router.push("/team/page-no-team");
+  // }
 
   //check xem thang dang nhap coi no phai member va la leader khong
   const checkRole = result?.data?.teamMembers?.find(member => member.userId === user?.id)?.role === TeamMemberRole.Leader;
@@ -169,7 +169,7 @@ export default function TeamInfo() {
                   <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
                     <ModalContent>
                       <UpdateProjectTeam />
-                    </ModalContent>x
+                    </ModalContent>
                   </ModalBody>
 
                 </Modal>
