@@ -20,6 +20,11 @@ import { RootState } from "@/lib/redux/store";
 import { useQuery } from "@tanstack/react-query";
 import { projectService } from "@/services/project-service";
 import { TeamMemberRole } from "@/types/enums/team-member";
+import { invitationService } from "@/services/invitation-service";
+import { ideaService } from "@/services/idea-service";
+import { UpdateCommand } from "@/types/models/commands/_base/base-command";
+import { IdeaUpdateCommand } from "@/types/models/commands/idea/idae-update-command";
+import { toast } from "sonner";
 
 
 const formSchema = z.object({
@@ -27,14 +32,14 @@ const formSchema = z.object({
   abbreviation: z.string().max(20, { message: "Abbreviation must be less than 20 characters." }),
   vietnameseTitle: z.string().min(2, { message: "Vietnamese Title must be at least 2 characters." }),
   description: z.string().min(10, { message: "Description must be at least 10 characters." }),
-  inviteEmail: z.string().email({ message: "Invalid email format." }),
+
 })
 
 
 const UpdateProjectTeam = () => {
 
   const user = useSelector((state: RootState) => state.user.user);
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,33 +47,58 @@ const UpdateProjectTeam = () => {
       abbreviation: "",
       vietnameseTitle: "",
       description: "",
-      inviteEmail: "",
     },
   })
-    //goi api bang tanstack
-    const {
-      data: result,
-      
-    } = useQuery({
-      queryKey: ["getTeamInfo"],
-      queryFn: projectService.getProjectInfo ,
-      refetchOnWindowFocus: false,
-    });
+  //goi api bang tanstack
+  const {
+    data: result,
+
+  } = useQuery({
+    queryKey: ["getTeamInfo"],
+    queryFn: projectService.getProjectInfo,
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (result?.data) {
+      form.reset({
+        englishTitle: result.data?.idea?.englishName || "",
+        abbreviation: result.data?.idea?.abbreviations || "",
+        vietnameseTitle: result.data?.idea?.vietNamName || "",
+        description: result.data?.idea?.description || "",
+      });
+    }
+  }, [result?.data, form.reset]);
   
 
 
-   // sap xep lai member
-   const sortedMembers = result?.data?.teamMembers
-     ?.slice() // Tạo bản sao để tránh thay đổi dữ liệu gốc
-     .sort((a, b) => (a.role === TeamMemberRole.Leader ? -1 : b.role === TeamMemberRole.Leader ? 1 : 0));
- 
-   const availableSlots = (result?.data?.teamSize ?? 0) - (result?.data?.teamMembers?.length ?? 0);
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Form submitted:", values)
+  // sap xep lai member
+  const sortedMembers = result?.data?.teamMembers
+    ?.slice() // Tạo bản sao để tránh thay đổi dữ liệu gốc
+    .sort((a, b) => (a.role === TeamMemberRole.Leader ? -1 : b.role === TeamMemberRole.Leader ? 1 : 0));
+
+  const availableSlots = (result?.data?.teamSize ?? 0) - (result?.data?.teamMembers?.length ?? 0);
+
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const haha : IdeaUpdateCommand ={
+      englishName: values?.englishTitle,
+      abbreviations: values?.abbreviation,
+      vietNamName: values?.vietnameseTitle,
+      description: values?.description
+    }
+   
+
+    const result = await ideaService.update(haha);
+    if(result?.status === 1){
+       toast("Bạn đã chỉnh sửa thành công")
+    }
+    console.log("test",result);
   }
 
 
   const handleInvite = () => {
+    // const result = invitationService.
 
   };
 
@@ -80,11 +110,11 @@ const UpdateProjectTeam = () => {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <p className="text-sm font-medium">Profession *</p>
-              <p className="text-gray-700">Information Technology (K15 trở đi)</p>
+              <p className="text-gray-700">{result?.data?.idea?.specialty?.profession?.professionName} (K15 trở đi)</p>
             </div>
             <div>
               <p className="text-sm font-medium">Specialty *</p>
-              <p className="text-gray-700">Software Engineering (JS)</p>
+              <p className="text-gray-700">{result?.data?.idea?.specialty?.specialtyName}</p>
             </div>
           </div>
 
@@ -96,7 +126,7 @@ const UpdateProjectTeam = () => {
               <FormItem>
                 <FormLabel>English Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="What's your idea? "  {...field}  />
+                  <Input placeholder="What's your idea? "  {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -138,53 +168,54 @@ const UpdateProjectTeam = () => {
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="h-40 mb-16">
                 <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea placeholder="Describe your project" {...field} />
+                <FormControl >
+                  <Textarea className="h-full" placeholder="Describe your project" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-        
+
           {/* Team Members */}
-          <div className="mb-4">
+          <div className="mb-4 mt-4">
             <p className="text-sm font-medium">Team Members</p>
             <p className="text-gray-500 text-sm">Existed Members</p>
-            {sortedMembers.map((member, index) => (
+            {sortedMembers?.map((member, index) => (
               <div key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded-lg mt-2">
                 <span className="text-sm">{member.user?.email}</span>
-                <span className="text-xs text-gray-500">{member.role}</span>
+                {member.role === TeamMemberRole.Leader ? (
+                  <span className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Owner</span>
+
+                ) : (
+                  <span className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</span>
+                )}
               </div>
             ))}
           </div>
 
 
 
-          <FormField
-            control={form.control}
-            name="inviteEmail"
-            render={({ field }) => (
+          <div className="space-y-2">
               <FormItem>
-                <FormLabel>Invite Email</FormLabel>
+                <label className="text-sm font-medium">Invite Email</label>
                 <p className="text-gray-500 text-xs mb-2">
                   You can only invite students whose specialties are allowed to work on the same thesis topic as yours in this term.
                 </p>
                 <FormControl>
                   <div className="flex space-x-2">
-                  <Input placeholder="Example@fpt.edu.vn" {...field} />
-                  <Button type="button" onClick={handleInvite}>Invite</Button>
+                    <Input placeholder="Example@fpt.edu.vn"  />
+                    <Button type="button" onClick={handleInvite}>Invite</Button>
                   </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
-            )}
-          />
+          </div>
           {/* Submit Button */}
-          <button className="w-full bg-purple-400 text-white mt-6 p-3 rounded-lg hover:bg-purple-500 transition">
-            Create
+          <button type="submit" className="w-full bg-purple-400 text-white mt-6 p-3 rounded-lg hover:bg-purple-500 transition">
+            Update Idea
           </button>
         </div>
       </form>
