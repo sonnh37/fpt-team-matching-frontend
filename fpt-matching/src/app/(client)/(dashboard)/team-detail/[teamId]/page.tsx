@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { boolean } from "zod";
 import { StudentInvitationCommand } from "@/types/models/commands/invitation/invitation-student-command";
+import Loader from "@/components/_common/waiting-icon/page";
 
 
 
@@ -133,7 +134,7 @@ export default function TeamInfoDetail() {
         setIsInvited(result?.data || null);
         console.log("test1", result?.data)
       }
-     
+
     };
 
     checkInvitation();
@@ -151,14 +152,28 @@ export default function TeamInfoDetail() {
   //  Tính số slot trống
   const availableSlots = (teamInfo?.teamSize ?? 0) - (teamMembers.length ?? 0);
 
+
   const requestJoinTeam = async (id: string) => {
     const ideacreate: StudentInvitationCommand = {
       projectId: id,
       content: "Muốn tham gia vào nhóm bạn"
     }
     const result = await invitationService.sendByStudent(ideacreate);
-    if (result) {
+
+    console.log("testnha", result)
+
+    if (result?.status === 200) {
       toast("Bạn đã gửi thành công ")
+
+      // Hiển thị loading page
+      setLoading(true);
+
+      // Đợi 2 giây rồi reload trang
+      setTimeout(() => {
+        setLoading(false); // Tắt loading (tuỳ chọn)
+        window.location.reload(); // Reload lại UI
+      }, 2000);
+
     } else {
       toast("Bạn đã gửi thất bại ")
     }
@@ -166,8 +181,26 @@ export default function TeamInfoDetail() {
   }
 
 
-  const cancelRequest = async () => {
+  const cancelRequest = async (teamInfoId: string) => {
+    console.log("test1", teamInfoId)
+    const result = await invitationService.cancelInvite(teamInfoId);
+    if (result.status === 1) {
 
+      toast("Bạn đã hủy thành công");
+
+
+      // Hiển thị loading page
+      setLoading(true);
+
+      // Đợi 2 giây rồi reload trang
+      setTimeout(() => {
+        setLoading(false); // Tắt loading (tuỳ chọn)
+        window.location.reload(); // Reload lại UI
+      }, 2000);
+
+    } else {
+      toast("Bạn đã hủy không thành công");
+    }
   }
 
 
@@ -175,6 +208,12 @@ export default function TeamInfoDetail() {
   return (
 
     <div>
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <Loader />
+        </div>
+      )}
+
       <div className="flex flex-row">
         <div className="basic-3/5">
           <div className=" text-3xl ml-4 text-blue-600 font-sans " >Group Detail</div>
@@ -194,7 +233,8 @@ export default function TeamInfoDetail() {
                     (availableSlots > 0 && !check) && (
                       //Check xem da gui moi chua
                       isInvited ? (
-                        <button className="bg-blue-500 text-base p-2  bg-blue-500 hover:bg-blue-200" onChange={() => cancelRequest()}>Cancel</button>
+
+                        <button className="bg-blue-500 text-base p-2  bg-blue-500 hover:bg-blue-200" onClick={() => cancelRequest(teamInfo?.id || "")}>Cancel</button>
                       ) : (
                         // <button className="bg-blue-500- text-xl p-2 bg-blue-500  hover:bg-blue-200" onChange={() => requestJoinTeam()}>Request</button>
                         <AlertDialog>

@@ -68,9 +68,9 @@ class InvitationService extends BaseService<Invitation> {
     }
   };
   
-  public LeavePermanent = (id: string): Promise<BusinessResult<null>> => {
-    return axiosInstance
-      .put<BusinessResult<null>>(`${this.endpoint}/ssss`)
+  public cancelInvite = async (projectId: string): Promise<BusinessResultWithoutData> => {
+    return await axiosInstance
+      .delete<BusinessResultWithoutData>(`${this.endpoint}/by-project-id/${projectId}`)
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
