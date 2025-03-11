@@ -1,4 +1,4 @@
-import { Gender } from "@/types/enums/user";
+import { Department, Gender } from "@/types/enums/user";
 import { CreateCommand } from "../_base/base-command";
 
 export interface UserCreateCommand extends CreateCommand {
@@ -13,6 +13,6 @@ export interface UserCreateCommand extends CreateCommand {
   dob?: string | null | undefined;
   phone?: string | null | undefined;
   address?: string | null | undefined;
-  department?: string | null | undefined;
+  department?: Department | null | undefined;
   file?: File | null;
 }

@@ -6,12 +6,11 @@ export interface UserUpdateCommand extends UpdateCommand {
   lastName?: string | null;
   username?: string | null;
   email?: string | null;
-  password?: string | null;
   avatar?: string | null;
   phone?: string | null;
   dob?: string | null;
   address?: string | null;
-  department?: string | null;
+  department?: Department | null;
   gender?: Gender | null;
   cache?: string | null;
 }
