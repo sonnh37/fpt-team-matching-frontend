@@ -5,3 +5,8 @@ export interface BusinessResult<Tdata> {
 }
 
 
+export interface BusinessResultBool{
+    status: number;
+    message?: string;
+    data?: boolean;
+}
