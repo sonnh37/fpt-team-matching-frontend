@@ -2,16 +2,16 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { PasswordInput } from "@/components/ui/password-input";
 import { userService } from "@/services/user-service";
-import { UserUpdatePasswordCommand } from "@/types/models/commands/user-command";
+import { UserUpdatePasswordCommand } from "@/types/models/commands/users/user-update-password-command";
 import { User } from "@/types/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient } from "@tanstack/react-query";
@@ -50,9 +50,9 @@ export default function ResetPasswordForm({ user }: { user?: User }) {
     try {
       // Assuming an async reset password function
       if (user) {
-        var hashedPassword = bcrypt.hashSync(values.password);
+        // var hashedPassword = bcrypt.hashSync(values.password);
         const updatedValues: UserUpdatePasswordCommand = {
-          password: hashedPassword,
+          password: values.password,
         };
         const response = await userService.updatePassword(updatedValues);
         if (response.status != 1) throw new Error(response.message);

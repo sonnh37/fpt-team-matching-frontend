@@ -4,3 +4,10 @@ export enum TeamMemberRole {
     Mentor,
     SubMentor
 }
+
+export enum TeamMemberStatus
+{
+    InProgress,  
+    Passed,     
+    Failed     
+}

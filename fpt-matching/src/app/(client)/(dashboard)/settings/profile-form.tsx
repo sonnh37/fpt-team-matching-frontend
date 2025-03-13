@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/dialog";
 import { getEnumOptions } from "@/lib/utils";
 import { userService } from "@/services/user-service";
-import { Gender } from "@/types/enums/user";
+import { Department, Gender } from "@/types/enums/user";
 import { UserUpdateCommand } from "@/types/models/commands/users/user-update-command";
 import { User } from "@/types/user";
 import { useQueryClient } from "@tanstack/react-query";
@@ -75,6 +75,7 @@ const profileFormSchema = z.object({
     .optional(),
 
   gender: z.nativeEnum(Gender).nullable().optional(),
+  department: z.nativeEnum(Department).nullable().optional(),
 
   phone: z
     .string()
@@ -87,12 +88,6 @@ const profileFormSchema = z.object({
     .min(2, { message: "Username must be at least 2 characters." })
     .max(30, { message: "Username must not exceed 30 characters." })
     .nullable(),
-
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters." })
-    .nullable()
-    .optional(),
 });
 type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
@@ -133,120 +128,108 @@ export function ProfileForm({ user }: { user?: User }) {
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        {/* Cv */}
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button variant="outline">Edit cv profile</Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit cv profile</DialogTitle>
-              <DialogDescription>
-                <ProfileStudentForm user={user}/>
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4"></div>
-          
-          </DialogContent>
-        </Dialog>
-        {/* Avatar */}
-        <FormField
-          control={form.control}
-          name="avatar"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Picture</FormLabel>
-              <FormControl>
-                <div className="relative w-fit">
-                  <CldUploadWidget
-                    onSuccess={async (results) => {
-                      if (
-                        typeof results.info === "object" &&
-                        "secure_url" in results.info
-                      ) {
-                        const imageUrl = results.info.secure_url;
-                        setImageUrl(imageUrl);
-                        try {
-                          field.onChange(imageUrl);
-                          await onSubmit(form.getValues());
-                        } catch (error) {
-                          toast.error("Cập nhật ảnh thất bại!");
+    <>
+      {/* Cv */}
+      <ProfileStudentForm user={user} />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Avatar */}
+          <FormField
+            control={form.control}
+            name="avatar"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Picture</FormLabel>
+                <FormControl>
+                  <div className="relative w-fit">
+                    <CldUploadWidget
+                      onSuccess={async (results) => {
+                        if (
+                          typeof results.info === "object" &&
+                          "secure_url" in results.info
+                        ) {
+                          const imageUrl = results.info.secure_url;
+                          setImageUrl(imageUrl);
+                          try {
+                            field.onChange(imageUrl);
+                            await onSubmit(form.getValues());
+                          } catch (error) {
+                            toast.error("Cập nhật ảnh thất bại!");
+                          }
+                        } else {
+                          toast.error("Upload ảnh thất bại!");
                         }
-                      } else {
-                        toast.error("Upload ảnh thất bại!");
-                      }
-                    }}
-                  >
-                    {({ open }) => (
-                      <div
-                        className="relative group w-24 rounded-md overflow-hidden cursor-pointer"
-                        onClick={() => open()}
-                      >
-                        {imageUrl ? (
-                          imageUrl.includes("cloudinary.com") ? (
-                            <CldImage
-                              src={imageUrl}
-                              width={9999}
-                              height={9999}
-                              crop="fill"
-                              alt="Uploaded Image"
-                              className="w-full h-full object-cover"
-                            />
+                      }}
+                    >
+                      {({ open }) => (
+                        <div
+                          className="relative group w-24 rounded-md overflow-hidden cursor-pointer"
+                          onClick={() => open()}
+                        >
+                          {imageUrl ? (
+                            imageUrl.includes("cloudinary.com") ? (
+                              <CldImage
+                                src={imageUrl}
+                                width={9999}
+                                height={9999}
+                                crop="fill"
+                                alt="Uploaded Image"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <Image
+                                src={imageUrl}
+                                className="w-full h-full object-cover"
+                                alt="External Image"
+                                width={9999}
+                                height={9999}
+                              />
+                            )
                           ) : (
-                            <Image
-                              src={imageUrl}
-                              className="w-full h-full object-cover"
-                              alt="External Image"
-                              width={9999}
-                              height={9999}
-                            />
-                          )
-                        ) : (
-                          <span className="flex items-center justify-center w-full h-full bg-gray-200">
-                            No Image
-                          </span>
-                        )}
-                        {imageUrl && (
-                          <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white text-center py-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                            Fix
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </CldUploadWidget>
-                </div>
-              </FormControl>
-            </FormItem>
-          )}
-        />
+                            <span className="flex items-center justify-center w-full h-full bg-gray-200">
+                              No Image
+                            </span>
+                          )}
+                          {imageUrl && (
+                            <div className="absolute bottom-0 left-0 w-full bg-black/50 text-white text-center py-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                              Fix
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </CldUploadWidget>
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
 
-        {/* Các trường input khác */}
-        <FormInput label="First name" name="firstName" form={form} />
-        <FormInput label="Last name" name="lastName" form={form} />
-        <FormInput
-          type="email"
-          disabled
-          label="Email"
-          name="email"
-          form={form}
-        />
-        <FormInputDateTimePicker label="Date" name="dob" form={form} />
-        <FormInputPhone label="Phone" name="phone" form={form} />
-        <FormRadioGroup
-          label="Sex"
-          name="gender"
-          form={form}
-          enumOptions={getEnumOptions(Gender)}
-        />
-        <FormInput label="Address" name="address" form={form} />
+          {/* Các trường input khác */}
+          <FormInput label="First name" name="firstName" form={form} />
+          <FormInput label="Last name" name="lastName" form={form} />
+          <FormInput
+            type="email"
+            disabled
+            label="Email"
+            name="email"
+            form={form}
+          />
+          <FormInputDateTimePicker label="Date" name="dob" form={form} />
+          <FormInputPhone label="Phone" name="phone" form={form} />
+          <FormRadioGroup
+            label="Sex"
+            name="gender"
+            form={form}
+            enumOptions={getEnumOptions(Gender)}
+          />
+          <FormInput label="Address" name="address" form={form} />
 
-        {/* Nút Submit */}
-        <Button type="submit" disabled={!isChanged}>
-          Update profile
-        </Button>
-      </form>
-    </Form>
+          {/* Nút Submit */}
+          <Button type="submit" disabled={!isChanged}>
+            Update profile
+          </Button>
+        </form>
+      </Form>
+    </>
   );
 }

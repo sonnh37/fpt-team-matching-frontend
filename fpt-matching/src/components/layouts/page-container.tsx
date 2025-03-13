@@ -12,10 +12,10 @@ export default function PageContainer({
     <>
       {scrollable ? (
         <ScrollArea>
-          <div className="h-fit py-4">{children}</div>
+          <div className="py-4">{children}</div>
         </ScrollArea>
       ) : (
-        <div className="h-fit py-4">{children}</div>
+        <div className="py-4">{children}</div>
       )}
     </>
   );

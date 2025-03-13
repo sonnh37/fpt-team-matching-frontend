@@ -1,9 +1,9 @@
 import { Const } from "@/lib/constants/const";
 import axiosInstance from "@/lib/interceptors/axios-instance";
-import { UserUpdatePasswordCommand } from "@/types/models/commands/user-command";
 import { BusinessResult } from "@/types/models/responses/business-result";
 import { User } from "@/types/user";
 import { BaseService } from "./_base/base-service";
+import { UserUpdatePasswordCommand } from "@/types/models/commands/users/user-update-password-command";
 
 class UserService extends BaseService<User> {
   constructor() {

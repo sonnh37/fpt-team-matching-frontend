@@ -1,8 +1,6 @@
 "use client";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingPage } from "@/components/_common/loading-page";
-import InvitationSendByTeamTable from "@/components/sites/my-request/received-by-team";
-import InvitationSentByStudentTable from "@/components/sites/my-request/sent-by-me";
 import {
   Tabs,
   TabsContent,
@@ -13,26 +11,9 @@ import { projectService } from "@/services/project-service";
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch } from "react-redux";
 
-import { Avatar } from "@/components/ui/avatar";
+import IdeaRequestApprovedTable from "@/components/sites/idea/request/approved";
+import IdeaRequestRejectedTable from "@/components/sites/idea/request/rejected";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import { Bell, HistoryIcon } from "lucide-react";
-import { Project } from "@/types/project";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Idea } from "@/types/idea";
 import {
   Card,
   CardContent,
@@ -40,8 +21,20 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@radix-ui/react-select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { Idea } from "@/types/idea";
+import { Project } from "@/types/project";
+import { Separator } from "@radix-ui/react-select";
+import { HistoryIcon } from "lucide-react";
+import { IdeaRequestPendingTable } from "@/components/sites/idea/request/pending";
+import { ideaService } from "@/services/idea-service";
+import { IdeaStatus, IdeaType } from "@/types/enums/idea";
 export default function Page() {
   const dispatch = useDispatch();
 
@@ -52,7 +45,7 @@ export default function Page() {
     error,
   } = useQuery({
     queryKey: ["getProjectInfo"],
-    queryFn: projectService.getProjectInfo,
+    queryFn: ideaService.getIdeaByUser,
     refetchOnWindowFocus: false,
   });
 
@@ -69,12 +62,12 @@ export default function Page() {
   //     }
   //   }
 
-  const project = result?.data ?? ({} as Project);
-  const idea = project.idea ?? ({} as Idea);
-
+  const ideas = result?.data ?? []
+  const idea = ideas.find(m => m.status === IdeaStatus.Pending && !m.isDeleted) ?? {} as Idea;
   const tab_1 = "Pending";
   const tab_2 = "Approved";
   const tab_3 = "rejected";
+  console.log("check_idea", idea)
   return (
     <>
       <Tabs defaultValue={tab_1} className="w-full container mx-auto">
@@ -84,54 +77,15 @@ export default function Page() {
             <TabsTrigger value={tab_2}>{tab_2}</TabsTrigger>
             <TabsTrigger value={tab_3}>{tab_3}</TabsTrigger>
           </TabsList>
-
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="ghost" size={"icon"}>
-                <HistoryIcon />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="end" asChild>
-              <ScrollArea className="h-[50vh] w-72">
-                <div className="p-2">
-                  <h4 className="mb-4 text-sm font-medium leading-none">
-                    History requests
-                  </h4>
-                  {idea.ideaRequests
-                    ? idea.ideaRequests.map((ideaRequest) => (
-                        <>
-                          <Card key={ideaRequest.id} className="text-sm">
-                            <CardHeader className="text-sm">
-                              <CardTitle>
-                                {ideaRequest.reviewer?.email +
-                                  " updated status " +
-                                  IdeaRequestStatus[ideaRequest.status ?? 0]}
-                              </CardTitle>
-                              <CardDescription>
-                                {ideaRequest.processDate}
-                              </CardDescription>
-                              <CardContent>
-                                {"Note: " + ideaRequest.content}
-                              </CardContent>
-                            </CardHeader>
-                          </Card>
-                          <Separator className="my-2" />
-                        </>
-                      ))
-                    : null}
-                </div>
-              </ScrollArea>
-            </PopoverContent>
-          </Popover>
         </div>
         <TabsContent value={tab_1}>
-          <InvitationSentByStudentTable />
+          <IdeaRequestPendingTable idea={idea}/>
         </TabsContent>
         <TabsContent value={tab_2}>
-          <InvitationSendByTeamTable />
+          <IdeaRequestApprovedTable  idea={idea}/>
         </TabsContent>
         <TabsContent value={tab_3}>
-          <InvitationSendByTeamTable />
+          <IdeaRequestRejectedTable idea={idea} />
         </TabsContent>
       </Tabs>
     </>

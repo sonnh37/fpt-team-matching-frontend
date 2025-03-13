@@ -1,25 +1,11 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import { TypographyH2 } from "@/components/_common/typography/typography-h2";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
-import { ideaService } from "@/services/idea-service";
-import { IdeaType } from "@/types/enums/idea";
+import { ideaRequestService } from "@/services/idea-request-service";
+import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { FilterEnum } from "@/types/models/filter-enum";
-import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
+import { IdeaRequestGetAllByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-gey-all-by-status-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -31,20 +17,20 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
+import { Idea } from "@/types/idea";
 
 //#region INPUT
 const defaultSchema = z.object({
-  englishName: z.string().optional(),
+  // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeasOfSupervisorsTableTable() {
+export default function IdeaRequestApprovedTable({ idea }: { idea: Idea }) {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -81,15 +67,19 @@ export default function IdeasOfSupervisorsTableTable() {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaGetAllQuery = useMemo(() => {
-    const params: IdeaGetAllQuery = useQueryParams(
+  const queryParams: IdeaRequestGetAllByStatusQuery = useMemo(() => {
+    const params: IdeaRequestGetAllByStatusQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
 
-    params.type = IdeaType.Lecturer;
+    params.ideaId = idea.id;
+    params.statusList = [
+      IdeaRequestStatus.MentorApproved,
+      IdeaRequestStatus.CouncilApproved,
+    ];
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -105,7 +95,7 @@ export default function IdeasOfSupervisorsTableTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaService.fetchPaginated(queryParams),
+    queryFn: () => ideaRequestService.fetchPaginatedByStatus(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -134,64 +124,10 @@ export default function IdeasOfSupervisorsTableTable() {
 
   return (
     <>
-      <div className="container mx-auto space-y-8">
-        <div className="w-fit mx-auto space-y-4">
-          <TypographyH2 className="text-center tracking-wide">
-            The list of Supervisor's Ideas
-          </TypographyH2>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="englishName"
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>English name:</FormLabel>
-                      <div className="flex items-center gap-2">
-                        <FormControl>
-                          <Input
-                            placeholder=""
-                            className="focus-visible:ring-none"
-                            type="text"
-                            {...field}
-                          />
-                        </FormControl>
-                        <Button type="submit" variant="default" size="icon">
-                          <Search />
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
-              />
-            </form>
-          </Form>
-        </div>
-
+      <div className="space-y-8">
         <div className="">
-          <Card className="space-y-4 p-4 w-full">
-            <DataTableToolbar
-              form={form}
-              table={table}
-              filterEnums={filterEnums}
-            />
-            {isFetching ? (
-              <DataTableSkeleton
-                columnCount={1}
-                showViewOptions={false}
-                withPagination={false}
-                rowCount={pagination.pageSize}
-                searchableColumnCount={0}
-                filterableColumnCount={0}
-                shrinkZero
-              />
-            ) : (
-              <DataTableComponent table={table} />
-            )}
-            <DataTablePagination table={table} />
-          </Card>
+          <DataTableComponent table={table} />
+          <DataTablePagination table={table} />
         </div>
       </div>
     </>

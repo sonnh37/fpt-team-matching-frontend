@@ -38,7 +38,7 @@ export class BaseService<T> {
 
     return axiosInstance
       .get<BusinessResult<PaginatedResult<T>>>(
-        `${this.endpoint}?isPagination=true&${cleanedQuery}`
+        `${this.endpoint}?${cleanedQuery}&isPagination=true`
       )
       .then((response) => {
         return response.data;

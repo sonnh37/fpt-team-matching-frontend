@@ -35,6 +35,7 @@ import { TypographyP } from "@/components/_common/typography/typography-p";
 import { useRouter } from "next/navigation"
 import { teammemberService } from "@/services/team-member-service";
 import ErrorSystem from "@/components/_common/errors/error-system";
+import PageNoTeam from "./page-no-team/page";
 import { useEffect } from "react";
 
 

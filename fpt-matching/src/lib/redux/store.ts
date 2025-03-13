@@ -1,10 +1,12 @@
 // store/store.ts
 import {configureStore} from '@reduxjs/toolkit';
 import userSlice from "@/lib/redux/slices/userSlice";
+import ideaRequestSlice from './slices/ideaRequestSlice';
 
 const store = configureStore({
     reducer: {
         user: userSlice,
+        ideaRequest: ideaRequestSlice,
     },
 });
 
