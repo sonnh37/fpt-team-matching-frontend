@@ -9,12 +9,12 @@ class TeamMemberSerivce extends BaseService<TeamMember> {
   constructor() {
     super(Const.TEAMMEMBER);
   }
-  //   public deleteteamMember = (id: string): Promise<BusinessResult<TeamMember>> => {
-  //     return axiosInstance
-  //         .delete<BusinessResult<TeamMember>>(`${this.endpoint}?id=${id}&IsPermanent=true`)
-  //         .then((response) => response.data)
-  //         .catch((error) => this.handleError(error)); // Xử lý lỗi
-  // };
+    public leaveTeam = (): Promise<BusinessResult<TeamMember>> => {
+      return axiosInstance
+          .delete<BusinessResult<TeamMember>>(`${this.endpoint}/current-user-leave`)
+          .then((response) => response.data)
+          .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
 
   public getteammemberbyuserid = (): Promise<BusinessResult<TeamMember>> => {
     return axiosInstance

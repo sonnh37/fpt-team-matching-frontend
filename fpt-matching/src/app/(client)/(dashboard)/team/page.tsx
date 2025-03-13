@@ -68,6 +68,7 @@ export default function TeamInfo() {
     isLoading,
     isError,
     error,
+    refetch,
   } = useQuery({
     queryKey: ["getTeamInfo"],
     queryFn: projectService.getProjectInfo,
@@ -151,6 +152,31 @@ export default function TeamInfo() {
     }
   }
 
+  async function handleLeaveTeam() {
+    // Gọi confirm để mở dialog
+    const confirmed = await confirm({
+      title: "Delete Item",
+      description: "Bạn có muốn rời nhóm không ?",
+      confirmText: "Có,tôi muốn",
+      cancelText: "Không",
+    })
+
+    if (confirmed) {
+      const data = await teammemberService.leaveTeam();
+      if(data.status === 1){
+      toast("Bạn đã rời nhóm")
+      refetch();
+      
+      }else{
+        toast("Rời nhóm thất bại")
+      }
+      // Thực hiện xóa
+    } else {
+      // Người dùng chọn No
+      toast("User canceled!")
+    }
+  }
+
   async function handleDeleteMember(id: string) {
     console.log("testid", id)
     if (!id) {
@@ -194,7 +220,7 @@ export default function TeamInfo() {
                 <p className="text-sm text-gray-500">Created at: {formatDate(result?.data?.createdDate)}</p>
               </div>
 
-              {infoMember?.data && infoMember?.data?.role === TeamMemberRole.Leader && (
+              {infoMember?.data && infoMember?.data?.role === TeamMemberRole.Leader ?  (
                 <div className="button0act flex ml-4">
                   <Modal>
                     <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
@@ -217,6 +243,16 @@ export default function TeamInfo() {
                     +Delete Idea
                   </button>
                 </div>
+              ):(
+
+                <div className="button0act flex ml-4">
+                <button
+                    className="border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-red-700 hover:text-white rounded-md"
+                    onClick={handleLeaveTeam}
+                  >
+                    Rời nhóm
+                  </button>
+               </div>
               )}
 
 
