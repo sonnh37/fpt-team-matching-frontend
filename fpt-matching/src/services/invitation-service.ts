@@ -7,6 +7,7 @@ import { cleanQueryParams } from "@/lib/utils";
 import axiosInstance from "@/lib/interceptors/axios-instance";
 import { StudentInvitationCommand } from "@/types/models/commands/invitation/invitation-student-command";
 import { BusinessResultWithoutData } from "@/types/models/responses/business-result-without-data";
+import { TeamInvitationCommand } from "@/types/models/commands/invitation/invitation-team-command";
 
 class InvitationService extends BaseService<Invitation> {
   constructor() {
@@ -56,7 +57,7 @@ class InvitationService extends BaseService<Invitation> {
   };
 
   
-  public sendByTeam = async (command: StudentInvitationCommand): Promise<boolean> => {
+  public sendByTeam = async (command: TeamInvitationCommand): Promise<boolean> => {
     try {
       const response = await axiosInstance.post<boolean>(
         `${this.endpoint}/send-by-student/${command}`

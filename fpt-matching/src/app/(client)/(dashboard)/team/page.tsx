@@ -35,6 +35,7 @@ import { TypographyP } from "@/components/_common/typography/typography-p";
 import { useRouter } from "next/navigation"
 import { teammemberService } from "@/services/team-member-service";
 import ErrorSystem from "@/components/_common/errors/error-system";
+import { useEffect } from "react";
 
 
 // const groupData = {
@@ -68,26 +69,60 @@ export default function TeamInfo() {
     error,
   } = useQuery({
     queryKey: ["getTeamInfo"],
-    queryFn: projectService.getProjectInfo ,
+    queryFn: projectService.getProjectInfo,
     refetchOnWindowFocus: false,
   });
+
+
+  // Query để lấy thông tin thành viên
+  const {
+    data: infoMember,
+  } = useQuery({
+    queryKey: ["getTeamMember"],
+    queryFn: teammemberService.getteammemberbyuserid,
+    refetchOnWindowFocus: false,
+  });
+
+
 
   if (isLoading) return <LoadingComponent />;
   if (!result || isError) {
     console.error("Error fetching:", error);
     return <ErrorSystem />;
   }
-
   if (result?.status == -2) {
-      return router.push("/team/page-no-team");
+    return router.push("/team/page-no-team");
   }
+
+
+
+
 
   //check xem thang dang nhap coi no phai member va la leader khong
   const checkRole = result?.data?.teamMembers?.find(member => member.userId === user?.id)?.role === TeamMemberRole.Leader;
   // sap xep lai member
-  const sortedMembers = result?.data?.teamMembers
-    ?.slice() // Tạo bản sao để tránh thay đổi dữ liệu gốc
-    .sort((a, b) => (a.role === TeamMemberRole.Leader ? -1 : b.role === TeamMemberRole.Leader ? 1 : 0));
+  // const sortedMembers = result?.data?.teamMembers
+  //   ?.slice() // Tạo bản sao để tránh thay đổi dữ liệu gốc
+  //   .sort((a, b) => {
+  //     if (a.role === TeamMemberRole.Leader && b.role !== TeamMemberRole.Leader) {
+  //       return -1; // `a` là Leader, đưa lên đầu
+  //     }
+  //     if (b.role === TeamMemberRole.Leader && a.role !== TeamMemberRole.Leader) {
+  //       return 1; // `b` là Leader, đưa lên đầu
+  //     }
+  //     return 0; // Giữ nguyên thứ tự
+  //   });
+
+
+    const teamMembersss = result?.data?.teamMembers ?? [];
+  // Tách Leader ra trước
+  const leaders = teamMembersss.filter(member => member.role === TeamMemberRole.Leader);
+  const others = teamMembersss.filter(member => member.role !== TeamMemberRole.Leader);
+
+  // Ghép lại, đảm bảo Leader luôn ở đầu
+  const sortedMembers = [...leaders, ...others];
+
+
 
   const availableSlots = (result?.data?.teamSize ?? 0) - (result?.data?.teamMembers?.length ?? 0);
   // mot check saooo t hua lam
@@ -115,8 +150,8 @@ export default function TeamInfo() {
     }
   }
 
-  async function handleDeleteMember(id: string){
-    console.log("testid",id)
+  async function handleDeleteMember(id: string) {
+    console.log("testid", id)
     if (!id) {
       toast("Invalid member ID!");
       return;
@@ -139,8 +174,8 @@ export default function TeamInfo() {
       toast("User canceled!")
     }
   }
-  
- 
+
+
 
 
   return (
@@ -157,43 +192,33 @@ export default function TeamInfo() {
                 <h2 className="text-xl font-semibold">{result?.data?.name}</h2>
                 <p className="text-sm text-gray-500">Created at: {formatDate(result?.data?.createdDate)}</p>
               </div>
-              <div className="button0act flex ml-4">
-                <Modal>
-                  <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
-                    <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
-                      +Update Idea
-                    </button>
 
-                  </ModalTrigger>
+              {infoMember?.data && infoMember?.data?.role === TeamMemberRole.Leader && (
+                <div className="button0act flex ml-4">
+                  <Modal>
+                    <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
+                      <button className="w-full text-gray-70 focus:outline-none focus:shadow-outline text-start">
+                        +Update Idea
+                      </button>
+                    </ModalTrigger>
 
-                  <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
-                    <ModalContent>
-                      <UpdateProjectTeam />
-                    </ModalContent>
-                  </ModalBody>
+                    <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
+                      <ModalContent>
+                        <UpdateProjectTeam />
+                      </ModalContent>
+                    </ModalBody>
+                  </Modal>
 
-                </Modal>
-                <button className="border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white  rounded-md" onClick={handleDelete}>
-                  +Delete idea
-                </button>
-
-                {/* <Modal>
-                <ModalTrigger className='border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white'>
-                  <button className="  w-full text-gray-70 focus:outline-none focus:shadow-outline text-start ">
-                   +Delete Idea
+                  <button
+                    className="border-purple-400 border-4 p-1 mr-3 text-sm hover:bg-purple-700 hover:text-white rounded-md"
+                    onClick={handleDelete}
+                  >
+                    +Delete Idea
                   </button>
+                </div>
+              )}
 
-                </ModalTrigger>
 
-                <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto'>
-                  <ModalContent>
-                   <CreateProjectForm />
-                  </ModalContent>x
-                </ModalBody>
-
-              </Modal> */}
-
-              </div>
             </div>
 
             {/* Abbreviation & Vietnamese Title */}
@@ -268,7 +293,7 @@ export default function TeamInfo() {
                                   <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
                                   <DropdownMenuContent>
                                     <DropdownMenuItem>
-                                    <a href={`/profile-detail/${member.user?.id}`}>Xem profile</a>
+                                      <a href={`/profile-detail/${member.user?.id}`}>Xem profile</a>
                                     </DropdownMenuItem>
                                   </DropdownMenuContent>
                                 </DropdownMenu>
@@ -277,7 +302,7 @@ export default function TeamInfo() {
                                 <DropdownMenu>
                                   <DropdownMenuTrigger ><FontAwesomeIcon className="size-4" icon={faEllipsisVertical} /></DropdownMenuTrigger>
                                   <DropdownMenuContent>
-                                    <DropdownMenuItem onClick={()=>handleDeleteMember(member?.id ?? "" )}>Xóa thành viên</DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => handleDeleteMember(member?.id ?? "")}>Xóa thành viên</DropdownMenuItem>
                                     <DropdownMenuItem>  <a href={`/profile-detail/${member.user?.id}`}>Xem profile</a></DropdownMenuItem>
                                     <DropdownMenuItem>Phân chức leader</DropdownMenuItem>
                                   </DropdownMenuContent>
@@ -292,8 +317,8 @@ export default function TeamInfo() {
                   </div>
                 ) : (
                   <div className="space-y-3 mt-2">
-                    {result?.data?.teamMembers.map((member, index) => {
-                      const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? "" }`;
+                    {sortedMembers.map((member, index) => {
+                      const initials = `${member.user?.lastName?.charAt(0).toUpperCase() ?? ""}`;
                       return (
                         <div key={index} className="flex items-center justify-between p-2 border rounded-lg">
                           <div className="flex items-center space-x-3">
