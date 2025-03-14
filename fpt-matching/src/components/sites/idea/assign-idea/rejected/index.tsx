@@ -95,7 +95,7 @@ export default function IdeaRequestRejectedForCurrentUserTable() {
       sorting
     );
     
-    params.statusList = [IdeaRequestStatus.MentorRejected, IdeaRequestStatus.CouncilRejected]
+    params.statusList = [IdeaRequestStatus.MentorRejected]
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);

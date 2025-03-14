@@ -38,12 +38,6 @@ const data = {
       isActive: true,
     },
     {
-      title: "Profile",
-      url: "/profile",
-      icon: SquareUserRound,
-      isActive: true,
-    },
-    {
       title: "Social",
       url: "/social/blog",
       icon: Globe,

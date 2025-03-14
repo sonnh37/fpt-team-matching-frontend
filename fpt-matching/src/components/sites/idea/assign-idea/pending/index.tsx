@@ -96,7 +96,6 @@ export function IdeaRequestPendingForCurrentUserTable() {
 
       params.statusList = [
         IdeaRequestStatus.MentorPending,
-        IdeaRequestStatus.CouncilPending,
       ];
 
       return { ...params };
@@ -112,7 +111,7 @@ export function IdeaRequestPendingForCurrentUserTable() {
   }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
-    queryKey: ["data", queryParams],
+    queryKey: ["data_ideaRequest"],
     queryFn: () =>
       ideaRequestService.fetchPaginatedByListStatusForCurrentUser(queryParams),
     placeholderData: keepPreviousData,
@@ -121,18 +120,9 @@ export function IdeaRequestPendingForCurrentUserTable() {
 
   if (error) return <div>Error loading data</div>;
 
-  const user = useSelector((state: RootState) => state.user.user);
-  const isLecturer = user?.userXRoles.some(
-    (m) => m.role?.roleName == "Lecturer"
-  ) as boolean;
-
-  const filteredColumns = !isLecturer
-  ? columns.filter((col) => col.header !== "Actions")
-  : columns;
-
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns: filteredColumns,
+    columns: columns,
     rowCount: data?.data?.totalRecords ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,

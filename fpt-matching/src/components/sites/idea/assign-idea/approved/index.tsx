@@ -78,7 +78,6 @@ export default function IdeaRequestApprovedForCurrentUserTable() {
 
     params.statusList = [
       IdeaRequestStatus.MentorApproved,
-      IdeaRequestStatus.CouncilApproved,
     ];
 
     return { ...params };

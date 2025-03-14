@@ -174,7 +174,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
       toast.success("Feedback submitted successfully");
       queryClient.invalidateQueries({
-        queryKey: [["getIdeaDetailWhenClick", ideaId], "getIdeaByUser"],
+        queryKey: [["data_ideaRequest"]],
       });
     } catch (error: any) {
       toast.error(error);
