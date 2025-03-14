@@ -3,8 +3,6 @@ import { Review } from "./review";
 
 export interface Feedback extends BaseEntity {
     reviewId?: string;
-    content?: string;
-    description?: string;
-    fileUpload?: string;
+    comment?: string;
     review?: Review;
 }

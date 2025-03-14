@@ -12,6 +12,7 @@ import { ProfileStudent } from "./profile-student";
 import { Project } from "./project";
 import { Rate } from "./rate";
 import { RefreshToken } from "./refresh-token";
+import { Review } from "./review";
 import { SkillProfile } from "./skill-profile";
 import { TeamMember } from "./team-member";
 import { UserXRole } from "./user-x-role";
@@ -49,4 +50,6 @@ export interface User extends BaseEntity {
   refreshTokens: RefreshToken[];
   skillProfiles: SkillProfile[];
   teamMembers: TeamMember[];
+  review1s: Review[];
+  review2s: Review[];
 }
