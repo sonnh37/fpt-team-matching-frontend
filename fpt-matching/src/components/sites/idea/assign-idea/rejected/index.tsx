@@ -43,13 +43,14 @@ import { ideaRequestService } from "@/services/idea-request-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { Idea } from "@/types/idea";
 import { IdeaRequestGetAllByListStatusAndIdeaIdQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-and-idea-id-query";
+import { IdeaRequestGetAllByListStatusForCurrentUser } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-for-current-user";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaRequestRejectedTable({ idea = null }: { idea?: Idea | null }) {
+export default function IdeaRequestRejectedForCurrentUserTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -86,15 +87,14 @@ export default function IdeaRequestRejectedTable({ idea = null }: { idea?: Idea 
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaRequestGetAllByListStatusAndIdeaIdQuery = useMemo(() => {
-    const params: IdeaRequestGetAllByListStatusAndIdeaIdQuery = useQueryParams(
+  const queryParams: IdeaRequestGetAllByListStatusForCurrentUser = useMemo(() => {
+    const params: IdeaRequestGetAllByListStatusForCurrentUser = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
     
-    params.ideaId = idea?.id;
     params.statusList = [IdeaRequestStatus.MentorRejected, IdeaRequestStatus.CouncilRejected]
 
     return { ...params };
@@ -111,7 +111,7 @@ export default function IdeaRequestRejectedTable({ idea = null }: { idea?: Idea 
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaRequestService.fetchPaginatedByListStatusAndIdeaId(queryParams),
+    queryFn: () => ideaRequestService.fetchPaginatedByListStatusForCurrentUser(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

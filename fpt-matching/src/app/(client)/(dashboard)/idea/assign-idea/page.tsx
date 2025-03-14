@@ -36,8 +36,14 @@ import { IdeaRequestPendingTable } from "@/components/sites/idea/request/pending
 import { ideaService } from "@/services/idea-service";
 import { IdeaStatus, IdeaType } from "@/types/enums/idea";
 import { Badge } from "@/components/ui/badge";
+import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
+import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-query";
+import { IdeaRequestPendingForCurrentUserTable } from "@/components/sites/idea/assign-idea/pending";
+import IdeaRequestApprovedForCurrentUserTable from "@/components/sites/idea/assign-idea/approved";
+import IdeaRequestRejectedForCurrentUserTable from "@/components/sites/idea/assign-idea/rejected";
 export default function Page() {
   const dispatch = useDispatch();
+  
 
   const {
     data: result,
@@ -45,7 +51,7 @@ export default function Page() {
     isError,
     error,
   } = useQuery({
-    queryKey: ["getIdeaByUser"],
+    queryKey: ["getIdeaByLecturer"],
     queryFn: ideaService.getIdeaByUser,
     refetchOnWindowFocus: false,
   });
@@ -74,8 +80,6 @@ export default function Page() {
   const ideaApproved =
     ideas.find((m) => m.status === IdeaStatus.Approved && !m.isDeleted) ??
     ({} as Idea);
-
-    console.log("check_ideaapprove", ideaApproved)
   const totalAprroved = ideas.filter(
     (m) => m.status === IdeaStatus.Approved && !m.isDeleted
   ).length;
@@ -115,13 +119,13 @@ export default function Page() {
           </TabsList>
         </div>
         <TabsContent value={tab_1}>
-          <IdeaRequestPendingTable idea={ideaPending} />
+          <IdeaRequestPendingForCurrentUserTable />
         </TabsContent>
         <TabsContent value={tab_2}>
-          <IdeaRequestApprovedTable idea={ideaApproved} />
+          <IdeaRequestApprovedForCurrentUserTable />
         </TabsContent>
         <TabsContent value={tab_3}>
-          <IdeaRequestRejectedTable idea={ideaRejected} />
+          <IdeaRequestRejectedForCurrentUserTable />
         </TabsContent>
       </Tabs>
     </>

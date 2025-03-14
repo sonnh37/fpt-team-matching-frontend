@@ -43,14 +43,15 @@ import { ideaRequestService } from "@/services/idea-request-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { Idea } from "@/types/idea";
 import { IdeaRequestGetAllByListStatusAndIdeaIdQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-and-idea-id-query";
+import { RootState } from "@/lib/redux/store";
+import { useSelector } from "react-redux";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function IdeaRequestPendingTable({ idea }: { idea: Idea }) {
-  if (!idea) return null;
+export function IdeaRequestPendingTable({ idea = null }: { idea?: Idea | null }) {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -87,22 +88,19 @@ export function IdeaRequestPendingTable({ idea }: { idea: Idea }) {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaRequestGetAllByListStatusAndIdeaIdQuery = useMemo(() => {
-    const params: IdeaRequestGetAllByListStatusAndIdeaIdQuery = useQueryParams(
-      inputFields,
-      columnFilters,
-      pagination,
-      sorting
-    );
+  const queryParams: IdeaRequestGetAllByListStatusAndIdeaIdQuery =
+    useMemo(() => {
+      const params: IdeaRequestGetAllByListStatusAndIdeaIdQuery =
+        useQueryParams(inputFields, columnFilters, pagination, sorting);
 
-    params.ideaId = idea.id;
-    params.statusList = [
-      IdeaRequestStatus.MentorPending,
-      IdeaRequestStatus.CouncilPending,
-    ];
+      params.ideaId = idea?.id;
+      params.statusList = [
+        IdeaRequestStatus.MentorPending,
+        IdeaRequestStatus.CouncilPending,
+      ];
 
-    return { ...params };
-  }, [inputFields, columnFilters, pagination, sorting]);
+      return { ...params };
+    }, [inputFields, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
@@ -115,16 +113,26 @@ export function IdeaRequestPendingTable({ idea }: { idea: Idea }) {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaRequestService.fetchPaginatedByListStatusAndIdeaId(queryParams),
+    queryFn: () =>
+      ideaRequestService.fetchPaginatedByListStatusAndIdeaId(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
   if (error) return <div>Error loading data</div>;
 
+  const user = useSelector((state: RootState) => state.user.user);
+  const isLecturer = user?.userXRoles.some(
+    (m) => m.role?.roleName == "Lecturer"
+  ) as boolean;
+
+  const filteredColumns = !isLecturer
+  ? columns.filter((col) => col.header !== "Actions")
+  : columns;
+
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns,
+    columns: filteredColumns,
     rowCount: data?.data?.totalRecords ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,

@@ -8,6 +8,7 @@ import { ideaService } from "./idea-service";
 import { Idea } from "@/types/idea";
 import { IdeaRequestGetAllByListStatusAndIdeaIdQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-and-idea-id-query";
 import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
+import { IdeaRequestGetAllByListStatusForCurrentUser } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-for-current-user";
 
 class IdeaRequestService extends BaseService<IdeaRequest> {
   constructor() {
@@ -21,6 +22,23 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
     return axiosInstance
       .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
         `${this.endpoint}/by-list-status-and-idea-id?${cleanedQuery}&isPagination=true`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
+
+  public fetchPaginatedByListStatusForCurrentUser = (
+    query?: IdeaRequestGetAllByListStatusForCurrentUser
+  ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
+    const cleanedQuery = cleanQueryParams(query ?? {});
+
+    return axiosInstance
+      .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
+        `${this.endpoint}/me/by-list-status?${cleanedQuery}&isPagination=true`
       )
       .then((response) => {
         return response.data;

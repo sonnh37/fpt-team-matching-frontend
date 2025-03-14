@@ -43,13 +43,16 @@ import { ideaRequestService } from "@/services/idea-request-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { Idea } from "@/types/idea";
 import { IdeaRequestGetAllByListStatusAndIdeaIdQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-and-idea-id-query";
+import { RootState } from "@/lib/redux/store";
+import { useSelector } from "react-redux";
+import { IdeaRequestGetAllByListStatusForCurrentUser } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-for-current-user";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaRequestRejectedTable({ idea = null }: { idea?: Idea | null }) {
+export function IdeaRequestPendingForCurrentUserTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -86,19 +89,18 @@ export default function IdeaRequestRejectedTable({ idea = null }: { idea?: Idea 
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaRequestGetAllByListStatusAndIdeaIdQuery = useMemo(() => {
-    const params: IdeaRequestGetAllByListStatusAndIdeaIdQuery = useQueryParams(
-      inputFields,
-      columnFilters,
-      pagination,
-      sorting
-    );
-    
-    params.ideaId = idea?.id;
-    params.statusList = [IdeaRequestStatus.MentorRejected, IdeaRequestStatus.CouncilRejected]
+  const queryParams: IdeaRequestGetAllByListStatusForCurrentUser =
+    useMemo(() => {
+      const params: IdeaRequestGetAllByListStatusForCurrentUser =
+        useQueryParams(inputFields, columnFilters, pagination, sorting);
 
-    return { ...params };
-  }, [inputFields, columnFilters, pagination, sorting]);
+      params.statusList = [
+        IdeaRequestStatus.MentorPending,
+        IdeaRequestStatus.CouncilPending,
+      ];
+
+      return { ...params };
+    }, [inputFields, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
@@ -111,16 +113,26 @@ export default function IdeaRequestRejectedTable({ idea = null }: { idea?: Idea 
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaRequestService.fetchPaginatedByListStatusAndIdeaId(queryParams),
+    queryFn: () =>
+      ideaRequestService.fetchPaginatedByListStatusForCurrentUser(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
   if (error) return <div>Error loading data</div>;
 
+  const user = useSelector((state: RootState) => state.user.user);
+  const isLecturer = user?.userXRoles.some(
+    (m) => m.role?.roleName == "Lecturer"
+  ) as boolean;
+
+  const filteredColumns = !isLecturer
+  ? columns.filter((col) => col.header !== "Actions")
+  : columns;
+
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns,
+    columns: filteredColumns,
     rowCount: data?.data?.totalRecords ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
@@ -142,7 +154,11 @@ export default function IdeaRequestRejectedTable({ idea = null }: { idea?: Idea 
     <>
       <div className="space-y-8">
         <div className="">
-          <DataTableComponent table={table} />
+          <DataTableComponent
+            table={table}
+            restore={ideaRequestService.restore}
+            deletePermanent={ideaRequestService.deletePermanent}
+          />
           <DataTablePagination table={table} />
         </div>
       </div>

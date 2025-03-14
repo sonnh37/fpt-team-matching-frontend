@@ -5,7 +5,6 @@ import { isExistedTeam_options } from "@/lib/filter-options";
 import { ideaRequestService } from "@/services/idea-request-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { FilterEnum } from "@/types/models/filter-enum";
-import { IdeaRequestGetAllByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-gey-all-by-status-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -24,13 +23,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
 import { Idea } from "@/types/idea";
+import { IdeaRequestGetAllByListStatusAndIdeaIdQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-and-idea-id-query";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaRequestApprovedTable({ idea }: { idea: Idea }) {
+export default function IdeaRequestApprovedTable({ idea = null }: { idea?: Idea | null }) {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -67,15 +67,15 @@ export default function IdeaRequestApprovedTable({ idea }: { idea: Idea }) {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaRequestGetAllByStatusQuery = useMemo(() => {
-    const params: IdeaRequestGetAllByStatusQuery = useQueryParams(
+  const queryParams: IdeaRequestGetAllByListStatusAndIdeaIdQuery = useMemo(() => {
+    const params: IdeaRequestGetAllByListStatusAndIdeaIdQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
 
-    params.ideaId = idea.id;
+    params.ideaId = idea?.id;
     params.statusList = [
       IdeaRequestStatus.MentorApproved,
       IdeaRequestStatus.CouncilApproved,
@@ -95,7 +95,7 @@ export default function IdeaRequestApprovedTable({ idea }: { idea: Idea }) {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaRequestService.fetchPaginatedByStatus(queryParams),
+    queryFn: () => ideaRequestService.fetchPaginatedByListStatusAndIdeaId(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

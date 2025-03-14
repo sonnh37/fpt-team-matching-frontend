@@ -105,6 +105,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   );
 
   const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
+  const isLecturer = user.userXRoles.some(
+    (m) => m.role?.roleName === "Lecturer"
+  );
 
   const navMain = data.navMain.map((item) => {
     if (item.title === "Idea") {
@@ -112,14 +115,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ...item,
         items: isCouncil
           ? [
-              { title: "Assign reviewer", icon: Lightbulb, url: "/idea/assign-reviewer" },
+              {
+                title: "Assign reviewer",
+                icon: Lightbulb,
+                url: "/idea/assign-reviewer",
+              },
               {
                 title: "Ideas of Supervisor",
                 icon: PiUserList,
                 url: "/idea/supervisors",
               },
             ]
-          : isReviewer
+          : isReviewer || isLecturer
           ? [
               { title: "Create Idea", icon: Pencil, url: "/idea/create" },
               {
@@ -127,7 +134,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 icon: GiWideArrowDunk,
                 url: "/idea/request",
               },
-              { title: "Approve Idea", icon: Lightbulb, url: "/idea/approve" },
+              { title: "Approve Idea", icon: Lightbulb, url: "/idea/assign-idea" },
               {
                 title: "Ideas of Supervisor",
                 icon: PiUserList,
