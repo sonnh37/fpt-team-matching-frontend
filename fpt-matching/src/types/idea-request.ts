@@ -7,6 +7,7 @@ export interface IdeaRequest extends BaseEntity {
   ideaId?: string;
   reviewerId?: string;
   content?: string;
+  role?: string;
   status?: IdeaRequestStatus;
   processDate?: string;
   idea?: Idea;
