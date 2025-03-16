@@ -175,9 +175,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
-      queryClient.invalidateQueries({
-        queryKey: ["data_idearequest_pending"],
-      });
+  
+      queryClient.refetchQueries({ queryKey: ["data_idearequest_pending"] });
+     
       setOpen(false);
     } catch (error: any) {
       toast.error(error);
@@ -198,9 +198,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
-      queryClient.invalidateQueries({
-        queryKey: [["data_idearequest_pending"]],
-      });
+      queryClient.refetchQueries({ queryKey: ["data_idearequest_pending"] });
       setOpen(false);
     } catch (error: any) {
       toast.error(error || "An unexpected error occurred");
