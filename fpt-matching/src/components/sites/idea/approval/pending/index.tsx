@@ -126,7 +126,7 @@ export function IdeaRequestPendingForCurrentUserTable() {
   }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
-    queryKey: ["data_ideaRequest"],
+    queryKey: ["data_idearequest_pending"],
     queryFn: () =>
       ideaRequestService.GetIdeaRequestsCurrentByStatusAndRoles(queryParams),
     placeholderData: keepPreviousData,
