@@ -77,10 +77,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
         | null = "default";
 
       switch (status) {
-        case IdeaRequestStatus.MentorRejected:
-          badgeVariant = "destructive";
-          break;
-        case IdeaRequestStatus.CouncilRejected:
+        case IdeaRequestStatus.Rejected:
           badgeVariant = "destructive";
           break;
         default:

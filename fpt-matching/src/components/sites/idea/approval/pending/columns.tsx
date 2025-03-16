@@ -33,7 +33,10 @@ import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { Idea } from "@/types/idea";
 import { IdeaRequest } from "@/types/idea-request";
 import { IdeaRequestUpdateCommand } from "@/types/models/commands/idea-requests/idea-request-update-command";
+import { IdeaRequestUpdateStatusCommand } from "@/types/models/commands/idea-requests/idea-request-update-status-command";
 import { IdeaUpdateCommand } from "@/types/models/commands/idea/idae-update-command";
+import { IdeaUpdateStatusCommand } from "@/types/models/commands/idea/idea-update-status-command";
+import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
 import { User } from "@/types/user";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
@@ -96,10 +99,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
         | null = "default";
 
       switch (status) {
-        case IdeaRequestStatus.MentorPending:
-          badgeVariant = "secondary";
-          break;
-        case IdeaRequestStatus.CouncilPending:
+        case IdeaRequestStatus.Pending:
           badgeVariant = "secondary";
           break;
         default:
@@ -131,6 +131,16 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const ideaId = row.original.ideaId;
   const initialFeedback = row.getValue("content") as string;
 
+  const user = useSelector((state: RootState) => state.user.user);
+
+  if (!user) {
+    return null;
+  }
+  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
+  const isLecturer = user.userXRoles.some(
+    (m) => m.role?.roleName === "Lecturer"
+  );
+
   const [feedback, setFeedback] = useState(initialFeedback ?? "");
 
   const {
@@ -152,29 +162,42 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const idea = result?.data ?? ({} as Idea);
 
-  const handleSubmit = async (
-    status: IdeaRequestStatus,
-    statusIdea: IdeaStatus
-  ) => {
+  const handleApprove = async () => {
     try {
-      row.original.status = status;
-      const ideaRequestUpdateCommand: IdeaRequestUpdateCommand = {
-        ...row.original,
+      row.original.status = IdeaRequestStatus.Approved;
+      const command: IdeaRequestUpdateStatusCommand = {
+        status: IdeaRequestStatus.Approved,
+        id: row.original.id,
+        content: feedback,
       };
-      const res = await ideaRequestService.update(ideaRequestUpdateCommand);
-      if (res.status != 1) throw new Error("Fail when update idea request");
-
-      idea.status = statusIdea;
-      const ideaUpdateCommand: IdeaUpdateCommand = {
-        ...idea,
-      };
-      const res_ = await ideaService.update(ideaUpdateCommand);
-
-      if (res_.status != 1) throw new Error("Fail when update idea");
+      const res = await ideaRequestService.updateStatus(command);
+      if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
       queryClient.invalidateQueries({
-        queryKey: [["getIdeaDetailWhenClick", ideaId], "getIdeaByUser"],
+        queryKey: [["data_ideaRequest"]],
+      });
+
+    } catch (error: any) {
+      toast.error(error);
+      return;
+    }
+  };
+
+  const handleReject = async () => {
+    try {
+      row.original.status = IdeaRequestStatus.Approved;
+      const command: IdeaRequestUpdateStatusCommand = {
+        status: IdeaRequestStatus.Rejected,
+        id: row.original.id,
+        content: feedback,
+      };
+      const res = await ideaRequestService.updateStatus(command);
+      if (res.status != 1) throw new Error(res.message);
+
+      toast.success("Feedback submitted successfully");
+      queryClient.invalidateQueries({
+        queryKey: [["data_ideaRequest"]],
       });
     } catch (error: any) {
       toast.error(error);
@@ -256,24 +279,14 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                     <Button
                       variant="default"
                       size="sm"
-                      onClick={() =>
-                        handleSubmit(
-                          IdeaRequestStatus.MentorApproved,
-                          IdeaStatus.Approved
-                        )
-                      }
+                      onClick={() => handleApprove()}
                     >
                       Approve
                     </Button>
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() =>
-                        handleSubmit(
-                          IdeaRequestStatus.MentorRejected,
-                          IdeaStatus.Rejected
-                        )
-                      }
+                      onClick={() => handleReject()}
                     >
                       Reject
                     </Button>

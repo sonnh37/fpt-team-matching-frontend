@@ -42,17 +42,16 @@ import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/ide
 import { ideaRequestService } from "@/services/idea-request-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { Idea } from "@/types/idea";
-import { IdeaRequestGetAllByListStatusAndIdeaIdQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-and-idea-id-query";
-import { RootState } from "@/lib/redux/store";
+import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
 import { useSelector } from "react-redux";
-import { IdeaRequestGetAllByListStatusForCurrentUser } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-for-current-user";
+import { RootState } from "@/lib/redux/store";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function IdeaRequestPendingForCurrentUserTable() {
+export default function IdeaRequestRejectedForCurrentUserTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -88,15 +87,31 @@ export function IdeaRequestPendingForCurrentUserTable() {
   const [inputFields, setInputFields] =
     useState<z.infer<typeof defaultSchema>>();
 
+  const user = useSelector((state: RootState) => state.user.user);
+
+  if (!user) {
+    return null;
+  }
+  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
+  const isLecturer = user.userXRoles.some(
+    (m) => m.role?.roleName === "Lecturer"
+  );
   // default field in table
-  const queryParams: IdeaRequestGetAllByListStatusForCurrentUser =
+  const queryParams: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
     useMemo(() => {
-      const params: IdeaRequestGetAllByListStatusForCurrentUser =
+      const params: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
         useQueryParams(inputFields, columnFilters, pagination, sorting);
 
-      params.statusList = [
-        IdeaRequestStatus.MentorPending,
-      ];
+      params.status = IdeaRequestStatus.Rejected;
+      if (isLecturer) {
+        params.roles = ["Mentor"];
+      } else if (isCouncil) {
+        params.roles = ["Council"];
+      }
+
+      if(isCouncil && isLecturer) {
+        params.roles = ["Council"];
+      }
 
       return { ...params };
     }, [inputFields, columnFilters, pagination, sorting]);
@@ -111,9 +126,9 @@ export function IdeaRequestPendingForCurrentUserTable() {
   }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
-    queryKey: ["data_ideaRequest"],
+    queryKey: ["data", queryParams],
     queryFn: () =>
-      ideaRequestService.fetchPaginatedByListStatusForCurrentUser(queryParams),
+      ideaRequestService.GetIdeaRequestsCurrentByStatusAndRoles(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -122,7 +137,7 @@ export function IdeaRequestPendingForCurrentUserTable() {
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns: columns,
+    columns,
     rowCount: data?.data?.totalRecords ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
@@ -144,11 +159,7 @@ export function IdeaRequestPendingForCurrentUserTable() {
     <>
       <div className="space-y-8">
         <div className="">
-          <DataTableComponent
-            table={table}
-            restore={ideaRequestService.restore}
-            deletePermanent={ideaRequestService.deletePermanent}
-          />
+          <DataTableComponent table={table} />
           <DataTablePagination table={table} />
         </div>
       </div>

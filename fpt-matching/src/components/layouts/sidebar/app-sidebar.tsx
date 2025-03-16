@@ -110,9 +110,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         items: isCouncil
           ? [
               {
-                title: "Assign reviewer",
+                title: "Approve Idea",
                 icon: Lightbulb,
-                url: "/idea/assign-reviewer",
+                url: "/idea/assign-idea",
               },
               {
                 title: "Ideas of Supervisor",
@@ -128,7 +128,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 icon: GiWideArrowDunk,
                 url: "/idea/request",
               },
-              { title: "Approve Idea", icon: Lightbulb, url: "/idea/assign-idea" },
+              {
+                title: "Approve Idea",
+                icon: Lightbulb,
+                url: "/idea/assign-idea",
+              },
               {
                 title: "Ideas of Supervisor",
                 icon: PiUserList,
@@ -141,6 +145,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 title: "Request Idea",
                 icon: GiWideArrowDunk,
                 url: "/idea/request",
+              },
+              {
+                title: "Approve Idea",
+                icon: Lightbulb,
+                url: "/idea/assign-idea",
               },
               {
                 title: "Ideas of Supervisor",
