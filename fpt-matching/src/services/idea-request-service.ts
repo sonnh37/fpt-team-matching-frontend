@@ -2,25 +2,60 @@ import { Const } from "@/lib/constants/const";
 import axiosInstance from "@/lib/interceptors/axios-instance";
 import { cleanQueryParams } from "@/lib/utils";
 import { IdeaRequest } from "@/types/idea-request";
+import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
+import { IdeaRequestGetAllCurrentByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status";
+import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
 import { BusinessResult } from "@/types/models/responses/business-result";
 import { BaseService } from "./_base/base-service";
-import { ideaService } from "./idea-service";
-import { Idea } from "@/types/idea";
-import { IdeaRequestGetAllByListStatusAndIdeaIdQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-by-list-status-and-idea-id-query";
-import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
+import { IdeaRequestUpdateStatusCommand } from "@/types/models/commands/idea-requests/idea-request-update-status-command";
 
 class IdeaRequestService extends BaseService<IdeaRequest> {
   constructor() {
     super(Const.IDEA_REQUEST);
   }
-  public fetchPaginatedByListStatusAndIdeaId = (
-    query?: IdeaRequestGetAllByListStatusAndIdeaIdQuery
+
+  public GetIdeaRequestsCurrentByStatusAndRoles = (
+    query?: IdeaRequestGetAllCurrentByStatusAndRolesQuery
   ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
     const cleanedQuery = cleanQueryParams(query ?? {});
 
     return axiosInstance
       .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
-        `${this.endpoint}/by-list-status-and-idea-id?${cleanedQuery}&isPagination=true`
+        `${this.endpoint}/me/by-status-and-roles?${cleanedQuery}&isPagination=true`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
+
+  public GetIdeaRequestsByStatusAndRolesAndIdeaId = (
+    query?: IdeaRequestGetAllCurrentByStatusAndRolesQuery
+  ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
+    const cleanedQuery = cleanQueryParams(query ?? {});
+
+    return axiosInstance
+      .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
+        `${this.endpoint}/by-status-and-roles?${cleanedQuery}&isPagination=true`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
+
+  public GetIdeaRequestsCurrentByStatus = (
+    query?: IdeaRequestGetAllCurrentByStatusQuery
+  ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
+    const cleanedQuery = cleanQueryParams(query ?? {});
+
+    return axiosInstance
+      .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
+        `${this.endpoint}/me/by-status?${cleanedQuery}&isPagination=true`
       )
       .then((response) => {
         return response.data;
@@ -71,6 +106,15 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
     } catch (error) {
       return this.handleError(error);
     }
+  };
+
+  public updateStatus = (
+    command: IdeaRequestUpdateStatusCommand
+  ): Promise<BusinessResult<IdeaRequest>> => {
+    return axiosInstance
+      .put<BusinessResult<IdeaRequest>>(`${this.endpoint}/status`, command)
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 }
 

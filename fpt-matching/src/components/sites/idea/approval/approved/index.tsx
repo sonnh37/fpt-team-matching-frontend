@@ -5,7 +5,6 @@ import { isExistedTeam_options } from "@/lib/filter-options";
 import { ideaRequestService } from "@/services/idea-request-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { FilterEnum } from "@/types/models/filter-enum";
-import { IdeaRequestGetAllByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-gey-all-by-status-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -24,13 +23,16 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
 import { Idea } from "@/types/idea";
+import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
+import { RootState } from "@/lib/redux/store";
+import { useSelector } from "react-redux";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaRequestApprovedTable({ idea }: { idea: Idea }) {
+export default function IdeaRequestApprovedForCurrentUserTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -66,23 +68,36 @@ export default function IdeaRequestApprovedTable({ idea }: { idea: Idea }) {
   const [inputFields, setInputFields] =
     useState<z.infer<typeof defaultSchema>>();
 
+  const user = useSelector((state: RootState) => state.user.user);
+
+  if (!user) {
+    return null;
+  }
+
+  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
+  const isLecturer = user.userXRoles.some(
+    (m) => m.role?.roleName === "Lecturer"
+  );
   // default field in table
-  const queryParams: IdeaRequestGetAllByStatusQuery = useMemo(() => {
-    const params: IdeaRequestGetAllByStatusQuery = useQueryParams(
-      inputFields,
-      columnFilters,
-      pagination,
-      sorting
-    );
+  const queryParams: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
+    useMemo(() => {
+      const params: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
+        useQueryParams(inputFields, columnFilters, pagination, sorting);
 
-    params.ideaId = idea.id;
-    params.statusList = [
-      IdeaRequestStatus.MentorApproved,
-      IdeaRequestStatus.CouncilApproved,
-    ];
+      params.status = IdeaRequestStatus.Approved;
+      
+      if (isLecturer) {
+        params.roles = ["Mentor"];
+      } else if (isCouncil) {
+        params.roles = ["Council"];
+      }
 
-    return { ...params };
-  }, [inputFields, columnFilters, pagination, sorting]);
+      if(isCouncil && isLecturer) {
+        params.roles = ["Council"];
+      }
+
+      return { ...params };
+    }, [inputFields, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
@@ -95,7 +110,8 @@ export default function IdeaRequestApprovedTable({ idea }: { idea: Idea }) {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaRequestService.fetchPaginatedByStatus(queryParams),
+    queryFn: () =>
+      ideaRequestService.GetIdeaRequestsCurrentByStatusAndRoles(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

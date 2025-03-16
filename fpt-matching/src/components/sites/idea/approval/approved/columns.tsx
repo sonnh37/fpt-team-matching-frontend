@@ -1,7 +1,6 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { RootState } from "@/lib/redux/store";
-import { ideaRequestService } from "@/services/idea-request-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { IdeaRequest } from "@/types/idea-request";
 import { User } from "@/types/user";
@@ -22,7 +20,6 @@ import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 import { useSelector } from "react-redux";
 
@@ -77,11 +74,8 @@ export const columns: ColumnDef<IdeaRequest>[] = [
         | null = "default";
 
       switch (status) {
-        case IdeaRequestStatus.MentorPending:
-          badgeVariant = "secondary";
-          break;
-        case IdeaRequestStatus.CouncilPending:
-          badgeVariant = "secondary";
+        case IdeaRequestStatus.Approved:
+          badgeVariant = "default";
           break;
         default:
           badgeVariant = "outline";
@@ -93,6 +87,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
       return value.includes(row.getValue(id));
     },
   },
+  
   {
     accessorKey: "actions",
     header: "Actions",
@@ -113,7 +108,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const handleViewDetailsClick = () => {
     // router.push(`${pathName}/${model.id}`);
   };
-  const [showDeleteTaskDialog, setShowDeleteTaskDialog] = useState(false);
 
   return (
     <>
@@ -126,9 +120,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>
-            Cancel
-          </DropdownMenuItem>
+          <DropdownMenuItem>Cancel</DropdownMenuItem>
           {/*<DropdownMenuItem onClick={handleUsersClick}>*/}
           {/*    View photos*/}
           {/*</DropdownMenuItem>*/}
@@ -138,17 +130,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <DeleteBaseEntitysDialog
-        deleteById={ideaRequestService.delete}
-        open={showDeleteTaskDialog}
-        buttonLeftMessage="Yes"
-        buttonRightMessage="No"
-        onOpenChange={setShowDeleteTaskDialog}
-        list={[model]}
-        showTrigger={false}
-        onSuccess={() => row.toggleSelected(false)}
-      />
     </>
   );
 };
