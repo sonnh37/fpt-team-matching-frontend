@@ -1,25 +1,10 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import { TypographyH2 } from "@/components/_common/typography/typography-h2";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
-import { ideaService } from "@/services/idea-service";
-import { IdeaType } from "@/types/enums/idea";
+import { ideaRequestService } from "@/services/idea-request-service";
+import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { FilterEnum } from "@/types/models/filter-enum";
-import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -31,27 +16,23 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
-import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-query";
-import { ideaRequestService } from "@/services/idea-request-service";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { Idea } from "@/types/idea";
+import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
 import { RootState } from "@/lib/redux/store";
 import { useSelector } from "react-redux";
-import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function IdeaRequestPendingForCurrentUserTable() {
+export default function IdeaRequestApprovedByMentorTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -92,6 +73,7 @@ export function IdeaRequestPendingForCurrentUserTable() {
   if (!user) {
     return null;
   }
+
   const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
   const isLecturer = user.userXRoles.some(
     (m) => m.role?.roleName === "Lecturer"
@@ -102,16 +84,9 @@ export function IdeaRequestPendingForCurrentUserTable() {
       const params: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
         useQueryParams(inputFields, columnFilters, pagination, sorting);
 
-      params.status = IdeaRequestStatus.Pending;
-      if (isLecturer) {
-        params.roles = ["Mentor"];
-      } else if (isCouncil) {
-        params.roles = ["Council"];
-      }
-
-      if(isCouncil && isLecturer) {
-        params.roles = ["Council"];
-      }
+      params.status = IdeaRequestStatus.Approved;
+      
+      params.roles = ["Mentor"];
 
       return { ...params };
     }, [inputFields, columnFilters, pagination, sorting]);
@@ -126,7 +101,7 @@ export function IdeaRequestPendingForCurrentUserTable() {
   }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
-    queryKey: ["data_idearequest_pending"],
+    queryKey: ["data", queryParams],
     queryFn: () =>
       ideaRequestService.GetIdeaRequestsCurrentByStatusAndRoles(queryParams),
     placeholderData: keepPreviousData,
@@ -137,7 +112,7 @@ export function IdeaRequestPendingForCurrentUserTable() {
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns: columns,
+    columns,
     rowCount: data?.data?.totalRecords ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
@@ -159,11 +134,7 @@ export function IdeaRequestPendingForCurrentUserTable() {
     <>
       <div className="space-y-8">
         <div className="">
-          <DataTableComponent
-            table={table}
-            restore={ideaRequestService.restore}
-            deletePermanent={ideaRequestService.deletePermanent}
-          />
+          <DataTableComponent table={table} />
           <DataTablePagination table={table} />
         </div>
       </div>

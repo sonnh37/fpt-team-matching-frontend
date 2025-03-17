@@ -130,10 +130,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   if (!user) {
     return null;
   }
-  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
-  const isLecturer = user.userXRoles.some(
-    (m) => m.role?.roleName === "Lecturer"
-  );
 
   const {
     data: result,
@@ -157,7 +153,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     (req) => req.role === "Council"
   );
 
-  const isNotMentorInThisIdea = (idea.mentorId !== user.id) && (idea.subMentorId !== user.id);
+  const isNotMentorInThisIdea =
+    idea.mentorId !== user.id && idea.subMentorId !== user.id;
 
   const handleSubmit = async () => {
     try {
@@ -168,7 +165,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       toast.success("Submitted to council!");
 
       queryClient.refetchQueries({
-        queryKey: ["getIdeaDetailWhenClick", ideaId]
+        queryKey: ["getIdeaDetailWhenClick", ideaId],
       });
       setOpen(false);
     } catch (error: any) {
@@ -186,10 +183,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <DialogTrigger asChild>
               <Button
                 size="sm"
-                variant={`${!isNotMentorInThisIdea ? "secondary" : "default"}`}
+                variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 // disabled={hasCouncilRequests}
               >
-                View {!isNotMentorInThisIdea ? "(Sent)" : ""}
+                View {hasCouncilRequests ? "(Sent)" : ""}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
