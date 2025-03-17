@@ -116,6 +116,20 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
+
+  public createCouncilRequestsForIdea = (
+    ideaId: string
+  ): Promise<BusinessResult<IdeaRequest>> => {
+    return axiosInstance
+      .post<BusinessResult<IdeaRequest>>(
+        `${this.endpoint}/create-council-requests`,
+        {
+          ideaId,
+        }
+      )
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
 }
 
 export const ideaRequestService = new IdeaRequestService();

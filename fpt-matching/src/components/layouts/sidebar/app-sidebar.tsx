@@ -147,11 +147,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 url: "/idea/request",
               },
               {
-                title: "Approve Idea",
-                icon: Lightbulb,
-                url: "/idea/assign-idea",
-              },
-              {
                 title: "Ideas of Supervisor",
                 icon: PiUserList,
                 url: "/idea/supervisors",
