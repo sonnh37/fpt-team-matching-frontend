@@ -9,6 +9,7 @@ import {
   Pencil,
   Send,
   SquareUserRound,
+  UserRoundCog,
   UsersRound,
 } from "lucide-react";
 import * as React from "react";
@@ -22,12 +23,15 @@ import {
   SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { RootState } from "@/lib/redux/store";
+import { AppDispatch, RootState } from "@/lib/redux/store";
 import Link from "next/link";
 import { GiWideArrowDunk } from "react-icons/gi";
 import { PiUserList } from "react-icons/pi";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { NavMain } from "./nav-main";
+import { RoleSwitcher } from "./role-switcher";
+import { useCurrentRole } from "@/hooks/use-current-role";
+import { initializeRole } from "@/lib/redux/slices/roleSlice";
 
 const data = {
   navMain: [
@@ -88,20 +92,20 @@ const data = {
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user.user);
+  if (!user) return;
+  React.useEffect(() => {
+    if (user?.cache) {
+      dispatch(initializeRole(user.cache));
+    }
+  }, [user?.cache, dispatch]);
 
-  if (!user) {
-    return null;
-  }
-
-  const isReviewer = user.userXRoles.some(
-    (m) => m.role?.roleName === "Reviewer"
-  );
-
-  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
-  const isLecturer = user.userXRoles.some(
-    (m) => m.role?.roleName === "Lecturer"
-  );
+  const role = useCurrentRole();
+  const isCouncil = role == "Council";
+  const isLecturer = role == "Lecturer";
+  const isStudent = role == "Student";
+  const isReviewer = role == "Reviewer";
 
   const navMain = data.navMain.map((item) => {
     if (item.title === "Idea") {
@@ -156,6 +160,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     }
     return item;
   });
+
   return (
     <Sidebar collapsible="icon" {...props} variant="inset">
       <SidebarHeader>
@@ -175,6 +180,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </div>
           </Link>
         </SidebarMenuButton>
+        {<RoleSwitcher />}
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMain} />
