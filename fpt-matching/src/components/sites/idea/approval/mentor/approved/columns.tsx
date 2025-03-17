@@ -1,7 +1,6 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import { TypographyP } from "@/components/_common/typography/typography-p";
@@ -28,17 +27,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { RootState } from "@/lib/redux/store";
 import { ideaRequestService } from "@/services/idea-request-service";
 import { ideaService } from "@/services/idea-service";
-import { IdeaStatus } from "@/types/enums/idea";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { Idea } from "@/types/idea";
 import { IdeaRequest } from "@/types/idea-request";
-import { IdeaRequestUpdateCommand } from "@/types/models/commands/idea-requests/idea-request-update-command";
 import { IdeaRequestUpdateStatusCommand } from "@/types/models/commands/idea-requests/idea-request-update-status-command";
-import { IdeaUpdateCommand } from "@/types/models/commands/idea/idae-update-command";
-import { IdeaUpdateStatusCommand } from "@/types/models/commands/idea/idea-update-status-command";
-import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
 import { User } from "@/types/user";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
@@ -99,8 +93,8 @@ export const columns: ColumnDef<IdeaRequest>[] = [
         | null = "default";
 
       switch (status) {
-        case IdeaRequestStatus.Pending:
-          badgeVariant = "secondary";
+        case IdeaRequestStatus.Approved:
+          badgeVariant = "default";
           break;
         default:
           badgeVariant = "outline";
@@ -129,7 +123,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
   const ideaId = row.original.ideaId;
-  const initialFeedback = row.getValue("content") as string;
   const [open, setOpen] = useState(false);
 
   const user = useSelector((state: RootState) => state.user.user);
@@ -141,8 +134,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const isLecturer = user.userXRoles.some(
     (m) => m.role?.roleName === "Lecturer"
   );
-
-  const [feedback, setFeedback] = useState(initialFeedback ?? "");
 
   const {
     data: result,
@@ -163,42 +154,17 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const idea = result?.data ?? ({} as Idea);
 
-  const handleApprove = async () => {
+  const handleSubmit = async () => {
     try {
-      row.original.status = IdeaRequestStatus.Approved;
-      const command: IdeaRequestUpdateStatusCommand = {
-        status: IdeaRequestStatus.Approved,
-        id: row.original.id,
-        content: feedback,
-      };
-      const res = await ideaRequestService.updateStatus(command);
+      if (!ideaId) throw new Error("Idea ID is required");
+      const res = await ideaRequestService.createCouncilRequestsForIdea(ideaId);
       if (res.status != 1) throw new Error(res.message);
 
-      toast.success("Feedback submitted successfully");
-  
-      queryClient.refetchQueries({ queryKey: ["data_idearequest_pending"] });
-     
-      setOpen(false);
-    } catch (error: any) {
-      toast.error(error);
-      setOpen(false);
-      return;
-    }
-  };
+      toast.success("Submitted to council!");
 
-  const handleReject = async () => {
-    try {
-      row.original.status = IdeaRequestStatus.Approved;
-      const command: IdeaRequestUpdateStatusCommand = {
-        status: IdeaRequestStatus.Rejected,
-        id: row.original.id,
-        content: feedback,
-      };
-      const res = await ideaRequestService.updateStatus(command);
-      if (res.status != 1) throw new Error(res.message);
-
-      toast.success("Feedback submitted successfully");
-      queryClient.refetchQueries({ queryKey: ["data_idearequest_pending"] });
+      queryClient.refetchQueries({
+        queryKey: ["getIdeaDetailWhenClick", ideaId]
+      });
       setOpen(false);
     } catch (error: any) {
       toast.error(error || "An unexpected error occurred");
@@ -213,7 +179,11 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         <div className="flex gap-2">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" variant="default">
+              <Button
+                size="sm"
+                variant={"default"}
+                // disabled={hasCouncilRequests}
+              >
                 View
               </Button>
             </DialogTrigger>
@@ -267,36 +237,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                   </div>
                 )}
                 {/* Option: approve or reject */}
-
-                {/* Input feedback */}
-                <div className="space-y-4">
-                  <TypographyP>
-                    <strong>Feedback:</strong>
-                  </TypographyP>
-                  <Textarea
-                    placeholder="Enter feedback..."
-                    value={feedback}
-                    onChange={(e) => setFeedback(e.target.value)}
-                  />
-                </div>
               </div>
-
-              <DialogFooter>
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => handleApprove()}
-                >
-                  Approve
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleReject()}
-                >
-                  Reject
-                </Button>
-              </DialogFooter>
+             
             </DialogContent>
           </Dialog>
         </div>

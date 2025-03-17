@@ -1,10 +1,25 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
+import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
+import { TypographyH2 } from "@/components/_common/typography/typography-h2";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
-import { ideaRequestService } from "@/services/idea-request-service";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { ideaService } from "@/services/idea-service";
+import { IdeaType } from "@/types/enums/idea";
 import { FilterEnum } from "@/types/models/filter-enum";
+import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -16,23 +31,27 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
+import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-query";
+import { ideaRequestService } from "@/services/idea-request-service";
+import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { Idea } from "@/types/idea";
 import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
-import { RootState } from "@/lib/redux/store";
 import { useSelector } from "react-redux";
+import { RootState } from "@/lib/redux/store";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaRequestApprovedForCurrentUserTable() {
+export default function IdeaRequestRejectedByCouncilTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -68,33 +87,14 @@ export default function IdeaRequestApprovedForCurrentUserTable() {
   const [inputFields, setInputFields] =
     useState<z.infer<typeof defaultSchema>>();
 
-  const user = useSelector((state: RootState) => state.user.user);
-
-  if (!user) {
-    return null;
-  }
-
-  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
-  const isLecturer = user.userXRoles.some(
-    (m) => m.role?.roleName === "Lecturer"
-  );
   // default field in table
   const queryParams: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
     useMemo(() => {
       const params: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
         useQueryParams(inputFields, columnFilters, pagination, sorting);
 
-      params.status = IdeaRequestStatus.Approved;
-      
-      if (isLecturer) {
-        params.roles = ["Mentor"];
-      } else if (isCouncil) {
-        params.roles = ["Council"];
-      }
-
-      if(isCouncil && isLecturer) {
-        params.roles = ["Council"];
-      }
+      params.status = IdeaRequestStatus.Rejected;
+      params.roles = ["Council"];
 
       return { ...params };
     }, [inputFields, columnFilters, pagination, sorting]);

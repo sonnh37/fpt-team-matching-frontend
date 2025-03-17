@@ -31,7 +31,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavMain } from "./nav-main";
 import { RoleSwitcher } from "./role-switcher";
 import { useCurrentRole } from "@/hooks/use-current-role";
-import { initializeRole } from "@/lib/redux/slices/roleSlice";
+import { initializeRole, updateUserCache } from "@/lib/redux/slices/roleSlice";
 
 const data = {
   navMain: [
@@ -95,9 +95,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user.user);
   if (!user) return;
+  const userRoles = user.userXRoles.map((m) => m.role?.roleName);
+  const firstRole = user.userXRoles[0]?.role?.roleName;
   React.useEffect(() => {
     if (user?.cache) {
       dispatch(initializeRole(user.cache));
+    } else {
+      dispatch(updateUserCache({ newCache: { role: firstRole } }));
     }
   }, [user?.cache, dispatch]);
 
@@ -116,7 +120,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {
                 title: "Approve Idea",
                 icon: Lightbulb,
-                url: "/idea/assign-idea",
+                url: "/idea/approve-idea",
               },
               {
                 title: "Ideas of Supervisor",
@@ -135,7 +139,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               {
                 title: "Approve Idea",
                 icon: Lightbulb,
-                url: "/idea/assign-idea",
+                url: "/idea/approve-idea",
               },
               {
                 title: "Ideas of Supervisor",

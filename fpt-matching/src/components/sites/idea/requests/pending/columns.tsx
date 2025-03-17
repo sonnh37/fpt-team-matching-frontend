@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { RootState } from "@/lib/redux/store";
 import { IdeaStatus } from "@/types/enums/idea";
@@ -55,15 +55,11 @@ export const columns: ColumnDef<Idea>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as IdeaStatus;
-      const statusText = IdeaStatus[status];
+      const status = row.getValue("status") as IdeaStatus | undefined;
+      const statusText = status !== undefined ? IdeaStatus[status] : "Unknown";
 
-      let badgeVariant:
-        | "secondary"
-        | "destructive"
-        | "default"
-        | "outline"
-        | null = "default";
+      let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
+        "default";
 
       switch (status) {
         case IdeaStatus.Pending:
@@ -102,10 +98,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   if (!user) {
     return null;
   }
-  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
-  const isLecturer = user.userXRoles.some(
-    (m) => m.role?.roleName === "Lecturer"
-  );
 
   const [feedback, setFeedback] = useState(initialFeedback ?? "");
 
@@ -149,9 +141,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
               <strong>Mentor Status:</strong>{" "}
               <Badge
                 variant={
-                  mentorApproval.status === IdeaRequestStatus.Approved
+                  mentorApproval?.status === IdeaRequestStatus.Approved
                     ? "default"
-                    : mentorApproval.status === IdeaRequestStatus.Rejected
+                    : mentorApproval?.status === IdeaRequestStatus.Rejected
                     ? "destructive"
                     : "secondary"
                 }
