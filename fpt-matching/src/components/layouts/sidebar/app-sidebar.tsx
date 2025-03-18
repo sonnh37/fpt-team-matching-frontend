@@ -88,6 +88,11 @@ const data = {
       url: "/#",
       icon: MessageCircleQuestion,
     },
+    {
+      title: "Manage review",
+      url: "/manage-review",
+      icon: SquareUserRound,
+    }
   ],
 };
 
