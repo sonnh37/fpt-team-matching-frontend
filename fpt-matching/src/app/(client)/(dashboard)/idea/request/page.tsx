@@ -1,19 +1,6 @@
 "use client";
-import ErrorSystem from "@/components/_common/errors/error-system";
-import { LoadingPage } from "@/components/_common/loading-page";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs-shadcn";
-import { projectService } from "@/services/project-service";
-import { useQuery } from "@tanstack/react-query";
-import { useDispatch } from "react-redux";
-
 import IdeaRequestApprovedTable from "@/components/sites/idea/requests/approved";
 import IdeaRequestRejectedTable from "@/components/sites/idea/requests/rejected";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -22,22 +9,35 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
-import { Idea } from "@/types/idea";
-import { Project } from "@/types/project";
-import { Separator } from "@radix-ui/react-select";
-import { HistoryIcon } from "lucide-react";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs-shadcn";
+import { useDispatch } from "react-redux";
+
 import { IdeaRequestPendingTable } from "@/components/sites/idea/requests/pending";
-import { ideaService } from "@/services/idea-service";
-import { IdeaStatus, IdeaType } from "@/types/enums/idea";
-import { Badge } from "@/components/ui/badge";
-import { ideaRequestService } from "@/services/idea-request-service";
-import { IdeaRequestGetAllCurrentByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { stageideaService } from "@/services/stage-idea-service";
+import { cn } from "@/lib/utils";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import ErrorSystem from "@/components/_common/errors/error-system";
+import { StageIdea } from "@/types/stage-idea";
+import { Separator } from "@/components/ui/separator";
 export default function Page() {
   const dispatch = useDispatch();
 
@@ -95,8 +95,65 @@ export default function Page() {
   const tab_1 = "Pending";
   const tab_2 = "Approved";
   const tab_3 = "Rejected";
+
+  const { data: res_stageIdea, isFetching, isLoading, error, isError } = useQuery({
+    queryKey: ["data_stage-idea_latest"],
+    queryFn: async () =>
+      await stageideaService.fetchLatest(),
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading) return <LoadingComponent />
+  if (isError) {
+    console.error("Error fetching:", error);
+    return <ErrorSystem />;
+  }
+
+  const stageIdea = res_stageIdea?.data ?? {} as StageIdea
   return (
     <>
+      <div className="container pt-3 pb-6 space-y-4">
+        <Card className={cn("w-[380px]")}>
+          <CardHeader>
+            <CardTitle>Notification Stage Ideas</CardTitle>
+            <CardDescription>You have new review stages.</CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            {stageIdea ? (
+              <div className="space-y-4">
+                <div className="space-y-1">
+                  <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
+                    <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">
+                        Timeline:{" "}
+                        {new Date(stageIdea.startDate).toLocaleString()} -{" "}
+                        {new Date(stageIdea.endDate).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
+                    <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium">
+                        Date of results:{" "}
+                        {new Date(stageIdea.resultDate).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">
+                Không có thông báo mới.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+        <Separator />
+      </div>
+
       <Tabs defaultValue={tab_1} className="w-full container mx-auto">
         <div className="flex justify-between">
           <TabsList>
