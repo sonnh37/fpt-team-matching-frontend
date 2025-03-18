@@ -12,6 +12,8 @@ export class Const {
     //#endregion
     static readonly BLOG = "blogs";
     static readonly TEAMMEMBER = "team-members";
+    static readonly LIKE = "likes";
+    static readonly COMMENT = "comments";
     static readonly PROJECT = "projects";
     static readonly USER = "users";
     static readonly SEMESTER = "semesters";
