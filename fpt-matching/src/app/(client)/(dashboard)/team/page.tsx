@@ -216,7 +216,7 @@ export default function TeamInfo() {
             <div className="flex justify-between items-center">
               {/* Tiêu đề nhóm */}
               <div className="title">
-                <h2 className="text-xl font-semibold">{result?.data?.name}</h2>
+                <h2 className="text-xl font-semibold">{result?.data?.teamName}</h2>
                 <p className="text-sm text-gray-500">Created at: {formatDate(result?.data?.createdDate)}</p>
               </div>
 
