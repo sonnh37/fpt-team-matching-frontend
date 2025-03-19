@@ -37,16 +37,11 @@ export const columns: ColumnDef<Idea>[] = [
   {
     accessorKey: "createdDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Data created" />
+      <DataTableColumnHeader column={column} title="Date created" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return date.toLocaleDateString("en-US", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+      return <p>{date.toLocaleString()}</p>;
     },
   },
   {
@@ -64,6 +59,12 @@ export const columns: ColumnDef<Idea>[] = [
       switch (status) {
         case IdeaStatus.Pending:
           badgeVariant = "secondary";
+          break;
+        case IdeaStatus.Approved:
+          badgeVariant = "default";
+          break;
+        case IdeaStatus.Rejected:
+          badgeVariant = "destructive";
           break;
         default:
           badgeVariant = "outline";
@@ -111,16 +112,20 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     (req) => req.role === "Council"
   ) as IdeaRequest[];
 
-  const approvedCouncils = councilRequests?.filter(
-    (req) => req.status === IdeaRequestStatus.Approved
-  ).length;
-  const pendingCouncils = councilRequests?.filter(
-    (req) => req.status === IdeaRequestStatus.Pending
+  const totalCouncilApprove = ideaRequests?.filter(
+    (req) => req.status === IdeaRequestStatus.Approved && req.role === "Council"
   ).length;
 
-  const rejectedCouncils = councilRequests?.filter(
-    (req) => req.status === IdeaRequestStatus.Rejected
+  const totalCouncilPending = ideaRequests?.filter(
+    (req) => req.status === IdeaRequestStatus.Pending && req.role === "Council"
   ).length;
+
+  console.log("check_result", ideaRequests);
+  const isResultDay = idea.stageIdea?.resultDate
+    ? new Date(idea.stageIdea.resultDate).getTime() < Date.now()
+    : false;
+
+  const isPublicResult = totalCouncilPending == 0 && isResultDay;
   return (
     <div className="flex flex-col gap-2">
       {/* Hiển thị trạng thái Mentor Approve */}
@@ -137,8 +142,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <DialogTitle>Idea detail</DialogTitle>
           </DialogHeader>
           <div className="grid p-4">
-            <TypographyP>
-              <strong>Mentor Status:</strong>{" "}
+            <div className="flex gap-1 justify-start items-center">
+              <strong>Mentor</strong>
               <Badge
                 variant={
                   mentorApproval?.status === IdeaRequestStatus.Approved
@@ -150,15 +155,51 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
               >
                 {IdeaRequestStatus[mentorApproval?.status ?? 0]}
               </Badge>
-            </TypographyP>
+              <p>{": " + mentorApproval.content}</p>
+            </div>
 
-            <TypographyP>
-              <strong>Council Approval:</strong> {approvedCouncils} Approved /{" "}
-              {pendingCouncils} Pending / {rejectedCouncils} Rejected
-            </TypographyP>
-            <TypographyP>
-              <strong>Feedback:</strong> {feedback}
-            </TypographyP>
+            {isResultDay ? (
+              <TypographyP>
+                {councilRequests.length > 0 ? (
+                  councilRequests.map((m, index) => {
+                    return (
+                      <>
+                        <div className="flex gap-1 justify-start items-center">
+                          <strong>Council {index}:</strong>
+                          <Badge
+                            variant={
+                              m.status === IdeaRequestStatus.Approved
+                                ? "default"
+                                : m.status === IdeaRequestStatus.Rejected
+                                ? "destructive"
+                                : "secondary"
+                            }
+                          >
+                            {IdeaRequestStatus[m?.status ?? 0]}
+                          </Badge>
+                          <p>{": " + mentorApproval.content}</p>
+                        </div>
+                      </>
+                    );
+                  })
+                ) : (
+                  <>
+                    <div className="flex gap-1 justify-start items-center">
+                      <strong>Council:</strong>
+                      <Badge variant={"destructive"}>
+                        {IdeaRequestStatus[IdeaRequestStatus.Rejected]}
+                      </Badge>
+                    </div>
+                  </>
+                )}
+              </TypographyP>
+            ) : (
+              <>
+                <TypographyP className="text-red-600">
+                  Not yet published
+                </TypographyP>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>

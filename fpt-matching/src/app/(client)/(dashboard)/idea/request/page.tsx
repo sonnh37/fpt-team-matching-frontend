@@ -9,20 +9,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage
-} from "@/components/ui/form";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Tabs,
   TabsContent,
   TabsList,
@@ -30,68 +16,25 @@ import {
 } from "@/components/ui/tabs-shadcn";
 import { useDispatch } from "react-redux";
 
-import { IdeaRequestPendingTable } from "@/components/sites/idea/requests/pending";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { stageideaService } from "@/services/stage-idea-service";
-import { cn } from "@/lib/utils";
-import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
-import { StageIdea } from "@/types/stage-idea";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import HorizontalLinearStepper from "@/components/material-ui/stepper";
+import { IdeaRequestPendingTable } from "@/components/sites/idea/requests/pending";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
+import { stageideaService } from "@/services/stage-idea-service";
+import { StageIdea } from "@/types/stage-idea";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { ideaService } from "@/services/idea-service";
+import { useSelectorUser } from "@/hooks/use-auth";
+import { IdeaStatus } from "@/types/enums/idea";
+import { Idea } from "@/types/idea";
 export default function Page() {
+  const user = useSelectorUser();
+  if (!user) return;
+
   const dispatch = useDispatch();
 
-  // const query: IdeaRequestGetAllCurrentByStatusQuery = {
-  //   status: IdeaRequestStatus.Pending,
-  // }
-
-  // const {
-  //   data: result,
-  //   isLoading,
-  //   isError,
-  //   error,
-  // } = useQuery({
-  //   queryKey: ["getCurrentIdeaByStatus"],
-  //   queryFn: ideaRequestService.GetIdeaRequestsCurrentByStatus(),
-  //   refetchOnWindowFocus: false,
-  // });
-
-  // if (isLoading) return <LoadingPage />;
-  // if (isError) {
-  //   console.error("Error fetching:", error);
-  //   return <ErrorSystem />;
-  // }
-
-  // //   if (result) {
-  // //     if (result.status !== 1) {
-  // //       // almost no has idea
-  // //       return <TypographyP className="text-red-500 pl-4">You have not team yet</TypographyP>;
-  // //     }
-  // //   }
-
-  // const ideas = result?.data ?? [];
-  // const ideaPending =
-  //   ideas.find((m) => m.status === IdeaStatus.Pending && !m.isDeleted) ??
-  //   ({} as Idea);
-
-  // const totalPending = ideas.filter(
-  //   (m) => m.status === IdeaStatus.Pending && !m.isDeleted
-  // ).length;
-  // const ideaApproved =
-  //   ideas.find((m) => m.status === IdeaStatus.Approved && !m.isDeleted) ??
-  //   ({} as Idea);
-
-  //   console.log("check_ideaapprove", ideaApproved)
-  // const totalAprroved = ideas.filter(
-  //   (m) => m.status === IdeaStatus.Approved && !m.isDeleted
-  // ).length;
-  // const ideaRejected =
-  //   ideas.find((m) => m.status === IdeaStatus.Rejected && !m.isDeleted) ??
-  //   ({} as Idea);
-
-  // const totalRejected = ideas.filter(
-  //   (m) => m.status === IdeaStatus.Rejected && !m.isDeleted
-  // ).length;
   const tab_1 = "Pending";
   const tab_2 = "Approved";
   const tab_3 = "Rejected";
@@ -104,53 +47,85 @@ export default function Page() {
     refetchOnWindowFocus: false,
   });
 
-  if (isLoading) return <LoadingComponent />
-  if (isError) {
-    console.error("Error fetching:", error);
+  const { data: res_ideas, isLoading: isLoadingAnother, error: errorAnother, isError: isErrorAnother } = useQuery({
+    queryKey: ["data_ideas"],
+    queryFn: async () => await ideaService.getIdeaByUser(),
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    data: res_semester,
+    isLoading: isLoadingSemester,
+    error: errorSemester,
+    isError: isErrorSemester,
+  } = useQuery({
+    queryKey: ["data_current_semester"],
+    queryFn: async () => await ideaService.getIdeaByUser(),
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading || isLoadingAnother || isErrorSemester) return <LoadingComponent />;
+  if (isError || isErrorSemester || isErrorAnother) {
+    console.error("Error fetching stage ideas:", error);
     return <ErrorSystem />;
   }
 
-  const stageIdea = res_stageIdea?.data ?? {} as StageIdea
+  const stageIdea = res_stageIdea?.data;
+
+  const idea_current = res_ideas?.data
+    ?.filter((m) => m.ownerId === user.id)
+    .sort((a, b) =>
+      new Date(b.createdDate || 0).getTime() - new Date(a.createdDate || 0).getTime()
+    )?.[0] ?? {} as Idea;
   return (
     <>
       <div className="container pt-3 pb-6 space-y-4">
-        <Card className={cn("w-[380px]")}>
-          <CardHeader>
-            <CardTitle>Notification Stage Ideas</CardTitle>
-            <CardDescription>You have new review stages.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            {stageIdea ? (
-              <div className="space-y-4">
-                <div className="space-y-1">
-                  <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-                    <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+        <div className="flex items-center gap-8 space-y-2">
+          <div>
+            <Card className={cn("w-[380px]")}>
+              <CardHeader>
+                <CardTitle>Notification Stage Ideas</CardTitle>
+                <CardDescription>You have new review stages.</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4">
+                {stageIdea ? (
+                  <div className="space-y-4">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium">
-                        Timeline:{" "}
-                        {new Date(stageIdea.startDate).toLocaleString()} -{" "}
-                        {new Date(stageIdea.endDate).toLocaleString()}
-                      </p>
+                      <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
+                        <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium">
+                            Timeline:{" "}
+                            {new Date(stageIdea.startDate).toLocaleString()} -{" "}
+                            {new Date(stageIdea.endDate).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
+                        <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium">
+                            Date of results:{" "}
+                            {new Date(stageIdea.resultDate).toLocaleString()}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-                    <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">
-                        Date of results:{" "}
-                        {new Date(stageIdea.resultDate).toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Không có thông báo mới.
-              </p>
-            )}
-          </CardContent>
-        </Card>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Không có thông báo mới.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+          <div className="w-full">
+            <HorizontalLinearStepper idea={idea_current} />
+          </div>
+        </div>
         <Separator />
       </div>
 

@@ -47,16 +47,11 @@ export const columns: ColumnDef<Idea>[] = [
   {
     accessorKey: "createdDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Data created" />
+      <DataTableColumnHeader column={column} title="Date created" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return date.toLocaleDateString("en-US", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+      return <p>{date.toLocaleString()}</p>;
     },
   },
   {
