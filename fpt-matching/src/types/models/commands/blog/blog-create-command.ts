@@ -4,7 +4,9 @@ import { CreateCommand } from "../_base/base-command";
 export interface BlogCreateCommand extends CreateCommand {
     title?: string,
     content?: string,
-    skillRequired?: string
+    skillRequired?: string,
+    projectId?: string,
     type: BlogType,
     status: BlogStatus
+
 }
