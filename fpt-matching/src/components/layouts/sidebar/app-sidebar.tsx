@@ -1,6 +1,6 @@
 "use client";
 import { MdOutlineRateReview, MdOutlineSupervisorAccount } from "react-icons/md";
-import { Globe, Home, Lightbulb, MessageCircleQuestion, Pencil, Send, UsersRound } from "lucide-react";
+import { Globe, Home, Lightbulb, MessageCircleQuestion, Pencil, Send, SquareUserRound, UsersRound } from "lucide-react";
 import * as React from "react";
 import { TypographyLarge } from "@/components/_common/typography/typography-large";
 import { Icons } from "@/components/ui/icons";
@@ -30,6 +30,11 @@ const data = {
     },
     { title: "List supervisors", url: "/supervisors", icon: MdOutlineSupervisorAccount },
     { title: "Support", url: "/#", icon: MessageCircleQuestion },
+    {
+      title: "Manage review",
+      url: "/manage-review",
+      icon: SquareUserRound,
+    }
   ],
 };
 
