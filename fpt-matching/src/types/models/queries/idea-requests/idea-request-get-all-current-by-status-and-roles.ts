@@ -4,5 +4,5 @@ import { BaseQueryableQuery } from "../_base/base-query";
 export interface IdeaRequestGetAllCurrentByStatusAndRolesQuery extends BaseQueryableQuery {
   status?: IdeaRequestStatus;
   roles?: string[];
-  ideaId?: string;
+  stageNumber?: number;
 }

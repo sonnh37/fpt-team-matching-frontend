@@ -113,6 +113,12 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     },
   },
   {
+    accessorKey: "idea.stageIdea.stageNumber",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Stage" />
+    ),
+  },
+  {
     accessorKey: "actions",
     header: "Actions",
     cell: ({ row }) => {

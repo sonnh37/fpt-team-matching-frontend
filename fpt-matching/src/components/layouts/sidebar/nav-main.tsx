@@ -60,7 +60,7 @@ export function NavMain({
                     <SidebarMenuButton
                       tooltip={item.title}
                       className={cn(
-                        "text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
+                        "text-lg tracking-wide py-5 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out ",
                         isActive ? "!bg-orange-500 !text-white" : ""
                       )}
                     >
@@ -79,7 +79,7 @@ export function NavMain({
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton
                               className={cn(
-                                "text-base tracking-wide py-4 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
+                                "text-base tracking-wide py-4 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out ",
                                 isActiveSub ? "!bg-orange-500 !text-white" : ""
                               )}
                               asChild
@@ -100,7 +100,7 @@ export function NavMain({
               ) : (
                 <SidebarMenuButton
                   className={cn(
-                    "text-lg tracking-wide py-6 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-300 ease-in-out hover:bg-orange-500 hover:text-white",
+                    "text-lg tracking-wide py-5 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out ",
                     isActive ? "!bg-orange-500 !text-white" : ""
                   )}
                   tooltip={item.title}

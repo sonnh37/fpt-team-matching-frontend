@@ -31,40 +31,6 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
       });
   };
 
-  public GetIdeaRequestsByStatusAndRolesAndIdeaId = (
-    query?: IdeaRequestGetAllCurrentByStatusAndRolesQuery
-  ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
-
-    return axiosInstance
-      .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
-        `${this.endpoint}/by-status-and-roles?${cleanedQuery}&isPagination=true`
-      )
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        return this.handleError(error);
-      });
-  };
-
-  public GetIdeaRequestsCurrentByStatus = (
-    query?: IdeaRequestGetAllCurrentByStatusQuery
-  ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
-
-    return axiosInstance
-      .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
-        `${this.endpoint}/me/by-status?${cleanedQuery}&isPagination=true`
-      )
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        return this.handleError(error);
-      });
-  };
-
   public fetchPaginatedWithoutReviewer = (
     query?: BaseQueryableQuery
   ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {

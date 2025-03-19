@@ -66,6 +66,10 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ProcessDate" />
     ),
+    cell: ({ row }) => {
+      const date = new Date(row.getValue("processDate"));
+      return <p>{date.toLocaleString()}</p>;
+    },
   },
   {
     accessorKey: "createdDate",
@@ -74,12 +78,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return date.toLocaleDateString("en-US", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+      return <p>{date.toLocaleString()}</p>;
     },
   },
   {
@@ -112,6 +111,12 @@ export const columns: ColumnDef<IdeaRequest>[] = [
       return value.includes(row.getValue(id));
     },
   },
+  {
+      accessorKey: "idea.stageIdea.stageNumber",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Stage" />
+      ),
+    },
   {
     accessorKey: "actions",
     header: "Actions",
