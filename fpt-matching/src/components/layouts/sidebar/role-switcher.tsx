@@ -67,8 +67,8 @@ export function RoleSwitcher() {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <activeRole.logo className="size-4" />
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg ">
+                <UserRoundCog className="size-4 dark:text-white text-black" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
