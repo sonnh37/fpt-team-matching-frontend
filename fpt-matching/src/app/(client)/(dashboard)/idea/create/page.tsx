@@ -81,7 +81,7 @@ const CreateProjectForm = () => {
       const ideaExists = await ideaService.getIdeaByUser();
       const teamExist = await projectService.getProjectInfo();
       //check xem user co idea nao dang pending or Done khong
-      const isPendingOrDone = ideaExists.data?.some(m=> m.status !== IdeaStatus.Rejected)
+      const isPendingOrDone = ideaExists.data?.some(m => m.status !== IdeaStatus.Rejected)
       if ((ideaExists.data && isPendingOrDone) || teamExist.data) {
         return router.push("/idea/idea-is-exist");
       }

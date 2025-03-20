@@ -36,65 +36,89 @@ import { useQuery } from '@tanstack/react-query';
 import { RootState } from '@/lib/redux/store';
 import { blogService } from '@/services/blog-service';
 import { BlogGetAllQuery } from '@/types/models/queries/blog/blog-get-all-query';
-import { boolean, number } from 'zod';
 import CommentBlog from '@/components/_common/comment/comment';
-import { CommentCreateCommand } from '@/types/models/commands/comment/comment-create-command';
-import { commentService } from '@/services/comment-service';
 import { toast } from 'sonner';
 import { BlogStatus, BlogType } from '@/types/enums/blog';
 import BlogDetail from '../../../../components/_common/blogdetail/blog-detail';
 import { BlogCreateCommand } from '@/types/models/commands/blog/blog-create-command';
 export default function Blog() {
 
-  const [post, setPost] = useState('');
+
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [getLatest, setLatest] = useState<boolean>(false);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [postType, setPostType] = useState(BlogType.Share); // Loại bài viết
   const [formData, setFormData] = useState({
+    projectId: ""  ,
     title: "",
     content: "",
     skillRequired: "",
-    type: BlogType.Share, // Loại bài viết
+    // type: BlogType.Share, // Loại bài viết
     status: BlogStatus.Public // Trạng thái mặc định
   });
+  const [filterType, setFilterType] = useState<BlogType | null>(null);
 
+  // Hàm thay đổi bộ lọc và gọi API lại
+  const handleFilterChange = (type: BlogType) => {
+    setFilterType(type);
+    refetch();
+  };
+  const handleNoFilter = () => {
+    window.location.href = "/social/blog"; // Chuyển hướng về trang chủ
+  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
     setFormData((prev) => ({
       ...prev,
-      [name]:  
-       name === "type" ? (value as unknown as BlogType) :
-       name === "status" ? (value as unknown as BlogStatus) : 
-       value,
+      [name]: value,
     }));
   };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>)  => {
-    e.preventDefault();
-    const blognew: BlogCreateCommand = {
-      title: formData.title,
-      content: formData.content,
-      skillRequired: formData.skillRequired,
-      type: formData.type,
-      status: formData.status,
-    }
-    const result = await blogService.create(blognew)
-    if(result?.status ===1){
-      toast("Chúc mừng bạn đã tạo blog thành công");
-      refetch();
-    }
-    // Xử lý logic khi submit form
-    console.log('Post submitted:', post);
+  const handlePostTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPostType(Number(e.target.value) as BlogType);
+    handleChange(e);
   };
+  // tạo blog
+  const handleSubmit = async () => {
+    try {
+      if (!formData.title || !formData.content) {
+        toast.error("⚠️ Vui lòng nhập tiêu đề và nội dung!");
+        return;
+      }
 
+      const blognew: BlogCreateCommand = {
+        title: formData.title,
+        content: formData.content,
+        skillRequired: formData.skillRequired,
+        type: postType,
+        status: formData.status,
+      };
+
+      const result = await blogService.create(blognew);
+
+      if (result?.status === 1) {
+        toast.success("🎉 Chúc mừng bạn đã tạo blog thành công!");
+        refetch(); // Refresh danh sách blog
+        setFormData({ projectId: "", title: "", content: "", skillRequired: "", status: BlogStatus.Public }); // Reset form
+        setPostType(BlogType.Share); // Reset lại kiểu bài viết
+      } else {
+        toast.error("🚨 Có lỗi xảy ra khi tạo blog, vui lòng thử lại!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo blog:", error);
+      toast.error("⚠️ Lỗi hệ thống, vui lòng thử lại sau!");
+    }
+  };
+  //gọi thông tin user đã đăng nhập
   const user = useSelector((state: RootState) => state.user.user)
 
-  const query: BlogGetAllQuery = {
-    // userId: user?.id || "",
-    pageNumber: currentPage,
-    // sortOrder: getLatest
+
+  // chỗ check user coi có project chưa 
+  const checkProjectUser = user?.projects.find(x=> x.isDeleted === false && x.teamMembers.find(u => u.userId === user.id));
+
+  let query: BlogGetAllQuery = { pageNumber: currentPage };
+  // NẾU NGƯỜI DÙNG BẤM FILTER THÌ MỚI HIỆN RA
+  if (filterType) {
+    query.type = filterType;
   }
   // //goi api bang tanstack
   const {
@@ -126,6 +150,7 @@ export default function Blog() {
 
   // day la sort theo type
   const sortFpt = notification.filter(x => x.type === BlogType.Share);
+
 
 
 
@@ -272,102 +297,106 @@ export default function Blog() {
         {/* blog center */}
         <div className='blog-center flex flex-col items-center basis-3/5 mr-4 ml-4'>
           <div className='form-create-blog bg-slate-100 rounded-xl w-full max-w-3xl p-3 mx-2 mt-3'>
-            <form onSubmit={handleSubmit}>
-              <div className="flex items-center space-x-3">
-                <img
-                  src="/meo.jpg"
-                  alt="Avatar"
-                  className="w-12 h-12 rounded-full"
-                />
-                <Modal>
-                  <ModalTrigger className='w-full'>
-                    <div className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
-                      {user?.firstName} đi, bạn đang nghĩ gì thế?
+
+            <div className="flex items-center space-x-3">
+              <img
+                src="/meo.jpg"
+                alt="Avatar"
+                className="w-12 h-12 rounded-full"
+              />
+              <Modal>
+                <ModalTrigger className='w-full'>
+                  <div className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
+                    {user?.firstName} đi, bạn đang nghĩ gì thế?
+                  </div>
+
+                </ModalTrigger>
+
+                <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
+                  <ModalContent >
+                    <div className="header-blog mb-4 py-4 border-b-2 h-1/5">
+                      <h4 className='text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center' >
+                        Tạo bài viết của bạn đi
+                      </h4>
                     </div>
-
-                  </ModalTrigger>
-
-                  <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
-                    <ModalContent >
-                      <div className="header-blog mb-4 py-4 border-b-2 h-1/5">
-                        <h4 className='text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center' >
-                          Tạo bài viết của bạn đi
-                        </h4>
-                      </div>
-                      <div className='body-blog w-full h-4/5'>
-                        <div className='headerbody  flex items-center w-full h-1/4'>
-                          <img
-                            src={user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
-                            alt="User Avatar"
-                            className="w-12 h-12 rounded-full"
-                          />
-                          <div className='w-full ml-3 '>
-                            <div className=' '>
-                              <p className="text-lg font-semibold text-gray-800">{user?.lastName} {user?.firstName}</p>
-                            </div>
-                            <select
-                              name="type"
-                              className="border p-2 rounded"
-                              value={formData.type}
-                              onChange={(e) => {
-                                setPostType(e.target.value);
-                                handleChange(e);
-                              }}
-                            >
-                              <option value={BlogType.Share}>Đăng chia sẻ</option>
-                              <option value={BlogType.Recruit}>Đăng tìm thành viên</option>
-                            </select>
+                    <div className='body-blog w-full h-4/5'>
+                      <div className='headerbody  flex items-center w-full h-1/4'>
+                        <img
+                          src={user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
+                          alt="User Avatar"
+                          className="w-12 h-12 rounded-full"
+                        />
+                        <div className='w-full ml-3 '>
+                          <div className=' '>
+                            <p className="text-lg font-semibold text-gray-800">{user?.lastName} {user?.firstName}</p>
                           </div>
+                          <select
+                            name="type"
+                            className="border p-2 rounded"
+                            value={postType}
+                            onChange={handlePostTypeChange}
+                          >
+                            <option value={BlogType.Share}>Đăng chia sẻ</option>
+                            <option value={BlogType.Recruit}>Đăng tìm thành viên</option>
+                          </select>
                         </div>
-                        <div className='body mt-3 h-3/4'>
-                          <div className='flex'>
-                            <div className='w-1/4 items-center p-2'>
-                              <h3 >Tiêu đề</h3>
-                            </div>
-                            <input className=' w-3/4' type="text"
-                              value={formData.title}
-                              onChange={handleChange} 
-                              placeholder='Nhập tựa đề ở đây' />
+                      </div>
+                      <div className='body mt-3 h-3/4'>
+                        <div className='flex'>
+                          <div className='w-1/4 items-center p-2'>
+                            <h3 >Tiêu đề</h3>
                           </div>
-                          <div className='flex mt-2 h-full'>
-                            <div className='w-1/4 items-center p-2 '>
-                              <h3 >Nội dung</h3>
-                            </div>
-                            <textarea className='w-3/4 h-40'
+                          <input className=' w-3/4' type="text"
+                            value={formData.title}
+                            name="title"
+                            onChange={handleChange}
+                            placeholder='Nhập tựa đề ở đây' />
+                        </div>
+                        <div className='flex mt-2 h-full'>
+                          <div className='w-1/4 items-center p-2 '>
+                            <h3 >Nội dung</h3>
+                          </div>
+                          <textarea className='w-3/4 h-40'
                             value={formData.content}
+                            name="content"
                             onChange={handleChange}
                             placeholder='Viết nội dung ở đây' />
-                          </div>
-                          {/* Nếu chọn "Đăng tìm thành viên" thì hiển thị thêm field nhập */}
-                          {postType === BlogType.Recruit && (
-                            <div className="mt-4 border-t pt-4">
-                              <h3 className="text-lg font-semibold">Thông tin tìm thành viên</h3>
-                              <div className="flex mt-2">
-                                <div className="w-1/4 items-center p-2">
-                                  <h3>Kỹ năng yêu cầu</h3>
-                                </div>
-                                <input
-                                  className="w-3/4 border p-2 rounded"
-                                  type="text"
-                                  name="skillRequired"
-                                  placeholder="Nhập kỹ năng yêu cầu"
-                                  value={formData.skillRequired}
-                                  onChange={handleChange}
-                                />
+                        </div>
+                        {/* Nếu chọn "Đăng tìm thành viên" thì hiển thị thêm field nhập */}
+                        {postType === BlogType.Recruit && user?.projects ? (
+                          <div className=''>
+                            <div className='flex mt-2 h-full'>
+                              <div className='w-1/4 items-center p-2 '>
+                                <h3 >Kỹ năng yêu cầu</h3>
                               </div>
+                              <textarea className="w-3/4 border p-2 rounded"
+                                name="skillRequired"
+                                placeholder="Nhập kỹ năng yêu cầu"
+                                value={formData.skillRequired}
+                                onChange={handleChange} />
                             </div>
-                          )}
-                        </div>
-                        <div className='flex h-14 items-center justify-center'>
-                          <button type='submit' className='bg-blue-500 h-3/4 w-full mx-2 hover:bg-blue-400 hover:text-gray-400'>Post Bài</button>
-                        </div>
-                      </div>
-                    </ModalContent>
-                  </ModalBody>
+                            <div className='flex mt-2 h-full'>
+                            <div className='w-1/4 items-center p-2 '>
+                                <h3 >Team của bạn</h3>
+                              </div>
+                              <div className="w-3/4 border p-2 rounded"> aa</div>
+                            </div>
+                          </div>
 
-                </Modal>
-              </div>
-            </form>
+                        ) : (
+                          <div></div>
+                        )}
+                      </div>
+                      <div className='flex w-full h-14 absolute bottom-0  items-center justify-center'>
+                        <button onClick={() => handleSubmit()} className='bg-blue-500 h-3/4 w-full mx-2 hover:bg-blue-400 hover:text-gray-400 '>Post Bài</button>
+                      </div>
+                    </div>
+                  </ModalContent>
+                </ModalBody>
+
+              </Modal>
+            </div>
+
             <div className="flex ">
 
               <div className="flex space-x-4 justify-center w-full">
@@ -386,9 +415,26 @@ export default function Blog() {
           </div>
           {/* filter blog */}
           <div className='header-button  pt-3'>
-            <span className='font-extrabold mx-1 px-2  hover:bg-white hover:text-blue-900'>Liên quan</span>
-            <span className=' px-2  hover:bg-white hover:text-blue-900'>Chia sẻ</span>
-            <span className='px-2  hover:bg-white hover:text-blue-900'>Tìm thành viên</span>
+            <div className='header-button pt-3'>
+              <span
+                className={` mx-1 px-2 hover:bg-white hover:text-blue-900 ${filterType === null ? "font-extrabold" : ""}`}
+                onClick={() => handleNoFilter()}
+              >
+                Liên quan
+              </span>
+              <span
+                className={`px-2 hover:bg-white hover:text-blue-900 ${filterType === BlogType.Share ? "font-extrabold" : ""}`}
+                onClick={() => handleFilterChange(BlogType.Share)}
+              >
+                Chia sẻ
+              </span>
+              <span
+                className={`px-2 hover:bg-white hover:text-blue-900 ${filterType === BlogType.Recruit ? "font-extrabold" : ""}`}
+                onClick={() => handleFilterChange(BlogType.Recruit)}
+              >
+                Tìm thành viên
+              </span>
+            </div>
           </div>
           {/* Blog */}
           <div className='bg-white max-w-3xl mx-3 my-8 p-6 rounded-xl shadow-md  '>
@@ -1027,7 +1073,7 @@ export default function Blog() {
         </div>
       </div>
 
-    </div>
+    </div >
 
   )
 }
