@@ -820,8 +820,6 @@ export default function Blog() {
                                 <DropdownMenuContent>
                                   <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem>Xóa blog</DropdownMenuItem>
-                                  <DropdownMenuItem>Edit blog</DropdownMenuItem>
                                   <DropdownMenuItem>Ghim blog</DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -951,7 +949,7 @@ export default function Blog() {
                           <div className="flex  items-center space-x-4">
                             <span className="flex items-center">
                               <i className="fas fa-thumbs-up text-blue-500"></i>
-                              <span className="ml-2">    {post.likes?.length ?? 0}    Likes <FontAwesomeIcon icon={faThumbsUp} /> </span>
+                              <span className="ml-2">    {post.likes?.length ?? 0}  Likes <FontAwesomeIcon icon={faThumbsUp} /> </span>
                             </span>
                             <span className="flex items-center">
                               <i className="fas fa-comment text-green-500"></i>
