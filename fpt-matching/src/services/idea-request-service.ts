@@ -31,40 +31,6 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
       });
   };
 
-  public GetIdeaRequestsByStatusAndRolesAndIdeaId = (
-    query?: IdeaRequestGetAllCurrentByStatusAndRolesQuery
-  ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
-
-    return axiosInstance
-      .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
-        `${this.endpoint}/by-status-and-roles?${cleanedQuery}&isPagination=true`
-      )
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        return this.handleError(error);
-      });
-  };
-
-  public GetIdeaRequestsCurrentByStatus = (
-    query?: IdeaRequestGetAllCurrentByStatusQuery
-  ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
-
-    return axiosInstance
-      .get<BusinessResult<PaginatedResult<IdeaRequest>>>(
-        `${this.endpoint}/me/by-status?${cleanedQuery}&isPagination=true`
-      )
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        return this.handleError(error);
-      });
-  };
-
   public fetchPaginatedWithoutReviewer = (
     query?: BaseQueryableQuery
   ): Promise<BusinessResult<PaginatedResult<IdeaRequest>>> => {
@@ -113,6 +79,20 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
   ): Promise<BusinessResult<IdeaRequest>> => {
     return axiosInstance
       .put<BusinessResult<IdeaRequest>>(`${this.endpoint}/status`, command)
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public createCouncilRequestsForIdea = (
+    ideaId: string
+  ): Promise<BusinessResult<IdeaRequest>> => {
+    return axiosInstance
+      .post<BusinessResult<IdeaRequest>>(
+        `${this.endpoint}/create-council-requests`,
+        {
+          ideaId,
+        }
+      )
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };

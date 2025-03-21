@@ -45,11 +45,11 @@ export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "createdDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Data created" />
+      <DataTableColumnHeader column={column} title="Date created" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return formatDate(date);
+      return <p>{date.toLocaleString()}</p>;
     },
   },
   {

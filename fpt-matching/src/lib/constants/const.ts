@@ -12,6 +12,8 @@ export class Const {
     //#endregion
     static readonly BLOG = "blogs";
     static readonly TEAMMEMBER = "team-members";
+    static readonly LIKE = "likes";
+    static readonly COMMENT = "comments";
     static readonly PROJECT = "projects";
     static readonly USER = "users";
     static readonly SEMESTER = "semesters";
@@ -22,6 +24,7 @@ export class Const {
     static readonly PROFESSION = "professions";
     static readonly NOTIFICATION = "notifications";
     static readonly PROFILE_STUDENT = "profile-students";
+    static readonly STAGE_IDEA = "stage-ideas";
     static readonly AUTH = "auth";
 
     static readonly DASHBOARD = "dashboard";

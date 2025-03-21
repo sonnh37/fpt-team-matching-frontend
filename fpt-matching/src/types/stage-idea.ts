@@ -5,5 +5,6 @@ export interface StageIdea {
     startDate: string;
     endDate: string;
     resultDate: string;
+    stageNumber: number;
     semester?: Semester | null;
 }
