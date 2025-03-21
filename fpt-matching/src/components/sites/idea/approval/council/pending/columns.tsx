@@ -113,6 +113,12 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     },
   },
   {
+    accessorKey: "idea.stageIdea.stageNumber",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Stage" />
+    ),
+  },
+  {
     accessorKey: "actions",
     header: "Actions",
     cell: ({ row }) => {
@@ -130,16 +136,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const isEditing = row.getIsSelected();
   const ideaId = row.original.ideaId;
   const initialFeedback = row.getValue("content") as string;
-
-  const user = useSelector((state: RootState) => state.user.user);
-
-  if (!user) {
-    return null;
-  }
-  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
-  const isLecturer = user.userXRoles.some(
-    (m) => m.role?.roleName === "Lecturer"
-  );
+  const [open, setOpen] = useState(false);
 
   const [feedback, setFeedback] = useState(initialFeedback ?? "");
 
@@ -174,12 +171,13 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
-      queryClient.invalidateQueries({
-        queryKey: [["data_ideaRequest"]],
-      });
-
+  
+      queryClient.refetchQueries({ queryKey: ["data_idearequest_pending"] });
+     
+      setOpen(false);
     } catch (error: any) {
       toast.error(error);
+      setOpen(false);
       return;
     }
   };
@@ -196,11 +194,12 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
-      queryClient.invalidateQueries({
-        queryKey: [["data_ideaRequest"]],
-      });
+      queryClient.refetchQueries({ queryKey: ["data_idearequest_pending"] });
+      setOpen(false);
     } catch (error: any) {
-      toast.error(error);
+      toast.error(error || "An unexpected error occurred");
+      setOpen(false);
+      return;
     }
   };
 
@@ -208,7 +207,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     <div className="flex flex-col gap-2">
       <>
         <div className="flex gap-2">
-          <Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
               <Button size="sm" variant="default">
                 View
@@ -275,24 +274,25 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
                   />
-                  <div className="flex gap-4">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => handleApprove()}
-                    >
-                      Approve
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleReject()}
-                    >
-                      Reject
-                    </Button>
-                  </div>
                 </div>
               </div>
+
+              <DialogFooter>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => handleApprove()}
+                >
+                  Approve
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleReject()}
+                >
+                  Reject
+                </Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>

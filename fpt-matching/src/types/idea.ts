@@ -7,10 +7,11 @@ import { IdeaRequest } from "./idea-request";
 import { Semester } from "./semester";
 import { IdeaHistory } from "./idea-history";
 import { MentorIdeaRequest } from "./mentor-idea-request";
+import { StageIdea } from "./stage-idea";
 
 export interface Idea extends BaseEntity {
   ownerId?: string;
-  semesterId?: string;
+  stageIdeaId?: string;
   mentorId?: string;
   subMentorId?: string;
   type?: IdeaType;
@@ -31,7 +32,7 @@ export interface Idea extends BaseEntity {
   subMentor?: User;
   specialty?: Specialty;
   project?: Project;
-  semester?: Semester;
+  stageIdea?: StageIdea;
   ideaRequests: IdeaRequest[];
   ideaHistories: IdeaHistory[];
   mentorIdeaRequests: MentorIdeaRequest[];
