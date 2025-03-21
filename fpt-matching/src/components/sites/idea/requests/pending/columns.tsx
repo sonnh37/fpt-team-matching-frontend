@@ -100,6 +100,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     return null;
   }
 
+  const isLecturer = user?.userXRoles.some(
+    (m) => m.role?.roleName == "Lecturer"
+  );
+
   const [feedback, setFeedback] = useState(initialFeedback ?? "");
 
   const idea = row.original;
@@ -142,21 +146,23 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <DialogTitle>Idea detail</DialogTitle>
           </DialogHeader>
           <div className="grid p-4">
-            <div className="flex gap-1 justify-start items-center">
-              <strong>Mentor</strong>
-              <Badge
-                variant={
-                  mentorApproval?.status === IdeaRequestStatus.Approved
-                    ? "default"
-                    : mentorApproval?.status === IdeaRequestStatus.Rejected
-                    ? "destructive"
-                    : "secondary"
-                }
-              >
-                {IdeaRequestStatus[mentorApproval?.status ?? 0]}
-              </Badge>
-              <p>{": " + mentorApproval.content}</p>
-            </div>
+            {!isLecturer && (
+              <div className="flex gap-1 justify-start items-center">
+                <strong>Mentor</strong>
+                <Badge
+                  variant={
+                    mentorApproval?.status === IdeaRequestStatus.Approved
+                      ? "default"
+                      : mentorApproval?.status === IdeaRequestStatus.Rejected
+                      ? "destructive"
+                      : "secondary"
+                  }
+                >
+                  {IdeaRequestStatus[mentorApproval?.status ?? 0]}
+                </Badge>
+                <p>{": " + mentorApproval.content}</p>
+              </div>
+            )}
 
             {isResultDay ? (
               <TypographyP>

@@ -15,6 +15,7 @@ import { StepIconProps } from "@mui/material/StepIcon";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { Idea } from "@/types/idea";
 import { Box, Button, Typography } from "@mui/material";
+import { useSelectorUser } from "@/hooks/use-auth";
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -189,9 +190,15 @@ export default function HorizontalLinearStepper({
   idea,
 }: HorizontalLinearStepperProps) {
   if (!idea) return;
+  const user = useSelectorUser();
+  if (!user) return;
   const idea_request = idea.ideaRequests;
   const totalCouncilApprove = idea_request?.filter(
     (req) => req.status === IdeaRequestStatus.Approved && req.role === "Council"
+  ).length;
+
+  const totalCouncil = idea_request?.filter(
+    (req) => req.role === "Council"
   ).length;
 
   const totalCouncilPending = idea_request?.filter(
@@ -211,7 +218,6 @@ export default function HorizontalLinearStepper({
     (req) => req.status === IdeaRequestStatus.Rejected && req.role === "Mentor"
   );
   // xét thêm && stageIdea
-  console.log("check_totalcouncil", totalCouncilApprove);
   const isCouncilApprove = totalCouncilApprove >= 2;
   const isCouncilRejected = totalCouncilApprove < 2;
   const [activeStep, setActiveStep] = React.useState(0);
@@ -263,8 +269,14 @@ export default function HorizontalLinearStepper({
     return step === -1;
   };
 
+  const isLecturer = user?.userXRoles.some(
+    (m) => m.role?.roleName == "Lecturer"
+  );
   React.useEffect(() => {
     if (idea) {
+      if (isLecturer && totalCouncil == 0) {
+        setActiveStep((prevActiveStep) => prevActiveStep + 1);
+      }
       if (isMentorApprove) {
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
       }
