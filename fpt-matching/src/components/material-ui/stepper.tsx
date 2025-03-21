@@ -1,76 +1,76 @@
-
-
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Stack from '@mui/material/Stack';
-import Stepper from '@mui/material/Stepper';
-import Step from '@mui/material/Step';
-import StepLabel from '@mui/material/StepLabel';
-import Check from '@mui/icons-material/Check';
-import SettingsIcon from '@mui/icons-material/Settings';
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
-import VideoLabelIcon from '@mui/icons-material/VideoLabel';
-import StepConnector, { stepConnectorClasses } from '@mui/material/StepConnector';
-import { StepIconProps } from '@mui/material/StepIcon';
-import { IdeaRequestStatus } from '@/types/enums/idea-request';
-import { Idea } from '@/types/idea';
-import { Box, Button, Typography } from '@mui/material';
+import * as React from "react";
+import { styled } from "@mui/material/styles";
+import Stack from "@mui/material/Stack";
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import Check from "@mui/icons-material/Check";
+import SettingsIcon from "@mui/icons-material/Settings";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import VideoLabelIcon from "@mui/icons-material/VideoLabel";
+import StepConnector, {
+  stepConnectorClasses,
+} from "@mui/material/StepConnector";
+import { StepIconProps } from "@mui/material/StepIcon";
+import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { Idea } from "@/types/idea";
+import { Box, Button, Typography } from "@mui/material";
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
     top: 10,
-    left: 'calc(-50% + 16px)',
-    right: 'calc(50% + 16px)',
+    left: "calc(-50% + 16px)",
+    right: "calc(50% + 16px)",
   },
   [`&.${stepConnectorClasses.active}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      borderColor: '#784af4',
+      borderColor: "#784af4",
     },
   },
   [`&.${stepConnectorClasses.completed}`]: {
     [`& .${stepConnectorClasses.line}`]: {
-      borderColor: '#784af4',
+      borderColor: "#784af4",
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
-    borderColor: '#eaeaf0',
+    borderColor: "#eaeaf0",
     borderTopWidth: 3,
     borderRadius: 1,
-    ...theme.applyStyles('dark', {
+    ...theme.applyStyles("dark", {
       borderColor: theme.palette.grey[800],
     }),
   },
 }));
 
-const QontoStepIconRoot = styled('div')<{ ownerState: { active?: boolean } }>(
+const QontoStepIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
   ({ theme }) => ({
-    color: '#eaeaf0',
-    display: 'flex',
+    color: "#eaeaf0",
+    display: "flex",
     height: 22,
-    alignItems: 'center',
-    '& .QontoStepIcon-completedIcon': {
-      color: '#784af4',
+    alignItems: "center",
+    "& .QontoStepIcon-completedIcon": {
+      color: "#784af4",
       zIndex: 1,
       fontSize: 18,
     },
-    '& .QontoStepIcon-circle': {
+    "& .QontoStepIcon-circle": {
       width: 8,
       height: 8,
-      borderRadius: '50%',
-      backgroundColor: 'currentColor',
+      borderRadius: "50%",
+      backgroundColor: "currentColor",
     },
-    ...theme.applyStyles('dark', {
+    ...theme.applyStyles("dark", {
       color: theme.palette.grey[700],
     }),
     variants: [
       {
         props: ({ ownerState }) => ownerState.active,
         style: {
-          color: '#784af4',
+          color: "#784af4",
         },
       },
     ],
-  }),
+  })
 );
 
 function QontoStepIcon(props: StepIconProps) {
@@ -94,39 +94,39 @@ const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.active}`]: {
     [`& .${stepConnectorClasses.line}`]: {
       backgroundImage:
-        'linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)',
+        "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)",
     },
   },
   [`&.${stepConnectorClasses.completed}`]: {
     [`& .${stepConnectorClasses.line}`]: {
       backgroundImage:
-        'linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)',
+        "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)",
     },
   },
   [`& .${stepConnectorClasses.line}`]: {
     height: 3,
     border: 0,
-    backgroundColor: '#eaeaf0',
+    backgroundColor: "#eaeaf0",
     borderRadius: 1,
-    ...theme.applyStyles('dark', {
+    ...theme.applyStyles("dark", {
       backgroundColor: theme.palette.grey[800],
     }),
   },
 }));
 
-const ColorlibStepIconRoot = styled('div')<{
+const ColorlibStepIconRoot = styled("div")<{
   ownerState: { completed?: boolean; active?: boolean };
 }>(({ theme }) => ({
-  backgroundColor: '#ccc',
+  backgroundColor: "#ccc",
   zIndex: 1,
-  color: '#fff',
+  color: "#fff",
   width: 50,
   height: 50,
-  display: 'flex',
-  borderRadius: '50%',
-  justifyContent: 'center',
-  alignItems: 'center',
-  ...theme.applyStyles('dark', {
+  display: "flex",
+  borderRadius: "50%",
+  justifyContent: "center",
+  alignItems: "center",
+  ...theme.applyStyles("dark", {
     backgroundColor: theme.palette.grey[700],
   }),
   variants: [
@@ -134,15 +134,15 @@ const ColorlibStepIconRoot = styled('div')<{
       props: ({ ownerState }) => ownerState.active,
       style: {
         backgroundImage:
-          'linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)',
-        boxShadow: '0 4px 10px 0 rgba(0,0,0,.25)',
+          "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
+        boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
       },
     },
     {
       props: ({ ownerState }) => ownerState.completed,
       style: {
         backgroundImage:
-          'linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)',
+          "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
       },
     },
   ],
@@ -158,7 +158,10 @@ function ColorlibStepIcon(props: StepIconProps) {
   };
 
   return (
-    <ColorlibStepIconRoot ownerState={{ completed, active }} className={className}>
+    <ColorlibStepIconRoot
+      ownerState={{ completed, active }}
+      className={className}
+    >
       {icons[String(props.icon)]}
     </ColorlibStepIconRoot>
   );
@@ -180,24 +183,35 @@ const steps: StepperProps[] = [
 ];
 
 interface HorizontalLinearStepperProps {
-  idea: Idea
+  idea?: Idea;
 }
-export default function HorizontalLinearStepper({ idea }: HorizontalLinearStepperProps) {
+export default function HorizontalLinearStepper({
+  idea,
+}: HorizontalLinearStepperProps) {
+  if (!idea) return;
   const idea_request = idea.ideaRequests;
-  const totalCouncilApprove = idea_request?.filter((req) => req.status === IdeaRequestStatus.Approved && req.role === "Council").length;
+  const totalCouncilApprove = idea_request?.filter(
+    (req) => req.status === IdeaRequestStatus.Approved && req.role === "Council"
+  ).length;
 
-  const totalCouncilPending = idea_request?.filter((req) => req.status === IdeaRequestStatus.Pending && req.role === "Council").length;
- 
+  const totalCouncilPending = idea_request?.filter(
+    (req) => req.status === IdeaRequestStatus.Pending && req.role === "Council"
+  ).length;
+
   const isResultDay = idea.stageIdea?.resultDate
     ? new Date(idea.stageIdea.resultDate).getTime() < Date.now()
-    : false; 
+    : false;
 
-  const isPublicResult = totalCouncilPending == 0 && isResultDay
+  const isPublicResult = totalCouncilPending == 0 && isResultDay;
 
-  const isMentorApprove = idea_request?.some((req) => req.status === IdeaRequestStatus.Approved && req.role === "Mentor")
-  const isMentorRejected = idea_request?.some((req) => req.status === IdeaRequestStatus.Rejected && req.role === "Mentor")
+  const isMentorApprove = idea_request?.some(
+    (req) => req.status === IdeaRequestStatus.Approved && req.role === "Mentor"
+  );
+  const isMentorRejected = idea_request?.some(
+    (req) => req.status === IdeaRequestStatus.Rejected && req.role === "Mentor"
+  );
   // xét thêm && stageIdea
-  console.log("check_totalcouncil", totalCouncilApprove)
+  console.log("check_totalcouncil", totalCouncilApprove);
   const isCouncilApprove = totalCouncilApprove >= 2;
   const isCouncilRejected = totalCouncilApprove < 2;
   const [activeStep, setActiveStep] = React.useState(0);
@@ -262,9 +276,8 @@ export default function HorizontalLinearStepper({ idea }: HorizontalLinearSteppe
     }
   }, [idea]);
 
-
   return (
-    <Box sx={{ width: '100%' }}>
+    <Box sx={{ width: "100%" }}>
       <Stepper activeStep={activeStep}>
         {steps.map((step, index) => {
           const stepProps: { completed?: boolean } = {};
@@ -282,7 +295,12 @@ export default function HorizontalLinearStepper({ idea }: HorizontalLinearSteppe
             labelProps.error = true;
           }
 
-          if (isPublicResult && isMentorApprove && isCouncilRejected && index == 1) {
+          if (
+            isPublicResult &&
+            isMentorApprove &&
+            isCouncilRejected &&
+            index == 1
+          ) {
             labelProps.optional = (
               <Typography variant="caption" color="error">
                 Rejected
@@ -298,7 +316,6 @@ export default function HorizontalLinearStepper({ idea }: HorizontalLinearSteppe
           );
         })}
       </Stepper>
-     
     </Box>
   );
 }
