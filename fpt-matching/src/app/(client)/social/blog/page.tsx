@@ -1,6 +1,6 @@
 
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faPaperPlane, faAngleDown } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -24,19 +24,137 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  Pagination
+} from "@/components/ui/pagination"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Meteors } from '@/components/ui/meteors'
-
+import { useSelector } from 'react-redux';
+import { useQuery } from '@tanstack/react-query';
+import { RootState } from '@/lib/redux/store';
+import { blogService } from '@/services/blog-service';
+import { BlogGetAllQuery } from '@/types/models/queries/blog/blog-get-all-query';
+import CommentBlog from '@/components/_common/comment/comment';
+import { toast } from 'sonner';
+import { BlogStatus, BlogType } from '@/types/enums/blog';
+import BlogDetail from '../../../../components/_common/blogdetail/blog-detail';
+import { BlogCreateCommand } from '@/types/models/commands/blog/blog-create-command';
 export default function Blog() {
 
-  const [post, setPost] = useState('');
-  const handleSubmit = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    // Xử lý logic khi submit form
-    console.log('Post submitted:', post);
+
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [postType, setPostType] = useState(BlogType.Share); // Loại bài viết
+  const [formData, setFormData] = useState({
+    projectId: ""  ,
+    title: "",
+    content: "",
+    skillRequired: "",
+    // type: BlogType.Share, // Loại bài viết
+    status: BlogStatus.Public // Trạng thái mặc định
+  });
+  const [filterType, setFilterType] = useState<BlogType | null>(null);
+
+  // Hàm thay đổi bộ lọc và gọi API lại
+  const handleFilterChange = (type: BlogType) => {
+    setFilterType(type);
+    refetch();
   };
+  const handleNoFilter = () => {
+    window.location.href = "/social/blog"; // Chuyển hướng về trang chủ
+  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+  const handlePostTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setPostType(Number(e.target.value) as BlogType);
+    handleChange(e);
+  };
+  // tạo blog
+  const handleSubmit = async () => {
+    try {
+      if (!formData.title || !formData.content) {
+        toast.error("⚠️ Vui lòng nhập tiêu đề và nội dung!");
+        return;
+      }
+
+      const blognew: BlogCreateCommand = {
+        title: formData.title,
+        content: formData.content,
+        skillRequired: formData.skillRequired,
+        type: postType,
+        status: formData.status,
+      };
+
+      const result = await blogService.create(blognew);
+
+      if (result?.status === 1) {
+        toast.success("🎉 Chúc mừng bạn đã tạo blog thành công!");
+        refetch(); // Refresh danh sách blog
+        setFormData({ projectId: "", title: "", content: "", skillRequired: "", status: BlogStatus.Public }); // Reset form
+        setPostType(BlogType.Share); // Reset lại kiểu bài viết
+      } else {
+        toast.error("🚨 Có lỗi xảy ra khi tạo blog, vui lòng thử lại!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo blog:", error);
+      toast.error("⚠️ Lỗi hệ thống, vui lòng thử lại sau!");
+    }
+  };
+  //gọi thông tin user đã đăng nhập
+  const user = useSelector((state: RootState) => state.user.user)
+
+
+  // chỗ check user coi có project chưa 
+  const checkProjectUser = user?.projects.find(x=> x.isDeleted === false && x.teamMembers.find(u => u.userId === user.id));
+
+  let query: BlogGetAllQuery = { pageNumber: currentPage };
+  // NẾU NGƯỜI DÙNG BẤM FILTER THÌ MỚI HIỆN RA
+  if (filterType) {
+    query.type = filterType;
+  }
+  // //goi api bang tanstack
+  const {
+    data: result,
+    refetch,
+    isLoading
+  } = useQuery({
+    queryKey: ["getBlogAll", query],
+    queryFn: () => blogService.fetchPaginated(query),
+    refetchOnWindowFocus: false,
+  });
+
+
+  useEffect(() => {
+    if (result?.data) {
+      setTotalPages(result?.data?.totalPages || 1);
+      // Chỉ reset về trang 1 nếu dữ liệu mới có số trang nhỏ hơn trang hiện tại
+      if (result.data.pageNumber && currentPage > result.data.pageNumber) {
+        setCurrentPage(1);
+      }
+    }
+  }, [result]);
+
+  // day la sort blog notification
+  const notification = result?.data?.results ?? [];
+  const sortedNotification = [...notification].sort((a, b) => {
+    return (b.comments?.length || 0) - (a.comments?.length || 0);
+  });
+
+  // day la sort theo type
+  const sortFpt = notification.filter(x => x.type === BlogType.Share);
+
+
+
+
+
 
   return (
     <div className='bg-slate-200'>
@@ -179,1011 +297,143 @@ export default function Blog() {
         {/* blog center */}
         <div className='blog-center flex flex-col items-center basis-3/5 mr-4 ml-4'>
           <div className='form-create-blog bg-slate-100 rounded-xl w-full max-w-3xl p-3 mx-2 mt-3'>
-            <form onSubmit={handleSubmit}>
-              <div className="flex items-center space-x-3">
-                <img
-                  src="/meo.jpg"
-                  alt="Avatar"
-                  className="w-12 h-12 rounded-full"
-                />
-                <Modal>
-                  <ModalTrigger className='w-full'>
-                    <div className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
-                      Quan đi, bạn đang nghĩ gì thế?
+
+            <div className="flex items-center space-x-3">
+              <img
+                src="/meo.jpg"
+                alt="Avatar"
+                className="w-12 h-12 rounded-full"
+              />
+              <Modal>
+                <ModalTrigger className='w-full'>
+                  <div className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
+                    {user?.firstName} đi, bạn đang nghĩ gì thế?
+                  </div>
+
+                </ModalTrigger>
+
+                <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
+                  <ModalContent >
+                    <div className="header-blog mb-4 py-4 border-b-2 h-1/5">
+                      <h4 className='text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center' >
+                        Tạo bài viết của bạn đi
+                      </h4>
                     </div>
-
-                  </ModalTrigger>
-
-                  <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
-                    <ModalContent >
-                      <div className="header-blog mb-4 py-4 border-b-2 h-1/5">
-                        <h4 className='text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center' >
-                          Tạo bài viết của bạn đi
-                        </h4>
-                      </div>
-                      <div className='body-blog w-full h-4/5'>
-                        <div className='headerbody  flex items-center w-full h-1/4'>
-                          <img
-                            src="/user-avatardefault.jpg" // Replace with your avatar image
-                            alt="User Avatar"
-                            className="w-12 h-12 rounded-full"
-                          />
-                          <div className='w-full ml-3 '>
-                            <div className=' '>
-                              <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
-                            </div>
-                            <select className=' '>
-                              <option value="value1">Đăng chia sẻ</option>
-                              <option value="value2">Đăng tìm thành viên</option>
-                              <option value="value2">Đăng bốc phốt gì đó</option>
-                            </select>
+                    <div className='body-blog w-full h-4/5'>
+                      <div className='headerbody  flex items-center w-full h-1/4'>
+                        <img
+                          src={user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
+                          alt="User Avatar"
+                          className="w-12 h-12 rounded-full"
+                        />
+                        <div className='w-full ml-3 '>
+                          <div className=' '>
+                            <p className="text-lg font-semibold text-gray-800">{user?.lastName} {user?.firstName}</p>
                           </div>
+                          <select
+                            name="type"
+                            className="border p-2 rounded"
+                            value={postType}
+                            onChange={handlePostTypeChange}
+                          >
+                            <option value={BlogType.Share}>Đăng chia sẻ</option>
+                            <option value={BlogType.Recruit}>Đăng tìm thành viên</option>
+                          </select>
                         </div>
-                        <div className='body mt-3 h-3/4'>
-                          <div className='flex'>
-                            <div className='w-1/4 items-center p-2'>
-                              <h3 >Tiêu đề</h3>
-                            </div>
-                            <input className=' w-3/4' type="text" placeholder='Nhập tựa đề ở đây' />
+                      </div>
+                      <div className='body mt-3 h-3/4'>
+                        <div className='flex'>
+                          <div className='w-1/4 items-center p-2'>
+                            <h3 >Tiêu đề</h3>
                           </div>
-                          <div className='flex mt-2 h-full'>
+                          <input className=' w-3/4' type="text"
+                            value={formData.title}
+                            name="title"
+                            onChange={handleChange}
+                            placeholder='Nhập tựa đề ở đây' />
+                        </div>
+                        <div className='flex mt-2 h-full'>
+                          <div className='w-1/4 items-center p-2 '>
+                            <h3 >Nội dung</h3>
+                          </div>
+                          <textarea className='w-3/4 h-40'
+                            value={formData.content}
+                            name="content"
+                            onChange={handleChange}
+                            placeholder='Viết nội dung ở đây' />
+                        </div>
+                        {/* Nếu chọn "Đăng tìm thành viên" thì hiển thị thêm field nhập */}
+                        {postType === BlogType.Recruit && user?.projects ? (
+                          <div className=''>
+                            <div className='flex mt-2 h-full'>
+                              <div className='w-1/4 items-center p-2 '>
+                                <h3 >Kỹ năng yêu cầu</h3>
+                              </div>
+                              <textarea className="w-3/4 border p-2 rounded"
+                                name="skillRequired"
+                                placeholder="Nhập kỹ năng yêu cầu"
+                                value={formData.skillRequired}
+                                onChange={handleChange} />
+                            </div>
+                            <div className='flex mt-2 h-full'>
                             <div className='w-1/4 items-center p-2 '>
-                              <h3 >Nội dung</h3>
+                                <h3 >Team của bạn</h3>
+                              </div>
+                              <div className="w-3/4 border p-2 rounded"> aa</div>
                             </div>
-                            <textarea className='w-3/4 h-40' placeholder='Viết nội dung ở đây' />
                           </div>
-                        </div>
-                        <div className='flex h-14 items-center justify-center'>
-                          <button className='bg-blue-500 h-3/4 w-full mx-2 hover:bg-blue-400 hover:text-gray-400'>Post Bài</button>
-                        </div>
+
+                        ) : (
+                          <div></div>
+                        )}
                       </div>
-                    </ModalContent>
-                  </ModalBody>
+                      <div className='flex w-full h-14 absolute bottom-0  items-center justify-center'>
+                        <button onClick={() => handleSubmit()} className='bg-blue-500 h-3/4 w-full mx-2 hover:bg-blue-400 hover:text-gray-400 '>Post Bài</button>
+                      </div>
+                    </div>
+                  </ModalContent>
+                </ModalBody>
 
-                </Modal>
-              </div>
-              <div className="flex ">
+              </Modal>
+            </div>
 
-                <div className="flex space-x-4 justify-center w-full">
-                  <button className="text-red-500 hover:text-gray-800">
-                    Video trực tiếp
-                  </button>
-                  <button className="text-green-600 hover:text-gray-800">
-                    Ảnh/video
-                  </button>
-                  <button className="text-yellow-600 hover:text-gray-800">
-                    Cảm xúc/hoạt động
-                  </button>
-                </div>
+            <div className="flex ">
+
+              <div className="flex space-x-4 justify-center w-full">
+                <button className="text-red-500 hover:text-gray-800">
+                  Video trực tiếp
+                </button>
+                <button className="text-green-600 hover:text-gray-800">
+                  Ảnh/video
+                </button>
+                <button className="text-yellow-600 hover:text-gray-800">
+                  Cảm xúc/hoạt động
+                </button>
               </div>
-            </form>
+            </div>
+
           </div>
           {/* filter blog */}
           <div className='header-button  pt-3'>
-            <span className='font-extrabold mx-1 px-2  hover:bg-white hover:text-blue-900'>Relevant</span>
-            <span className=' px-2  hover:bg-white hover:text-blue-900'>Latest</span>
-            <span className='px-2  hover:bg-white hover:text-blue-900'>Top</span>
-          </div>
-          {/* Blog */}
-          <div className='bg-white max-w-3xl mx-3 my-8 p-6 rounded-xl shadow-md  '>
-            <div>
-              {/* Post Header with Avatar, Username, and Date */}
-              <div className="flex items-center space-x-4">
-                <img
-                  src="/user-avatardefault.jpg" // Replace with your avatar image
-                  alt="User Avatar"
-                  className="w-12 h-12 rounded-full"
-                />
-                <div className='flex w-full justify-between'>
-                  <div>
-                    <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
-                    <p className="text-sm text-gray-500">4 giờ trước  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
-                  </div>
-                  <div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>Xóa blog</DropdownMenuItem>
-                        <DropdownMenuItem>Edit blog</DropdownMenuItem>
-                        <DropdownMenuItem>Ghim blog</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </div>
-
-
-              {/* Post Title */}
-              <div className="text-3xl font-semibold text-gray-800 mt-6">
-                <Modal>
-                  <ModalTrigger className="font-bold text-black ">
-                    <span className="  ">
-                      Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
-                    </span>
-                  </ModalTrigger>
-                  <ModalBody>
-                    <ModalContent className='w-full max-h-[80vh] overflow-y-auto '>
-                      {/* Header - Cố định khi cuộn */}
-                      <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
-                        <div className="flex justify-center w-full">
-                          Bai viet cua thang nao do
-                        </div>
-                        <ModalClose className="absolute top-2 right-2">X</ModalClose>
-                      </div>
-                      <div className='body-blogdetail'>
-                        <div className="flex items-center space-x-4 p-2">
-                          <img
-                            src="/user-avatardefault.jpg" // Replace with your avatar image
-                            alt="User Avatar"
-                            className="w-12 h-12 rounded-full"
-                          />
-                          <div className='flex w-full justify-between'>
-                            <div>
-                              <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
-                              <p className="text-sm text-gray-500">4 giờ trước  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
-                            </div>
-                            <div className='setting-blog'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                                  <DropdownMenuItem>Billing</DropdownMenuItem>
-                                  <DropdownMenuItem>Team</DropdownMenuItem>
-                                  <DropdownMenuItem>Subscription</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-
-                            </div>
-                          </div>
-                        </div>
-                        {/* Post Content */}
-                        <h1 className=" px-2 ">
-                          Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
-                        </h1>
-                        <p className="mt-4 text-gray-700 text-xl px-2 ">
-
-                          Với dáng vẻ đầy uy lực cá tính, cùng với khối động cơ L-twin 898cc Superquadro sản xuất công suất 148 mã lực và mô-men xoắn 99 Nm – Panigale 899 mau chóng nhận được rất nhiều sự yêu thích của các Biker.
-                        </p>
-
-                        {/* Post Stats (Likes, Comments, Upload Count) */}
-                        <div className="flex py-3 w-full">
-                          <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
-                            <span className="flex items-center">
-                              28 lượt thích từ người khác
-                            </span>
-                            <div className='flex'>
-                              <span className="flex items-center">
-                                <i className="fas fa-comment text-green-500"></i>
-                                <span className="ml-2">10 bình luận  </span>
-                              </span>
-                              <span className="flex items-center">
-                                <i className="fas fa-image text-red-500"></i>
-                                <span className="ml-2">+16 nộp CV </span>
-                              </span>
-                            </div>
-
-                          </div>
-                        </div>
-                      </div>
-
-
-
-                      {/* Post Stats (Likes, Comments, Upload Count) */}
-                      <div className="flex w-full text-gray-600 border-y-2 p-3">
-                        <div className="flex w-full text-xl justify-between  items-center space-x-4">
-                          <span className="flex items-center">
-                            <i className="fas fa-thumbs-up text-blue-500"></i>
-                            <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp} />  Lượt thích </span>
-                          </span>
-                          <span className="flex items-center">
-                            <i className="fas fa-comment text-green-500"></i>
-                            <span className="ml-2"> <FontAwesomeIcon icon={faComment} /> Bình luận</span>
-                          </span>
-                          <span className="flex items-center">
-                            <i className="fas fa-image text-red-500"></i>
-                            <span className="ml-2"> <FontAwesomeIcon icon={faPaperclip} /> Nộp CV</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Post Comment */}
-                      <div className='blog-comment'>
-                        <div className='filter-comment'>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="outline" className='border-none hover:bg-none'>Phù hợp nhất <FontAwesomeIcon icon={faAngleDown} /></Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80">
-                              <div className="grid gap-4">
-                                <div className="space-y-2 hover:bg-slate-300">
-                                  <h4 className="font-medium leading-none">Phù hợp nhất</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    Hiển thị bình luận được tương tác nhiều nhất
-                                  </p>
-                                </div>
-                                <div className="space-y-2  hover:bg-slate-300">
-                                  <h4 className="font-medium leading-none">Mới nhất</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    Hiển thị tất cả bình luận mới nhất
-                                  </p>
-                                </div>  <div className="space-y-2  hover:bg-slate-300">
-                                  <h4 className="font-medium leading-none">Cũ nhất</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    Hiển thị tất cả bình luận cũ nhất
-                                  </p>
-                                </div>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                        <div className='comment-content w-full px-3 pt-1'>
-                          <div className='account flex p-2'>
-                            <div className='img pr-1'>
-                              <img
-                                src="/user-avatardefault.jpg" // Replace with your avatar image
-                                alt="User Avatar"
-                                className="w-10 h-10 rounded-full"
-                              />
-                            </div>
-                            <div className='comment-account '>
-                              <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                <div className='comment w-full h-auto text-sm text-gray-500'>
-                                  aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                </div>
-                              </div>
-                              <div className='account-time text-xs pl-1'>
-                                1 tuần trước
-                              </div>
-                            </div>
-                            <div className='setting comment pl-2'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                  <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-
-                          </div>
-
-                        </div>
-                        <div className='comment-content w-full px-3 pt-1'>
-                          <div className='account flex p-2'>
-                            <div className='img pr-1'>
-                              <img
-                                src="/user-avatardefault.jpg" // Replace with your avatar image
-                                alt="User Avatar"
-                                className="w-10 h-10 rounded-full"
-                              />
-                            </div>
-                            <div className='comment-account '>
-                              <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                <div className='comment w-full h-auto text-sm text-gray-500'>
-                                  aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                </div>
-                              </div>
-                              <div className='account-time text-xs pl-1'>
-                                1 tuần trước
-                              </div>
-                            </div>
-                            <div className='setting comment pl-2'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                  <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-
-                          </div>
-
-                        </div>
-                        <div className='comment-content w-full px-3 pt-1'>
-                          <div className='account flex p-2'>
-                            <div className='img pr-1'>
-                              <img
-                                src="/user-avatardefault.jpg" // Replace with your avatar image
-                                alt="User Avatar"
-                                className="w-10 h-10 rounded-full"
-                              />
-                            </div>
-                            <div className='comment-account '>
-                              <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                <div className='comment w-full h-auto text-sm text-gray-500'>
-                                  aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                </div>
-                              </div>
-                              <div className='account-time text-xs pl-1'>
-                                1 tuần trước
-                              </div>
-                            </div>
-                            <div className='setting comment pl-2'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                  <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-
-                          </div>
-
-                        </div>
-                      </div>
-
-                    </ModalContent>
-                    <ModalFooter className="justify-start w-full h-auto">
-                      <div className='flex w-full'>
-                        <img
-                          src="/user-avatardefault.jpg" // Replace with your avatar image
-                          alt="User Avatar"
-                          className="w-10 h-10 rounded-full"
-                        />
-                        <div className="relative w-full">
-                          <textarea
-                            className="w-full px-2 py-2 pr-10 border rounded-md resize-none"
-                            placeholder="Hãy làm người văn minh đi"
-                          ></textarea>
-
-                          {/* Nút Send nằm góc phải dưới */}
-                          <button className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
-                            <FontAwesomeIcon icon={faPaperPlane} /> Send
-                          </button>
-                        </div>
-                      </div>
-                    </ModalFooter>
-                  </ModalBody>
-                </Modal>
-              </div>
-              <div className="relative w-full py-5 flex items-center">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full h-[2px] bg-gray-300 blur-md"></div>
-                </div>
-                <div className="relative w-full h-[2px] bg-gray-500"></div>
-              </div>
-              {/* Post Stats (Likes, Comments, Upload Count) */}
-              <div className="flex justify-between mt-1 text-gray-600">
-                <div className="flex  items-center space-x-4">
-                  <span className="flex items-center">
-                    <i className="fas fa-thumbs-up text-blue-500"></i>
-                    <span className="ml-2">28 Likes <FontAwesomeIcon icon={faThumbsUp} /> </span>
-                  </span>
-                  <span className="flex items-center">
-                    <i className="fas fa-comment text-green-500"></i>
-                    <span className="ml-2">10 Comments <FontAwesomeIcon icon={faComment} /></span>
-                  </span>
-                  <span className="flex items-center">
-                    <i className="fas fa-image text-red-500"></i>
-                    <span className="ml-2">+16 Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-          {/* Blog */}
-          <div className='bg-white max-w-3xl mx-3 my-8 p-6 rounded-xl shadow-md  '>
-            <div>
-              {/* Post Header with Avatar, Username, and Date */}
-              <div className="flex items-center space-x-4">
-                <img
-                  src="/user-avatardefault.jpg" // Replace with your avatar image
-                  alt="User Avatar"
-                  className="w-12 h-12 rounded-full"
-                />
-                <div className='flex w-full justify-between'>
-                  <div>
-                    <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
-                    <p className="text-sm text-gray-500">4 giờ trước  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
-                  </div>
-                  <div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>Xóa blog</DropdownMenuItem>
-                        <DropdownMenuItem>Edit blog</DropdownMenuItem>
-                        <DropdownMenuItem>Ghim blog</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </div>
-
-
-              {/* Post Title */}
-              <div className="text-3xl font-semibold text-gray-800 mt-6">
-                <Modal>
-                  <ModalTrigger className="font-bold text-black ">
-                    <span className="  ">
-                      Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
-                    </span>
-                  </ModalTrigger>
-                  <ModalBody>
-                    <ModalContent className='w-full max-h-[80vh] overflow-y-auto '>
-                      {/* Header - Cố định khi cuộn */}
-                      <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
-                        <div className="flex justify-center w-full">
-                          Bai viet cua thang nao do
-                        </div>
-                        <ModalClose className="absolute top-2 right-2">X</ModalClose>
-                      </div>
-                      <div className='body-blogdetail'>
-                        <div className="flex items-center space-x-4 p-2">
-                          <img
-                            src="/user-avatardefault.jpg" // Replace with your avatar image
-                            alt="User Avatar"
-                            className="w-12 h-12 rounded-full"
-                          />
-                          <div className='flex w-full justify-between'>
-                            <div>
-                              <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
-                              <p className="text-sm text-gray-500">4 giờ trước  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
-                            </div>
-                            <div className='setting-blog'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                                  <DropdownMenuItem>Billing</DropdownMenuItem>
-                                  <DropdownMenuItem>Team</DropdownMenuItem>
-                                  <DropdownMenuItem>Subscription</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-
-                            </div>
-                          </div>
-                        </div>
-                        {/* Post Content */}
-                        <h1 className=" px-2 ">
-                          Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
-                        </h1>
-                        <p className="mt-4 text-gray-700 text-xl px-2 ">
-
-                          Với dáng vẻ đầy uy lực cá tính, cùng với khối động cơ L-twin 898cc Superquadro sản xuất công suất 148 mã lực và mô-men xoắn 99 Nm – Panigale 899 mau chóng nhận được rất nhiều sự yêu thích của các Biker.
-                        </p>
-
-                        {/* Post Stats (Likes, Comments, Upload Count) */}
-                        <div className="flex py-3 w-full">
-                          <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
-                            <span className="flex items-center">
-                              28 lượt thích từ người khác
-                            </span>
-                            <div className='flex'>
-                              <span className="flex items-center">
-                                <i className="fas fa-comment text-green-500"></i>
-                                <span className="ml-2">10 bình luận  </span>
-                              </span>
-                              <span className="flex items-center">
-                                <i className="fas fa-image text-red-500"></i>
-                                <span className="ml-2">+16 nộp CV </span>
-                              </span>
-                            </div>
-
-                          </div>
-                        </div>
-                      </div>
-
-
-
-                      {/* Post Stats (Likes, Comments, Upload Count) */}
-                      <div className="flex w-full text-gray-600 border-y-2 p-3">
-                        <div className="flex w-full text-xl justify-between  items-center space-x-4">
-                          <span className="flex items-center">
-                            <i className="fas fa-thumbs-up text-blue-500"></i>
-                            <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp} />  Lượt thích </span>
-                          </span>
-                          <span className="flex items-center">
-                            <i className="fas fa-comment text-green-500"></i>
-                            <span className="ml-2"> <FontAwesomeIcon icon={faComment} /> Bình luận</span>
-                          </span>
-                          <span className="flex items-center">
-                            <i className="fas fa-image text-red-500"></i>
-                            <span className="ml-2"> <FontAwesomeIcon icon={faPaperclip} /> Nộp CV</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Post Comment */}
-                      <div className='blog-comment'>
-                        <div className='filter-comment'>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="outline" className='border-none hover:bg-none'>Phù hợp nhất <FontAwesomeIcon icon={faAngleDown} /></Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80">
-                              <div className="grid gap-4">
-                                <div className="space-y-2 hover:bg-slate-300">
-                                  <h4 className="font-medium leading-none">Phù hợp nhất</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    Hiển thị bình luận được tương tác nhiều nhất
-                                  </p>
-                                </div>
-                                <div className="space-y-2  hover:bg-slate-300">
-                                  <h4 className="font-medium leading-none">Mới nhất</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    Hiển thị tất cả bình luận mới nhất
-                                  </p>
-                                </div>  <div className="space-y-2  hover:bg-slate-300">
-                                  <h4 className="font-medium leading-none">Cũ nhất</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    Hiển thị tất cả bình luận cũ nhất
-                                  </p>
-                                </div>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                        {/* Comment */}
-                        <div className='comment-content w-full px-3 pt-1'>
-                          <div className='account flex p-2'>
-                            <div className='img pr-1'>
-                              <img
-                                src="/user-avatardefault.jpg" // Replace with your avatar image
-                                alt="User Avatar"
-                                className="w-10 h-10 rounded-full"
-                              />
-                            </div>
-                            <div className='comment-account '>
-                              <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                <div className='comment w-full h-auto text-sm text-gray-500'>
-                                  aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                </div>
-                              </div>
-                              <div className='account-time text-xs pl-1'>
-                                1 tuần trước
-                              </div>
-                            </div>
-                            <div className='setting comment pl-2'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                  <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-
-                          </div>
-
-                        </div>
-                        <div className='comment-content w-full px-3 pt-1'>
-                          <div className='account flex p-2'>
-                            <div className='img pr-1'>
-                              <img
-                                src="/user-avatardefault.jpg" // Replace with your avatar image
-                                alt="User Avatar"
-                                className="w-10 h-10 rounded-full"
-                              />
-                            </div>
-                            <div className='comment-account '>
-                              <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                <div className='comment w-full h-auto text-sm text-gray-500'>
-                                  aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                </div>
-                              </div>
-                              <div className='account-time text-xs pl-1'>
-                                1 tuần trước
-                              </div>
-                            </div>
-                            <div className='setting comment pl-2'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                  <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-
-                          </div>
-
-                        </div>
-                        <div className='comment-content w-full px-3 pt-1'>
-                          <div className='account flex p-2'>
-                            <div className='img pr-1'>
-                              <img
-                                src="/user-avatardefault.jpg" // Replace with your avatar image
-                                alt="User Avatar"
-                                className="w-10 h-10 rounded-full"
-                              />
-                            </div>
-                            <div className='comment-account '>
-                              <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                <div className='comment w-full h-auto text-sm text-gray-500'>
-                                  aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                </div>
-                              </div>
-                              <div className='account-time text-xs pl-1'>
-                                1 tuần trước
-                              </div>
-                            </div>
-                            <div className='setting comment pl-2'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                  <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-
-                          </div>
-
-                        </div>
-                      </div>
-
-                    </ModalContent>
-                    <ModalFooter className="justify-start w-full h-auto">
-                      <div className='flex w-full'>
-                        <img
-                          src="/user-avatardefault.jpg" // Replace with your avatar image
-                          alt="User Avatar"
-                          className="w-10 h-10 rounded-full"
-                        />
-                        <div className="relative w-full">
-                          <textarea
-                            className="w-full px-2 py-2 pr-10 border rounded-md resize-none"
-                            placeholder="Hãy làm người văn minh đi"
-                          ></textarea>
-
-                          {/* Nút Send nằm góc phải dưới */}
-                          <button className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
-                            <FontAwesomeIcon icon={faPaperPlane} /> Send
-                          </button>
-                        </div>
-                      </div>
-                    </ModalFooter>
-                  </ModalBody>
-                </Modal>
-              </div>
-
-              <div className="relative w-full py-5 flex items-center">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full h-[2px] bg-gray-300 blur-md"></div>
-                </div>
-                <div className="relative w-full h-[2px] bg-gray-500"></div>
-              </div>
-              {/* Post Stats (Likes, Comments, Upload Count) */}
-              <div className="flex justify-between mt-1 text-gray-600">
-                <div className="flex  items-center space-x-4">
-                  <span className="flex items-center">
-                    <i className="fas fa-thumbs-up text-blue-500"></i>
-                    <span className="ml-2">28 Likes <FontAwesomeIcon icon={faThumbsUp} /> </span>
-                  </span>
-                  <span className="flex items-center">
-                    <i className="fas fa-comment text-green-500"></i>
-                    <span className="ml-2">10 Comments <FontAwesomeIcon icon={faComment} /></span>
-                  </span>
-                  <span className="flex items-center">
-                    <i className="fas fa-image text-red-500"></i>
-                    <span className="ml-2">+16 Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Blog */}
-          <div className='bg-white max-w-3xl mx-3 my-8 p-6 rounded-xl shadow-md  '>
-            <div>
-              {/* Post Header with Avatar, Username, and Date */}
-              <div className="flex items-center space-x-4">
-                <img
-                  src="/user-avatardefault.jpg" // Replace with your avatar image
-                  alt="User Avatar"
-                  className="w-12 h-12 rounded-full"
-                />
-                <div className='flex w-full justify-between'>
-                  <div>
-                    <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
-                    <p className="text-sm text-gray-500">4 giờ trước  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
-                  </div>
-                  <div>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>Xóa blog</DropdownMenuItem>
-                        <DropdownMenuItem>Edit blog</DropdownMenuItem>
-                        <DropdownMenuItem>Ghim blog</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-                </div>
-              </div>
-
-
-              {/* Post Title */}
-              <div className="text-3xl font-semibold text-gray-800 mt-6">
-                <Modal>
-                  <ModalTrigger className="font-bold text-black ">
-                    <span className="  ">
-                      Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
-                    </span>
-                  </ModalTrigger>
-                  <ModalBody>
-                    <ModalContent className='w-full max-h-[80vh] overflow-y-auto '>
-                      {/* Header - Cố định khi cuộn */}
-                      <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
-                        <div className="flex justify-center w-full">
-                          Bai viet cua thang nao do
-                        </div>
-                        <ModalClose className="absolute top-2 right-2">X</ModalClose>
-                      </div>
-                      <div className='body-blogdetail'>
-                        <div className="flex items-center space-x-4 p-2">
-                          <img
-                            src="/user-avatardefault.jpg" // Replace with your avatar image
-                            alt="User Avatar"
-                            className="w-12 h-12 rounded-full"
-                          />
-                          <div className='flex w-full justify-between'>
-                            <div>
-                              <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
-                              <p className="text-sm text-gray-500">4 giờ trước  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
-                            </div>
-                            <div className='setting-blog'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem>Profile</DropdownMenuItem>
-                                  <DropdownMenuItem>Billing</DropdownMenuItem>
-                                  <DropdownMenuItem>Team</DropdownMenuItem>
-                                  <DropdownMenuItem>Subscription</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-
-                            </div>
-                          </div>
-                        </div>
-                        {/* Post Content */}
-                        <h1 className=" px-2 ">
-                          Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
-                        </h1>
-                        <p className="mt-4 text-gray-700 text-xl px-2 ">
-
-                          Với dáng vẻ đầy uy lực cá tính, cùng với khối động cơ L-twin 898cc Superquadro sản xuất công suất 148 mã lực và mô-men xoắn 99 Nm – Panigale 899 mau chóng nhận được rất nhiều sự yêu thích của các Biker.
-                        </p>
-
-                        {/* Post Stats (Likes, Comments, Upload Count) */}
-                        <div className="flex py-3 w-full">
-                          <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
-                            <span className="flex items-center">
-                              28 lượt thích từ người khác
-                            </span>
-                            <div className='flex'>
-                              <span className="flex items-center">
-                                <i className="fas fa-comment text-green-500"></i>
-                                <span className="ml-2">10 bình luận  </span>
-                              </span>
-                              <span className="flex items-center">
-                                <i className="fas fa-image text-red-500"></i>
-                                <span className="ml-2">+16 nộp CV </span>
-                              </span>
-                            </div>
-
-                          </div>
-                        </div>
-                      </div>
-
-
-
-                      {/* Post Stats (Likes, Comments, Upload Count) */}
-                      <div className="flex w-full text-gray-600 border-y-2 p-3">
-                        <div className="flex w-full text-xl justify-between  items-center space-x-4">
-                          <span className="flex items-center">
-                            <i className="fas fa-thumbs-up text-blue-500"></i>
-                            <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp} />  Lượt thích </span>
-                          </span>
-                          <span className="flex items-center">
-                            <i className="fas fa-comment text-green-500"></i>
-                            <span className="ml-2"> <FontAwesomeIcon icon={faComment} /> Bình luận</span>
-                          </span>
-                          <span className="flex items-center">
-                            <i className="fas fa-image text-red-500"></i>
-                            <span className="ml-2"> <FontAwesomeIcon icon={faPaperclip} /> Nộp CV</span>
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Post Comment */}
-                      <div className='blog-comment'>
-                        <div className='filter-comment'>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="outline" className='border-none hover:bg-none'>Phù hợp nhất <FontAwesomeIcon icon={faAngleDown} /></Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-80">
-                              <div className="grid gap-4">
-                                <div className="space-y-2 hover:bg-slate-300">
-                                  <h4 className="font-medium leading-none">Phù hợp nhất</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    Hiển thị bình luận được tương tác nhiều nhất
-                                  </p>
-                                </div>
-                                <div className="space-y-2  hover:bg-slate-300">
-                                  <h4 className="font-medium leading-none">Mới nhất</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    Hiển thị tất cả bình luận mới nhất
-                                  </p>
-                                </div>  <div className="space-y-2  hover:bg-slate-300">
-                                  <h4 className="font-medium leading-none">Cũ nhất</h4>
-                                  <p className="text-sm text-muted-foreground">
-                                    Hiển thị tất cả bình luận cũ nhất
-                                  </p>
-                                </div>
-                              </div>
-                            </PopoverContent>
-                          </Popover>
-                        </div>
-                        <div className='comment-content w-full px-3 pt-1'>
-                          <div className='account flex p-2'>
-                            <div className='img pr-1'>
-                              <img
-                                src="/user-avatardefault.jpg" // Replace with your avatar image
-                                alt="User Avatar"
-                                className="w-10 h-10 rounded-full"
-                              />
-                            </div>
-                            <div className='comment-account '>
-                              <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                <div className='comment w-full h-auto text-sm text-gray-500'>
-                                  aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                </div>
-                              </div>
-                              <div className='account-time text-xs pl-1'>
-                                1 tuần trước
-                              </div>
-                            </div>
-                            <div className='setting comment pl-2'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                  <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-
-                          </div>
-
-                        </div>
-                        <div className='comment-content w-full px-3 pt-1'>
-                          <div className='account flex p-2'>
-                            <div className='img pr-1'>
-                              <img
-                                src="/user-avatardefault.jpg" // Replace with your avatar image
-                                alt="User Avatar"
-                                className="w-10 h-10 rounded-full"
-                              />
-                            </div>
-                            <div className='comment-account '>
-                              <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                <div className='comment w-full h-auto text-sm text-gray-500'>
-                                  aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                </div>
-                              </div>
-                              <div className='account-time text-xs pl-1'>
-                                1 tuần trước
-                              </div>
-                            </div>
-                            <div className='setting comment pl-2'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                  <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-
-                          </div>
-
-                        </div>
-                        <div className='comment-content w-full px-3 pt-1'>
-                          <div className='account flex p-2'>
-                            <div className='img pr-1'>
-                              <img
-                                src="/user-avatardefault.jpg" // Replace with your avatar image
-                                alt="User Avatar"
-                                className="w-10 h-10 rounded-full"
-                              />
-                            </div>
-                            <div className='comment-account '>
-                              <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                <div className='comment w-full h-auto text-sm text-gray-500'>
-                                  aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                </div>
-                              </div>
-                              <div className='account-time text-xs pl-1'>
-                                1 tuần trước
-                              </div>
-                            </div>
-                            <div className='setting comment pl-2'>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                  <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-
-                          </div>
-
-                        </div>
-                      </div>
-
-                    </ModalContent>
-                    <ModalFooter className="justify-start w-full h-auto">
-                      <div className='flex w-full'>
-                        <img
-                          src="/user-avatardefault.jpg" // Replace with your avatar image
-                          alt="User Avatar"
-                          className="w-10 h-10 rounded-full"
-                        />
-                        <div className="relative w-full">
-                          <textarea
-                            className="w-full px-2 py-2 pr-10 border rounded-md resize-none"
-                            placeholder="Hãy làm người văn minh đi"
-                          ></textarea>
-
-                          {/* Nút Send nằm góc phải dưới */}
-                          <button className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
-                            <FontAwesomeIcon icon={faPaperPlane} /> Send
-                          </button>
-                        </div>
-                      </div>
-                    </ModalFooter>
-                  </ModalBody>
-                </Modal>
-              </div>
-
-              <div className="relative w-full py-5 flex items-center">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full h-[2px] bg-gray-300 blur-md"></div>
-                </div>
-                <div className="relative w-full h-[2px] bg-gray-500"></div>
-              </div>
-              {/* Post Stats (Likes, Comments, Upload Count) */}
-              <div className="flex justify-between mt-1 text-gray-600">
-                <div className="flex  items-center space-x-4">
-                  <span className="flex items-center">
-                    <i className="fas fa-thumbs-up text-blue-500"></i>
-                    <span className="ml-2">28 Likes <FontAwesomeIcon icon={faThumbsUp} /> </span>
-                  </span>
-                  <span className="flex items-center">
-                    <i className="fas fa-comment text-green-500"></i>
-                    <span className="ml-2">10 Comments <FontAwesomeIcon icon={faComment} /></span>
-                  </span>
-                  <span className="flex items-center">
-                    <i className="fas fa-image text-red-500"></i>
-                    <span className="ml-2">+16 Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
-                  </span>
-                </div>
-              </div>
+            <div className='header-button pt-3'>
+              <span
+                className={` mx-1 px-2 hover:bg-white hover:text-blue-900 ${filterType === null ? "font-extrabold" : ""}`}
+                onClick={() => handleNoFilter()}
+              >
+                Liên quan
+              </span>
+              <span
+                className={`px-2 hover:bg-white hover:text-blue-900 ${filterType === BlogType.Share ? "font-extrabold" : ""}`}
+                onClick={() => handleFilterChange(BlogType.Share)}
+              >
+                Chia sẻ
+              </span>
+              <span
+                className={`px-2 hover:bg-white hover:text-blue-900 ${filterType === BlogType.Recruit ? "font-extrabold" : ""}`}
+                onClick={() => handleFilterChange(BlogType.Recruit)}
+              >
+                Tìm thành viên
+              </span>
             </div>
           </div>
           {/* Blog */}
@@ -1441,6 +691,39 @@ export default function Blog() {
                           </div>
 
                         </div>
+                        <div className='comment-content w-full px-3 pt-1'>
+                          <div className='account flex p-2'>
+                            <div className='img pr-1'>
+                              <img
+                                src="/user-avatardefault.jpg" // Replace with your avatar image
+                                alt="User Avatar"
+                                className="w-10 h-10 rounded-full"
+                              />
+                            </div>
+                            <div className='comment-account '>
+                              <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
+                                <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
+                                <div className='comment w-full h-auto text-sm text-gray-500'>
+                                  aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
+                                </div>
+                              </div>
+                              <div className='account-time text-xs pl-1'>
+                                1 tuần trước
+                              </div>
+                            </div>
+                            <div className='setting comment pl-2'>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
+                                  <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+
+                          </div>
+
+                        </div>
                       </div>
 
                     </ModalContent>
@@ -1464,10 +747,10 @@ export default function Blog() {
                         </div>
                       </div>
                     </ModalFooter>
+
                   </ModalBody>
                 </Modal>
               </div>
-
               <div className="relative w-full py-5 flex items-center">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full h-[2px] bg-gray-300 blur-md"></div>
@@ -1492,6 +775,205 @@ export default function Blog() {
                 </div>
               </div>
             </div>
+          </div>
+
+
+          {/* Cho show blog all */}
+          <div>
+            {isLoading ? (
+              <p>Loading...</p>
+            ) : (
+              <>
+                {
+                  result?.data?.results?.map((post) => (
+                    // Cho blog detail
+
+                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 rounded-xl shadow-md  '>
+                      <div>
+                        {/* Post Header with Avatar, Username, and Date */}
+                        <div className="flex items-center space-x-4">
+                          <img
+                            src={post.user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
+                            alt="User Avatar"
+                            className="w-12 h-12 rounded-full"
+                          />
+                          <div className='flex w-full justify-between'>
+                            <div>
+                              <p className="text-lg font-semibold text-gray-800">{post.user?.username}</p>
+                              <p className="text-sm text-gray-500">
+                                {post?.createdDate
+                                  ? new Date(post.createdDate).toLocaleString("vi-VN", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                  })
+                                  : "Không có ngày "}
+                                <FontAwesomeIcon icon={faEarthAmericas} />
+                              </p>
+
+                            </div>
+                            <div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem>Ghim blog</DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+                        </div>
+
+
+                        {/* Post Title */}
+                        <div className="text-3xl font-semibold text-gray-800 mt-6">
+                          <Modal>
+                            <ModalTrigger className="font-bold text-black ">
+                              <span className="  ">
+                                {post.title}
+                              </span>
+                            </ModalTrigger>
+                            <ModalBody>
+                              <ModalContent className='w-full max-h-[80vh] overflow-y-auto '>
+                                {/* Header - Cố định khi cuộn */}
+                                <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
+                                  <div className="flex justify-center w-full">
+                                    Bài viết của {post?.user?.username}
+                                  </div>
+                                  <ModalClose className="absolute top-2 right-2">X</ModalClose>
+                                </div>
+                                <div className='body-blogdetail'>
+                                  <div className="flex items-center space-x-4 p-2">
+                                    <img
+                                      src="/user-avatardefault.jpg" // Replace with your avatar image
+                                      alt="User Avatar"
+                                      className="w-12 h-12 rounded-full"
+                                    />
+                                    <div className='flex w-full justify-between'>
+                                      <div>
+                                        <p className="text-lg font-semibold text-gray-800">{post?.user?.lastName} {post?.user?.firstName}</p>
+                                        <p className="text-sm text-gray-500">
+                                          {post?.createdDate
+                                            ? new Date(post.createdDate).toLocaleString("vi-VN", {
+                                              day: "2-digit",
+                                              month: "2-digit",
+                                              year: "numeric",
+                                              hour: "2-digit",
+                                              minute: "2-digit"
+                                            })
+                                            : "Không có ngày "}  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
+                                      </div>
+                                      <div className='setting-blog'>
+                                        <DropdownMenu>
+                                          <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
+                                          <DropdownMenuContent>
+                                            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                            <DropdownMenuSeparator />
+                                            <DropdownMenuItem>Profile</DropdownMenuItem>
+                                            <DropdownMenuItem>Billing</DropdownMenuItem>
+                                            <DropdownMenuItem>Team</DropdownMenuItem>
+                                            <DropdownMenuItem>Subscription</DropdownMenuItem>
+                                          </DropdownMenuContent>
+                                        </DropdownMenu>
+
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {/* Post Content */}
+                                  <h1 className=" px-2 ">
+                                    {post?.title}
+                                  </h1>
+                                  <p className="mt-4 text-gray-700 text-xl px-2 ">
+                                    {post?.content}
+                                  </p>
+
+                                  {/* Post Stats (Likes, Comments, Upload Count) */}
+                                  <div className="flex py-3 w-full">
+                                    <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
+                                      <span className="flex items-center">
+                                        {post?.likes.length ?? 0} lượt thích từ người khác
+                                      </span>
+                                      <div className='flex'>
+                                        <span className="flex items-center">
+                                          <i className="fas fa-comment text-green-500"></i>
+                                          <span className="ml-2">{post?.comments.length ?? 0} bình luận  </span>
+                                        </span>
+                                        <span className="flex items-center">
+                                          <i className="fas fa-image text-red-500"></i>
+                                          <span className="ml-2">{post?.blogCvs.length ?? 0} nộp CV </span>
+                                        </span>
+                                      </div>
+
+                                    </div>
+                                  </div>
+                                </div>
+
+
+
+                                {/* Post Stats (Likes, Comments, Upload Count) */}
+                                <div className="flex w-full text-gray-600 border-y-2 p-3">
+                                  <div className="flex w-full text-xl justify-between  items-center space-x-4">
+                                    <span className="flex items-center">
+                                      <i className="fas fa-thumbs-up text-blue-500"></i>
+                                      <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp} />  Lượt thích </span>
+                                    </span>
+                                    <span className="flex items-center">
+                                      <i className="fas fa-comment text-green-500"></i>
+                                      <span className="ml-2"> <FontAwesomeIcon icon={faComment} /> Bình luận</span>
+                                    </span>
+                                    <span className="flex items-center">
+                                      <i className="fas fa-image text-red-500"></i>
+                                      <span className="ml-2"> <FontAwesomeIcon icon={faPaperclip} /> Nộp CV</span>
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {/* Post Comment */}
+                                <CommentBlog id={post.id ?? ""} />
+                              </ModalContent>
+
+                            </ModalBody>
+                          </Modal>
+                        </div>
+                        <div className="relative w-full py-5 flex items-center">
+                          <div className="absolute inset-0 flex items-center">
+                            <div className="w-full h-[2px] bg-gray-300 blur-md"></div>
+                          </div>
+                          <div className="relative w-full h-[2px] bg-gray-500"></div>
+                        </div>
+                        {/* Post Stats (Likes, Comments, Upload Count) */}
+                        <div className="flex justify-between mt-1 text-gray-600">
+                          <div className="flex  items-center space-x-4">
+                            <span className="flex items-center">
+                              <i className="fas fa-thumbs-up text-blue-500"></i>
+                              <span className="ml-2">    {post.likes?.length ?? 0}  Likes <FontAwesomeIcon icon={faThumbsUp} /> </span>
+                            </span>
+                            <span className="flex items-center">
+                              <i className="fas fa-comment text-green-500"></i>
+                              <span className="ml-2">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
+                            </span>
+                            <span className="flex items-center">
+                              <i className="fas fa-image text-red-500"></i>
+                              <span className="ml-2">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+
+                }
+
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </>
+            )}
           </div>
 
         </div>
@@ -1504,283 +986,29 @@ export default function Blog() {
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
                     <h1 className='text-xl text-black font-extrabold'># Discuss</h1>
-                    <p className="font-normal text-xm text-gray-700 mb-4  ">
+                    <p className="font-normal text-xm text-gray-700 px-4 py-2  ">
                       Discussion threads targeting the whole community
                     </p>
                   </div>
                 </div>
-                <div className='w-full h-auto border-b-2 border-gray-200 px-2 py-2'>
-                  <Modal >
-                    <ModalTrigger className="font-bold text-start text-gray-700 mb-2 px-0  ">
-                      <p className="  ">
-                        Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
-                      </p>
-                    </ModalTrigger>
-                    <ModalBody>
-                      <ModalContent className='w-full max-h-[80vh] overflow-y-auto '>
-                        {/* Header - Cố định khi cuộn */}
-                        <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
-                          <div className="flex justify-center w-full">
-                            Bai viet cua thang nao do
-                          </div>
-                          <ModalClose className="absolute top-2 right-2">X</ModalClose>
-                        </div>
-                        <div className='body-blogdetail'>
-                          <div className="flex items-center space-x-4 p-2">
-                            <img
-                              src="/user-avatardefault.jpg" // Replace with your avatar image
-                              alt="User Avatar"
-                              className="w-12 h-12 rounded-full"
-                            />
-                            <div className='flex w-full justify-between'>
-                              <div>
-                                <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
-                                <p className="text-sm text-gray-500">4 giờ trước  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
-                              </div>
-                              <div className='setting-blog'>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                                    <DropdownMenuItem>Billing</DropdownMenuItem>
-                                    <DropdownMenuItem>Team</DropdownMenuItem>
-                                    <DropdownMenuItem>Subscription</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                {sortedNotification.slice(0, 4).map((postNt, index) => (
 
-                              </div>
-                            </div>
-                          </div>
-                          {/* Post Content */}
-                          <h1 className=" px-2 ">
-                            Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
-                          </h1>
-                          <p className="mt-4 text-gray-700 text-xl px-2 ">
-
-                            Với dáng vẻ đầy uy lực cá tính, cùng với khối động cơ L-twin 898cc Superquadro sản xuất công suất 148 mã lực và mô-men xoắn 99 Nm – Panigale 899 mau chóng nhận được rất nhiều sự yêu thích của các Biker.
-                          </p>
-
-                          {/* Post Stats (Likes, Comments, Upload Count) */}
-                          <div className="flex py-3 w-full">
-                            <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
-                              <span className="flex items-center">
-                                28 lượt thích từ người khác
-                              </span>
-                              <div className='flex'>
-                                <span className="flex items-center">
-                                  <i className="fas fa-comment text-green-500"></i>
-                                  <span className="ml-2">10 bình luận  </span>
-                                </span>
-                                <span className="flex items-center">
-                                  <i className="fas fa-image text-red-500"></i>
-                                  <span className="ml-2">+16 nộp CV </span>
-                                </span>
-                              </div>
-
-                            </div>
-                          </div>
-                        </div>
-
-
-
-                        {/* Post Stats (Likes, Comments, Upload Count) */}
-                        <div className="flex w-full text-gray-600 border-y-2 p-3">
-                          <div className="flex w-full text-xl justify-between  items-center space-x-4">
-                            <span className="flex items-center">
-                              <i className="fas fa-thumbs-up text-blue-500"></i>
-                              <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp} />  Lượt thích </span>
-                            </span>
-                            <span className="flex items-center">
-                              <i className="fas fa-comment text-green-500"></i>
-                              <span className="ml-2"> <FontAwesomeIcon icon={faComment} /> Bình luận</span>
-                            </span>
-                            <span className="flex items-center">
-                              <i className="fas fa-image text-red-500"></i>
-                              <span className="ml-2"> <FontAwesomeIcon icon={faPaperclip} /> Nộp CV</span>
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Post Comment */}
-                        <div className='blog-comment'>
-                          <div className='filter-comment'>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button variant="outline" className='border-none hover:bg-none'>Phù hợp nhất <FontAwesomeIcon icon={faAngleDown} /></Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-80">
-                                <div className="grid gap-4">
-                                  <div className="space-y-2 hover:bg-slate-300">
-                                    <h4 className="font-medium leading-none">Phù hợp nhất</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      Hiển thị bình luận được tương tác nhiều nhất
-                                    </p>
-                                  </div>
-                                  <div className="space-y-2  hover:bg-slate-300">
-                                    <h4 className="font-medium leading-none">Mới nhất</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      Hiển thị tất cả bình luận mới nhất
-                                    </p>
-                                  </div>  <div className="space-y-2  hover:bg-slate-300">
-                                    <h4 className="font-medium leading-none">Cũ nhất</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      Hiển thị tất cả bình luận cũ nhất
-                                    </p>
-                                  </div>
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          </div>
-                          <div className='comment-content w-full px-3 pt-1'>
-                            <div className='account flex p-2'>
-                              <div className='img pr-1'>
-                                <img
-                                  src="/user-avatardefault.jpg" // Replace with your avatar image
-                                  alt="User Avatar"
-                                  className="w-10 h-10 rounded-full"
-                                />
-                              </div>
-                              <div className='comment-account '>
-                                <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                  <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                  <div className='comment w-full h-auto text-sm text-gray-500'>
-                                    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                  </div>
-                                </div>
-                                <div className='account-time text-xs pl-1'>
-                                  1 tuần trước
-                                </div>
-                              </div>
-                              <div className='setting comment pl-2'>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                    <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-
-                            </div>
-
-                          </div>
-                          <div className='comment-content w-full px-3 pt-1'>
-                            <div className='account flex p-2'>
-                              <div className='img pr-1'>
-                                <img
-                                  src="/user-avatardefault.jpg" // Replace with your avatar image
-                                  alt="User Avatar"
-                                  className="w-10 h-10 rounded-full"
-                                />
-                              </div>
-                              <div className='comment-account '>
-                                <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                  <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                  <div className='comment w-full h-auto text-sm text-gray-500'>
-                                    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                  </div>
-                                </div>
-                                <div className='account-time text-xs pl-1'>
-                                  1 tuần trước
-                                </div>
-                              </div>
-                              <div className='setting comment pl-2'>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                    <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-
-                            </div>
-
-                          </div>
-                          <div className='comment-content w-full px-3 pt-1'>
-                            <div className='account flex p-2'>
-                              <div className='img pr-1'>
-                                <img
-                                  src="/user-avatardefault.jpg" // Replace with your avatar image
-                                  alt="User Avatar"
-                                  className="w-10 h-10 rounded-full"
-                                />
-                              </div>
-                              <div className='comment-account '>
-                                <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                  <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                  <div className='comment w-full h-auto text-sm text-gray-500'>
-                                    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                  </div>
-                                </div>
-                                <div className='account-time text-xs pl-1'>
-                                  1 tuần trước
-                                </div>
-                              </div>
-                              <div className='setting comment pl-2'>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                    <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-
-                            </div>
-
-                          </div>
-                        </div>
-
-                      </ModalContent>
-                      <ModalFooter className="justify-start w-full h-auto">
-                        <div className='flex w-full'>
-                          <img
-                            src="/user-avatardefault.jpg" // Replace with your avatar image
-                            alt="User Avatar"
-                            className="w-10 h-10 rounded-full"
-                          />
-                          <div className="relative w-full">
-                            <textarea
-                              className="w-full px-2 py-2 pr-10 border rounded-md resize-none"
-                              placeholder="Hãy làm người văn minh đi"
-                            ></textarea>
-
-                            {/* Nút Send nằm góc phải dưới */}
-                            <button className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
-                              <FontAwesomeIcon icon={faPaperPlane} /> Send
-                            </button>
-                          </div>
-                        </div>
-                      </ModalFooter>
-                    </ModalBody>
-                  </Modal>
-                  <p className='text-xm'>20 Comment</p>
-
-                </div>
-                <div className='w-full h-auto border-b-2 border-gray-200 px-2 py-2'>
-                  <div className=''>
-                    <h2 className="font-bold  text-gray-700 mb-2 ">
-                      Meme everyday
-                    </h2>
-                    <p className='text-xm'>20 Comment</p>
+                  <div className='w-full h-auto border-b-2 border-gray-200 px-5 py-2'>
+                    <div className=''>
+                      <h2 className="font-bold  text-gray-700 mb-2 ">
+                        {postNt.title}
+                      </h2>
+                      <p className='text-xm'>{postNt.comments.length ?? 0} comments</p>
+                    </div>
                   </div>
-                </div>
-                <div className='w-full h-auto border-b-2 border-gray-200 px-2 py-2'>
-                  <div className=''>
-                    <h2 className="font-bold  text-gray-700 mb-2 ">
-                      Son sang ngay bi ia chay
-                    </h2>
-                    <p className='text-xm'>20 Comment</p>
-                  </div>
-                </div>
+                )
+                )
+                }
                 <div className=" px-4 py-1 rounded-lg ">
                   Explore
                 </div>
                 {/* Meaty part - Meteor effect */}
-                <Meteors number={20} />
+                {/* <Meteors number={20} /> */}
               </div>
             </div>
           </div>
@@ -1792,287 +1020,34 @@ export default function Blog() {
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
                     <h1 className='text-xl text-black'># Notification</h1>
-                    <p className="font-normal text-xm text-gray-700 mb-4 ">
+                    <p className="font-normal text-xm text-gray-700 px-4 py-2  ">
                       hong hot drama truong fpt
                     </p>
                   </div>
                 </div>
-                <div className='w-full h-auto border-b-2 border-gray-200 px-2 py-2'>
-                  <div className=''>
-                  <Modal >
-                    <ModalTrigger className="font-bold text-start text-gray-700 mb-2 px-0  ">
-                      <p className="  ">
-                        Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
-                      </p>
-                    </ModalTrigger>
-                    <ModalBody>
-                      <ModalContent className='w-full max-h-[80vh] overflow-y-auto '>
-                        {/* Header - Cố định khi cuộn */}
-                        <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
-                          <div className="flex justify-center w-full">
-                            Bai viet cua thang nao do
-                          </div>
-                          <ModalClose className="absolute top-2 right-2">X</ModalClose>
-                        </div>
-                        <div className='body-blogdetail'>
-                          <div className="flex items-center space-x-4 p-2">
-                            <img
-                              src="/user-avatardefault.jpg" // Replace with your avatar image
-                              alt="User Avatar"
-                              className="w-12 h-12 rounded-full"
-                            />
-                            <div className='flex w-full justify-between'>
-                              <div>
-                                <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
-                                <p className="text-sm text-gray-500">4 giờ trước  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
-                              </div>
-                              <div className='setting-blog'>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                                    <DropdownMenuItem>Billing</DropdownMenuItem>
-                                    <DropdownMenuItem>Team</DropdownMenuItem>
-                                    <DropdownMenuItem>Subscription</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                {sortFpt.slice(0, 4).map((blogfpt, index) => (
 
-                              </div>
-                            </div>
-                          </div>
-                          {/* Post Content */}
-                          <h1 className=" px-2 ">
-                            Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
-                          </h1>
-                          <p className="mt-4 text-gray-700 text-xl px-2 ">
-
-                            Với dáng vẻ đầy uy lực cá tính, cùng với khối động cơ L-twin 898cc Superquadro sản xuất công suất 148 mã lực và mô-men xoắn 99 Nm – Panigale 899 mau chóng nhận được rất nhiều sự yêu thích của các Biker.
-                          </p>
-
-                          {/* Post Stats (Likes, Comments, Upload Count) */}
-                          <div className="flex py-3 w-full">
-                            <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
-                              <span className="flex items-center">
-                                28 lượt thích từ người khác
-                              </span>
-                              <div className='flex'>
-                                <span className="flex items-center">
-                                  <i className="fas fa-comment text-green-500"></i>
-                                  <span className="ml-2">10 bình luận  </span>
-                                </span>
-                                <span className="flex items-center">
-                                  <i className="fas fa-image text-red-500"></i>
-                                  <span className="ml-2">+16 nộp CV </span>
-                                </span>
-                              </div>
-
-                            </div>
-                          </div>
-                        </div>
-
-
-
-                        {/* Post Stats (Likes, Comments, Upload Count) */}
-                        <div className="flex w-full text-gray-600 border-y-2 p-3">
-                          <div className="flex w-full text-xl justify-between  items-center space-x-4">
-                            <span className="flex items-center">
-                              <i className="fas fa-thumbs-up text-blue-500"></i>
-                              <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp} />  Lượt thích </span>
-                            </span>
-                            <span className="flex items-center">
-                              <i className="fas fa-comment text-green-500"></i>
-                              <span className="ml-2"> <FontAwesomeIcon icon={faComment} /> Bình luận</span>
-                            </span>
-                            <span className="flex items-center">
-                              <i className="fas fa-image text-red-500"></i>
-                              <span className="ml-2"> <FontAwesomeIcon icon={faPaperclip} /> Nộp CV</span>
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Post Comment */}
-                        <div className='blog-comment'>
-                          <div className='filter-comment'>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <Button variant="outline" className='border-none hover:bg-none'>Phù hợp nhất <FontAwesomeIcon icon={faAngleDown} /></Button>
-                              </PopoverTrigger>
-                              <PopoverContent className="w-80">
-                                <div className="grid gap-4">
-                                  <div className="space-y-2 hover:bg-slate-300">
-                                    <h4 className="font-medium leading-none">Phù hợp nhất</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      Hiển thị bình luận được tương tác nhiều nhất
-                                    </p>
-                                  </div>
-                                  <div className="space-y-2  hover:bg-slate-300">
-                                    <h4 className="font-medium leading-none">Mới nhất</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      Hiển thị tất cả bình luận mới nhất
-                                    </p>
-                                  </div>  <div className="space-y-2  hover:bg-slate-300">
-                                    <h4 className="font-medium leading-none">Cũ nhất</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                      Hiển thị tất cả bình luận cũ nhất
-                                    </p>
-                                  </div>
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          </div>
-                          <div className='comment-content w-full px-3 pt-1'>
-                            <div className='account flex p-2'>
-                              <div className='img pr-1'>
-                                <img
-                                  src="/user-avatardefault.jpg" // Replace with your avatar image
-                                  alt="User Avatar"
-                                  className="w-10 h-10 rounded-full"
-                                />
-                              </div>
-                              <div className='comment-account '>
-                                <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                  <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                  <div className='comment w-full h-auto text-sm text-gray-500'>
-                                    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                  </div>
-                                </div>
-                                <div className='account-time text-xs pl-1'>
-                                  1 tuần trước
-                                </div>
-                              </div>
-                              <div className='setting comment pl-2'>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                    <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-
-                            </div>
-
-                          </div>
-                          <div className='comment-content w-full px-3 pt-1'>
-                            <div className='account flex p-2'>
-                              <div className='img pr-1'>
-                                <img
-                                  src="/user-avatardefault.jpg" // Replace with your avatar image
-                                  alt="User Avatar"
-                                  className="w-10 h-10 rounded-full"
-                                />
-                              </div>
-                              <div className='comment-account '>
-                                <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                  <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                  <div className='comment w-full h-auto text-sm text-gray-500'>
-                                    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                  </div>
-                                </div>
-                                <div className='account-time text-xs pl-1'>
-                                  1 tuần trước
-                                </div>
-                              </div>
-                              <div className='setting comment pl-2'>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                    <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-
-                            </div>
-
-                          </div>
-                          <div className='comment-content w-full px-3 pt-1'>
-                            <div className='account flex p-2'>
-                              <div className='img pr-1'>
-                                <img
-                                  src="/user-avatardefault.jpg" // Replace with your avatar image
-                                  alt="User Avatar"
-                                  className="w-10 h-10 rounded-full"
-                                />
-                              </div>
-                              <div className='comment-account '>
-                                <div className=' h-auto bg-gray-200 border-3 p-2 rounded-xl max-w-[800px]'>
-                                  <div className='account-name font-bold text-sm'> Son Ngu Ngoc</div>
-                                  <div className='comment w-full h-auto text-sm text-gray-500'>
-                                    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa    aaaaaaaaaaaaaaaaaaaaaa
-                                  </div>
-                                </div>
-                                <div className='account-time text-xs pl-1'>
-                                  1 tuần trước
-                                </div>
-                              </div>
-                              <div className='setting comment pl-2'>
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem>Xóa bình luận</DropdownMenuItem>
-                                    <DropdownMenuItem>Báo cáo bình luận</DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-
-                            </div>
-
-                          </div>
-                        </div>
-
-                      </ModalContent>
-                      <ModalFooter className="justify-start w-full h-auto">
-                        <div className='flex w-full'>
-                          <img
-                            src="/user-avatardefault.jpg" // Replace with your avatar image
-                            alt="User Avatar"
-                            className="w-10 h-10 rounded-full"
-                          />
-                          <div className="relative w-full">
-                            <textarea
-                              className="w-full px-2 py-2 pr-10 border rounded-md resize-none"
-                              placeholder="Hãy làm người văn minh đi"
-                            ></textarea>
-
-                            {/* Nút Send nằm góc phải dưới */}
-                            <button className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
-                              <FontAwesomeIcon icon={faPaperPlane} /> Send
-                            </button>
-                          </div>
-                        </div>
-                      </ModalFooter>
-                    </ModalBody>
-                  </Modal>
-                    <p className='text-xm'>20 Comment</p>
+                  <div className='w-full h-auto border-b-2 border-gray-200 px-5 py-2'>
+                    <div className=''>
+                      <h2 className="font-bold  text-gray-700 mb-2 ">
+                        {blogfpt.title}
+                      </h2>
+                      <p className='text-xm'>  {blogfpt.comments.length ?? 0} Comment</p>
+                    </div>
                   </div>
-                </div>
-                <div className='w-full h-auto border-b-2 border-gray-200 px-2 py-2'>
-                  <div className=''>
-                    <h2 className="font-bold  text-gray-700 mb-2 ">
-                      Ban B bi bong de
-                    </h2>
-                    <p className='text-xm'>20 Comment</p>
-                  </div>
-                </div>
-                <div className='w-full h-auto border-b-2 border-gray-200 px-2 py-2'>
-                  <div className=''>
-                    <h2 className="font-bold  text-gray-700 mb-2 ">
-                      Thu va Loc sang ngay bi ia chay
-                    </h2>
-                    <p className='text-xm'>20 Comment</p>
-                  </div>
-                </div>
+
+                ))}
+
+
                 <div className=" px-4 py-1 rounded-lg ">
                   Explore
                 </div>
                 {/* Meaty part - Meteor effect */}
-                <Meteors number={20} />
+                {/* <Meteors number={20} /> */}
               </div>
             </div>
           </div>
+
           <div className='box-trending'>
             <div className='w-full h-auto  px-2 py-2'>
               <div className='text-black font-extrabold '>Trending</div>
@@ -2096,7 +1071,7 @@ export default function Blog() {
         </div>
       </div>
 
-    </div>
+    </div >
 
   )
 }
