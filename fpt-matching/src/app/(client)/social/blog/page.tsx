@@ -41,6 +41,7 @@ import { toast } from 'sonner';
 import { BlogStatus, BlogType } from '@/types/enums/blog';
 import BlogDetail from '../../../../components/_common/blogdetail/blog-detail';
 import { BlogCreateCommand } from '@/types/models/commands/blog/blog-create-command';
+import LikeBlog from '@/components/_common/likeblog/like-blog';
 export default function Blog() {
 
 
@@ -108,6 +109,9 @@ export default function Blog() {
       toast.error("⚠️ Lỗi hệ thống, vui lòng thử lại sau!");
     }
   };
+
+
+
   //gọi thông tin user đã đăng nhập
   const user = useSelector((state: RootState) => state.user.user)
 
@@ -894,7 +898,7 @@ export default function Blog() {
                                   <div className="flex py-3 w-full">
                                     <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
                                       <span className="flex items-center">
-                                        {post?.likes.length ?? 0} lượt thích từ người khác
+                                        <LikeBlog postId={post?.id ?? ""} />
                                       </span>
                                       <div className='flex'>
                                         <span className="flex items-center">
@@ -918,7 +922,7 @@ export default function Blog() {
                                   <div className="flex w-full text-xl justify-between  items-center space-x-4">
                                     <span className="flex items-center">
                                       <i className="fas fa-thumbs-up text-blue-500"></i>
-                                      <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp} />  Lượt thích </span>
+                                      <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp}  />  Lượt thích </span>
                                     </span>
                                     <span className="flex items-center">
                                       <i className="fas fa-comment text-green-500"></i>
@@ -949,7 +953,7 @@ export default function Blog() {
                           <div className="flex  items-center space-x-4">
                             <span className="flex items-center">
                               <i className="fas fa-thumbs-up text-blue-500"></i>
-                              <span className="ml-2">    {post.likes?.length ?? 0}  Likes <FontAwesomeIcon icon={faThumbsUp} /> </span>
+                              <span className="ml-2">           <LikeBlog postId={post?.id ?? ""} /> </span>
                             </span>
                             <span className="flex items-center">
                               <i className="fas fa-comment text-green-500"></i>

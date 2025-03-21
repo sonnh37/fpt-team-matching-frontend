@@ -47,8 +47,6 @@ class InvitationService extends BaseService<Invitation> {
         `${this.endpoint}/send-by-student`, // Không có /${command}
         command // Truyền object vào body
       );
-      
-      
       return response;
     } catch (error) {
       this.handleError(error);
@@ -57,12 +55,13 @@ class InvitationService extends BaseService<Invitation> {
   };
 
   
-  public sendByTeam = async (command: TeamInvitationCommand): Promise<boolean> => {
+  public sendByTeam = async (command: TeamInvitationCommand): Promise<BusinessResultWithoutData> => {
     try {
-      const response = await axiosInstance.post<boolean>(
-        `${this.endpoint}/send-by-student/${command}`
+      const response = await axiosInstance.post<BusinessResultWithoutData>(
+        `${this.endpoint}/sent-by-team` ,
+        command
       );
-      return response.data ; // Đảm bảo trả về boolean
+      return response ; 
     } catch (error) {
       this.handleError(error);
       return Promise.reject(error); // Trả về `false` thay vì `Promise.reject(error)`

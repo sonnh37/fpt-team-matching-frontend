@@ -25,6 +25,10 @@ import { ideaService } from "@/services/idea-service";
 import { UpdateCommand } from "@/types/models/commands/_base/base-command";
 import { IdeaUpdateCommand } from "@/types/models/commands/idea/idae-update-command";
 import { toast } from "sonner";
+import { TeamInvitationCommand } from "@/types/models/commands/invitation/invitation-team-command";
+import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
+import { userService } from "@/services/user-service";
+import { ProjectStatus } from "@/types/enums/project";
 
 
 const formSchema = z.object({
@@ -39,7 +43,7 @@ const formSchema = z.object({
 const UpdateProjectTeam = () => {
 
   const user = useSelector((state: RootState) => state.user.user);
-
+  const [email, setEmailInvite] = useState<string>("");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -52,6 +56,7 @@ const UpdateProjectTeam = () => {
   //goi api bang tanstack
   const {
     data: result,
+    refetch
 
   } = useQuery({
     queryKey: ["getTeamInfo"],
@@ -69,7 +74,7 @@ const UpdateProjectTeam = () => {
       });
     }
   }, [result?.data, form.reset]);
-  
+
 
 
   // sap xep lai member
@@ -81,24 +86,61 @@ const UpdateProjectTeam = () => {
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const haha : IdeaUpdateCommand ={
+    const haha: IdeaUpdateCommand = {
       englishName: values?.englishTitle,
       abbreviations: values?.abbreviation,
       vietNamName: values?.vietnameseTitle,
       description: values?.description
     }
-   
+
 
     const result = await ideaService.update(haha);
-    if(result?.status === 1){
-       toast("Bạn đã chỉnh sửa thành công")
+    if (result?.status === 1) {
+      toast("Bạn đã chỉnh sửa thành công")
     }
-    console.log("test",result);
+    console.log("test", result);
   }
 
+  // team mời thành viên
+  const handleInvite = async () => {
+    if (!email) {
+      toast.error("Vui lòng nhập email người dùng để mời")
+      return
+    }
+    if (availableSlots === 0) {
+      toast.error("Hiện tại nhóm đã đủ thành viên")
+      return
+    }
+    const query1: UserGetAllQuery = {
+      email: email
+    }
+    // check email người dùng
+    const receiver = await userService.fetchAll(query1);
+    if (receiver.status === 1 && receiver.data) {
+      const idReceiver = receiver.data[0].id;
+      console.log("User ID:", idReceiver);
+      // check project coi leader nó team không
+      const prj = await projectService.getProjectInfo();
 
-  const handleInvite = () => {
-    // const result = invitationService.
+      if (prj.status !== 1) {
+        toast(prj.message)
+      }
+      // const result = invitationService.
+      const query: TeamInvitationCommand = {
+        receivedId: receiver.data?.[0]?.id ?? "",
+        projectId: prj.data?.id ?? ""
+      }
+      const result = await invitationService.sendByTeam(query);
+      if (result.status === 1) {
+        toast.success("Chúc mừng bạn đã gửi lời mời thành công")
+        setEmailInvite(""); //Reset mail lại cho mời tiếp
+      } else {
+        toast.error(result.message)
+      }
+    } else {
+      toast("Nguời dùng không tồn tại");
+    }
+
 
   };
 
@@ -199,19 +241,23 @@ const UpdateProjectTeam = () => {
 
 
           <div className="space-y-2">
-              <FormItem>
-                <label className="text-sm font-medium">Invite Email</label>
-                <p className="text-gray-500 text-xs mb-2">
-                  You can only invite students whose specialties are allowed to work on the same thesis topic as yours in this term.
-                </p>
-                <FormControl>
-                  <div className="flex space-x-2">
-                    <Input placeholder="Example@fpt.edu.vn"  />
-                    <Button type="button" onClick={handleInvite}>Invite</Button>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+            <FormItem>
+              <label className="text-sm font-medium">Invite Email</label>
+              <p className="text-gray-500 text-xs mb-2">
+                You can only invite students whose specialties are allowed to work on the same thesis topic as yours in this term.
+              </p>
+              <FormControl>
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="Example@fpt.edu.vn"
+                    value={email} // Gán giá trị từ state
+                    onChange={(e) => setEmailInvite(e.target.value)} // Cập nhật state khi nhập
+                  />
+                  <Button type="button" onClick={handleInvite}>Invite</Button>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
           </div>
           {/* Submit Button */}
           <button type="submit" className="w-full bg-purple-400 text-white mt-6 p-3 rounded-lg hover:bg-purple-500 transition">
