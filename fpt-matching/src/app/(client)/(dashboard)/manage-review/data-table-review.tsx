@@ -131,7 +131,7 @@ export function ReviewDataTable<TData, TValue>({
         },
     });
     const [date, setDate] = React.useState<Date>()
-    const [status, setStatus] = React.useState<string|undefined>(undefined)
+    const [status, setStatus] = React.useState<string|undefined>("")
     return (
         <>
             {/*-------------- Filter part -------------*/}

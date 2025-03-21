@@ -24,6 +24,8 @@ import {
 
 import { Progress } from "@/components/ui/progress"
 import { Label } from "@/components/ui/label";
+import {semesterService} from "@/services/semester-service";
+import {Semester} from "@/types/semester";
 
 // Custom components
 
@@ -76,27 +78,51 @@ export default function Page ()  {
     const [reviews, setReviews] = useState<Review[] | null>(null)
     const [reviewNumber, setReviewNumber] = useState<string>("1")
     const [loading, setLoading] = useState<boolean>(true)
-
+    const [currentSemester, setCurrentSemester] = useState<Semester | null>(null)
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true)
-            const result = await reviewService.fetchReviewBySemesterAndReviewNumber({semesterId: "ab61a0c5-4cef-455f-8903-e32ffa05861e", reviewNumber: parseInt(reviewNumber)})
-            if (result.data) {
-                setReviews(result.data)
-                setLoading(false)
+        const fetchDataReview = async () => {
+            if (currentSemester) {
+                setLoading(true)
+                const result = await reviewService.fetchReviewBySemesterAndReviewNumber({semesterId: currentSemester.id!, reviewNumber: parseInt(reviewNumber)})
+                if (result.data) {
+                    setReviews(result.data)
+                    setLoading(false)
+                }
             }
         }
-        fetchData()
-    }, [reviewNumber]);
+        fetchDataReview()
+    }, [reviewNumber, currentSemester]);
+
+    useEffect(() => {
+        const fetchCurrentSemester = async () => {
+            const result = await semesterService.getCurrentSemester();
+            if (result.data) {
+                setCurrentSemester(result.data)
+            }
+        }
+
+        fetchCurrentSemester()
+    }, [])
+
+    console.log(currentSemester)
     const router = useRouter()
     return (
         <div className={"px-4"}>
-            <div className={"mb-4"}>
-                <ButtonWithIcon router={router} />
+            <div className={"mb-4 flex "}>
+                <div className={"w-1/6"}>
+                    <ButtonWithIcon router={router} />
+                </div>
+                {<div className={"w-2/3 flex justify-center items-center"}>
+                    <div className={"font-bold text-2xl"}>
+                        Current term: {currentSemester?.semesterName} - {currentSemester?.semesterCode}
+                    </div>
+                </div>}
             </div>
-            <div className={"mb-4"}>
-                <Label className={"text-xs text-gray-500 pl-2 pb-2"}>Review number</Label>
-                <SelectReview setReviewNumber={setReviewNumber} />
+            <div className={"mb-4 flex justify-center"}>
+                <div className={"flex items-center flex-col justify-center"}>
+                    <Label className={"text-sm text-gray-700  pb-2"}>Review number</Label>
+                    <SelectReview setReviewNumber={setReviewNumber} />
+                </div>
             </div>
             {
                 loading ? <ProgressGetReview /> :  reviews && ( <ReviewDataTable data={reviews} columns={ReviewColumns} />)

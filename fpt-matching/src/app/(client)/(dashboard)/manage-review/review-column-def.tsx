@@ -65,6 +65,9 @@ export const ReviewColumns: ColumnDef<Review>[] = [
     {
         id:"status",
         header: "Status",
+        accessorFn: (row) => {
+            return row.reviewDate && row.room && row.slot ? "Assigned" : "Not yet";
+        },
         cell: ({row}) => {
             const reviewDate = row.getValue<Date | null>("reviewDate");
             const room = row.getValue<string | null>("room");
@@ -73,8 +76,4 @@ export const ReviewColumns: ColumnDef<Review>[] = [
             return (reviewDate && room && slot ) ? (<Button className={"px-4 bg-green-600"}>Assigned</Button>) : (<Button variant={"destructive"}>Not yet</Button>)
         }
     },
-    // {
-    //     accessorKey: "reviewer1",
-    //     header: "Reviewer 1",
-    // },
 ]
