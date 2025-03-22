@@ -143,7 +143,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <DialogTitle>Idea detail</DialogTitle>
           </DialogHeader>
           <div className="grid p-4">
-            <div className="flex gap-1 justify-start items-center">
+            {/* <div className="flex gap-1 justify-start items-center">
               <strong>Mentor</strong>
               <Badge
                 variant={
@@ -157,7 +157,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 {IdeaRequestStatus[mentorApproval?.status ?? 0]}
               </Badge>
               <p>{": " + mentorApproval.content}</p>
-            </div>
+            </div> */}
             <HorizontalLinearStepper idea={idea} />
             {/* {isResultDay ? (
               <TypographyP>
