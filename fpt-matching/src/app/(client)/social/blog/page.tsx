@@ -41,6 +41,7 @@ import { toast } from 'sonner';
 import { BlogStatus, BlogType } from '@/types/enums/blog';
 import BlogDetail from '../../../../components/_common/blogdetail/blog-detail';
 import { BlogCreateCommand } from '@/types/models/commands/blog/blog-create-command';
+import LikeBlog from '@/components/_common/likeblog/like-blog';
 export default function Blog() {
 
 
@@ -48,7 +49,7 @@ export default function Blog() {
   const [totalPages, setTotalPages] = useState<number>(1);
   const [postType, setPostType] = useState(BlogType.Share); // Loại bài viết
   const [formData, setFormData] = useState({
-    projectId: ""  ,
+    projectId: "",
     title: "",
     content: "",
     skillRequired: "",
@@ -108,12 +109,15 @@ export default function Blog() {
       toast.error("⚠️ Lỗi hệ thống, vui lòng thử lại sau!");
     }
   };
+
+
+
   //gọi thông tin user đã đăng nhập
   const user = useSelector((state: RootState) => state.user.user)
 
 
   // chỗ check user coi có project chưa 
-  const checkProjectUser = user?.projects.find(x=> x.isDeleted === false && x.teamMembers.find(u => u.userId === user.id));
+  const checkProjectUser = user?.projects.find(x => x.isDeleted === false && x.teamMembers.find(u => u.userId === user.id));
 
   let query: BlogGetAllQuery = { pageNumber: currentPage };
   // NẾU NGƯỜI DÙNG BẤM FILTER THÌ MỚI HIỆN RA
@@ -130,6 +134,7 @@ export default function Blog() {
     queryFn: () => blogService.fetchPaginated(query),
     refetchOnWindowFocus: false,
   });
+
 
 
   useEffect(() => {
@@ -160,7 +165,7 @@ export default function Blog() {
     <div className='bg-slate-200'>
       <div className='blog-center flex flex-row max-w-screen-2xl h-auto mx-auto bg-slate-200 '>
         {/* blog left */}
-        <div className='blog-left basis-1/5 bg-slate-200'>
+        <div className='blog-left basis-1/5 bg-slate-200 bg-orange-400 max-h-fit pl-3 pb-3'>
           <aside className="hidden w-64 md:block min-h-screen">
             <div className="py-3 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3">
               <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
@@ -174,7 +179,7 @@ export default function Blog() {
             </div>
             <nav className="text-sm ">
               <ul className="flex flex-col">
-                <li className="px-4 cursor-pointer bg-gray-500 text-gray-800 hover:bg-blue-300  hover:text-white">
+                <li className="px-4 cursor-pointer bg-gray-100 text-gray-800 hover:bg-blue-300  hover:text-white">
                   <a className="py-3 flex items-center" href="/">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                       stroke="currentColor" className="w-4 mr-3">
@@ -197,7 +202,7 @@ export default function Blog() {
                 </li>
                 <li className="px-4 py-2 text-xs uppercase tracking-wider text-gray-500 font-bold">Blog Management</li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
-                  <a className="py-3 flex items-center" href="/blog/blogmanagerment">
+                  <a className="py-3 flex items-center" href="social/blog/blogmanagerment">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                       stroke="currentColor" className="w-4 mr-3">
                       <path stroke-linecap="round" stroke-linejoin="round"
@@ -330,18 +335,31 @@ export default function Blog() {
                           <div className=' '>
                             <p className="text-lg font-semibold text-gray-800">{user?.lastName} {user?.firstName}</p>
                           </div>
+                          {/* <div> */}
                           <select
                             name="type"
-                            className="border p-2 rounded"
+                            className="border p-2 rounded w-48"
                             value={postType}
                             onChange={handlePostTypeChange}
                           >
                             <option value={BlogType.Share}>Đăng chia sẻ</option>
                             <option value={BlogType.Recruit}>Đăng tìm thành viên</option>
                           </select>
+                          {/* <div>
+                              <select
+                                name="type"
+                                className="border p-2 rounded w-48"
+                                value={postType}
+                                onChange={handlePostTypeChange}
+                              >
+                                <option value={BlogType.Share}>Đăng chia sẻ</option>
+                                <option value={BlogType.Recruit}>Đăng tìm thành viên</option>
+                              </select>
+                            </div> */}
+                          {/* </div> */}
                         </div>
                       </div>
-                      <div className='body mt-3 h-3/4'>
+                      <div className='body mt-3 h-3/4 px-2'>
                         <div className='flex'>
                           <div className='w-1/4 items-center p-2'>
                             <h3 >Tiêu đề</h3>
@@ -365,23 +383,45 @@ export default function Blog() {
                         {/* Nếu chọn "Đăng tìm thành viên" thì hiển thị thêm field nhập */}
                         {postType === BlogType.Recruit && user?.projects ? (
                           <div className=''>
-                            <div className='flex mt-2 h-full'>
-                              <div className='w-1/4 items-center p-2 '>
-                                <h3 >Kỹ năng yêu cầu</h3>
+                            <div className='skill'>
+                              <div className='flex mt-2 h-full'>
+                                <div className='w-1/4 items-center p-2 '>
+                                  <h3 >Kỹ năng yêu cầu</h3>
+                                </div>
+                                <textarea className="w-3/4 border p-2 rounded"
+                                  name="skillRequired"
+                                  placeholder="Nhập kỹ năng yêu cầu"
+                                  value={formData.skillRequired}
+                                  onChange={handleChange} />
                               </div>
-                              <textarea className="w-3/4 border p-2 rounded"
-                                name="skillRequired"
-                                placeholder="Nhập kỹ năng yêu cầu"
-                                value={formData.skillRequired}
-                                onChange={handleChange} />
                             </div>
-                            <div className='flex mt-2 h-full'>
-                            <div className='w-1/4 items-center p-2 '>
-                                <h3 >Team của bạn</h3>
+                            <div className='project py-2'>
+
+                              <div className='flex mt-2 h-full'>
+                                <div className='w-1/4 items-center p-2 '>
+                                  <h3 >Team của bạn</h3>
+                                </div>
+                                <div>
+                                  <h4 className='text-red-400'>*Không bắt buộc</h4>
+                                  <select
+                                    name="type"
+                                    className="border p-2 rounded w-48"
+                                  >
+                                    <option value=""></option>
+                                    <option value={BlogType.Recruit}>Tên nhóm</option>
+                                  </select>
+                                </div>
                               </div>
-                              <div className="w-3/4 border p-2 rounded"> aa</div>
+                              <div className='flex mt-2 h-full'>
+                                <div className='w-1/4 items-center p-2 '>
+                                  <h3 >Team của bạn</h3>
+                                </div>
+                                <div className="w-3/4 border p-2 rounded"> aa</div>
+                              </div>
                             </div>
                           </div>
+
+
 
                         ) : (
                           <div></div>
@@ -894,7 +934,7 @@ export default function Blog() {
                                   <div className="flex py-3 w-full">
                                     <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
                                       <span className="flex items-center">
-                                        {post?.likes.length ?? 0} lượt thích từ người khác
+                                        <LikeBlog postId={post?.id ?? ""} />
                                       </span>
                                       <div className='flex'>
                                         <span className="flex items-center">
@@ -949,7 +989,7 @@ export default function Blog() {
                           <div className="flex  items-center space-x-4">
                             <span className="flex items-center">
                               <i className="fas fa-thumbs-up text-blue-500"></i>
-                              <span className="ml-2">    {post.likes?.length ?? 0}  Likes <FontAwesomeIcon icon={faThumbsUp} /> </span>
+                              <span className="ml-2">           <LikeBlog postId={post?.id ?? ""} /> </span>
                             </span>
                             <span className="flex items-center">
                               <i className="fas fa-comment text-green-500"></i>
