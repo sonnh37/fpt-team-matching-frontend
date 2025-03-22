@@ -35,8 +35,8 @@ function ProgressGetReview() {
 
     React.useEffect(() => {
         const timer = setTimeout(() => {
-            setProgress(80)
-        }, 500)
+            setProgress(100)
+        }, 1000)
         return () => clearTimeout(timer)
     }, [])
 
@@ -104,7 +104,6 @@ export default function Page ()  {
         fetchCurrentSemester()
     }, [])
 
-    console.log(currentSemester)
     const router = useRouter()
     return (
         <div className={"px-4"}>
@@ -125,7 +124,11 @@ export default function Page ()  {
                 </div>
             </div>
             {
-                loading ? <ProgressGetReview /> :  reviews && ( <ReviewDataTable data={reviews} columns={ReviewColumns} />)
+                loading ?(
+                    <div className={"flex items-center justify-center"}>
+                        <ProgressGetReview />
+                    </div>
+                ):  reviews && ( <ReviewDataTable data={reviews} columns={ReviewColumns} />)
             }
         </div>
     )
