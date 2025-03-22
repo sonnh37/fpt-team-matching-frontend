@@ -49,6 +49,8 @@ import {
   FormSwitch,
 } from "@/lib/form-custom-shadcn";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { semesterService } from "@/services/semester-service";
+import { stageideaService } from "@/services/stage-idea-service";
 // Các đuôi file cho phép
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
@@ -158,8 +160,37 @@ const CreateProjectForm = () => {
           (m) => m.status !== IdeaStatus.Rejected
         );
         if ((ideaExists.data && isPendingOrDone) || teamExist.data) {
-          setShowPageIsIdea(true);
+          if (isStudent) {
+            setShowPageIsIdea(true);
+          }
         }
+
+        // #region Check semester and stage idea
+        // const res_semester = await semesterService.fetchLatest();
+
+        // const isBeforeEndDateInSemesterLatest = res_semester.data?.endDate
+        //   ? new Date(res_semester.data?.endDate).getTime() > Date.now()
+        //   : false;
+        // if (isBeforeEndDateInSemesterLatest) {
+        //   const res_stageIdea = await stageideaService.fetchLatest();
+
+        //   const isInStageIdea =
+        //     res_stageIdea.data?.startDate && res_stageIdea.data?.endDate
+        //       ? Date.now() >=
+        //           new Date(res_stageIdea.data.startDate).getTime() &&
+        //         Date.now() <= new Date(res_stageIdea.data.endDate).getTime()
+        //       : false;
+
+        //   if (isInStageIdea) {
+        //     // Đang trong giai đoạn được tạo idea
+        //   } else {
+        //     // toast.warning("Not in stage idea!");
+        //     // setShowPageIsIdea(true);
+        //   }
+        // } else {
+        //   toast.warning("Semester is ended!");
+        //   setShowPageIsIdea(true);
+        // }
       } catch (error) {
         console.error("Error fetching data:", error);
         setIsError(true);
@@ -173,7 +204,6 @@ const CreateProjectForm = () => {
 
   if (isLoading) return <LoadingComponent />;
   if (isError) return <ErrorSystem />;
-  if (showPageIsIdea) return <PageIsIdea />;
 
   //Tao idea
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -222,6 +252,8 @@ const CreateProjectForm = () => {
   };
 
   const isEnterpriseIdea = form.watch("isEnterpriseTopic");
+
+  if (showPageIsIdea) return <PageIsIdea />;
 
   return (
     <Form {...form}>
