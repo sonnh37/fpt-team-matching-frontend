@@ -13,12 +13,24 @@ class IdeaService extends BaseService<Idea> {
   constructor() {
     super(Const.IDEA);
   }
-  public createIdea = (
+  public createIdeaByStudent = (
     command: IdeaCreateCommand
   ): Promise<BusinessResult<Idea>> => {
     return axiosInstance
       .post<BusinessResult<Idea>>(
         `${this.endpoint}/student-create-pending`,
+        command
+      )
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public createIdeaByLecturer = (
+    command: IdeaCreateCommand
+  ): Promise<BusinessResult<Idea>> => {
+    return axiosInstance
+      .post<BusinessResult<Idea>>(
+        `${this.endpoint}/lecturer-create-pending`,
         command
       )
       .then((response) => response.data)
