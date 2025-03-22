@@ -5,6 +5,5 @@ import { User } from "./user";
 export interface Like extends BaseEntity {
     blogId?: string;
     userId?: string;
-    blog?: Blog;
-    user?: User;
+   
 }

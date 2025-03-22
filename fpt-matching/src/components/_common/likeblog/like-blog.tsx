@@ -45,8 +45,8 @@ const LikeBlog: React.FC<LikeButtonProps> = ({ postId }) =>{
         }
 
         if (hasLiked) {
-            // 🗑 Nếu đã thích → Unlike (Xóa like)
-            const result = await likeService.delete(postId);
+            //  Nếu đã thích → Unlike (Xóa like)
+            const result = await likeService.deleteCommentPermant(postId);
             if (result?.status === 1) {
                 setLikes(likes.filter(id => id !== user.id)); // Cập nhật state
                 toast.info("Bạn đã bỏ thích bài viết.");
@@ -55,13 +55,13 @@ const LikeBlog: React.FC<LikeButtonProps> = ({ postId }) =>{
                 toast.error("Lỗi khi bỏ thích bài viết!");
             }
         } else {
-            // ❤️ Nếu chưa thích → Thêm like
+            //  Nếu chưa thích → Thêm like
             const query: LikeCreateCommand = { blogId: postId, userId: user.id ?? "" };
             const result = await likeService.create(query);
 
             if (result?.status === 1) {
                 setLikes([...likes, user.id ?? ""]); // Cập nhật state
-                toast.success("Bạn đã thích bài viết! ❤️");
+                toast.success("Bạn đã thích bài viết! ");
                 refetch();
             } else {
                 toast.error("Lỗi khi thích bài viết!");
