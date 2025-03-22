@@ -1,15 +1,14 @@
 'use client'
-import React, { useEffect, useState} from 'react';
+import React, {Dispatch, useEffect, useState} from 'react';
 import * as XLSX from "xlsx"
 import { FileData } from './FileData';
 import { InputFile } from './InputFile';
 import {DataTable} from "@/app/(client)/(dashboard)/manage-review/import-csv/DataTable";
 import {columnsFileCsv} from "@/app/(client)/(dashboard)/manage-review/import-csv/ColumsDef";
 import {Button} from "@/components/ui/button";
-import {Import} from "lucide-react";
+import {ChevronRight, Import, Loader2} from "lucide-react";
 import {
     AlertDialog,
-    AlertDialogAction,
     AlertDialogCancel,
     AlertDialogContent,
     AlertDialogDescription,
@@ -18,10 +17,72 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { ChevronDown } from "lucide-react"
 
-function AlertDialogImport() {
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuLabel,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {reviewService} from "@/services/review-service";
+import {Toast} from "@/components/ui/toast";
+
+export function DropdownReviewListMenu({review, setReview} : {review: string, setReview: Dispatch<React.SetStateAction<string>>}) {
     return (
-        <AlertDialog>
+        <Breadcrumb className={"mb-4"}>
+            <BreadcrumbList>
+                <BreadcrumbItem>
+                    SPSE25
+                </BreadcrumbItem>
+                <BreadcrumbSeparator>
+                    <ChevronRight />
+                </BreadcrumbSeparator>
+                <BreadcrumbItem>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger className="flex items-center gap-1">
+                            Review {review}
+                            <ChevronDown className="h-4 w-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start">
+                            <DropdownMenuLabel>Select review number</DropdownMenuLabel>
+                            <DropdownMenuRadioGroup value={review} onValueChange={setReview}>
+                                <DropdownMenuRadioItem value="1">Review 1</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="2">Review 2</DropdownMenuRadioItem>
+                                <DropdownMenuRadioItem value="3">Review 3</DropdownMenuRadioItem>
+                            </DropdownMenuRadioGroup>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </BreadcrumbItem>
+            </BreadcrumbList>
+        </Breadcrumb>
+    )
+}
+
+
+function AlertDialogImport({loading, setLoading, callApiPostXLSXFunction, open, setOpen}:
+                           {
+                               loading: boolean,
+                               setLoading: Dispatch<React.SetStateAction<boolean>>,
+                               callApiPostXLSXFunction: Function,
+                               open: boolean,
+                               setOpen: Dispatch<React.SetStateAction<boolean>>,
+                           }) {
+    const handleClickContinueAction = async () => {
+        setLoading(true)
+        await callApiPostXLSXFunction()
+        setOpen(false)
+    }
+    return (
+        <AlertDialog open={open}>
             <AlertDialogTrigger asChild>
                 <Button className={"px-6 py-4 mt-6"} variant="default"><Import/> Save to Database</Button>
             </AlertDialogTrigger>
@@ -33,8 +94,15 @@ function AlertDialogImport() {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction>Continue</AlertDialogAction>
+                    <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+                    {
+                        !loading
+                            ? ( <Button onClick={() => {handleClickContinueAction()}}>Continue</Button>)
+                            : ( <Button disabled>
+                                <Loader2 className="animate-spin" />
+                                Please wait
+                            </Button>)
+                    }
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
@@ -45,6 +113,18 @@ export default function Page() {
     const [file, setFile] = useState<File | null>(null);
     const [data, setData] = useState<FileData[] | null>(null);
     const [header, setHeader] = useState<string[] | null>(null);
+    const [review, setReview] = useState<string>("1")
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [open, setOpen] = React.useState<boolean>(false);
+
+    const postFileXLSX = async () => {
+        const result = await reviewService.importReviewFromXLSX(file!, parseInt(review), "ab61a0c5-4cef-455f-8903-e32ffa05861e")
+        console.log(result)
+        if (result.status == -1) {
+
+        }
+        setIsLoading(false)
+    }
     useEffect(() => {
         if (!file) return;
 
@@ -103,18 +183,26 @@ export default function Page() {
 
         reader.onerror = (error) => console.error("File reading error:", error);
     }, [file]);
-    console.log(data);
 
     return (
-        <div className={"flex justify-center items-center gap-1.5 px-8 py-2"}>
+        <div className={" items-center gap-1.5 px-8 py-2"}>
+            <DropdownReviewListMenu setReview={setReview} review={review} />
             {
                 (data == null) && (header == null) ? (
-                    <InputFile file={file} setFile={setFile} />
+                    <div className={"w-full"}>
+                        <InputFile file={file} setFile={setFile} />
+                    </div>
                 ) : (
                     <div className="w-full">
                         <DataTable data={data!} columns={columnsFileCsv} />
-                        <div className={""}>
-                            <AlertDialogImport />
+                        <div onClick={() => {setOpen(true)}}>
+                            <AlertDialogImport
+                                callApiPostXLSXFunction={postFileXLSX}
+                                loading={isLoading}
+                                setLoading={setIsLoading}
+                                open={open}
+                                setOpen={setOpen}
+                            />
                         </div>
                     </div>
                 )
