@@ -92,7 +92,7 @@ export default function TeamInfo() {
     console.error("Error fetching:", error);
     return <ErrorSystem />;
   }
-  if (result?.status == -2) {
+  if (result?.status != 1) {
     return router.push("/team/page-no-team");
   }
 

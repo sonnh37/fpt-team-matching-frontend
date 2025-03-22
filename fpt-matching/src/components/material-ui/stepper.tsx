@@ -201,6 +201,10 @@ export default function HorizontalLinearStepper({
     (req) => req.role === "Council"
   ).length;
 
+  const isStudent = user?.userXRoles.some(
+    (m) => m.role?.roleName == "Student"
+  );
+
   const totalCouncilPending = idea_request?.filter(
     (req) => req.status === IdeaRequestStatus.Pending && req.role === "Council"
   ).length;
@@ -275,13 +279,19 @@ export default function HorizontalLinearStepper({
   React.useEffect(() => {
     if (idea) {
       if (isLecturer && totalCouncil == 0) {
+        console.log("first step");
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        return;
       }
-      if (isMentorApprove) {
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-      }
-      if (isCouncilApprove && isPublicResult) {
-        setActiveStep((prevActiveStep) => prevActiveStep + 2);
+      if(isStudent) {
+        if (isMentorApprove) {
+          console.log("first step");
+          setActiveStep((prevActiveStep) => prevActiveStep + 1);
+        }
+        if (isCouncilApprove && isPublicResult) {
+          console.log("two step");
+          setActiveStep((prevActiveStep) => prevActiveStep + 2);
+        }
       }
     } else {
       setActiveStep((prevActiveStep) => prevActiveStep + 0);
