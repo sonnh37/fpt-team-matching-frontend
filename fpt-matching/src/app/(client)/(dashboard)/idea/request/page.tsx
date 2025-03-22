@@ -29,6 +29,7 @@ import { ideaService } from "@/services/idea-service";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { IdeaStatus } from "@/types/enums/idea";
 import { Idea } from "@/types/idea";
+import { Badge } from "@/components/ui/badge";
 export default function Page() {
   const user = useSelectorUser();
   if (!user) return;
@@ -39,46 +40,51 @@ export default function Page() {
   const tab_2 = "Approved";
   const tab_3 = "Rejected";
 
-  const { data: res_stageIdea, isFetching, isLoading, error, isError } = useQuery({
+  const {
+    data: res_stageIdea,
+    isFetching,
+    isLoading,
+    error,
+    isError,
+  } = useQuery({
     queryKey: ["data_stage-idea_latest"],
-    queryFn: async () =>
-      await stageideaService.fetchLatest(),
+    queryFn: async () => await stageideaService.fetchLatest(),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
-  const { data: res_ideas, isLoading: isLoadingAnother, error: errorAnother, isError: isErrorAnother } = useQuery({
+  const {
+    data: res_ideas,
+    isLoading: isLoadingAnother,
+    error: errorAnother,
+    isError: isErrorAnother,
+  } = useQuery({
     queryKey: ["data_ideas"],
     queryFn: async () => await ideaService.getIdeaByUser(),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
-  const {
-    data: res_semester,
-    isLoading: isLoadingSemester,
-    error: errorSemester,
-    isError: isErrorSemester,
-  } = useQuery({
-    queryKey: ["data_current_semester"],
-    queryFn: async () => await ideaService.getIdeaByUser(),
-    placeholderData: keepPreviousData,
-    refetchOnWindowFocus: false,
-  });
-
-  if (isLoading || isLoadingAnother || isErrorSemester) return <LoadingComponent />;
-  if (isError || isErrorSemester || isErrorAnother) {
+  if (isLoading || isLoadingAnother) return <LoadingComponent />;
+  if (isError || isErrorAnother) {
     console.error("Error fetching stage ideas:", error);
     return <ErrorSystem />;
   }
 
   const stageIdea = res_stageIdea?.data;
 
-  const idea_current = res_ideas?.data
-    ?.filter((m) => m.ownerId === user.id)
-    .sort((a, b) =>
-      new Date(b.createdDate || 0).getTime() - new Date(a.createdDate || 0).getTime()
-    )?.[0] ?? {} as Idea;
+  const idea_current =
+    res_ideas?.data
+      ?.filter((m) => m.ownerId === user.id)
+      .sort(
+        (a, b) =>
+          new Date(b.createdDate || 0).getTime() -
+          new Date(a.createdDate || 0).getTime()
+      )?.[0];
+
+  const countIdeasByStatus = (status: IdeaStatus) => {
+    return res_ideas?.data?.filter((m) => m.status == status).length ?? 0;
+  };
   return (
     <>
       <div className="container pt-3 pb-6 space-y-4">
@@ -135,19 +141,25 @@ export default function Page() {
             <TabsTrigger value={tab_1}>
               <span className="flex items-center gap-2">
                 {tab_1}{" "}
-                {/* {totalPending != 0 ? <Badge>{totalPending}</Badge> : null} */}
+                {countIdeasByStatus(IdeaStatus.Pending) != 0 ? (
+                  <Badge>{countIdeasByStatus(IdeaStatus.Pending)}</Badge>
+                ) : null}
               </span>
             </TabsTrigger>
             <TabsTrigger value={tab_2}>
               <span className="flex items-center gap-2">
                 {tab_2}{" "}
-                {/* {totalAprroved != 0 ? <Badge>{totalAprroved}</Badge> : null} */}
+                {countIdeasByStatus(IdeaStatus.Approved) != 0 ? (
+                  <Badge>{countIdeasByStatus(IdeaStatus.Approved)}</Badge>
+                ) : null}
               </span>
             </TabsTrigger>
             <TabsTrigger value={tab_3}>
               <span className="flex items-center gap-2">
                 {tab_3}{" "}
-                {/* {totalRejected != 0 ? <Badge>{totalRejected}</Badge> : null} */}
+                {countIdeasByStatus(IdeaStatus.Rejected) != 0 ? (
+                  <Badge>{countIdeasByStatus(IdeaStatus.Rejected)}</Badge>
+                ) : null}
               </span>
             </TabsTrigger>
           </TabsList>

@@ -240,18 +240,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 )}
                 {/* Option: approve or reject */}
               </div>
-              {!isNotMentorInThisIdea && (
-                <DialogFooter>
-                  <Button
-                    variant={`${hasCouncilRequests ? "secondary" : "default"}`}
-                    size="sm"
-                    onClick={() => handleSubmit()}
-                    disabled={hasCouncilRequests}
-                  >
-                    {hasCouncilRequests ? "Sent" : "Submit to council"}
-                  </Button>
-                </DialogFooter>
-              )}
+             
             </DialogContent>
           </Dialog>
         </div>
