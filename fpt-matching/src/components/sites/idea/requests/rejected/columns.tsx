@@ -2,6 +2,7 @@
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import { TypographyP } from "@/components/_common/typography/typography-p";
+import HorizontalLinearStepper from "@/components/material-ui/stepper";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -158,7 +159,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
               <p>{": " + mentorApproval.content}</p>
             </div>
 
-            {isResultDay ? (
+            <HorizontalLinearStepper idea={idea} />
+            {/* {isResultDay ? (
               <TypographyP>
                 {councilRequests.length > 0 ? (
                   councilRequests.map((m, index) => {
@@ -199,7 +201,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                   Not yet published
                 </TypographyP>
               </>
-            )}
+            )} */}
           </div>
         </DialogContent>
       </Dialog>
