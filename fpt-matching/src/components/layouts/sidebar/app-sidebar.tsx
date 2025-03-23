@@ -161,9 +161,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Icons.logo />
             </div>
             <div className="grid flex-1 text-left">
-              <TypographyH4 className="truncate text-lg tracking-widest">
+              <TypographyLarge className="truncate text-base uppercase">
                 {"Team Matching"}
-              </TypographyH4>
+              </TypographyLarge>
             </div>
           </Link>
         </SidebarMenuButton>
