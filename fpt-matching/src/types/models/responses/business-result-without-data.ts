@@ -4,3 +4,7 @@ export interface BusinessResultWithoutData{
 }
 
 
+export interface BusinessResultWithoutData1<Tdata> {
+    status: number;
+    message?: string;
+}
