@@ -201,19 +201,17 @@ export default function HorizontalLinearStepper({
     (req) => req.role === "Council"
   ).length;
 
-  const isStudent = user?.userXRoles.some(
-    (m) => m.role?.roleName == "Student"
-  );
+  const isStudent = user?.userXRoles.some((m) => m.role?.roleName == "Student");
 
   const totalCouncilPending = idea_request?.filter(
     (req) => req.status === IdeaRequestStatus.Pending && req.role === "Council"
   ).length;
 
+  console.log("check", totalCouncilPending);
+
   const isResultDay = idea.stageIdea?.resultDate
     ? new Date(idea.stageIdea.resultDate).getTime() < Date.now()
     : false;
-
-  const isPublicResult = totalCouncilPending == 0 && isResultDay;
 
   const isMentorApprove = idea_request?.some(
     (req) => req.status === IdeaRequestStatus.Approved && req.role === "Mentor"
@@ -283,12 +281,12 @@ export default function HorizontalLinearStepper({
         setActiveStep((prevActiveStep) => prevActiveStep + 1);
         return;
       }
-      if(isStudent) {
+      if (isStudent) {
         if (isMentorApprove) {
           console.log("first step");
           setActiveStep((prevActiveStep) => prevActiveStep + 1);
         }
-        if (isCouncilApprove && isPublicResult) {
+        if (isCouncilApprove && isResultDay) {
           console.log("two step");
           setActiveStep((prevActiveStep) => prevActiveStep + 2);
         }
@@ -318,9 +316,9 @@ export default function HorizontalLinearStepper({
           }
 
           if (
-            isPublicResult &&
-            isMentorApprove &&
-            isCouncilRejected &&
+            (totalCouncilPending > 0 ||
+              (isMentorApprove && isCouncilRejected)) &&
+            isResultDay &&
             index == 1
           ) {
             labelProps.optional = (
