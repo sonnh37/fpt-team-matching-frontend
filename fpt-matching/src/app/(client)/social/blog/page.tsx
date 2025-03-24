@@ -42,12 +42,17 @@ import { BlogStatus, BlogType } from '@/types/enums/blog';
 import BlogDetail from '../../../../components/_common/blogdetail/blog-detail';
 import { BlogCreateCommand } from '@/types/models/commands/blog/blog-create-command';
 import LikeBlog from '@/components/_common/likeblog/like-blog';
+import { isExists } from 'date-fns';
+import { projectService } from '@/services/project-service';
+import { Project } from '@/types/project';
 export default function Blog() {
 
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+  const [projectUser, setProject] = useState<Project>();
   const [postType, setPostType] = useState(BlogType.Share); // Loại bài viết
+  const [messageUser, setMessage] = useState<string>(""); // check xem user co prj khong
   const [formData, setFormData] = useState({
     projectId: "",
     title: "",
@@ -58,6 +63,9 @@ export default function Blog() {
   });
   const [filterType, setFilterType] = useState<BlogType | null>(null);
 
+
+console.log("tét",formData)
+  
   // Hàm thay đổi bộ lọc và gọi API lại
   const handleFilterChange = (type: BlogType) => {
     setFilterType(type);
@@ -92,6 +100,7 @@ export default function Blog() {
         skillRequired: formData.skillRequired,
         type: postType,
         status: formData.status,
+        projectId: formData.projectId
       };
 
       const result = await blogService.create(blognew);
@@ -116,15 +125,36 @@ export default function Blog() {
   const user = useSelector((state: RootState) => state.user.user)
 
 
-  // chỗ check user coi có project chưa 
-  const checkProjectUser = user?.projects.find(x => x.isDeleted === false && x.teamMembers.find(u => u.userId === user.id));
+  useEffect(() => {
+    const fetchProjectInfo = async () => {
+      try {
+        const checkPrj = await projectService.getProjectInfoCheckLeader();
+        if (checkPrj.status !== 1) {
+          setMessage(checkPrj?.message ?? "");
+        }
+        if (checkPrj.status === 1) {
+          setProject(checkPrj.data)
+        }
+      } catch (error) {
+        console.error("Error fetching project info:", error);
+      }
+    };
 
-  let query: BlogGetAllQuery = { pageNumber: currentPage };
+    fetchProjectInfo();
+  }, []);
+
+
+
+  let query: BlogGetAllQuery = {
+    pageNumber: currentPage,
+    isDeleted: false
+  };
   // NẾU NGƯỜI DÙNG BẤM FILTER THÌ MỚI HIỆN RA
   if (filterType) {
     query.type = filterType;
   }
   // //goi api bang tanstack
+  //phan trang
   const {
     data: result,
     refetch,
@@ -134,9 +164,6 @@ export default function Blog() {
     queryFn: () => blogService.fetchPaginated(query),
     refetchOnWindowFocus: false,
   });
-
-
-
   useEffect(() => {
     if (result?.data) {
       setTotalPages(result?.data?.totalPages || 1);
@@ -146,6 +173,8 @@ export default function Blog() {
       }
     }
   }, [result]);
+
+
 
   // day la sort blog notification
   const notification = result?.data?.results ?? [];
@@ -202,7 +231,7 @@ export default function Blog() {
                 </li>
                 <li className="px-4 py-2 text-xs uppercase tracking-wider text-gray-500 font-bold">Blog Management</li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
-                  <a className="py-3 flex items-center" href="social/blog/blogmanagerment">
+                  <a className="py-3 flex items-center" href="/social/blog/blogmanagerment">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                       stroke="currentColor" className="w-4 mr-3">
                       <path stroke-linecap="round" stroke-linejoin="round"
@@ -305,7 +334,7 @@ export default function Blog() {
 
             <div className="flex items-center space-x-3">
               <img
-                src="/meo.jpg"
+                src={user?.avatar ?? "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"}
                 alt="Avatar"
                 className="w-12 h-12 rounded-full"
               />
@@ -325,7 +354,7 @@ export default function Blog() {
                       </h4>
                     </div>
                     <div className='body-blog w-full h-4/5'>
-                      <div className='headerbody  flex items-center w-full h-1/4'>
+                      <div className='headerbody  flex items-center w-full h-1/4 px-3'>
                         <img
                           src={user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
                           alt="User Avatar"
@@ -403,20 +432,20 @@ export default function Blog() {
                                 </div>
                                 <div>
                                   <h4 className='text-red-400'>*Không bắt buộc</h4>
+                                  <h4 className='text-red-400'>{messageUser}</h4>
+
                                   <select
-                                    name="type"
-                                    className="border p-2 rounded w-48"
+                                    name="projectId"className="border p-2 rounded w-48"
+                                    value={formData.projectId || ""}  // Đảm bảo không bị undefined
+                                    onChange={handleChange}
                                   >
-                                    <option value=""></option>
-                                    <option value={BlogType.Recruit}>Tên nhóm</option>
+                                    <option value="">Chọn dự án</option>
+                                    {projectUser?.id && (
+                                      <option value={projectUser.id}>{projectUser.teamName}</option>
+                                    )}
                                   </select>
+
                                 </div>
-                              </div>
-                              <div className='flex mt-2 h-full'>
-                                <div className='w-1/4 items-center p-2 '>
-                                  <h3 >Team của bạn</h3>
-                                </div>
-                                <div className="w-3/4 border p-2 rounded"> aa</div>
                               </div>
                             </div>
                           </div>
@@ -477,10 +506,10 @@ export default function Blog() {
             </div>
           </div>
           {/* Blog */}
-          <div className='bg-white max-w-3xl mx-3 my-8 p-6 rounded-xl shadow-md  '>
-            <div>
+          {/* <div className='bg-white max-w-3xl mx-3 my-8 p-6 rounded-xl shadow-md  '>
+            <div> */}
               {/* Post Header with Avatar, Username, and Date */}
-              <div className="flex items-center space-x-4">
+              {/* <div className="flex items-center space-x-4">
                 <img
                   src="/user-avatardefault.jpg" // Replace with your avatar image
                   alt="User Avatar"
@@ -504,39 +533,39 @@ export default function Blog() {
                     </DropdownMenu>
                   </div>
                 </div>
-              </div>
+              </div> */}
 
 
               {/* Post Title */}
-              <div className="text-3xl font-semibold text-gray-800 mt-6">
-                <Modal>
-                  <ModalTrigger className="font-bold text-black ">
+              {/* <div className="text-3xl font-semibold text-gray-800 mt-6"> */}
+                {/* <Modal> */}
+                  {/* <ModalTrigger className="font-bold text-black ">
                     <span className="  ">
                       Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
                     </span>
-                  </ModalTrigger>
-                  <ModalBody>
-                    <ModalContent className='w-full max-h-[80vh] overflow-y-auto '>
+                  </ModalTrigger> */}
+                  {/* <ModalBody> */}
+                    {/* <ModalContent className='w-full max-h-[80vh] overflow-y-auto '> */}
                       {/* Header - Cố định khi cuộn */}
-                      <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
+                      {/* <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                         <div className="flex justify-center w-full">
                           Bai viet cua thang nao do
                         </div>
                         <ModalClose className="absolute top-2 right-2">X</ModalClose>
-                      </div>
-                      <div className='body-blogdetail'>
-                        <div className="flex items-center space-x-4 p-2">
-                          <img
+                      </div> */}
+                      {/* <div className='body-blogdetail'> */}
+                        {/* <div className="flex items-center space-x-4 p-2"> */}
+                          {/* <img
                             src="/user-avatardefault.jpg" // Replace with your avatar image
                             alt="User Avatar"
                             className="w-12 h-12 rounded-full"
-                          />
-                          <div className='flex w-full justify-between'>
-                            <div>
+                          /> */}
+                          {/* <div className='flex w-full justify-between'> */}
+                            {/* <div>
                               <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
                               <p className="text-sm text-gray-500">4 giờ trước  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
-                            </div>
-                            <div className='setting-blog'>
+                            </div> */}
+                            {/* <div className='setting-blog'>
                               <DropdownMenu>
                                 <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
                                 <DropdownMenuContent>
@@ -549,20 +578,21 @@ export default function Blog() {
                                 </DropdownMenuContent>
                               </DropdownMenu>
 
-                            </div>
-                          </div>
-                        </div>
+                            </div> */}
+                          {/* </div> */}
+                          
+                        {/* </div> */}
                         {/* Post Content */}
-                        <h1 className=" px-2 ">
+                        {/* <h1 className=" px-2 ">
                           Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
                         </h1>
                         <p className="mt-4 text-gray-700 text-xl px-2 ">
 
                           Với dáng vẻ đầy uy lực cá tính, cùng với khối động cơ L-twin 898cc Superquadro sản xuất công suất 148 mã lực và mô-men xoắn 99 Nm – Panigale 899 mau chóng nhận được rất nhiều sự yêu thích của các Biker.
-                        </p>
+                        </p> */}
 
                         {/* Post Stats (Likes, Comments, Upload Count) */}
-                        <div className="flex py-3 w-full">
+                        {/* <div className="flex py-3 w-full">
                           <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
                             <span className="flex items-center">
                               28 lượt thích từ người khác
@@ -579,13 +609,13 @@ export default function Blog() {
                             </div>
 
                           </div>
-                        </div>
-                      </div>
+                        </div> */}
+                      {/* </div> */}
 
 
 
                       {/* Post Stats (Likes, Comments, Upload Count) */}
-                      <div className="flex w-full text-gray-600 border-y-2 p-3">
+                      {/* <div className="flex w-full text-gray-600 border-y-2 p-3">
                         <div className="flex w-full text-xl justify-between  items-center space-x-4">
                           <span className="flex items-center">
                             <i className="fas fa-thumbs-up text-blue-500"></i>
@@ -600,10 +630,10 @@ export default function Blog() {
                             <span className="ml-2"> <FontAwesomeIcon icon={faPaperclip} /> Nộp CV</span>
                           </span>
                         </div>
-                      </div>
+                      </div> */}
 
                       {/* Post Comment */}
-                      <div className='blog-comment'>
+                      {/* <div className='blog-comment'>
                         <div className='filter-comment'>
                           <Popover>
                             <PopoverTrigger asChild>
@@ -764,12 +794,12 @@ export default function Blog() {
                           </div>
 
                         </div>
-                      </div>
+                      </div> */}
 
-                    </ModalContent>
-                    <ModalFooter className="justify-start w-full h-auto">
-                      <div className='flex w-full'>
-                        <img
+                    {/* </ModalContent> */}
+                    {/* <ModalFooter className="justify-start w-full h-auto"> */}
+                      {/* <div className='flex w-full'> */}
+                        {/* <img
                           src="/user-avatardefault.jpg" // Replace with your avatar image
                           alt="User Avatar"
                           className="w-10 h-10 rounded-full"
@@ -778,27 +808,27 @@ export default function Blog() {
                           <textarea
                             className="w-full px-2 py-2 pr-10 border rounded-md resize-none"
                             placeholder="Hãy làm người văn minh đi"
-                          ></textarea>
+                          ></textarea> */}
 
                           {/* Nút Send nằm góc phải dưới */}
-                          <button className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
+                          {/* <button className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
                             <FontAwesomeIcon icon={faPaperPlane} /> Send
-                          </button>
-                        </div>
-                      </div>
-                    </ModalFooter>
+                          </button> */}
+                         {/* </div>
+                      </div> */}
+                    {/* </ModalFooter> */}
 
-                  </ModalBody>
-                </Modal>
-              </div>
-              <div className="relative w-full py-5 flex items-center">
+                  {/* </ModalBody> */}
+                {/* </Modal> */}
+              {/* </div> */}
+              {/* <div className="relative w-full py-5 flex items-center">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full h-[2px] bg-gray-300 blur-md"></div>
                 </div>
                 <div className="relative w-full h-[2px] bg-gray-500"></div>
-              </div>
+              </div> */}
               {/* Post Stats (Likes, Comments, Upload Count) */}
-              <div className="flex justify-between mt-1 text-gray-600">
+              {/* <div className="flex justify-between mt-1 text-gray-600">
                 <div className="flex  items-center space-x-4">
                   <span className="flex items-center">
                     <i className="fas fa-thumbs-up text-blue-500"></i>
@@ -813,9 +843,9 @@ export default function Blog() {
                     <span className="ml-2">+16 Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
                   </span>
                 </div>
-              </div>
-            </div>
-          </div>
+              </div> */}
+            {/* </div>
+          </div> */}
 
 
           {/* Cho show blog all */}
@@ -869,9 +899,9 @@ export default function Blog() {
 
 
                         {/* Post Title */}
-                        <div className="text-3xl font-semibold text-gray-800 mt-6">
+                        <div className="text-xl md:text-2xl font-bold text-gray-900 leading-tight pt-3 mt-2">
                           <Modal>
-                            <ModalTrigger className="font-bold text-black ">
+                            <ModalTrigger className=" ">
                               <span className="  ">
                                 {post.title}
                               </span>
@@ -923,7 +953,7 @@ export default function Blog() {
                                     </div>
                                   </div>
                                   {/* Post Content */}
-                                  <h1 className=" px-2 ">
+                                  <h1 className=" text-3xl md:text-4xl font-bold text-gray-900 leading-tight px-2 ">
                                     {post?.title}
                                   </h1>
                                   <p className="mt-4 text-gray-700 text-xl px-2 ">
@@ -978,7 +1008,7 @@ export default function Blog() {
                             </ModalBody>
                           </Modal>
                         </div>
-                        <div className="relative w-full py-5 flex items-center">
+                        <div className="relative w-full py-3 flex items-center">
                           <div className="absolute inset-0 flex items-center">
                             <div className="w-full h-[2px] bg-gray-300 blur-md"></div>
                           </div>

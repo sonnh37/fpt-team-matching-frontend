@@ -138,7 +138,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
             </div>
 
             {result?.data?.length === 0 ? (
-                <div className="comment-content w-full px-3 pt-1 my-5 flex justify-center">
+                <div className="min-h-[300px] max-h-[600px] w-full px-3 pt-1 my-5 flex justify-center">
                     <p className="text-xl">Chưa có bình luận nào</p>
                 </div>
             ) : (
@@ -194,7 +194,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                 </div>
             )}
 
-            <ModalFooter className="sticky  bottom-0 left-0 w-full bg-white mt-2 p-3 border-t">
+            <ModalFooter className="sticky bottom-0 left-0 w-full bg-white p-3 border-t top-auto">
                 <div className='flex w-full'>
                     <img
                         src={user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
