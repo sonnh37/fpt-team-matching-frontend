@@ -44,6 +44,11 @@ class ReviewService extends BaseService<Review>{
         }, {});
         return response.data;
     }
+
+    public async getReviewDetails (id: string) : Promise<BusinessResult<Review>> {
+        const response = await axiosInstance.get(`${this.endpoint}/${id}`);
+        return response.data;
+    }
 }
 
 

@@ -128,9 +128,9 @@ export default function Page() {
               </CardContent>
             </Card>
           </div>
-          <div className="w-full">
+          {/* <div className="w-full">
             <HorizontalLinearStepper idea={idea_current} />
-          </div>
+          </div> */}
         </div>
         <Separator />
       </div>
