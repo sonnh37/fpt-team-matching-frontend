@@ -58,6 +58,9 @@ interface DataTableToolbarProps<TData> {
   filterEnums?: FilterEnum[];
   deleteAll?: (id: string) => Promise<BusinessResult<null>>;
   isSheetOpen?: boolean;
+  isSortColumns?: boolean;
+  isCreateButton?: boolean;
+  isSelectColumns?: boolean;
   isDownloadCsv?: boolean;
   columnSearch?: string;
   handleSheetChange?: (open: boolean) => void;
@@ -108,6 +111,9 @@ export function DataTableToolbar<TData>({
   form,
   table,
   filterEnums = undefined,
+  isSortColumns = true,
+  isCreateButton = true,
+  isSelectColumns = true,
   columnSearch = undefined,
   deleteAll = undefined,
   isSheetOpen = false,
@@ -297,41 +303,43 @@ export function DataTableToolbar<TData>({
               </SheetContent>
             </Sheet>
           )}
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 gap-1"
-                onClick={() => setIsOpen(!isOpen)}
+          {isSortColumns && (
+            <Popover open={isOpen} onOpenChange={setIsOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1"
+                  onClick={() => setIsOpen(!isOpen)}
+                >
+                  <CiViewTable className="h-4 w-4" />
+                  Sort Columns
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="w-fit p-2 shadow-lg rounded-md border bg-white"
+                onClick={(e) => e.stopPropagation()}
               >
-                <CiViewTable className="h-4 w-4" />
-                Sort Columns
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="end"
-              className="w-fit p-2 shadow-lg rounded-md border bg-white"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="font-medium mb-2">Select position columns</div>
-              <div className="border-t my-2"></div>
-              <DndContext onDragEnd={handleDragEnd}>
-                {columnOrder.map((columnId) => {
-                  const column = table.getColumn(columnId);
-                  return (
-                    <DraggableColumnItem
-                      key={column!.id}
-                      column={column}
-                      onToggleVisibility={() =>
-                        toggleColumnVisibility(column!.id)
-                      }
-                    />
-                  );
-                })}
-              </DndContext>
-            </PopoverContent>
-          </Popover>
+                <div className="font-medium mb-2">Select position columns</div>
+                <div className="border-t my-2"></div>
+                <DndContext onDragEnd={handleDragEnd}>
+                  {columnOrder.map((columnId) => {
+                    const column = table.getColumn(columnId);
+                    return (
+                      <DraggableColumnItem
+                        key={column!.id}
+                        column={column}
+                        onToggleVisibility={() =>
+                          toggleColumnVisibility(column!.id)
+                        }
+                      />
+                    );
+                  })}
+                </DndContext>
+              </PopoverContent>
+            </Popover>
+          )}
           {/* <div className="flex items-center space-x-2">
           <span>Table Width:</span>
           <Slider
@@ -344,46 +352,48 @@ export function DataTableToolbar<TData>({
           />
           <span>{tableWidth}%</span>
         </div> */}
-          <Popover open={isToggleColumn} onOpenChange={setIsToggleColumn}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-8 gap-1"
-                onClick={() => setIsToggleColumn(!isToggleColumn)}
+          {isSelectColumns && (
+            <Popover open={isToggleColumn} onOpenChange={setIsToggleColumn}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-8 gap-1"
+                  onClick={() => setIsToggleColumn(!isToggleColumn)}
+                >
+                  <MixerHorizontalIcon className="h-4 w-4" />
+                  Select columns
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="w-fit p-2 shadow-lg rounded-md border bg-white"
+                onClick={(e) => e.stopPropagation()}
               >
-                <MixerHorizontalIcon className="h-4 w-4" />
-                Select columns
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="end"
-              className="w-fit p-2 shadow-lg rounded-md border bg-white"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="font-medium mb-2">Toggle columns</div>
-              <div className="border-t my-2"></div>
-              {columnOrder.map((columnId) => {
-                const column = table.getColumn(columnId);
-                return (
-                  <div
-                    key={column!.id}
-                    className="flex items-center cursor-pointer hover:bg-gray-100 p-1 rounded"
-                    onClick={() => toggleColumnVisibility(column!.id)}
-                  >
-                    <span className="">
-                      {columnVisibility[column!.id] ? (
-                        <IoCheckboxSharp className="w-6 h-6 text-black" />
-                      ) : (
-                        <GrCheckbox className="w-6 h-6 text-gray-500" />
-                      )}
-                    </span>
-                    <span className="capitalize">{column!.id}</span>
-                  </div>
-                );
-              })}
-            </PopoverContent>
-          </Popover>
+                <div className="font-medium mb-2">Toggle columns</div>
+                <div className="border-t my-2"></div>
+                {columnOrder.map((columnId) => {
+                  const column = table.getColumn(columnId);
+                  return (
+                    <div
+                      key={column!.id}
+                      className="flex items-center cursor-pointer hover:bg-gray-100 p-1 rounded"
+                      onClick={() => toggleColumnVisibility(column!.id)}
+                    >
+                      <span className="">
+                        {columnVisibility[column!.id] ? (
+                          <IoCheckboxSharp className="w-6 h-6 text-black" />
+                        ) : (
+                          <GrCheckbox className="w-6 h-6 text-gray-500" />
+                        )}
+                      </span>
+                      <span className="capitalize">{column!.id}</span>
+                    </div>
+                  );
+                })}
+              </PopoverContent>
+            </Popover>
+          )}
           {isDownloadCsv ? (
             <CSVLink
               filename="export_data.csv"
@@ -397,15 +407,14 @@ export function DataTableToolbar<TData>({
             </CSVLink>
           ) : null}
 
-          {fields.length > 0 && (
+          {isCreateButton && (
             <Link
               className="text-primary-foreground sm:whitespace-nowrap"
               href={`${pathname}/new`}
             >
               <motion.div
                 whileHover={{
-                  scale: 1.1,
-                  boxShadow: "0px 6px 20px rgba(0,118,255,0.23)",
+                  scale: 1.07,
                 }}
                 whileTap={{ scale: 0.95 }}
               >

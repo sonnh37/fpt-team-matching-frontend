@@ -22,6 +22,7 @@ import {
   MessageCircleQuestion,
   Pencil,
   Send,
+  ShieldHalf,
   SquareUserRound,
   UsersRound,
 } from "lucide-react";
@@ -72,6 +73,12 @@ const data = {
       url: "/manage-review",
       icon: SquareUserRound,
     },
+
+    {
+      title: "Manage semester",
+      url: "/management/semester",
+      icon: ShieldHalf,
+    },
   ],
 };
 
@@ -100,6 +107,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isCouncil = role === "Council";
   const isLecturer = role === "Lecturer";
   const isReviewer = role === "Reviewer";
+  const isManager = role === "Manager";
 
   const navMain = data.navMain.map((item) => {
     if (item.title !== "Idea") return item;
@@ -184,7 +192,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <Separator />
       <SidebarContent>
         <NavMain items={navMain} />
-        <NavManagement items={data.navManage} />
+        {isManager && <NavManagement items={data.navManage} />}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
