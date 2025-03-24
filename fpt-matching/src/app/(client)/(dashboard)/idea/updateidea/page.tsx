@@ -28,7 +28,7 @@ import { toast } from "sonner";
 import { TeamInvitationCommand } from "@/types/models/commands/invitation/invitation-team-command";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { userService } from "@/services/user-service";
-import { ProjectStatus } from "@/types/enums/project";
+
 
 
 const formSchema = z.object({
@@ -44,6 +44,9 @@ const UpdateProjectTeam = () => {
 
   const user = useSelector((state: RootState) => state.user.user);
   const [email, setEmailInvite] = useState<string>("");
+  const [MessageInvite, setMessage] = useState<string>("");
+
+  console.log(email,"check email")
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -101,7 +104,7 @@ const UpdateProjectTeam = () => {
     console.log("test", result);
   }
 
-  // team mời thành viên
+  // Team mời thành viên
   const handleInvite = async () => {
     if (!email) {
       toast.error("Vui lòng nhập email người dùng để mời")
@@ -116,26 +119,31 @@ const UpdateProjectTeam = () => {
     }
     // check email người dùng
     const receiver = await userService.fetchAll(query1);
+    console.log("checkUser1",receiver)
     if (receiver.status === 1 && receiver.data) {
       const idReceiver = receiver.data[0].id;
-      console.log("User ID:", idReceiver);
       // check project coi leader nó team không
       const prj = await projectService.getProjectInfo();
 
-      if (prj.status !== 1) {
-        toast(prj.message)
-      }
-      // const result = invitationService.
+      // if (prj.status !== 200) {
+      //   toast("Người dùng đã có project hoặc trong team khác")
+      //   return
+      // }
+
       const query: TeamInvitationCommand = {
-        receivedId: receiver.data?.[0]?.id ?? "",
+        receiverId: idReceiver ?? "",
         projectId: prj.data?.id ?? ""
       }
+      console.log(query , "checkUser2")
       const result = await invitationService.sendByTeam(query);
+
       if (result.status === 1) {
-        toast.success("Chúc mừng bạn đã gửi lời mời thành công")
-        setEmailInvite(""); //Reset mail lại cho mời tiếp
+        toast("Chúc mừng bạn đã gửi lời mời thành công");
+        setEmailInvite(""); // Reset email lại để mời tiếp
       } else {
-        toast.error(result.message)
+        toast(result.message || "Gửi lời mời thất bại");
+        setEmailInvite(""); // Reset email dù có lỗi
+        setMessage(result?.message ?? "")
       }
     } else {
       toast("Nguời dùng không tồn tại");
@@ -256,7 +264,7 @@ const UpdateProjectTeam = () => {
                   <Button type="button" onClick={handleInvite}>Invite</Button>
                 </div>
               </FormControl>
-              <FormMessage />
+              <h3>{MessageInvite}</h3>
             </FormItem>
           </div>
           {/* Submit Button */}

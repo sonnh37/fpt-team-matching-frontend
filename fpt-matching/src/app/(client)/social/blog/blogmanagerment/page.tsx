@@ -80,6 +80,8 @@ export default function Blogmanagement() {
             }
         }
     }, [result]);
+
+    
       //Đây là form delete trả về true false tái sử dụng được
     const confirm = useConfirm()
     async function handleDelete(id: string){

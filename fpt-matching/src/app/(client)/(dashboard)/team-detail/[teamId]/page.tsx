@@ -102,6 +102,7 @@ export default function TeamInfoDetail() {
   const user = useSelector((state: RootState) => state.user.user);
   //  State lưu dữ liệu từ API
   const [teamInfo, setTeamInfo] = useState<Project | null>(null);
+  const [teamUserLogin, setTeamUser] = useState<Project | null>(null);
   const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
   const [userTeam, setUserTeam] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -127,7 +128,6 @@ export default function TeamInfoDetail() {
 
 
   useEffect(() => {
-
     const checkInvitation = async () => {
       if (teamInfo?.id) {
         const result = await invitationService.checkMemberProject(teamInfo?.id?.toString());
@@ -136,9 +136,19 @@ export default function TeamInfoDetail() {
       }
 
     };
-
     checkInvitation();
   }, [teamInfo?.id]);
+
+
+
+  useEffect(() => {
+    const checkProjectUserLogin = async () => {
+        const result = await projectService.getProjectInfo();
+        setTeamUser(result?.data || null);
+        console.log("co team roi", result?.data)
+    };
+    checkProjectUserLogin();
+  }, []);
 
 
   //gọi ra coi nó có trong team prj này không
@@ -222,17 +232,17 @@ export default function TeamInfoDetail() {
               <div className="flex justify-between items-center">
                 {/* Tiêu đề nhóm */}
                 <div className="title">
-                  <h2 className="text-xl font-semibold">{teamInfo?.name}</h2>
+                  <h2 className="text-xl font-semibold">{teamInfo?.teamName}</h2>
                   <p className="text-sm text-gray-500">Created at: {formatDate(teamInfo?.createdDate)}</p>
                 </div>
 
                 <div className="button-request">
 
                   {
-                    //check xem con slot khong va no khog co trong team nay
-                    (availableSlots > 0 && !check) && (
+                    //check xem con slot khong va no khog co trong team nay va no khong co team vo nao khac roi
+                    (availableSlots > 0 && !check && !teamUserLogin) && (
                       //Check xem da gui moi chua
-                      isInvited ? (
+                      isInvited  ? (
 
                         <button className="bg-blue-500 text-base p-2  bg-blue-500 hover:bg-blue-200" onClick={() => cancelRequest(teamInfo?.id || "")}>Cancel</button>
                       ) : (
@@ -241,7 +251,7 @@ export default function TeamInfoDetail() {
                           <AlertDialogTrigger className="bg-blue-500 text-base p-2  bg-blue-500 hover:bg-blue-200">Request</AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Are you want to join the team {teamInfo?.name} sure?</AlertDialogTitle>
+                              <AlertDialogTitle>Are you want to join the team {teamInfo?.teamName} sure?</AlertDialogTitle>
                               <AlertDialogDescription className="text-gray-500">
                                 {teamInfo?.idea?.description}
                               </AlertDialogDescription>
