@@ -44,7 +44,7 @@ const data = {
     { title: "Home", url: "/", icon: Home, isActive: true },
     { title: "Social", url: "/social/blog", icon: Globe },
     { title: "Team", url: "/team", icon: UsersRound },
-    { title: "My request", url: "/my-request", icon: Send },
+    { title: "Invitations", url: "/invitations", icon: Send },
     {
       title: "Idea",
       url: "/idea",
