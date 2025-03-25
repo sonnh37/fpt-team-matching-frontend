@@ -74,6 +74,20 @@ class InvitationService extends BaseService<Invitation> {
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
+
+  public approveInvite = async (projectId: string): Promise<BusinessResult<null>> => {
+    return await axiosInstance
+      .put<BusinessResult<null>>(`${this.endpoint}/approve-invitation-of-team-by-me/by-project-id/${projectId}`)
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public cancelInvite_ = async (projectId: string): Promise<BusinessResult<null>> => {
+    return await axiosInstance
+      .put<BusinessResult<null>>(`${this.endpoint}/cancel-invitation-of-team-by-me/by-project-id/${projectId}`)
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
 }
 
 export const invitationService = new InvitationService();

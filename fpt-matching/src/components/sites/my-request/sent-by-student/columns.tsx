@@ -31,7 +31,7 @@ export const columns: ColumnDef<Invitation>[] = [
 
       return (
         <Button variant="link" className="p-0 m-0" asChild>
-          <Link href={`/project/${projectId}`}>{teamName}</Link>
+          <Link href={`/team-detail/${projectId}`}>{teamName}</Link>
         </Button>
       );
     },
@@ -88,13 +88,13 @@ export const columns: ColumnDef<Invitation>[] = [
       return value.includes(row.getValue(id));
     },
   },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-    cell: ({ row }) => {
-      return <Actions row={row} />;
-    },
-  },
+  // {
+  //   accessorKey: "actions",
+  //   header: "Actions",
+  //   cell: ({ row }) => {
+  //     return <Actions row={row} />;
+  //   },
+  // },
 ];
 
 interface ActionsProps {
