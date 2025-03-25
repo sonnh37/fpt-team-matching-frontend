@@ -195,13 +195,13 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
             )}
 
             <ModalFooter className="sticky bottom-0 left-0 w-full bg-white p-3 border-t top-auto">
-                <div className='flex w-full'>
+                <div className='flex w-full justify-center items-center mr-2'>
                     <img
                         src={user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
                         alt="User Avatar"
                         className="w-10 h-10 rounded-full"
                     />
-                    <div className="relative w-full">
+                    <div className="pl-2 relative w-full">
                         <textarea
                             className="w-full px-2 py-2 pr-10 border rounded-md resize-none"
                             placeholder="Hãy làm người văn minh đi"
@@ -216,7 +216,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                                 setComment(""); // Xóa nội dung textarea sau khi gửi
 
                             }
-                        }} className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
+                        }} className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-3 text-sm rounded-md hover:bg-blue-600">
                             <FontAwesomeIcon icon={faPaperPlane} /> Send
                         </button>
                     </div>

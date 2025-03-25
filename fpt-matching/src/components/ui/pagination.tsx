@@ -14,7 +14,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
   const endPage = Math.min(totalPages, startPage + maxPageNumbers - 1);
 
   return (
-    <div className="flex justify-center space-x-2 mt-4">
+    <div className="flex justify-center space-x-2 mt-4 mb-4">
       {/* Nút Prev (bị vô hiệu hóa nếu ở trang 1) */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
