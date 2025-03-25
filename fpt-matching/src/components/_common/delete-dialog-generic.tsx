@@ -64,7 +64,7 @@ export function DeleteBaseEntitysDialog<TData>({
     startDeleteTransition(async () => {
       if (!deleteById) {
         toast.error("Delete function is not defined.");
-        return; // Early return if deleteById is undefined
+        return;
       }
 
       try {
@@ -82,7 +82,7 @@ export function DeleteBaseEntitysDialog<TData>({
         }
         props.onOpenChange?.(false);
         if (onSuccess) {
-          queryClient.invalidateQueries({ queryKey: ["data"] });
+          queryClient.refetchQueries({ queryKey: ["data"] });
           onSuccess();
         }
         props.onOpenChange?.(false);

@@ -19,6 +19,9 @@ import { BusinessResult } from "@/types/models/responses/business-result";
 import { Semester } from "@/types/semester";
 import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { DataOnlyTable } from "@/components/_common/data-table-client/data-table";
+import { columns } from "./stage-idea/columns";
+import StageIdeaTable from "./stage-idea";
 
 interface SemesterFormProps {
   initialData?: Semester | null;
@@ -77,7 +80,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
         };
         const response = await semesterService.update(updatedValues);
         if (response.status != 1) throw new Error(response.message);
-        queryClient.invalidateQueries({
+        queryClient.refetchQueries({
           queryKey: ["fetchSemesterById", initialData.id],
         });
         toast.success(response.message);
@@ -196,7 +199,10 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                 <InformationBaseCard form={form} initialData={initialData} />
               </div>
             </div>
-            <div></div>
+            <div>
+              {/* Button create */}
+              {initialData && <StageIdeaTable />}
+            </div>
           </div>
         </form>
       </Form>

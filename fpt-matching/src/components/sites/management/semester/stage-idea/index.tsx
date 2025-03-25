@@ -26,44 +26,105 @@ import { Profession } from "@/types/profession";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
+  ColumnDef,
   ColumnFiltersState,
   getCoreRowModel,
   getFilteredRowModel,
   PaginationState,
+  Row,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { MoreHorizontal, Search } from "lucide-react";
+import {
+  useParams,
+  usePathname,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
-import { semesterService } from "@/services/semester-service";
-import { SemesterGetAllQuery } from "@/types/models/queries/semesters/semester-get-all-query";
-import { DataTableSemesterComponent } from "./data-table-custom-component";
 import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { isDeleted_options } from "@/lib/filter-options";
-
+import { StageIdeaGetAllQuery } from "@/types/models/queries/stage-ideas/stage-idea-get-all-query";
+import { stageideaService } from "@/services/stage-idea-service";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { StageIdea } from "@/types/stage-idea";
+import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
+import { StageIdeaFormDialog } from "./create-or-update-dialog";
 //#region INPUT
 const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
 });
+
+interface ActionsProps {
+  row: Row<StageIdea>;
+  onEdit: (stageIdea: StageIdea) => void; // Thêm callback để mở dialog
+}
+
+const Actions: React.FC<ActionsProps> = ({ row, onEdit }) => {
+  const model = row.original;
+  const [showDeleteTaskDialog, setShowDeleteTaskDialog] = useState(false);
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => onEdit(model)}>
+            {" "}
+            {/* Mở form Edit */}
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>
+            Delete
+            <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DeleteBaseEntitysDialog
+        deleteById={stageideaService.delete}
+        open={showDeleteTaskDialog}
+        onOpenChange={setShowDeleteTaskDialog}
+        list={[model]}
+        showTrigger={false}
+        onSuccess={() => row.toggleSelected(false)}
+      />
+    </>
+  );
+};
 //#endregion
-export default function SemesterTable() {
-  const searchParams = useSearchParams();
+export default function StageIdeaTable() {
+  const params_ = useParams();
   const filterEnums: FilterEnum[] = [
     { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
   ];
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
     {
-      id: "createdDate",
-      desc: true,
+      id: "stageNumber",
+      desc: false,
     },
   ]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -76,6 +137,11 @@ export default function SemesterTable() {
     pageSize: 10,
   });
   const [isTyping, setIsTyping] = useState(false);
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [currentStageIdea, setCurrentStageIdea] = useState<StageIdea | null>(
+    null
+  );
+
   //#endregion
 
   //#region CREATE TABLE
@@ -89,12 +155,14 @@ export default function SemesterTable() {
 
   // default field in table
   const queryParams = useMemo(() => {
-    const params: SemesterGetAllQuery = useQueryParams(
+    const params: StageIdeaGetAllQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
+
+    params.semesterId = params_.semesterId as string;
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -110,16 +178,31 @@ export default function SemesterTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => semesterService.fetchPaginated(queryParams),
+    queryFn: () => stageideaService.fetchPaginated(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
   if (error) return <div>Error loading data</div>;
 
+  const handleEdit = (stageIdea: StageIdea) => {
+    setCurrentStageIdea(stageIdea);
+    setIsFormDialogOpen(true);
+  };
+
+  const columns_: ColumnDef<StageIdea>[] = [
+    ...columns,
+    {
+      accessorKey: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        return <Actions row={row} onEdit={handleEdit} />;
+      },
+    },
+  ];
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns,
+    columns: columns_,
     rowCount: data?.data?.totalRecords ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
@@ -138,53 +221,27 @@ export default function SemesterTable() {
     setInputFields(values);
   };
 
+  // Thêm nút "Create" vào Toolbar
+  const handleCreateClick = () => {
+    setCurrentStageIdea(null); // Reset để tạo mới
+    setIsFormDialogOpen(true);
+  };
+
+  // Xử lý khi nhấn Edit từ Actions
+
+  // Refresh data sau khi thêm/sửa
+  const handleSuccess = () => {
+    refetch(); // Gọi lại API để cập nhật dữ liệu
+  };
+
   return (
     <>
       <div className="container mx-auto space-y-8">
-        <div className="w-fit mx-auto space-y-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="emailOrFullname"
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>Search name or code</FormLabel>
-                      <div className="flex items-center gap-2">
-                        <FormControl>
-                          <Input
-                            placeholder=""
-                            className="focus-visible:ring-none"
-                            type="text"
-                            {...field}
-                          />
-                        </FormControl>
-                        <Button type="submit" variant="default" size="icon">
-                          <Search />
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
-              />
-            </form>
-          </Form>
-        </div>
-
         <div className="">
           <div className="space-y-4 p-4 mx-auto">
-            <DataTableToolbar
-              form={form}
-              table={table}
-              filterEnums={filterEnums}
-              isSelectColumns={false}
-              isSortColumns={false}
-              // columnSearch={columnSearch}
-              // handleSheetChange={handleSheetChange}
-              // formFilterAdvanceds={formFilterAdvanceds}
-            />
+            <Button type="button" onClick={handleCreateClick} variant="default">
+              Create New
+            </Button>
             {isFetching && !isTyping ? (
               <DataTableSkeleton
                 columnCount={1}
@@ -196,11 +253,21 @@ export default function SemesterTable() {
                 shrinkZero
               />
             ) : (
-              <DataTableSemesterComponent table={table} />
+              <DataTableComponent
+                table={table}
+                restore={stageideaService.restore}
+                deletePermanent={stageideaService.deletePermanent}
+              />
             )}
             <DataTablePagination table={table} />
           </div>
         </div>
+        <StageIdeaFormDialog
+          open={isFormDialogOpen}
+          onOpenChange={setIsFormDialogOpen}
+          stageIdea={currentStageIdea}
+          onSuccess={handleSuccess}
+        />
       </div>
     </>
   );

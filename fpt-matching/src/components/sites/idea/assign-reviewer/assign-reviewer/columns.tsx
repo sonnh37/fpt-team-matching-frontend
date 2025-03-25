@@ -107,7 +107,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       toast.success("Assigned!")
       row.original.reviewerId = "";
       row.original.content = "";
-      queryClient.invalidateQueries({ queryKey: ["dataWithoutReviewer"] });
+      queryClient.refetchQueries({ queryKey: ["dataWithoutReviewer"] });
       row.toggleSelected(false);
     }
   };

@@ -25,7 +25,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input"; // Đảm bảo đúng đường dẫn
+import { Input, InputProps } from "@/components/ui/input"; // Đảm bảo đúng đường dẫn
 import {
   Popover,
   PopoverContent,
@@ -46,8 +46,13 @@ import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
-import { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
+import { ReactElement, useRef, useState } from "react";
+import {
+  FieldPath,
+  FieldValues,
+  useFormContext,
+  UseFormReturn,
+} from "react-hook-form";
 
 interface FormInputProps<TFieldValues extends FieldValues>
   extends Omit<React.ComponentPropsWithoutRef<"input">, "form"> {
@@ -290,7 +295,85 @@ export const FormRadioGroup = <TFieldValues extends FieldValues>({
   );
 };
 
+interface InputNumberBaseProps<TFieldValues extends FieldValues> {
+  label?: string;
+  name: FieldPath<TFieldValues>;
+  description?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  form: UseFormReturn<TFieldValues>;
+  min?: number;
+  max?: number;
+  step?: string;
+  decimalScale?: number;
+}
+
 export const FormInputNumber = <TFieldValues extends FieldValues>({
+  label,
+  name,
+  description,
+  form,
+  min = 0,
+  max,
+  step = "1",
+  decimalScale = 0,
+  ...props
+}: InputNumberBaseProps<TFieldValues>) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { control } = useFormContext<TFieldValues>();
+
+  return (
+    <FormField
+      control={form?.control || control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          {label && <FormLabel>{label}</FormLabel>}
+          <FormControl>
+            <Input
+              {...field}
+              ref={inputRef}
+              {...props}
+              type="number"
+              min={min}
+              max={max}
+              step={step}
+              value={field.value ?? ""}
+              onChange={(e) => {
+                let value = e.target.value;
+
+                // Xử lý số thập phân nếu cần
+                if (decimalScale > 0) {
+                  const regex = new RegExp(
+                    `^-?\\d*\\.?\\d{0,${decimalScale}}$`
+                  );
+                  if (!regex.test(value)) return;
+                } else {
+                  // Chỉ cho phép số nguyên
+                  value = value.replace(/[^0-9]/g, "");
+                }
+
+                // Chuyển đổi sang number
+                const numValue =
+                  value === ""
+                    ? null
+                    : decimalScale > 0
+                    ? parseFloat(value)
+                    : parseInt(value);
+
+                field.onChange(numValue);
+              }}
+            />
+          </FormControl>
+          {description && <FormDescription>{description}</FormDescription>}
+          <FormMessage />
+        </FormItem>
+      )}
+    />
+  );
+};
+
+export const FormInputNumberCurrency = <TFieldValues extends FieldValues>({
   label,
   name,
   description,
@@ -517,58 +600,68 @@ export const FormSelectColor = <TFieldValues extends FieldValues>({
   );
 };
 
+interface DateBaseProps<TFieldValues extends FieldValues> {
+  label?: string;
+  name: FieldPath<TFieldValues>;
+  description?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  form: UseFormReturn<TFieldValues>;
+  pattern?: string;
+}
+
+interface FormInputDateProps<TFieldValues extends FieldValues> {
+  label?: string;
+  name: FieldPath<TFieldValues>;
+  description?: string;
+  form: UseFormReturn<TFieldValues>;
+  min?: string;
+  max?: string;
+}
+
 export const FormInputDate = <TFieldValues extends FieldValues>({
   label,
   name,
+  description,
   form,
-  disabled = false,
-}: BaseProps<TFieldValues>) => {
+  min,
+  max,
+  ...props
+}: FormInputDateProps<TFieldValues>) => {
+  const { control } = useFormContext<TFieldValues>();
+
   return (
     <FormField
-      control={form.control}
+      control={form?.control || control}
       name={name}
-      render={({ field }) => {
-        return (
-          <FormItem>
-            <FormLabel>{label}</FormLabel>
-            <FormControl>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    disabled={disabled}
-                    variant={"outline"}
-                    className={cn(
-                      "w-full flex flex-row justify-between pl-3 text-left font-normal",
-                      !field.value && "text-muted-foreground"
-                    )}
-                  >
-                    {field.value ? (
-                      format(field.value, "dd/MM/yyyy")
-                    ) : (
-                      <span>{format(new Date(), "dd/MM/yyyy")}</span>
-                    )}
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={field.value || new Date()}
-                    onSelect={field.onChange}
-                    initialFocus
-                    disabled={disabled}
-                  />
-                </PopoverContent>
-              </Popover>
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        );
-      }}
+      render={({ field }) => (
+        <FormItem>
+          {label && <FormLabel>{label}</FormLabel>}
+          <FormControl>
+            <Input
+              {...field}
+              {...props}
+              type="date"
+              min={min}
+              max={max}
+              value={
+                field.value
+                  ? new Date(field.value).toISOString().split("T")[0]
+                  : ""
+              }
+              onChange={(e) => {
+                const date = e.target.value ? new Date(e.target.value) : null;
+                field.onChange(date);
+              }}
+            />
+          </FormControl>
+          {description && <FormDescription>{description}</FormDescription>}
+          <FormMessage />
+        </FormItem>
+      )}
     />
   );
 };
-
 export const FormInputDateRangePicker = <TFieldValues extends FieldValues>({
   label,
   name,
