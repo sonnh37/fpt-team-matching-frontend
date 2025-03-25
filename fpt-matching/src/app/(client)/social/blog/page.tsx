@@ -2,7 +2,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faPaperPlane, faAngleDown } from "@fortawesome/free-solid-svg-icons";
+import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faUser, faVideo, faFaceSmile, faPhotoFilm, faPencil, faNoteSticky, faShareFromSquare, faComments, faHouse, faShare, faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +45,14 @@ import LikeBlog from '@/components/_common/likeblog/like-blog';
 import { isExists } from 'date-fns';
 import { projectService } from '@/services/project-service';
 import { Project } from '@/types/project';
+import ProjectInfo from '@/components/_common/projectInfo/project-info';
+import { Upload } from 'lucide-react';
+import UploadCv from '@/components/_common/uploadCv/upload-cv';
+
+
+
+
+
 export default function Blog() {
 
 
@@ -64,8 +72,8 @@ export default function Blog() {
   const [filterType, setFilterType] = useState<BlogType | null>(null);
 
 
-console.log("tét",formData)
-  
+  console.log("tét", formData)
+
   // Hàm thay đổi bộ lọc và gọi API lại
   const handleFilterChange = (type: BlogType) => {
     setFilterType(type);
@@ -184,6 +192,7 @@ console.log("tét",formData)
 
   // day la sort theo type
   const sortFpt = notification.filter(x => x.type === BlogType.Share);
+
 
 
 
@@ -330,7 +339,7 @@ console.log("tét",formData)
         </div>
         {/* blog center */}
         <div className='blog-center flex flex-col items-center basis-3/5 mr-4 ml-4'>
-          <div className='form-create-blog bg-slate-100 rounded-xl w-full max-w-3xl p-3 mx-2 mt-3'>
+          <div className='form-create-blog bg-white rounded-xl w-full max-w-3xl p-3 mx-2 mt-3'>
 
             <div className="flex items-center space-x-3">
               <img
@@ -348,8 +357,8 @@ console.log("tét",formData)
 
                 <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
                   <ModalContent >
-                    <div className="header-blog mb-4 py-4 border-b-2 h-1/5">
-                      <h4 className='text-lg md:text-2xl text-neutral-600 dark:text-neutral-100 font-bold text-center' >
+                    <div className="header-blog mb-4 py-4 border-b-slate-100 h-1/5 bg-orange-400">
+                      <h4 className='text-lg md:text-2xl text-neutral-100 dark:text-neutral-100 font-bold text-center' >
                         Tạo bài viết của bạn đi
                       </h4>
                     </div>
@@ -362,7 +371,7 @@ console.log("tét",formData)
                         />
                         <div className='w-full ml-3 '>
                           <div className=' '>
-                            <p className="text-lg font-semibold text-gray-800">{user?.lastName} {user?.firstName}</p>
+                            <p className="text-lg font-semibold text-gray-800"><FontAwesomeIcon icon={faUser} /> {user?.lastName} {user?.firstName}</p>
                           </div>
                           {/* <div> */}
                           <select
@@ -391,7 +400,7 @@ console.log("tét",formData)
                       <div className='body mt-3 h-3/4 px-2'>
                         <div className='flex'>
                           <div className='w-1/4 items-center p-2'>
-                            <h3 >Tiêu đề</h3>
+                            <h3 > <FontAwesomeIcon icon={faPencil} /> Tiêu đề</h3>
                           </div>
                           <input className=' w-3/4' type="text"
                             value={formData.title}
@@ -401,7 +410,7 @@ console.log("tét",formData)
                         </div>
                         <div className='flex mt-2 h-full'>
                           <div className='w-1/4 items-center p-2 '>
-                            <h3 >Nội dung</h3>
+                            <h3 ><FontAwesomeIcon icon={faNoteSticky} /> Nội dung</h3>
                           </div>
                           <textarea className='w-3/4 h-40'
                             value={formData.content}
@@ -426,8 +435,8 @@ console.log("tét",formData)
                             </div>
                             <div className='project py-2'>
 
-                              <div className='flex mt-2 h-full'>
-                                <div className='w-1/4 items-center p-2 '>
+                              <div className='flex mt-2 h-full mb-4 min-h-28'>
+                                <div className='w-1/4 items-center p-2  '>
                                   <h3 >Team của bạn</h3>
                                 </div>
                                 <div>
@@ -435,7 +444,7 @@ console.log("tét",formData)
                                   <h4 className='text-red-400'>{messageUser}</h4>
 
                                   <select
-                                    name="projectId"className="border p-2 rounded w-48"
+                                    name="projectId" className="border p-2 rounded w-48"
                                     value={formData.projectId || ""}  // Đảm bảo không bị undefined
                                     onChange={handleChange}
                                   >
@@ -457,7 +466,7 @@ console.log("tét",formData)
                         )}
                       </div>
                       <div className='flex w-full h-14 absolute bottom-0  items-center justify-center'>
-                        <button onClick={() => handleSubmit()} className='bg-blue-500 h-3/4 w-full mx-2 hover:bg-blue-400 hover:text-gray-400 '>Post Bài</button>
+                        <button onClick={() => handleSubmit()} className='bg-blue-500 h-3/4 w-1/3 mx-2 rounded-xl hover:bg-blue-400 hover:text-black '>Post Bài</button>
                       </div>
                     </div>
                   </ModalContent>
@@ -465,17 +474,23 @@ console.log("tét",formData)
 
               </Modal>
             </div>
-
-            <div className="flex ">
+            <div className="flex my-3 border-b-2  border-gray-400 px-6"> </div>
+            <div className="flex mt-3 ">
 
               <div className="flex space-x-4 justify-center w-full">
-                <button className="text-red-500 hover:text-gray-800">
+                <button className="text-red-500 hover:text-gray-800 w-1/4">
+                  <FontAwesomeIcon icon={faVideo} />
+                  <span> </span>
                   Video trực tiếp
                 </button>
-                <button className="text-green-600 hover:text-gray-800">
+                <button className="text-green-600 hover:text-gray-800 w-1/4">
+                  <FontAwesomeIcon icon={faPhotoFilm} />
+                  <span> </span>
                   Ảnh/video
                 </button>
-                <button className="text-yellow-600 hover:text-gray-800">
+                <button className="text-yellow-600 hover:text-gray-800 w-1/4">
+                  <FontAwesomeIcon icon={faFaceSmile} />
+                  <span> </span>
                   Cảm xúc/hoạt động
                 </button>
               </div>
@@ -484,32 +499,32 @@ console.log("tét",formData)
           </div>
           {/* filter blog */}
           <div className='header-button  pt-3'>
-            <div className='header-button pt-3'>
+            <div className='header-button pt-3 h-10'>
               <span
-                className={` mx-1 px-2 hover:bg-white hover:text-blue-900 ${filterType === null ? "font-extrabold" : ""}`}
+                className={` h-full  px-2 p-3 mx-3 hover:bg-white hover:text-blue-900 ${filterType === null ? "bg-white font-extrabold" : ""}`}
                 onClick={() => handleNoFilter()}
               >
-                Liên quan
+               <FontAwesomeIcon icon={faHouse} /> Liên quan
               </span>
               <span
-                className={`px-2 hover:bg-white hover:text-blue-900 ${filterType === BlogType.Share ? "font-extrabold" : ""}`}
+                className={`h-full px-2 p-3 mx-3 hover:bg-white hover:text-blue-900 ${filterType === BlogType.Share ? "bg-white font-extrabold" : ""}`}
                 onClick={() => handleFilterChange(BlogType.Share)}
               >
-                Chia sẻ
+               <FontAwesomeIcon icon={faShare} /> Chia sẻ
               </span>
               <span
-                className={`px-2 hover:bg-white hover:text-blue-900 ${filterType === BlogType.Recruit ? "font-extrabold" : ""}`}
+                className={`h-full px-2 p-3 mx-3  hover:bg-white hover:text-blue-900 ${filterType === BlogType.Recruit ? "bg-white font-extrabold" : ""}`}
                 onClick={() => handleFilterChange(BlogType.Recruit)}
               >
-                Tìm thành viên
+                <FontAwesomeIcon icon={faCircleUser} /> Tìm thành viên
               </span>
             </div>
           </div>
           {/* Blog */}
           {/* <div className='bg-white max-w-3xl mx-3 my-8 p-6 rounded-xl shadow-md  '>
             <div> */}
-              {/* Post Header with Avatar, Username, and Date */}
-              {/* <div className="flex items-center space-x-4">
+          {/* Post Header with Avatar, Username, and Date */}
+          {/* <div className="flex items-center space-x-4">
                 <img
                   src="/user-avatardefault.jpg" // Replace with your avatar image
                   alt="User Avatar"
@@ -536,36 +551,36 @@ console.log("tét",formData)
               </div> */}
 
 
-              {/* Post Title */}
-              {/* <div className="text-3xl font-semibold text-gray-800 mt-6"> */}
-                {/* <Modal> */}
-                  {/* <ModalTrigger className="font-bold text-black ">
+          {/* Post Title */}
+          {/* <div className="text-3xl font-semibold text-gray-800 mt-6"> */}
+          {/* <Modal> */}
+          {/* <ModalTrigger className="font-bold text-black ">
                     <span className="  ">
                       Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
                     </span>
                   </ModalTrigger> */}
-                  {/* <ModalBody> */}
-                    {/* <ModalContent className='w-full max-h-[80vh] overflow-y-auto '> */}
-                      {/* Header - Cố định khi cuộn */}
-                      {/* <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
+          {/* <ModalBody> */}
+          {/* <ModalContent className='w-full max-h-[80vh] overflow-y-auto '> */}
+          {/* Header - Cố định khi cuộn */}
+          {/* <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                         <div className="flex justify-center w-full">
                           Bai viet cua thang nao do
                         </div>
                         <ModalClose className="absolute top-2 right-2">X</ModalClose>
                       </div> */}
-                      {/* <div className='body-blogdetail'> */}
-                        {/* <div className="flex items-center space-x-4 p-2"> */}
-                          {/* <img
+          {/* <div className='body-blogdetail'> */}
+          {/* <div className="flex items-center space-x-4 p-2"> */}
+          {/* <img
                             src="/user-avatardefault.jpg" // Replace with your avatar image
                             alt="User Avatar"
                             className="w-12 h-12 rounded-full"
                           /> */}
-                          {/* <div className='flex w-full justify-between'> */}
-                            {/* <div>
+          {/* <div className='flex w-full justify-between'> */}
+          {/* <div>
                               <p className="text-lg font-semibold text-gray-800">Nguyễn Toàn</p>
                               <p className="text-sm text-gray-500">4 giờ trước  <FontAwesomeIcon icon={faEarthAmericas} /> </p>
                             </div> */}
-                            {/* <div className='setting-blog'>
+          {/* <div className='setting-blog'>
                               <DropdownMenu>
                                 <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
                                 <DropdownMenuContent>
@@ -579,11 +594,11 @@ console.log("tét",formData)
                               </DropdownMenu>
 
                             </div> */}
-                          {/* </div> */}
-                          
-                        {/* </div> */}
-                        {/* Post Content */}
-                        {/* <h1 className=" px-2 ">
+          {/* </div> */}
+
+          {/* </div> */}
+          {/* Post Content */}
+          {/* <h1 className=" px-2 ">
                           Một trong những dòng Sport Bike hot hit nhà Ducati, thì phải nhắc đến Panigale 899.
                         </h1>
                         <p className="mt-4 text-gray-700 text-xl px-2 ">
@@ -591,8 +606,8 @@ console.log("tét",formData)
                           Với dáng vẻ đầy uy lực cá tính, cùng với khối động cơ L-twin 898cc Superquadro sản xuất công suất 148 mã lực và mô-men xoắn 99 Nm – Panigale 899 mau chóng nhận được rất nhiều sự yêu thích của các Biker.
                         </p> */}
 
-                        {/* Post Stats (Likes, Comments, Upload Count) */}
-                        {/* <div className="flex py-3 w-full">
+          {/* Post Stats (Likes, Comments, Upload Count) */}
+          {/* <div className="flex py-3 w-full">
                           <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
                             <span className="flex items-center">
                               28 lượt thích từ người khác
@@ -610,12 +625,12 @@ console.log("tét",formData)
 
                           </div>
                         </div> */}
-                      {/* </div> */}
+          {/* </div> */}
 
 
 
-                      {/* Post Stats (Likes, Comments, Upload Count) */}
-                      {/* <div className="flex w-full text-gray-600 border-y-2 p-3">
+          {/* Post Stats (Likes, Comments, Upload Count) */}
+          {/* <div className="flex w-full text-gray-600 border-y-2 p-3">
                         <div className="flex w-full text-xl justify-between  items-center space-x-4">
                           <span className="flex items-center">
                             <i className="fas fa-thumbs-up text-blue-500"></i>
@@ -632,8 +647,8 @@ console.log("tét",formData)
                         </div>
                       </div> */}
 
-                      {/* Post Comment */}
-                      {/* <div className='blog-comment'>
+          {/* Post Comment */}
+          {/* <div className='blog-comment'>
                         <div className='filter-comment'>
                           <Popover>
                             <PopoverTrigger asChild>
@@ -796,10 +811,10 @@ console.log("tét",formData)
                         </div>
                       </div> */}
 
-                    {/* </ModalContent> */}
-                    {/* <ModalFooter className="justify-start w-full h-auto"> */}
-                      {/* <div className='flex w-full'> */}
-                        {/* <img
+          {/* </ModalContent> */}
+          {/* <ModalFooter className="justify-start w-full h-auto"> */}
+          {/* <div className='flex w-full'> */}
+          {/* <img
                           src="/user-avatardefault.jpg" // Replace with your avatar image
                           alt="User Avatar"
                           className="w-10 h-10 rounded-full"
@@ -810,25 +825,25 @@ console.log("tét",formData)
                             placeholder="Hãy làm người văn minh đi"
                           ></textarea> */}
 
-                          {/* Nút Send nằm góc phải dưới */}
-                          {/* <button className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
+          {/* Nút Send nằm góc phải dưới */}
+          {/* <button className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
                             <FontAwesomeIcon icon={faPaperPlane} /> Send
                           </button> */}
-                         {/* </div>
+          {/* </div>
                       </div> */}
-                    {/* </ModalFooter> */}
+          {/* </ModalFooter> */}
 
-                  {/* </ModalBody> */}
-                {/* </Modal> */}
-              {/* </div> */}
-              {/* <div className="relative w-full py-5 flex items-center">
+          {/* </ModalBody> */}
+          {/* </Modal> */}
+          {/* </div> */}
+          {/* <div className="relative w-full py-5 flex items-center">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full h-[2px] bg-gray-300 blur-md"></div>
                 </div>
                 <div className="relative w-full h-[2px] bg-gray-500"></div>
               </div> */}
-              {/* Post Stats (Likes, Comments, Upload Count) */}
-              {/* <div className="flex justify-between mt-1 text-gray-600">
+          {/* Post Stats (Likes, Comments, Upload Count) */}
+          {/* <div className="flex justify-between mt-1 text-gray-600">
                 <div className="flex  items-center space-x-4">
                   <span className="flex items-center">
                     <i className="fas fa-thumbs-up text-blue-500"></i>
@@ -844,7 +859,7 @@ console.log("tét",formData)
                   </span>
                 </div>
               </div> */}
-            {/* </div>
+          {/* </div>
           </div> */}
 
 
@@ -858,7 +873,7 @@ console.log("tét",formData)
                   result?.data?.results?.map((post) => (
                     // Cho blog detail
 
-                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 rounded-xl shadow-md  '>
+                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md  '>
                       <div>
                         {/* Post Header with Avatar, Username, and Date */}
                         <div className="flex items-center space-x-4">
@@ -953,17 +968,31 @@ console.log("tét",formData)
                                     </div>
                                   </div>
                                   {/* Post Content */}
-                                  <h1 className=" text-3xl md:text-4xl font-bold text-gray-900 leading-tight px-2 ">
-                                    {post?.title}
+                                  <h1 className="flex text-xl md:text-2xl font-bold text-gray-900 leading-tight px-4 ">
+                                  {post?.type === BlogType.Recruit && (   <div>🔥🔎</div> )} {post?.title}
                                   </h1>
-                                  <p className="mt-4 text-gray-700 text-xl px-2 ">
+                                  <p className="mt-2 font-normal text-base md:text-lg text-gray-700 px-4 ">
                                     {post?.content}
                                   </p>
+
+                                  {post?.type === BlogType.Recruit && (
+
+                                    <div>  <h4 className='text-lg px-4 mt-1'>Kỹ năng yêu cầu :</h4>
+                                      <div className="mt-1 text-gray-700 font-medium text-base px-4 ">
+                                        {post?.skillRequired ?? "Hiện tại chưa có."}
+                                        {/* <getByProjectId id={post?.id}/> */}
+                                        <h4 className='text-lg mt-1 font-bold  text-gray-900'>Thông tin của team :</h4>
+                                        <ProjectInfo id={post.projectId ?? ""} />
+                                      </div>
+                                    </div>
+
+
+                                  )}
 
                                   {/* Post Stats (Likes, Comments, Upload Count) */}
                                   <div className="flex py-3 w-full">
                                     <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
-                                      <span className="flex items-center">
+                                      <span className="flex items-center ml-3">
                                         <LikeBlog postId={post?.id ?? ""} />
                                       </span>
                                       <div className='flex'>
@@ -971,7 +1000,7 @@ console.log("tét",formData)
                                           <i className="fas fa-comment text-green-500"></i>
                                           <span className="ml-2">{post?.comments.length ?? 0} bình luận  </span>
                                         </span>
-                                        <span className="flex items-center">
+                                        <span className="flex items-center mr-3">
                                           <i className="fas fa-image text-red-500"></i>
                                           <span className="ml-2">{post?.blogCvs.length ?? 0} nộp CV </span>
                                         </span>
@@ -1015,19 +1044,17 @@ console.log("tét",formData)
                           <div className="relative w-full h-[2px] bg-gray-500"></div>
                         </div>
                         {/* Post Stats (Likes, Comments, Upload Count) */}
-                        <div className="flex justify-between mt-1 text-gray-600">
-                          <div className="flex  items-center space-x-4">
-                            <span className="flex items-center">
-                              <i className="fas fa-thumbs-up text-blue-500"></i>
-                              <span className="ml-2">           <LikeBlog postId={post?.id ?? ""} /> </span>
+                        <div className="flex  text-gray-600">
+                          <div className="flex justify-between items-center  w-full space-x-4">
+                            <span className="flex items-center ml-4 pl-4 p-2 hover:bg-slate-200">
+                              <span className="ml-2 text-lg">           <LikeBlog postId={post?.id ?? ""} /> </span>
                             </span>
-                            <span className="flex items-center">
-                              <i className="fas fa-comment text-green-500"></i>
-                              <span className="ml-2">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
+                            <span className="flex items-center p-2 ">
+                              <span className="ml-2 text-lg">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
                             </span>
-                            <span className="flex items-center">
-                              <i className="fas fa-image text-red-500"></i>
-                              <span className="ml-2">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
+                            <span className="flex items-center mr-4 pr-4 p-2  hover:bg-slate-200">
+                                <UploadCv blogId={post.id ?? ""}/>
+                              {/* <span className="ml-2 text-lg ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span> */}
                             </span>
                           </div>
                         </div>
@@ -1055,7 +1082,7 @@ console.log("tét",formData)
               <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-2xl flex flex-col justify-end items-start">
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
-                    <h1 className='text-xl text-black font-extrabold'># Discuss</h1>
+                    <h1 className='text-xl text-black'># 💬🧐 Discuss</h1>
                     <p className="font-normal text-xm text-gray-700 px-4 py-2  ">
                       Discussion threads targeting the whole community
                     </p>
@@ -1089,9 +1116,9 @@ console.log("tét",formData)
               <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-2xl flex flex-col justify-end items-start">
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
-                    <h1 className='text-xl text-black'># Notification</h1>
+                    <h1 className='text-xl text-black'># 🔔 Notification</h1>
                     <p className="font-normal text-xm text-gray-700 px-4 py-2  ">
-                      hong hot drama truong fpt
+                      Hóng hớt drama trường FPT thân yêu 
                     </p>
                   </div>
                 </div>
@@ -1120,7 +1147,7 @@ console.log("tét",formData)
 
           <div className='box-trending'>
             <div className='w-full h-auto  px-2 py-2'>
-              <div className='text-black font-extrabold '>Trending</div>
+              <div className='text-black font-extrabold text-lg'>🔥🔥 Trending</div>
               <div className='title-trending p-3  hover:bg-white hover:text-blue-900 '>
                 <h2 className=" mb-2 z-50 w-full ">
                   Thu va Loc sang ngay bi ia chay
