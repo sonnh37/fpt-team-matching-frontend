@@ -46,7 +46,7 @@ export function DataTableComponent<TData>({
         const command: UpdateCommand = { id: model.id }; // Define your command structure
         const result = await restore(command);
         if (result.status == 1) {
-          queryClient.invalidateQueries({ queryKey: ["data"] });
+          queryClient.refetchQueries({ queryKey: ["data"] });
           toast.success(`Row with id ${model.id} restored successfully.`);
           // Optionally, restore the local state or refetch data
         } else {
@@ -63,7 +63,7 @@ export function DataTableComponent<TData>({
       try {
         const result = await deletePermanent(id);
         if (result.status == 1) {
-          queryClient.invalidateQueries({ queryKey: ["data"] });
+          queryClient.refetchQueries({ queryKey: ["data"] });
           toast.success(`Row with id ${id} deleted permanently.`);
           // Optionally, restore the local state or refetch data
         } else {
@@ -127,10 +127,11 @@ export function DataTableComponent<TData>({
                 ))}
                 {isDeleted && (
                   <div className="pointer-events-auto absolute inset-0 z-10 flex items-center justify-center gap-1 bg-white/50 opacity-0 hover:opacity-100 dark:bg-black/50">
-                    <Button onClick={() => handleRestore(model)}>
+                    <Button type="button" onClick={() => handleRestore(model)}>
                       Restore
                     </Button>
                     <Button
+                      type="button"
                       variant={"destructive"}
                       onClick={() => handleDeletePermanently(model.id)}
                     >

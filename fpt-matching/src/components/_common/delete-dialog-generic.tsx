@@ -64,7 +64,7 @@ export function DeleteBaseEntitysDialog<TData>({
     startDeleteTransition(async () => {
       if (!deleteById) {
         toast.error("Delete function is not defined.");
-        return; // Early return if deleteById is undefined
+        return;
       }
 
       try {
@@ -82,7 +82,7 @@ export function DeleteBaseEntitysDialog<TData>({
         }
         props.onOpenChange?.(false);
         if (onSuccess) {
-          queryClient.invalidateQueries({ queryKey: ["data"] });
+          queryClient.refetchQueries({ queryKey: ["data"] });
           onSuccess();
         }
         props.onOpenChange?.(false);
@@ -109,7 +109,7 @@ export function DeleteBaseEntitysDialog<TData>({
           </DialogHeader>
           <DialogFooter className="gap-2 sm:space-x-0">
             <DialogClose asChild>
-              <Button variant="outline">{buttonRightMessage}</Button>
+              <Button variant="outline">{buttonLeftMessage}</Button>
             </DialogClose>
             <Button
               aria-label="Delete selected rows"
@@ -123,20 +123,20 @@ export function DeleteBaseEntitysDialog<TData>({
                   aria-hidden="true"
                 />
               )}
-              {buttonLeftMessage}
+              {buttonRightMessage}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     ) : (
       <Dialog {...props}>
-        <DialogContent className="shadow-lg">
+        <DialogContent className="shadow-lg dialog">
           <DialogHeader>
             <DialogTitle>{titleMessasge}</DialogTitle>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:space-x-0">
             <DialogClose asChild>
-              <Button variant="outline">{buttonRightMessage}</Button>
+              <Button variant="outline">{buttonLeftMessage}</Button>
             </DialogClose>
             <Button
               aria-label="Delete selected rows"
@@ -150,7 +150,7 @@ export function DeleteBaseEntitysDialog<TData>({
                   aria-hidden="true"
                 />
               )}
-              {buttonLeftMessage}
+              {buttonRightMessage}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -179,7 +179,7 @@ export function DeleteBaseEntitysDialog<TData>({
         </DrawerHeader>
         <DrawerFooter className="gap-2 sm:space-x-0">
           <DrawerClose asChild>
-            <Button variant="outline">{buttonRightMessage}</Button>
+            <Button variant="outline">{buttonLeftMessage}</Button>
           </DrawerClose>
           <Button
             aria-label="Delete selected rows"
@@ -193,7 +193,7 @@ export function DeleteBaseEntitysDialog<TData>({
                 aria-hidden="true"
               />
             )}
-            {buttonLeftMessage}
+            {buttonRightMessage}
           </Button>
         </DrawerFooter>
       </DrawerContent>

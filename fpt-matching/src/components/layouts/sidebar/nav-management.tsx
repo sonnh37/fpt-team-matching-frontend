@@ -22,7 +22,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
-export function NavMain({
+export function NavManagement({
   items,
 }: {
   items: {
@@ -40,7 +40,7 @@ export function NavMain({
   const pathName = usePathname();
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      <SidebarGroupLabel>Management</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const isActive =

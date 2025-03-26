@@ -31,82 +31,6 @@ import { Separator } from "../ui/separator";
 import { TypographyLarge } from "./typography/typography-large";
 import { Badge } from "../ui/badge";
 
-const notifications = [
-  {
-    id: 1,
-    avatar: "https://via.placeholder.com/50",
-    name: "Nguyễn Nhi",
-    action: "đã mời bạn thích",
-    target: "Let Me Cook",
-    time: "1 ngày trước",
-    type: "invite",
-  },
-  {
-    id: 2,
-    avatar: "https://via.placeholder.com/50",
-    name: "Nguyen Vo Truc Ha",
-    action: "gợi ý kết bạn mới",
-    time: "3 ngày trước",
-    type: "friend_suggestion",
-  },
-  {
-    id: 3,
-    avatar: "https://via.placeholder.com/50",
-    name: "Lê Gia Huy",
-    action: "Bạn đã nhận được huy hiệu fan cứng của",
-    time: "3 ngày trước",
-    type: "fan_badge",
-  },
-  {
-    id: 4,
-    avatar: "https://via.placeholder.com/50",
-    name: "Lê Gia Huy",
-    action: "Bạn đã nhận được huy hiệu fan cứng của",
-    time: "1 tuần trước",
-    type: "fan_badge",
-  },
-  {
-    id: 5,
-    avatar: "https://via.placeholder.com/50",
-    name: "Nguyễn Văn A",
-    action: "đã gửi lời mời kết bạn",
-    time: "2 tuần trước",
-    type: "friend_request",
-  },
-  {
-    id: 6,
-    avatar: "https://via.placeholder.com/50",
-    name: "Trần B",
-    action: "đã bình luận bài viết của bạn",
-    time: "3 tuần trước",
-    type: "comment",
-  },
-  {
-    id: 7,
-    avatar: "https://via.placeholder.com/50",
-    name: "Nguyễn a",
-    action: "đã thích bài viết của bạn",
-    time: "1 tháng trước",
-    type: "like",
-  },
-  {
-    id: 8,
-    avatar: "https://via.placeholder.com/50",
-    name: "Nguyễn ",
-    action: "đã thích bài viết của bạn",
-    time: "1 tháng trước",
-    type: "like",
-  },
-  {
-    id: 9,
-    avatar: "https://via.placeholder.com/50",
-    name: "Nguyễn C",
-    action: "đã thích bài viết của bạn",
-    time: "1 tháng trước",
-    type: "like",
-  },
-];
-
 interface NotificationPopoverProps
   extends React.ComponentPropsWithRef<typeof PopoverTrigger>,
     ButtonProps {
@@ -123,6 +47,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
   const businessResult = notificationHub.businessResult;
 
   const notifications = businessResult?.data?.results ?? [];
+  const totalRecords = businessResult?.data?.totalRecords ?? 0;
 
   return (
     <Popover>
@@ -130,9 +55,11 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
         <Button variant="outline" className={cn("size-8 rounded-full")}>
           <Avatar className="size-8 overflow-visible bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500 flex items-center justify-center">
             <Bell className="!w-5 !h-5 text-foreground/80" />
-            <Badge className="absolute inline-flex items-center justify-center w-4 h-4 font-bold text-white bg-red-500 border-1 border-white -top-2 -end-2 dark:border-gray-900">
-              {businessResult?.data?.totalRecords}
-            </Badge>
+            {totalRecords > 0 && (
+              <Badge className="absolute inline-flex items-center justify-center w-4 h-4 font-bold text-white bg-red-500 border-1 border-white -top-2 -end-2 dark:border-gray-900">
+                {businessResult?.data?.totalRecords}
+              </Badge>
+            )}
           </Avatar>
         </Button>
       </PopoverTrigger>
@@ -201,7 +128,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
 
           <Button
             variant={"link"}
-            onClick={() => window.location.href = "/social/blog/notification"}
+            onClick={() => (window.location.href = "/social/blog/notification")}
             className="w-fit h-fit"
           >
             See all

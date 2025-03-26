@@ -168,7 +168,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
     }
 
     toast.success("Thay đổi của bạn đã lưu.");
-    queryClient.invalidateQueries({ queryKey: ["getUserInfo"] });
+    queryClient.refetchQueries({ queryKey: ["getUserInfo"] });
     setOpen(false);
   }
 

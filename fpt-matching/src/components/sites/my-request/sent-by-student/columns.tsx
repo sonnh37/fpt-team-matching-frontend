@@ -21,26 +21,20 @@ import { usePathname, useRouter } from "next/navigation";
 
 export const columns: ColumnDef<Invitation>[] = [
   {
-    accessorKey: "project.name",
+    accessorKey: "project.teamName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Project" />
     ),
     cell: ({ row }) => {
-      const projectName = row.original.project?.name ?? "Unknown"; // Tránh lỗi undefined
+      const teamName = row.original.project?.teamName ?? "Unknown"; // Tránh lỗi undefined
       const projectId = row.original.project?.id ?? "#";
 
       return (
         <Button variant="link" className="p-0 m-0" asChild>
-          <Link href={`/project/${projectId}`}>{projectName}</Link>
+          <Link href={`/team-detail/${projectId}`}>{teamName}</Link>
         </Button>
       );
     },
-  },
-  {
-    accessorKey: "project.teamName",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Team" />
-    ),
   },
   {
     accessorKey: "createdDate",
@@ -94,13 +88,13 @@ export const columns: ColumnDef<Invitation>[] = [
       return value.includes(row.getValue(id));
     },
   },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-    cell: ({ row }) => {
-      return <Actions row={row} />;
-    },
-  },
+  // {
+  //   accessorKey: "actions",
+  //   header: "Actions",
+  //   cell: ({ row }) => {
+  //     return <Actions row={row} />;
+  //   },
+  // },
 ];
 
 interface ActionsProps {
@@ -126,15 +120,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText(model.id!)}
-          >
-            Copy model ID
-          </DropdownMenuItem>
-          {/*<DropdownMenuItem onClick={handleUsersClick}>*/}
-          {/*    View photos*/}
-          {/*</DropdownMenuItem>*/}
-          <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleViewDetailsClick}>
             View details
           </DropdownMenuItem>
