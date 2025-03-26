@@ -23,9 +23,6 @@ import {useState} from "react";
 import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import * as React from "react";
-import {Button} from "@/components/ui/button";
-import {Import} from "lucide-react";
-
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
