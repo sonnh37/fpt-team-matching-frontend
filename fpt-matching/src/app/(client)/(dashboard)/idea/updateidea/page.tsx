@@ -46,7 +46,7 @@ const UpdateProjectTeam = () => {
   const [email, setEmailInvite] = useState<string>("");
   const [MessageInvite, setMessage] = useState<string>("");
 
-  console.log(email,"check email")
+  console.log(email, "check email")
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -119,7 +119,7 @@ const UpdateProjectTeam = () => {
     }
     // check email người dùng
     const receiver = await userService.fetchAll(query1);
-    console.log("checkUser1",receiver)
+    console.log("checkUser1", receiver)
     if (receiver.status === 1 && receiver.data) {
       const idReceiver = receiver.data[0].id;
       // check project coi leader nó team không
@@ -132,12 +132,13 @@ const UpdateProjectTeam = () => {
 
       const query: TeamInvitationCommand = {
         receiverId: idReceiver ?? "",
-        projectId: prj.data?.id ?? ""
+        projectId: prj.data?.id ?? "",
+        content: "Muốn mời bạn vào nhóm!"
       }
-      console.log(query , "checkUser2")
+      console.log(query, "checkUser2")
       const result = await invitationService.sendByTeam(query);
-
-      if (result.status === 1) {
+      console.log("checkUser3", result)
+      if (result.status === 200) {
         toast("Chúc mừng bạn đã gửi lời mời thành công");
         setEmailInvite(""); // Reset email lại để mời tiếp
       } else {

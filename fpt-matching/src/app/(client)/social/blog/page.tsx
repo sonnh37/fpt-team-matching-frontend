@@ -341,13 +341,13 @@ export default function Blog() {
         <div className='blog-center flex flex-col items-center basis-3/5 mr-4 ml-4'>
           <div className='form-create-blog bg-white rounded-xl w-full max-w-3xl p-3 mx-2 mt-3'>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center ">
               <img
-                src={user?.avatar ?? "https://www.shutterstock.com/image-vector/user-profile-icon-vector-avatar-600nw-2247726673.jpg"}
+                src={user?.avatar || "/user-avatardefault.jpg"}
                 alt="Avatar"
                 className="w-12 h-12 rounded-full"
               />
-              <Modal>
+              <Modal >
                 <ModalTrigger className='w-full'>
                   <div className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
                     {user?.firstName} đi, bạn đang nghĩ gì thế?
@@ -365,8 +365,8 @@ export default function Blog() {
                     <div className='body-blog w-full h-4/5'>
                       <div className='headerbody  flex items-center w-full h-1/4 px-3'>
                         <img
-                          src={user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
-                          alt="User Avatar"
+                          src={user?.avatar || "/user-avatardefault.jpg"}
+                          alt="Avatar"
                           className="w-12 h-12 rounded-full"
                         />
                         <div className='w-full ml-3 '>
@@ -504,13 +504,13 @@ export default function Blog() {
                 className={` h-full  px-2 p-3 mx-3 hover:bg-white hover:text-blue-900 ${filterType === null ? "bg-white font-extrabold" : ""}`}
                 onClick={() => handleNoFilter()}
               >
-               <FontAwesomeIcon icon={faHouse} /> Liên quan
+                <FontAwesomeIcon icon={faHouse} /> Liên quan
               </span>
               <span
                 className={`h-full px-2 p-3 mx-3 hover:bg-white hover:text-blue-900 ${filterType === BlogType.Share ? "bg-white font-extrabold" : ""}`}
                 onClick={() => handleFilterChange(BlogType.Share)}
               >
-               <FontAwesomeIcon icon={faShare} /> Chia sẻ
+                <FontAwesomeIcon icon={faShare} /> Chia sẻ
               </span>
               <span
                 className={`h-full px-2 p-3 mx-3  hover:bg-white hover:text-blue-900 ${filterType === BlogType.Recruit ? "bg-white font-extrabold" : ""}`}
@@ -873,12 +873,12 @@ export default function Blog() {
                   result?.data?.results?.map((post) => (
                     // Cho blog detail
 
-                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md  '>
+                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md min-w-[715px] '>
                       <div>
                         {/* Post Header with Avatar, Username, and Date */}
                         <div className="flex items-center space-x-4">
                           <img
-                            src={post.user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
+                            src={post.user?.avatar || "/user-avatardefault.jpg"} // Replace with your avatar image
                             alt="User Avatar"
                             className="w-12 h-12 rounded-full"
                           />
@@ -933,7 +933,7 @@ export default function Blog() {
                                 <div className='body-blogdetail'>
                                   <div className="flex items-center space-x-4 p-2">
                                     <img
-                                      src="/user-avatardefault.jpg" // Replace with your avatar image
+                                      src={post.user?.avatar || "/user-avatardefault.jpg"} // Replace with your avatar image
                                       alt="User Avatar"
                                       className="w-12 h-12 rounded-full"
                                     />
@@ -969,7 +969,7 @@ export default function Blog() {
                                   </div>
                                   {/* Post Content */}
                                   <h1 className="flex text-xl md:text-2xl font-bold text-gray-900 leading-tight px-4 ">
-                                  {post?.type === BlogType.Recruit && (   <div>🔥🔎</div> )} {post?.title}
+                                    {post?.type === BlogType.Recruit && (<div>🔥🔎</div>)} {post?.title}
                                   </h1>
                                   <p className="mt-2 font-normal text-base md:text-lg text-gray-700 px-4 ">
                                     {post?.content}
@@ -1052,10 +1052,15 @@ export default function Blog() {
                             <span className="flex items-center p-2 ">
                               <span className="ml-2 text-lg">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
                             </span>
-                            <span className="flex items-center mr-4 pr-4 p-2  hover:bg-slate-200">
-                                <UploadCv blogId={post.id ?? ""}/>
-                              {/* <span className="ml-2 text-lg ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span> */}
-                            </span>
+                            {post?.type === BlogType.Recruit ? (
+                              <span className="flex items-center mr-4 pr-4 p-2  hover:bg-slate-200">
+                                <UploadCv blogId={post.id ?? ""} />
+
+                              </span>
+                            ) : (
+
+                              <span className="ml-2 text-lg ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1118,7 +1123,7 @@ export default function Blog() {
                   <div className=' mx-3'>
                     <h1 className='text-xl text-black'># 🔔 Notification</h1>
                     <p className="font-normal text-xm text-gray-700 px-4 py-2  ">
-                      Hóng hớt drama trường FPT thân yêu 
+                      Hóng hớt drama trường FPT thân yêu
                     </p>
                   </div>
                 </div>

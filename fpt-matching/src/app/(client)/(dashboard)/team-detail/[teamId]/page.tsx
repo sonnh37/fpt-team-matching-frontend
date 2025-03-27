@@ -225,7 +225,7 @@ export default function TeamInfoDetail() {
       )}
 
       <div className="flex flex-row">
-        <div className="basic-3/5">
+        <div className="basic-3/5 min-w-[890px] min-h-[500] ml-4 mr-4 ">
           <div className=" text-3xl ml-4 text-blue-600 font-sans " >Group Detail</div>
           <Card className="mt-5 p-6 bg-white shadow-lg rounded-lg ">
             <CardContent className="space-y-4">
