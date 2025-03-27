@@ -148,7 +148,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                             <div className="account flex p-2">
                                 <div className="img pr-1">
                                     <img
-                                        src={comment.user?.avatar ?? "/user-avatardefault.jpg"}
+                                        src={comment.user?.avatar || "/user-avatardefault.jpg"}
                                         alt="User Avatar"
                                         className="w-10 h-10 rounded-full"
                                     />
@@ -197,7 +197,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
             <ModalFooter className="sticky bottom-0 left-0 w-full bg-white p-3 border-t top-auto">
                 <div className='flex w-full justify-center items-center mr-2'>
                     <img
-                        src={user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
+                        src={user?.avatar || "/user-avatardefault.jpg"} // Replace with your avatar image
                         alt="User Avatar"
                         className="w-10 h-10 rounded-full"
                     />
