@@ -21,6 +21,19 @@ class ProjectSerivce extends BaseService<Project> {
     }
   };
 
+  public getProjectInfoCheckLeader = async (): Promise<BusinessResult<Project>> => {
+    try {
+      const response = await axiosInstance.get<BusinessResult<Project>>(
+        `${this.endpoint}/get-of-user-login`
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      return Promise.reject(error);
+    }
+  };
+
+
 
   
 }

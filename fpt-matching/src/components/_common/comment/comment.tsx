@@ -138,7 +138,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
             </div>
 
             {result?.data?.length === 0 ? (
-                <div className="comment-content w-full px-3 pt-1 my-5 flex justify-center">
+                <div className="min-h-[300px] max-h-[600px] w-full px-3 pt-1 my-5 flex justify-center">
                     <p className="text-xl">Chưa có bình luận nào</p>
                 </div>
             ) : (
@@ -148,7 +148,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                             <div className="account flex p-2">
                                 <div className="img pr-1">
                                     <img
-                                        src={comment.user?.avatar ?? "/user-avatardefault.jpg"}
+                                        src={comment.user?.avatar || "/user-avatardefault.jpg"}
                                         alt="User Avatar"
                                         className="w-10 h-10 rounded-full"
                                     />
@@ -194,14 +194,14 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                 </div>
             )}
 
-            <ModalFooter className="sticky  bottom-0 left-0 w-full bg-white mt-2 p-3 border-t">
-                <div className='flex w-full'>
+            <ModalFooter className="sticky bottom-0 left-0 w-full bg-white p-3 border-t top-auto">
+                <div className='flex w-full justify-center items-center mr-2'>
                     <img
-                        src={user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
+                        src={user?.avatar || "/user-avatardefault.jpg"} // Replace with your avatar image
                         alt="User Avatar"
                         className="w-10 h-10 rounded-full"
                     />
-                    <div className="relative w-full">
+                    <div className="pl-2 relative w-full">
                         <textarea
                             className="w-full px-2 py-2 pr-10 border rounded-md resize-none"
                             placeholder="Hãy làm người văn minh đi"
@@ -216,7 +216,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                                 setComment(""); // Xóa nội dung textarea sau khi gửi
 
                             }
-                        }} className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-1 text-sm rounded-md hover:bg-blue-600">
+                        }} className="absolute bottom-2 right-2 bg-blue-500 text-white px-3 py-3 text-sm rounded-md hover:bg-blue-600">
                             <FontAwesomeIcon icon={faPaperPlane} /> Send
                         </button>
                     </div>

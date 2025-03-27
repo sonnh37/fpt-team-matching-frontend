@@ -37,6 +37,11 @@ import { BlogStatus, BlogType } from '@/types/enums/blog';
 import { useConfirm } from '@/components/_common/formdelete/confirm-context';
 import { isExists } from 'date-fns';
 import { commentService } from '@/services/comment-service';
+import LikeBlog from '@/components/_common/likeblog/like-blog';
+import ProjectInfo from '@/components/_common/projectInfo/project-info';
+import UploadCv from '@/components/_common/uploadCv/upload-cv';
+import ListUploadCv from '@/components/_common/listupload/list-upload';
+import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 
 
 export default function Blogmanagement() {
@@ -80,10 +85,12 @@ export default function Blogmanagement() {
             }
         }
     }, [result]);
-      //Đây là form delete trả về true false tái sử dụng được
+
+
+    //Đây là form delete trả về true false tái sử dụng được
     const confirm = useConfirm()
-    async function handleDelete(id: string){
-      
+    async function handleDelete(id: string) {
+
         // Gọi confirm để mở dialog
         const confirmed = await confirm({
             title: "Xóa bài viết",
@@ -110,7 +117,7 @@ export default function Blogmanagement() {
         // }
     }
 
-   
+
 
 
     const handleUpdate = async () => {
@@ -160,7 +167,7 @@ export default function Blogmanagement() {
                         <div className="relative h-60">
                             <img src="https://baocantho.com.vn/image/fckeditor/upload/2023/20231113/images/t2.webp" alt="Cover" className="w-full h-full object-cover" />
                             <div className="absolute -bottom-12 left-6">
-                                <img src={user?.avatar ?? "https://www.shutterstock.com/image-vector/blank-avatar-photo-place-holder-600nw-1095249842.jpg"} alt="Profile" className="w-36 h-36 rounded-xl object-cover border-4 border-white dark:border-gray-800 shadow-lg" />
+                                <img src={user?.avatar || "/user-avatardefault.jpg"} alt="Profile" className="w-36 h-36 rounded-xl object-cover border-4 border-white dark:border-gray-800 shadow-lg" />
                             </div>
                         </div>
 
@@ -223,15 +230,16 @@ export default function Blogmanagement() {
                                 result?.data?.results?.map((post) => (
                                     // Cho blog detail
 
-                                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 rounded-xl shadow-md  '>
+                                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md   '>
                                         <div>
                                             {/* Post Header with Avatar, Username, and Date */}
                                             <div className="flex items-center space-x-4">
                                                 <img
-                                                    src={post.user?.avatar ?? "/user-avatardefault.jpg"} // Replace with your avatar image
+                                                    src={post.user?.avatar || "/user-avatardefault.jpg"} // Replace with your avatar image
                                                     alt="User Avatar"
                                                     className="w-12 h-12 rounded-full"
                                                 />
+                                             
                                                 <div className='flex w-full justify-between'>
                                                     <div>
                                                         <p className="text-lg font-semibold text-gray-800">{post.user?.username}</p>
@@ -255,11 +263,6 @@ export default function Blogmanagement() {
                                                             <DropdownMenuContent>
                                                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                                                 <DropdownMenuSeparator />
-                                                                <DropdownMenuItem>
-                                                                    <div onClick={()=>handleDelete(post?.id ?? "")}>  Xóa blog</div>
-                                                                  
-                                                                    </DropdownMenuItem>
-                                                                <DropdownMenuItem>Edit blog</DropdownMenuItem>
                                                                 <DropdownMenuItem>Ghim blog</DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>
@@ -269,9 +272,9 @@ export default function Blogmanagement() {
 
 
                                             {/* Post Title */}
-                                            <div className="text-3xl font-semibold text-gray-800 mt-6">
+                                            <div className="text-xl md:text-2xl font-bold text-gray-900 leading-tight pt-3 mt-2">
                                                 <Modal>
-                                                    <ModalTrigger className="font-bold text-black ">
+                                                    <ModalTrigger className=" ">
                                                         <span className="  ">
                                                             {post.title}
                                                         </span>
@@ -310,9 +313,12 @@ export default function Blogmanagement() {
                                                                             <DropdownMenu>
                                                                                 <DropdownMenuTrigger className='text-xl'>...</DropdownMenuTrigger>
                                                                                 <DropdownMenuContent>
-                                                                                    <DropdownMenuItem>Xóa</DropdownMenuItem>
-                                                                                    <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
-                                                                                    <DropdownMenuItem>Ghim bài viết</DropdownMenuItem>
+                                                                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                                                                                    <DropdownMenuSeparator />
+                                                                                    <DropdownMenuItem>Profile</DropdownMenuItem>
+                                                                                    <DropdownMenuItem>Billing</DropdownMenuItem>
+                                                                                    <DropdownMenuItem>Team</DropdownMenuItem>
+                                                                                    <DropdownMenuItem>Subscription</DropdownMenuItem>
                                                                                 </DropdownMenuContent>
                                                                             </DropdownMenu>
 
@@ -320,25 +326,39 @@ export default function Blogmanagement() {
                                                                     </div>
                                                                 </div>
                                                                 {/* Post Content */}
-                                                                <h1 className=" px-2 ">
-                                                                    {post?.title}
+                                                                <h1 className="flex text-xl md:text-2xl font-bold text-gray-900 leading-tight px-4 ">
+                                                                    {post?.type === BlogType.Recruit && (<div>🔥🔎</div>)} {post?.title}
                                                                 </h1>
-                                                                <p className="mt-4 text-gray-700 text-xl px-2 ">
+                                                                <p className="mt-2 font-normal text-base md:text-lg text-gray-700 px-4 ">
                                                                     {post?.content}
                                                                 </p>
+
+                                                                {post?.type === BlogType.Recruit && (
+
+                                                                    <div>  <h4 className='text-lg px-4 mt-1'>Kỹ năng yêu cầu :</h4>
+                                                                        <div className="mt-1 text-gray-700 font-medium text-base px-4 ">
+                                                                            {post?.skillRequired ?? "Hiện tại chưa có."}
+                                                                            {/* <getByProjectId id={post?.id}/> */}
+                                                                            <h4 className='text-lg mt-1 font-bold  text-gray-900'>Thông tin của team :</h4>
+                                                                            <ProjectInfo id={post.projectId ?? ""} />
+                                                                        </div>
+                                                                    </div>
+
+
+                                                                )}
 
                                                                 {/* Post Stats (Likes, Comments, Upload Count) */}
                                                                 <div className="flex py-3 w-full">
                                                                     <div className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
-                                                                        <span className="flex items-center">
-                                                                            {post?.likes.length ?? 0} lượt thích từ người khác
+                                                                        <span className="flex items-center ml-3">
+                                                                            <LikeBlog postId={post?.id ?? ""} />
                                                                         </span>
                                                                         <div className='flex'>
                                                                             <span className="flex items-center">
                                                                                 <i className="fas fa-comment text-green-500"></i>
                                                                                 <span className="ml-2">{post?.comments.length ?? 0} bình luận  </span>
                                                                             </span>
-                                                                            <span className="flex items-center">
+                                                                            <span className="flex items-center mr-3">
                                                                                 <i className="fas fa-image text-red-500"></i>
                                                                                 <span className="ml-2">{post?.blogCvs.length ?? 0} nộp CV </span>
                                                                             </span>
@@ -375,27 +395,30 @@ export default function Blogmanagement() {
                                                     </ModalBody>
                                                 </Modal>
                                             </div>
-                                            <div className="relative w-full py-5 flex items-center">
+                                            <div className="relative w-full py-3 flex items-center">
                                                 <div className="absolute inset-0 flex items-center">
                                                     <div className="w-full h-[2px] bg-gray-300 blur-md"></div>
                                                 </div>
                                                 <div className="relative w-full h-[2px] bg-gray-500"></div>
                                             </div>
                                             {/* Post Stats (Likes, Comments, Upload Count) */}
-                                            <div className="flex justify-between mt-1 text-gray-600">
-                                                <div className="flex  items-center space-x-4">
-                                                    <span className="flex items-center">
-                                                        <i className="fas fa-thumbs-up text-blue-500"></i>
-                                                        <span className="ml-2">    {post.likes?.length ?? 0}    Likes <FontAwesomeIcon icon={faThumbsUp} /> </span>
+                                            <div className="flex  text-gray-600">
+                                                <div className="flex justify-between items-center  w-full space-x-4">
+                                                    <span className="flex items-center ml-4 pl-4 p-2 hover:bg-slate-200">
+                                                        <span className="ml-2 text-lg">           <LikeBlog postId={post?.id ?? ""} /> </span>
                                                     </span>
-                                                    <span className="flex items-center">
-                                                        <i className="fas fa-comment text-green-500"></i>
-                                                        <span className="ml-2">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
+                                                    <span className="flex items-center p-2 ">
+                                                        <span className="ml-2 text-lg">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
                                                     </span>
-                                                    <span className="flex items-center">
-                                                        <i className="fas fa-image text-red-500"></i>
-                                                        <span className="ml-2">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
-                                                    </span>
+                                                    {post?.type === BlogType.Recruit ? (
+                                                        <span className="flex items-center mr-4 pr-4 p-2  hover:bg-slate-200">
+                                                            <ListUploadCv blogId={post.id ?? ""} />
+
+                                                        </span>
+                                                    ) : (
+
+                                                        <span className="ml-2 text-lg ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
