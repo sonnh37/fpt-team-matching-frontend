@@ -49,6 +49,21 @@ class ReviewService extends BaseService<Review>{
         const response = await axiosInstance.get(`${this.endpoint}/${id}`);
         return response.data;
     }
+
+
+    public async uploadFileUrp ({reviewId, fileUrl}: {reviewId: string, fileUrl: string}): Promise<BusinessResult<void>> {
+        const response = await axiosInstance.put(`${this.endpoint}/upload-file-url-review`, {
+            "reviewId": reviewId,
+            "fileUrl": fileUrl,
+        })
+
+        return response.data;
+    }
+
+    public async getReviewByProjectId ({projectId} : {projectId: string}) : Promise<BusinessResult<Review[]>> {
+        const response = await axiosInstance.get(`${this.endpoint}/get-by-projectId/${projectId}`);
+        return response.data;
+    }
 }
 
 

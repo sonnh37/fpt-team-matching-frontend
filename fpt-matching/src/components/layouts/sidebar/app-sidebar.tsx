@@ -1,8 +1,19 @@
 "use client";
+import { TypographyLarge } from "@/components/_common/typography/typography-large";
+import { Icons } from "@/components/ui/icons";
+import { Separator } from "@/components/ui/separator";
 import {
-  MdOutlineRateReview,
-  MdOutlineSupervisorAccount,
-} from "react-icons/md";
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarMenuButton,
+  SidebarRail,
+} from "@/components/ui/sidebar";
+import { useCurrentRole } from "@/hooks/use-current-role";
+import { initializeRole, updateUserCache } from "@/lib/redux/slices/roleSlice";
+import { AppDispatch, RootState } from "@/lib/redux/store";
+import { semesterService } from "@/services/semester-service";
+import { useQuery } from "@tanstack/react-query";
 import {
   Calendar,
   Globe,
@@ -11,43 +22,29 @@ import {
   MessageCircleQuestion,
   Pencil,
   Send,
+  ShieldHalf,
   SquareUserRound,
   UsersRound,
 } from "lucide-react";
-import * as React from "react";
-import { TypographyLarge } from "@/components/_common/typography/typography-large";
-import { Icons } from "@/components/ui/icons";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarMenuButton,
-  SidebarRail,
-} from "@/components/ui/sidebar";
-import { AppDispatch, RootState } from "@/lib/redux/store";
 import Link from "next/link";
+import * as React from "react";
 import { GiWideArrowDunk } from "react-icons/gi";
+import {
+  MdOutlineRateReview,
+  MdOutlineSupervisorAccount,
+} from "react-icons/md";
 import { PiUserList } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
 import { NavMain } from "./nav-main";
 import { RoleSwitcher } from "./role-switcher";
-import { useCurrentRole } from "@/hooks/use-current-role";
-import { initializeRole, updateUserCache } from "@/lib/redux/slices/roleSlice";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import { useQuery } from "@tanstack/react-query";
-import { semesterService } from "@/services/semester-service";
-import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
-import { TypographyInlinecode } from "@/components/_common/typography/typography-inline-code";
-import { TypographyH3 } from "@/components/_common/typography/typography-h3";
-import { TypographyH4 } from "@/components/_common/typography/typography-h4";
+import { NavManagement } from "./nav-management";
 
 const data = {
   navMain: [
     { title: "Home", url: "/", icon: Home, isActive: true },
     { title: "Social", url: "/social/blog", icon: Globe },
     { title: "Team", url: "/team", icon: UsersRound },
-    { title: "My request", url: "/my-request", icon: Send },
+    { title: "Invitations", url: "/invitations", icon: Send },
     {
       title: "Idea",
       url: "/idea",
@@ -68,10 +65,19 @@ const data = {
       icon: MdOutlineSupervisorAccount,
     },
     { title: "Support", url: "/#", icon: MessageCircleQuestion },
+  ],
+
+  navManage: [
     {
       title: "Manage review",
       url: "/manage-review",
       icon: SquareUserRound,
+    },
+
+    {
+      title: "Manage semester",
+      url: "/management/semester",
+      icon: ShieldHalf,
     },
   ],
 };
@@ -82,24 +88,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   if (!user) return null;
 
   const { data: result } = useQuery({
-    queryKey: ["getUsersByRole"],
+    queryKey: ["getSemesterLatest_AppSidebar"],
     queryFn: () => semesterService.fetchLatest(),
     refetchOnWindowFocus: false,
   });
 
-  const firstRole = user.userXRoles[0]?.role?.roleName;
   React.useEffect(() => {
     if (user.cache) {
       dispatch(initializeRole(user.cache));
     } else {
+      const firstRole = user.userXRoles[0]?.role?.roleName;
+
       dispatch(updateUserCache({ newCache: { role: firstRole } }));
     }
-  }, [user.cache, dispatch]);
+  }, [user, dispatch]);
 
   const role = useCurrentRole();
   const isCouncil = role === "Council";
   const isLecturer = role === "Lecturer";
   const isReviewer = role === "Reviewer";
+  const isManager = role === "Manager";
 
   const navMain = data.navMain.map((item) => {
     if (item.title !== "Idea") return item;
@@ -161,9 +169,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Icons.logo />
             </div>
             <div className="grid flex-1 text-left">
-              <TypographyH4 className="truncate text-lg tracking-widest">
+              <TypographyLarge className="truncate text-base uppercase">
                 {"Team Matching"}
-              </TypographyH4>
+              </TypographyLarge>
             </div>
           </Link>
         </SidebarMenuButton>
@@ -184,6 +192,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <Separator />
       <SidebarContent>
         <NavMain items={navMain} />
+        {isManager && <NavManagement items={data.navManage} />}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

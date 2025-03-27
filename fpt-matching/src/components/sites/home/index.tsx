@@ -132,8 +132,6 @@ export default function IdeaSearchList() {
     queryFn: () => ideaService.fetchPaginated(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
-    refetchOnMount: false, // Không gọi lại khi component remount
-    refetchOnReconnect: false, // Không tự động gọi lại khi mạng reconnect
   });
 
   if (error) return <div>Error loading data</div>;

@@ -13,112 +13,35 @@ import {
 } from "@/components/ui/card"
 
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
 import {semesterService} from "@/services/semester-service";
 import { Semester } from '@/types/semester';
+import BreadcrumbReviewDetails from './breadcrum-review-details';
+import SheetFileUpload from './file-upload_review_details';
+import {reviewDetailsRBAC} from "@/app/(client)/(dashboard)/manage-review/review-details/mange-role";
+import { useCurrentRole } from '@/hooks/use-current-role';
 
-
-import {
-    Sheet,
-    SheetClose,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
-} from "@/components/ui/sheet"
-
-function SheetFileUpload({file}: {file: string | undefined}) {
-    return (
-        <Sheet>
-            <SheetTrigger asChild>
-                <Button className={"ml-2"} variant="default">Click to view file review</Button>
-            </SheetTrigger>
-            <SheetContent>
-                <SheetHeader>
-                    <SheetTitle>Review file</SheetTitle>
-                    <SheetDescription>
-                        Quick look about review file.
-                    </SheetDescription>
-                </SheetHeader>
-                <div className="grid gap-4 py-4">
-                    {file == null ? (
-                        <span>
-                            <div className="flex items-center justify-center w-full">
-                                <label htmlFor="dropzone-file"
-                                       className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
-                                             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 16">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
-                                        </svg>
-                                        <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span
-                                            className="font-semibold">Click to upload</span> or drag and drop</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Import your review file with template</p>
-                                    </div>
-                                    <input id="dropzone-file" type="file" className="hidden"/>
-                                </label>
-                            </div>
-                        </span>)
-                        : <div>File existed</div>}
-                </div>
-                <SheetFooter>
-                    <SheetClose asChild>
-                        <Button>Close</Button>
-                    </SheetClose>
-                </SheetFooter>
-            </SheetContent>
-        </Sheet>
-    )
-}
-
-function BreadcrumbReviewDetails(
-    {semesterName, projectCode, ideaCode, reviewNumber}:
-    { semesterName: string, projectCode: string, ideaCode: string, reviewNumber: number }
-) {
-    return (
-        <Breadcrumb>
-            <BreadcrumbList>
-                <BreadcrumbItem>
-                    <BreadcrumbPage>{semesterName}</BreadcrumbPage>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator/>
-                <BreadcrumbItem>
-                    <BreadcrumbPage>{ideaCode}</BreadcrumbPage>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator/>
-                <BreadcrumbItem>
-                    <BreadcrumbPage>{projectCode}</BreadcrumbPage>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator/>
-                <BreadcrumbItem>
-                    <BreadcrumbPage>Review {reviewNumber}</BreadcrumbPage>
-                </BreadcrumbItem>
-            </BreadcrumbList>
-        </Breadcrumb>
-    )
-}
 
 const Page = () => {
     const searchParams = useSearchParams();
     const reviewId = searchParams.get('reviewId');
     const [reviewDetails, setReviewDetails] = useState<Review | null>(null)
     const [semester, setSemester] = useState<Semester | null>(null)
+    const [fileUpload, setFileupload] = useState<File | null>(null)
+    const currentRole = useCurrentRole()
+
     useEffect( () => {
         if (reviewId){
             const fetchReviewDetails = async () => {
                 const result = await reviewService.getReviewDetails(reviewId)
                 if (result.status == 1 && result.data) {
                     setReviewDetails(result.data)
+                    if (result.data.fileUpload) {
+                        const responseLoadfile = await fetch(result.data.fileUpload);
+                        const blob = await responseLoadfile.blob();
+                        const fileName = result.data.fileUpload.split("Checklist_")
+                        const file = new File([blob], fileName[1], {type: blob.type || ".xlsx"} )
+                        setFileupload(file)
+                    }
                 }
             }
             fetchReviewDetails()
@@ -131,15 +54,20 @@ const Page = () => {
                 setSemester(result.data)
             }
         }
-        fetchCurrentSemester()
+        const registerRole = () => {
+            // Manage: readDetails,
+            reviewDetailsRBAC.registerRole("Manager", ["readDetails", "writeDetails", "editDetails", "assignReview"])
+            reviewDetailsRBAC.registerRole("Student", ["readDetails", "writeDetails", "editDetails", "writeFile", "updateFile"])
+            reviewDetailsRBAC.registerRole("Lecture", ["readDetails", "writeDetails", "editDetails", "feedbackReview"])
+        }
 
+        registerRole()
+        fetchCurrentSemester()
     }, []);
-    console.log("review details: ", reviewDetails)
-    console.log("semester: ", semester)
     return (
         <div className={"px-8 mt-4"}>
             {
-                reviewDetails ? (
+                reviewDetails && semester && currentRole ? (
                     <div className={""}>
                         <BreadcrumbReviewDetails
                             semesterName={semester!.semesterName!}
@@ -148,7 +76,10 @@ const Page = () => {
                             reviewNumber={reviewDetails.number}
                         />
                         <div className={"font-bold text-xl mt-6"}>
-                             {reviewDetails.project?.idea?.englishName}
+                             <div>
+                                 {reviewDetails.project?.idea?.englishName}
+                             </div>
+                            <div></div>
                         </div>
                         <div className={"w-full"}>
                             <Card className="w-full mt-4">
@@ -187,26 +118,56 @@ const Page = () => {
                                         </AccordionItem>
                                     </Accordion>
                                 </CardContent>
-                                <CardFooter className={""} >
-                                    <div>
+                                <CardFooter className={"w-full"} >
+                                    <div className={"w-full"}>
                                         <div className={"font-bold text-lg mb-2"}>Review information</div>
                                         <div className={"flex gap-4 flex-col font-bold text-sm"}>
-                                            <div>Reviewer 1: {reviewDetails.reviewer1?.username != null
+                                            <div className={"w-full flex items-center"}>
+                                                <span className={"min-w-24"}>Reviewer 1: </span>
+                                                {reviewDetails.reviewer1?.username != null
                                                 ? (<span>{reviewDetails.reviewer1?.username}</span>)
-                                                : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}</div>
-                                            <div>Reviewer 2: {reviewDetails.reviewer2?.username != null
+                                                : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
+                                                {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
+                                                    <Button className={"ml-2"}>Update information</Button>
+                                                )}
+                                            </div>
+                                            <div className={"w-full flex items-center"}>
+                                                <span className={"min-w-24"}>Reviewer 2: </span>
+                                                {reviewDetails.reviewer2?.username != null
                                                 ? <span>{reviewDetails.reviewer2?.username}</span>
-                                                : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}</div>
-                                            <div>Review date: {reviewDetails.reviewDate != null
+                                                : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
+                                                {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
+                                                    <Button className={"ml-2"}>Update information</Button>
+                                                )}
+                                            </div>
+                                            <div className={"w-full flex items-center"}>
+                                                <span className={"min-w-24"}>Review date: </span>
+                                                {reviewDetails.reviewDate != null
                                                 ? (<span>{reviewDetails.reviewDate}</span>)
-                                                : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}</div>
-                                            <div>Room: {reviewDetails.room != null
+                                                : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
+                                                {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
+                                                    <Button className={"ml-2"}>Update information</Button>
+                                                )}
+                                            </div>
+                                            <div className={"w-full flex items-center"}>
+                                                <span className={"min-w-24"}>Room: </span>
+                                                {reviewDetails.room != null
                                                 ? <span>{reviewDetails.room}</span>
-                                                : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}</div>
-                                            <div>Slot: {reviewDetails.slot != null
+                                                : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
+                                                {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
+                                                    <Button className={"ml-2"}>Update information</Button>
+                                                )}
+                                            </div>
+                                            <div className={"w-full flex items-center"}>
+                                                <span className={"min-w-24"}>Slot: </span>
+                                                {reviewDetails.slot != null
                                                 ? <span>{reviewDetails.slot}</span>
-                                                : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}</div>
-                                            <div>File upload: <SheetFileUpload file={reviewDetails.fileUpload} /></div>
+                                                : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
+                                                {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
+                                                    <Button className={"ml-2"}>Update information</Button>
+                                                )}
+                                            </div>
+                                            <div>File upload: <SheetFileUpload file={fileUpload} setFile={setFileupload} /></div>
                                         </div>
                                     </div>
                                 </CardFooter>
