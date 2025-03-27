@@ -20,6 +20,7 @@ import { RootState } from "@/lib/redux/store";
 import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { blogService } from "@/services/blog-service";
+import { FileUpload } from "@/components/ui/file-upload";
 
 const UploadCv = ({  blogId }: {  blogId: string }) => {
     //gọi thông tin user đã đăng nhập
