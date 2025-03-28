@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import React from "react";
 import { TbUsersPlus } from "react-icons/tb";
 import { LuUsersRound } from "react-icons/lu";
+import Link from "next/link";
 
 const PageNoTeam = () => {
   return (
@@ -11,8 +12,10 @@ const PageNoTeam = () => {
           You don't have any team. Let's find your team with options:
         </div>
         <div className="w-full flex justify-center">
-          <Button variant={"default"}>
-            <TbUsersPlus /> Create team
+          <Button variant={"default"} asChild>
+            <Link href={"/team/create"}>
+              <TbUsersPlus /> Create team
+            </Link>
           </Button>
         </div>
         <div className="w-full flex justify-center">
