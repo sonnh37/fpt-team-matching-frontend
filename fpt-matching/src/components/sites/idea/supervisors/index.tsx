@@ -171,7 +171,7 @@ export default function IdeasOfSupervisorsTableTable() {
         </div>
 
         <div className="">
-          <Card className="space-y-4 p-4 w-full">
+          <Card className="space-y-4 p-4 ">
             <DataTableToolbar
               form={form}
               table={table}
@@ -188,7 +188,7 @@ export default function IdeasOfSupervisorsTableTable() {
                 shrinkZero
               />
             ) : (
-              <DataTableComponent table={table} />
+                <DataTableComponent table={table} />
             )}
             <DataTablePagination table={table} />
           </Card>

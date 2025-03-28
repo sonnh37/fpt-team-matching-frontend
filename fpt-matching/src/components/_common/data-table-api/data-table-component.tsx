@@ -76,7 +76,8 @@ export function DataTableComponent<TData>({
   };
 
   return (
-    <Table className={className}>
+    <div className="overflow-auto">
+      <Table className={className}>
       <TableHeader>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow
@@ -155,5 +156,6 @@ export function DataTableComponent<TData>({
         )}
       </TableBody>
     </Table>
+    </div>
   );
 }

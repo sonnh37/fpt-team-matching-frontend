@@ -3,6 +3,7 @@
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,11 +12,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { Idea } from "@/types/idea";
+import { Project } from "@/types/project";
 import { User } from "@/types/user";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Send } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 
@@ -23,13 +31,23 @@ export const columns: ColumnDef<Idea>[] = [
   {
     accessorKey: "englishName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Project English name" />
+      <DataTableColumnHeader column={column} title="English" />
     ),
+    cell: ({ row }) => {
+      const englishName = row.original.englishName ?? "Unknown"; // Tránh lỗi undefined
+      const ideaId = row.original.id ?? "#";
+
+      return (
+        <Button variant="link" className="p-0 m-0" asChild>
+          <Link href={`/idea-detail/${ideaId}`}>{englishName}</Link>
+        </Button>
+      );
+    },
   },
   {
     accessorKey: "vietNamName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Project Vietnamese name" />
+      <DataTableColumnHeader column={column} title="Vietnamese name" />
     ),
   },
   {
@@ -39,20 +57,43 @@ export const columns: ColumnDef<Idea>[] = [
     ),
   },
   {
-    accessorKey: "user.email",
+    accessorKey: "specialty.profession.professionName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Profession" />
+    ),
+  },
+  {
+    accessorKey: "specialty.specialtyName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Specialty" />
+    ),
+  },
+  {
+    accessorKey: "mentor.email",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Mentor" />
+    ),
+    cell: ({ row }) => {
+      const mentorEmail = row.original.mentor?.email ?? "Unknown"; // Tránh lỗi undefined
+      const mentorId = row.original.mentorId ?? "#";
+
+      return (
+        <Button variant="link" className="p-0 m-0" asChild>
+          <Link href={`/profile-detail/${mentorId}`}>{mentorEmail}</Link>
+        </Button>
+      );
+    },
+  },
+  {
+    accessorKey: "subMentor.email",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Sub Mentor" />
     ),
   },
   {
     accessorKey: "createdDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date created" />
-    ),
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdDate"));
-      return <p>{date.toLocaleString()}</p>;
-    },
+    header: ({ column }) => null,
+    cell: ({ row }) => null,
   },
   {
     accessorKey: "isExistedTeam",
@@ -60,29 +101,15 @@ export const columns: ColumnDef<Idea>[] = [
       <DataTableColumnHeader column={column} title="Slot" />
     ),
     cell: ({ row }) => {
+      const project = row.getValue("project") as Project;
+      console.log("check_project", project);
       const isExistedTeam = row.getValue("isExistedTeam") as boolean;
-      if (!isExistedTeam) {
-        return (
-          <CiFolderOn />
-          // <Image
-          //   src="https://firebasestorage.googleapis.com/v0/b/smart-thrive.appspot.com/o/Blog%2Fcheck.png?alt=media&token=1bdb7751-4bdc-4af1-b6e1-9b758df3a3d5"
-          //   width={500}
-          //   height={500}
-          //   alt="Gallery Icon"
-          //   className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
-          // />
-        );
+      console.log("check_project_", isExistedTeam);
+
+      if (!project && !isExistedTeam) {
+        return <Checkbox checked={true} />;
       }
-      return (
-        <CiFolderOff />
-        // <Image
-        //   src="https://firebasestorage.googleapis.com/v0/b/smart-thrive.appspot.com/o/Blog%2Funcheck.png?alt=media&token=3b2b94d3-1c59-4a96-b4c6-312033d868b1"
-        //   width={500}
-        //   height={500}
-        //   alt="Gallery Icon"
-        //   className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
-        // />
-      );
+      return <Checkbox checked={false} />;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
@@ -111,29 +138,20 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText(model.id!)}
-          >
-            Copy model ID
-          </DropdownMenuItem>
-          {/*<DropdownMenuItem onClick={handleUsersClick}>*/}
-          {/*    View photos*/}
-          {/*</DropdownMenuItem>*/}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleViewDetailsClick}>
-            View details
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {model.isExistedTeam ? (
+        <Button variant={"secondary"}>Enough</Button>
+      ) : (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant={"default"}>
+              <Send />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Request</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
     </>
   );
 };

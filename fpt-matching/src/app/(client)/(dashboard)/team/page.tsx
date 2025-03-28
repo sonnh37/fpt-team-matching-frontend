@@ -435,12 +435,11 @@ export default function TeamInfo() {
               <>
                 <TypographyP className="text-red-600">
                   Not have idea yet.{" "}
-                  <Link
-                    className="border-b-2 border-red-600"
-                    href="/idea/supervisors"
-                  >
-                    Click hear to view list idea from lecturer
-                  </Link>
+                  <Button variant="link" className="p-0 m-0" asChild>
+                    <Link className="text-red-600 font-semibold" href="/idea/supervisors">
+                      Click hear to view list idea from lecturer
+                    </Link>
+                  </Button>
                 </TypographyP>
                 {/* Members */}
                 <div>
