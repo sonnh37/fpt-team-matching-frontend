@@ -1,17 +1,16 @@
 "use client";
-import InvitationSendByTeamTable from "@/components/sites/my-request/receives/by-team";
-import { InivitationSent } from "@/components/sites/my-request/sends";
-import InvitationSentByStudentTable from "@/components/sites/my-request/sends/by-me";
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs-shadcn";
+import InvitationSentByStudentTable from "./by-me";
+import InvitationSentForIdeaTable from "./for-idea";
 
-export default function Page() {
-  const tab_1 = "Send By me";
-  const tab_2 = "Receive By team";
+export function InivitationSent() {
+  const tab_1 = "By me";
+  const tab_2 = "For idea from lecturer";
   return (
     <>
       <Tabs defaultValue={tab_1} className="w-full container mx-auto">
@@ -20,10 +19,10 @@ export default function Page() {
           <TabsTrigger value={tab_2}>{tab_2}</TabsTrigger>
         </TabsList>
         <TabsContent value={tab_1}>
-          <InivitationSent />
+          <InvitationSentByStudentTable />
         </TabsContent>
         <TabsContent value={tab_2}>
-          <InvitationSendByTeamTable />
+          <InvitationSentForIdeaTable />
         </TabsContent>
       </Tabs>
     </>

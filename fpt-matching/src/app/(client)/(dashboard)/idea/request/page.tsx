@@ -92,7 +92,7 @@ export default function Page() {
           <div>
             <Card className={cn("w-[380px]")}>
               <CardHeader>
-                <CardTitle>Notification Stage Ideas</CardTitle>
+                <CardTitle>Stage {stageIdea?.stageNumber} idea</CardTitle>
                 <CardDescription>You have new review stages.</CardDescription>
               </CardHeader>
               <CardContent className="grid gap-4">
@@ -104,8 +104,8 @@ export default function Page() {
                         <div className="space-y-1">
                           <p className="text-sm font-medium">
                             Timeline:{" "}
-                            {new Date(stageIdea.startDate).toLocaleString()} -{" "}
-                            {new Date(stageIdea.endDate).toLocaleString()}
+                            {stageIdea.startDate ? new Date(stageIdea.startDate).toLocaleDateString() : "N/A"} -{" "}
+                            {stageIdea.endDate ? new Date(stageIdea.endDate).toLocaleDateString() : "N/A"}
                           </p>
                         </div>
                       </div>
@@ -114,7 +114,7 @@ export default function Page() {
                         <div className="space-y-1">
                           <p className="text-sm font-medium">
                             Date of results:{" "}
-                            {new Date(stageIdea.resultDate).toLocaleString()}
+                            {stageIdea.resultDate ? new Date(stageIdea.resultDate).toLocaleDateString() : "N/A"}
                           </p>
                         </div>
                       </div>

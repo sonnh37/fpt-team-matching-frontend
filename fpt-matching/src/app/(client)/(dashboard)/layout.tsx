@@ -43,8 +43,8 @@ export default function DashboardLayout({
         </header>
 
         <Separator />
-        <div className="flex flex-1 flex-col gap-4 overflow-hidden">
-          <PageContainer>{children}</PageContainer>
+        <div className="flex flex-1 flex-col overflow-hidden gap-4">
+          <div className="py-4 h-full overflow-auto">{children}</div>
         </div>
       </SidebarInset>
     </SidebarProvider>
