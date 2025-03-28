@@ -22,11 +22,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { blogService } from "@/services/blog-service";
 import { FileUpload } from "@/components/ui/file-upload";
 import { useState } from "react";
+import { cloudinaryService } from "@/services/cloudinary-service";
 
 const UploadCv = ({ blogId }: { blogId: string }) => {
     //gọi thông tin user đã đăng nhập
     const user = useSelector((state: RootState) => state.user.user)
     const [files, setFiles] = useState<File[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const handleFileUpload = (files: File[]) => {
         setFiles(files);
         console.log(files);
@@ -40,31 +42,48 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
         queryFn: () => blogService.fetchById(blogId),
         refetchOnWindowFocus: false,
     });
-    console.log("resu", result?.data)
+    const userIsExist = result?.data?.user?.id ?? ""
 
-    // const {
-    //     data: projectInfo,
-    // } = useQuery({
-    //     queryKey: ["getProjecttInfo", blogId],
-    //     queryFn: () => projectService.getProjectInfo(),
-    //     refetchOnWindowFocus: false,
-    // });
 
 
     const submit = async () => {
+        if (isSubmitting) return; // Nếu API đang chạy, không cho phép bấm tiếp
+        setIsSubmitting(true); // Đánh dấu API đang chạy
 
+        if(user?.id == userIsExist ){
+            toast("Bạn không thể gửi vì bạn đã có nhóm")
+            setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
+            return
+        }
         const projectInfo = await projectService.getProjectInfo();
-        console.log("Check prj", projectInfo)
+     
         //check xem người nộp có team chưa
         if (projectInfo.status === 1) {
             toast("Bạn đã có team rồi không thể nộp ứng tuyển")
+            setIsSubmitting(false);
             return
         }
+
+        let fileurl = "";
+
+        if (files?.length) {
+            try {
+                fileurl = await cloudinaryService.uploadFile(files[0] ) ?? "";
+            } catch (error) {
+                console.error("Upload failed:", error);
+                setIsSubmitting(false);
+                return
+            }
+        }
+        console.log("check" , fileurl)
+
         let query: BlogCvCommand = {
             blogId: blogId,
-            userId: user?.id ?? ""
-            // fileCv: ""
-        }
+            userId: user?.id ?? "",
+            fileCv: fileurl
+        };
+
+
         // if(query.fileCv)
         const result = await blogCvService.create(query);
         if (result.status == 1) {
@@ -73,7 +92,7 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
         } else {
             toast.error("Đã xảy ra lỗi ,bạn đã nộp đơn thất bại!")
         }
-
+        setIsSubmitting(false); // Hoàn tất, cho phép bấm tiếp
     }
 
     return (

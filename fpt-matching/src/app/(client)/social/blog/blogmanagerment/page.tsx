@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faPaperPlane, faAngleDown, faTrophy, faShare, faCircleUser } from "@fortawesome/free-solid-svg-icons";
+import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faPaperPlane, faAngleDown, faTrophy, faShare, faCircleUser, faPencil, faNoteSticky, faUser, faVideo, faPhotoFilm, faFaceSmile } from "@fortawesome/free-solid-svg-icons";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -68,7 +68,7 @@ export default function Blogmanagement() {
     const handleNoFilter = () => {
         setFilterType(null);
         // window.location.href = "/social/blog/blogmanagerment"; // Chuyển hướng về trang chủ
-    
+
     };
 
     //gọi thông tin user đã đăng nhập
@@ -93,7 +93,7 @@ export default function Blogmanagement() {
         queryFn: () => blogService.fetchPaginated(query),
         refetchOnWindowFocus: false,
     });
-    
+
 
     useEffect(() => {
         if (result?.data) {
@@ -135,7 +135,7 @@ export default function Blogmanagement() {
     }
 
 
-// update blog
+    // update blog
     const handleUpdate = async () => {
         try {
             if (!formData.title || !formData.content) {
@@ -165,8 +165,9 @@ export default function Blogmanagement() {
         }
     };
     return (
+        
         <div className="bg-gray-50 dark:bg-gray-900 min-h-screen  transition-colors duration-200">
-            <div className='w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-colors duration-200'>
+            <div className='w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg  overflow-hidden transition-colors duration-200 '>
                 <div className="max-w-4xl mx-auto">
                     <button
                         className="fixed top-4 right-4 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200"
@@ -244,8 +245,171 @@ export default function Blogmanagement() {
                     </div>
                 </div>
             </div>
-            <div className='blog-center flex  w-full justify-center'>
-                <div className="mt-6 flex-row bg-white min-w-[680px] max-w-3xl mx-3 my-4 p-6 pb-3 rounded-xl ">
+            {/* Form tạo blog */}
+            <div className='w-full flex items-center justify-center  '>
+                <div className='form-create-blog bg-white rounded-xl min-w-[680px] max-w-3xl p-3 mx-2 mt-3 shadow-md'>
+
+                    <div className="flex items-center ">
+                        <img
+                            src={user?.avatar || "/user-avatardefault.jpg"}
+                            alt="Avatar"
+                            className="w-12 h-12 rounded-full"
+                        />
+                        <Modal >
+                            <ModalTrigger className='w-full'>
+                                <div className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
+                                    {user?.firstName} đi, bạn đang nghĩ gì thế?
+                                </div>
+
+                            </ModalTrigger>
+
+                            <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
+                                <ModalContent >
+                                    <div className="header-blog mb-4 py-4 border-b-slate-100 h-1/5 bg-orange-400">
+                                        <h4 className='text-lg md:text-2xl text-neutral-100 dark:text-neutral-100 font-bold text-center' >
+                                            Tạo bài viết của bạn đi
+                                        </h4>
+                                    </div>
+                                    <div className='body-blog w-full h-4/5'>
+                                        <div className='headerbody  flex items-center w-full h-1/4 px-3'>
+                                            <img
+                                                src={user?.avatar || "/user-avatardefault.jpg"}
+                                                alt="Avatar"
+                                                className="w-12 h-12 rounded-full"
+                                            />
+                                            <div className='w-full ml-3 '>
+                                                <div className=' '>
+                                                    <p className="text-lg font-semibold text-gray-800"><FontAwesomeIcon icon={faUser} /> {user?.lastName} {user?.firstName}</p>
+                                                </div>
+                                                {/* <div> */}
+                                                <select
+                                                    name="type"
+                                                    className="border p-2 rounded w-48"
+                                                // value={postType}
+                                                // onChange={handlePostTypeChange}
+                                                >
+                                                    <option value={BlogType.Share}>Đăng chia sẻ</option>
+                                                    <option value={BlogType.Recruit}>Đăng tìm thành viên</option>
+                                                </select>
+                                                {/* <div>
+                              <select
+                                name="type"
+                                className="border p-2 rounded w-48"
+                                value={postType}
+                                onChange={handlePostTypeChange}
+                              >
+                                <option value={BlogType.Share}>Đăng chia sẻ</option>
+                                <option value={BlogType.Recruit}>Đăng tìm thành viên</option>
+                              </select>
+                            </div> */}
+                                                {/* </div> */}
+                                            </div>
+                                        </div>
+                                        <div className='body mt-3 h-3/4 px-2'>
+                                            <div className='flex'>
+                                                <div className='w-1/4 items-center p-2'>
+                                                    <h3 > <FontAwesomeIcon icon={faPencil} /> Tiêu đề</h3>
+                                                </div>
+                                                <input className=' w-3/4' type="text"
+                                                    // value={formData.title}
+                                                    // name="title"
+                                                    // onChange={handleChange}
+                                                    placeholder='Nhập tựa đề ở đây' />
+                                            </div>
+                                            <div className='flex mt-2 h-full'>
+                                                <div className='w-1/4 items-center p-2 '>
+                                                    <h3 ><FontAwesomeIcon icon={faNoteSticky} /> Nội dung</h3>
+                                                </div>
+                                                <textarea className='w-3/4 h-40'
+                                                    // value={formData.content}
+                                                    // name="content"
+                                                    // onChange={handleChange}
+                                                    placeholder='Viết nội dung ở đây' />
+                                            </div>
+                                            {/* Nếu chọn "Đăng tìm thành viên" thì hiển thị thêm field nhập
+                        {postType === BlogType.Recruit && user?.projects ? ( */}
+                                            <div className=''>
+                                                <div className='skill'>
+                                                    <div className='flex mt-2 h-full'>
+                                                        <div className='w-1/4 items-center p-2 '>
+                                                            <h3 >Kỹ năng yêu cầu</h3>
+                                                        </div>
+                                                        <textarea className="w-3/4 border p-2 rounded"
+                                                            name="skillRequired"
+                                                            placeholder="Nhập kỹ năng yêu cầu"
+                                                        //   value={formData.skillRequired}
+                                                        //   onChange={handleChange} 
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className='project py-2'>
+
+                                                    <div className='flex mt-2 h-full mb-4 min-h-28'>
+                                                        <div className='w-1/4 items-center p-2  '>
+                                                            <h3 >Team của bạn</h3>
+                                                        </div>
+                                                        <div>
+                                                            <h4 className='text-red-400'>*Không bắt buộc</h4>
+                                                            {/* <h4 className='text-red-400'>{messageUser}</h4> */}
+
+                                                            {/* <select
+                                    name="projectId" className="border p-2 rounded w-48"
+                                    value={formData.projectId || ""}  // Đảm bảo không bị undefined
+                                    // onChange={handleChange}
+                                  >
+                                    <option value="">Chọn dự án</option>
+                                    {projectUser?.id && (
+                                      <option value={projectUser.id}>{projectUser.teamName}</option>
+                                    )}
+                                  </select> */}
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+                                            {/* ) : (
+                          <div></div>
+                        )} */}
+                                        </div>
+                                        <div className='flex w-full h-14 absolute bottom-0  items-center justify-center'>
+                                            {/* <button onClick={() => handleSubmit()} className='bg-blue-500 h-3/4 w-1/3 mx-2 rounded-xl hover:bg-blue-400 hover:text-black '>Post Bài</button> */}
+                                        </div>
+                                    </div>
+                                </ModalContent>
+                            </ModalBody>
+
+                        </Modal>
+                    </div>
+                    <div className="flex my-3 border-b-2  border-gray-400 px-6"> </div>
+                    <div className="flex mt-3 ">
+
+                        <div className="flex space-x-4 justify-center w-full">
+                            <button className="text-red-500 hover:text-gray-800 w-1/4">
+                                <FontAwesomeIcon icon={faVideo} />
+                                <span> </span>
+                                Video trực tiếp
+                            </button>
+                            <button className="text-green-600 hover:text-gray-800 w-1/4">
+                                <FontAwesomeIcon icon={faPhotoFilm} />
+                                <span> </span>
+                                Ảnh/video
+                            </button>
+                            <button className="text-yellow-600 hover:text-gray-800 w-1/4">
+                                <FontAwesomeIcon icon={faFaceSmile} />
+                                <span> </span>
+                                Cảm xúc/hoạt động
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            {/* form filter */}
+            <div className='blog-center flex  w-full justify-center '>
+                <div className="mt-3 flex-row bg-white min-w-[680px] max-w-3xl mx-3  p-6 pb-3 rounded-xl shadow-md  ">
                     <div className='flex justify-between'>
                         {/* Tiêu đề */}
                         <h2 className="text-xl font-semibold">Bài viết</h2>
@@ -264,7 +428,7 @@ export default function Blogmanagement() {
                     </div>
 
                     <div className='border-b-2 w-full my-2 border-black'></div>
-                    
+
                     {/* Chế độ xem */}
                     <div className="flex border-b w-full mt-2">
                         {/* Chế độ xem tất cả */}
@@ -280,7 +444,7 @@ export default function Blogmanagement() {
                         <button
                             className={`flex-1 py-2 text-sm font-medium border-b-2 ${filterType === BlogType.Share ? "text-blue-600 border-blue-600" : "text-gray-500 hover:text-black border-transparent"
                                 }`}
-                                onClick={() => handleFilterChange(BlogType.Share)}
+                            onClick={() => handleFilterChange(BlogType.Share)}
                         >
                             <FontAwesomeIcon icon={faShare} className="mr-1" />
                             Chế độ xem share
@@ -301,7 +465,7 @@ export default function Blogmanagement() {
 
             <div className='blog-center flex  w-full justify-center '>
                 {/* Blog */}
-            
+
                 <div>
                     {isLoading ? (
                         <p>Hiện tại bạn đang không có bài nào cả</p>
