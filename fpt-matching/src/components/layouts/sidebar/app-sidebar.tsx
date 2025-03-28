@@ -43,7 +43,14 @@ const data = {
   navMain: [
     { title: "Home", url: "/", icon: Home, isActive: true },
     { title: "Social", url: "/social/blog", icon: Globe },
-    { title: "Team", url: "/team", icon: UsersRound },
+    { title: "Team",
+      url: "/team",
+      icon: UsersRound,
+      items: [
+        { title: "My Team", icon: Pencil, url: "/team" },
+        { title: "Manage review", icon: Pencil, url: "/team/manage-review" },
+      ]
+    },
     { title: "Invitations", url: "/invitations", icon: Send },
     {
       title: "Idea",
