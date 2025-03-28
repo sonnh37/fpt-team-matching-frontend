@@ -82,7 +82,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                                 <TableCell>{cv.user?.email}</TableCell>
                                 <TableCell>{Department[cv.user?.department ?? 0]}</TableCell>
                                 <TableCell>{cv.fileCv}</TableCell>
-                                <TableCell >   <button className="p-1 bg-orange-400 ml-3"><a href={`/profile-detail/${cv.user?.id}`}>Xem profile</a></button></TableCell>
+                                <TableCell >   <button className="p-1 bg-orange-400 ml-3"><a href={`social/blog/profile-social/${cv.user?.id}`}>Xem profile</a></button></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

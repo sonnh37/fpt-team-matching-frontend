@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faPaperPlane, faAngleDown } from "@fortawesome/free-solid-svg-icons";
+import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faPaperPlane, faAngleDown, faTrophy, faShare, faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -47,6 +47,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
 export default function Blogmanagement() {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
+
     const [formData, setFormData] = useState({
         projectId: "",
         title: "",
@@ -55,17 +56,34 @@ export default function Blogmanagement() {
         type: BlogType.Share, // Loại bài viết
         status: BlogStatus.Public // Trạng thái mặc định
     });
+
+    //làm filter
+    const [filterType, setFilterType] = useState<BlogType | null>(null);
+
+    // Hàm thay đổi bộ lọc và gọi API lại
+    const handleFilterChange = (type: BlogType) => {
+        setFilterType(type);
+        refetch();
+    };
+    const handleNoFilter = () => {
+        setFilterType(null);
+        // window.location.href = "/social/blog/blogmanagerment"; // Chuyển hướng về trang chủ
+    
+    };
+
     //gọi thông tin user đã đăng nhập
     const user = useSelector((state: RootState) => state.user.user)
+
 
     let query: BlogGetAllQuery = {
         pageNumber: currentPage,
         userId: user?.id,
-        isDeleted: false
+        isDeleted: false,
+        ...(filterType !== null && { type: filterType }), // Thêm type nếu filterType khác null
     };
-    // NẾU NGƯỜI DÙNG BẤM FILTER THÌ MỚI HIỆN RA
 
-    // //goi api bang tanstack
+
+    // //goi api blog của user bang tanstack
     const {
         data: result,
         refetch,
@@ -75,6 +93,7 @@ export default function Blogmanagement() {
         queryFn: () => blogService.fetchPaginated(query),
         refetchOnWindowFocus: false,
     });
+    
 
     useEffect(() => {
         if (result?.data) {
@@ -85,7 +104,6 @@ export default function Blogmanagement() {
             }
         }
     }, [result]);
-
 
     //Đây là form delete trả về true false tái sử dụng được
     const confirm = useConfirm()
@@ -98,7 +116,6 @@ export default function Blogmanagement() {
             confirmText: "Có,xóa nó đi",
             cancelText: "Không,cảm ơn",
         })
-
         if (confirmed) {
             // Người dùng chọn Yes
             const result = await blogService.delete(id)
@@ -118,8 +135,7 @@ export default function Blogmanagement() {
     }
 
 
-
-
+// update blog
     const handleUpdate = async () => {
         try {
             if (!formData.title || !formData.content) {
@@ -204,6 +220,15 @@ export default function Blogmanagement() {
                             </div>
 
                             <div className="mt-6">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Achievement</h2>
+                                <p className="mt-3 text-gray-600 dark:text-gray-300">
+                                    <FontAwesomeIcon icon={faTrophy} />  {user?.profileStudent?.achievement ?? "  Người dùng chưa điền thông tin các thành tựu"}
+
+                                </p>
+                            </div>
+
+
+                            <div className="mt-4">
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Contact</h2>
                                 <a
                                     href="mailto:abhirajk@example.com"
@@ -219,8 +244,64 @@ export default function Blogmanagement() {
                     </div>
                 </div>
             </div>
+            <div className='blog-center flex  w-full justify-center'>
+                <div className="mt-6 flex-row bg-white min-w-[680px] max-w-3xl mx-3 my-4 p-6 pb-3 rounded-xl ">
+                    <div className='flex justify-between'>
+                        {/* Tiêu đề */}
+                        <h2 className="text-xl font-semibold">Bài viết</h2>
+
+                        {/* Nút chức năng */}
+                        <div className="flex gap-2">
+                            <button className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium border rounded-md hover:bg-gray-100">
+                                <span className="text-lg">⚙</span> Bộ lọc
+                            </button>
+                            <button className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium border rounded-md hover:bg-gray-100">
+                                <span className="text-lg">⚙</span> Quản lý bài viết
+                            </button>
+
+
+                        </div>
+                    </div>
+
+                    <div className='border-b-2 w-full my-2 border-black'></div>
+                    
+                    {/* Chế độ xem */}
+                    <div className="flex border-b w-full mt-2">
+                        {/* Chế độ xem tất cả */}
+                        <button
+                            className={`flex-1 py-2 text-sm font-medium border-b-2 ${filterType === null ? "text-blue-600 border-blue-600" : "text-gray-500 hover:text-black border-transparent"
+                                }`}
+                            onClick={handleNoFilter}
+                        >
+                            ☰ Chế độ xem tất cả
+                        </button>
+
+                        {/* Chế độ xem share */}
+                        <button
+                            className={`flex-1 py-2 text-sm font-medium border-b-2 ${filterType === BlogType.Share ? "text-blue-600 border-blue-600" : "text-gray-500 hover:text-black border-transparent"
+                                }`}
+                                onClick={() => handleFilterChange(BlogType.Share)}
+                        >
+                            <FontAwesomeIcon icon={faShare} className="mr-1" />
+                            Chế độ xem share
+                        </button>
+
+                        {/* Chế độ xem tìm thành viên */}
+                        <button
+                            className={`flex-1 py-2 text-sm font-medium border-b-2 ${filterType === BlogType.Recruit ? "text-blue-600 border-blue-600" : "text-gray-500 hover:text-black border-transparent"
+                                }`}
+                            onClick={() => handleFilterChange(BlogType.Recruit)}
+                        >
+                            <FontAwesomeIcon icon={faCircleUser} className="mr-1" />
+                            Chế độ xem tìm thành viên
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div className='blog-center flex  w-full justify-center '>
                 {/* Blog */}
+            
                 <div>
                     {isLoading ? (
                         <p>Hiện tại bạn đang không có bài nào cả</p>
@@ -239,7 +320,7 @@ export default function Blogmanagement() {
                                                     alt="User Avatar"
                                                     className="w-12 h-12 rounded-full"
                                                 />
-                                             
+
                                                 <div className='flex w-full justify-between'>
                                                     <div>
                                                         <p className="text-lg font-semibold text-gray-800">{post.user?.username}</p>
@@ -264,6 +345,7 @@ export default function Blogmanagement() {
                                                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                                                 <DropdownMenuSeparator />
                                                                 <DropdownMenuItem>Ghim blog</DropdownMenuItem>
+                                                                <DropdownMenuItem onClick={() => handleDelete(post.id ?? "")}>Xóa blog</DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>
                                                     </div>
