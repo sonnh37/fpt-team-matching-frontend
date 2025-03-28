@@ -208,91 +208,101 @@ export default function Blog() {
             <div className="py-3 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3">
               <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
               <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>
-              <a href="">
-                <div className='Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline'> Login</div>
-              </a>
-              <a href="">
-                <div className='Register w-full mt-2 text-center  p-1 text-xl  hover:bg-blue-200 hover:underline'> Register</div>
-              </a>
+
+              {!user?.id && (
+                <>
+                  <a href="">
+                    <div className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
+                      Login
+                    </div>
+                  </a>
+                  <a href="">
+                    <div className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
+                      Register
+                    </div>
+                  </a>
+                </>
+              )}
+
             </div>
-            <nav className="text-base ">
+            <nav className="text-[16px] ">
               <ul className="flex flex-col">
-                <li className="px-4 cursor-pointer bg-gray-100 text-gray-800 hover:bg-blue-300  hover:text-white">
+                <li className="px-4 cursor-pointer text-gray-800 hover:bg-blue-300  hover:text-white">
                   <a className="py-3 flex items-center" href="/">
-                  🏠
+                    🏠
                     Trang chủ
                   </a>
                 </li>
-                <li className="px-4 py-2 text-[14px] uppercase tracking-wider text-gray-500 font-bold">USER MANAGEMENT</li>
+                <li className="px-4 py-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">USER MANAGEMENT</li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a className="py-3 flex items-center" href="/">
-                  👥
+                    👥
                     Users
                   </a>
                 </li>
-                <li className="px-4 py-2 text-[14px] uppercase tracking-wider text-gray-500 font-bold">Blog Management</li>
+                <li className="px-4 py-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Blog Management</li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a className="py-3 flex items-center" href="/social/blog/blogmanagerment">
-                  😀
+                    😀
 
                     Blog Cá nhân
                   </a>
                 </li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a className="py-3 flex items-center" href="/">
-                  🖇   Blog Sharing
+                    🖇   Blog Sharing
                   </a>
                 </li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a className="py-3 flex items-center" href="/">
-                  📖
+                    📖
                     Blog Project
                   </a>
                 </li>
-                <li className="px-4 py-2 mt-2 text-[14px] uppercase tracking-wider text-gray-500 font-bold">Apps</li>
+                <li className="px-4 py-2 mt-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Apps</li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a href="#" className="py-2 flex items-center">
-                  ✉️
+                    ✉️
                     Messages
                     <span className="ml-auto text-xs bg-gray-300 px-2 py-1 rounded-sm">16</span>
                   </a>
                 </li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a href="blog/notification" className="py-2 flex items-center">
-                  🔔
+                    🔔
                     Notification
                     <span className="ml-auto text-xs bg-gray-300 px-2 py-1 rounded-sm">16</span>
                   </a>
                 </li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a href="#" className="py-2 flex items-center">
-                  📅
+                    📅
 
                     Calendar
                   </a>
                 </li>
-                <li className="px-4 py-2 text-[14px] uppercase tracking-wider text-gray-500 font-bold">Other</li>
+                <li className="px-4 py-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Other</li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
-                  ⚠️
+                    ⚠️
                     Privacy Policy
                   </a>
                 </li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
-                  🔒
+                    🔒
                     Term of use
                   </a>
                 </li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
-                  💡
+                    💡
                     About
                   </a>
                 </li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
-                  📧
+                    📧
                     Contact
                   </a>
                 </li>
@@ -302,6 +312,7 @@ export default function Blog() {
         </div>
         {/* blog center */}
         <div className='blog-center flex flex-col items-center basis-3/5 mr-4 ml-4'>
+          {/* Form tạo blog */}
           <div className='form-create-blog bg-white rounded-xl w-full max-w-3xl p-3 mx-2 mt-3'>
 
             <div className="flex items-center ">
@@ -462,7 +473,7 @@ export default function Blog() {
           </div>
           {/* filter blog */}
           <div className='blog-center flex  w-full justify-center'>
-            <div className="mt-6 flex-row bg-white min-w-[715px] max-w-3xl mx-3 my-4 p-6 pb-3 rounded-xl ">
+            <div className="mt-6 flex-row bg-white min-w-[650px] max-w-3xl mx-3 my-4 p-6 pb-3 rounded-xl ">
               <div className='flex justify-between  pb-1'>
                 {/* Tiêu đề */}
                 <h2 className="text-xl font-semibold">Bài viết</h2>
@@ -867,7 +878,7 @@ export default function Blog() {
                   result?.data?.results?.map((post) => (
                     // Cho blog detail
 
-                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md min-w-[715px] '>
+                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md min-w-[650px] '>
                       <div>
                         {/* Post Header with Avatar, Username, and Date */}
                         <div className="flex items-center space-x-4">
@@ -908,11 +919,11 @@ export default function Blog() {
 
 
                         {/* Post Title */}
-                        <div className="text-xl md:text-2xl font-bold text-gray-900 leading-tight pt-3 mt-2">
+                        <div className="text-lg md:text-xl font-bold text-gray-900 leading-tight pt-3 mt-2">
                           <Modal>
-                            <ModalTrigger className=" ">
+                            <ModalTrigger className="text-xl ">
                               <div className='text-left'> {post?.type === BlogType.Recruit && (<div>[🔎Đăng tuyển,tìm thành viên]</div>)}</div>
-                              <span className="  ">
+                              <span className={`${post?.type === BlogType.Recruit ? "text-none font-medium text-lg" : ""}`}>
                                 {post.title}
                               </span>
                             </ModalTrigger>
@@ -1009,7 +1020,7 @@ export default function Blog() {
 
                                 {/* Post Stats (Likes, Comments, Upload Count) */}
                                 <div className="flex w-full text-gray-600 border-y-2 p-3">
-                                  <div className="flex w-full text-xl justify-between  items-center space-x-4">
+                                  <div className="flex w-full text-base justify-between  items-center space-x-4">
                                     <span className="flex items-center">
                                       <i className="fas fa-thumbs-up text-blue-500"></i>
                                       <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp} />  Lượt thích </span>
@@ -1042,10 +1053,10 @@ export default function Blog() {
                         <div className="flex  text-gray-600">
                           <div className="flex justify-between items-center  w-full space-x-4">
                             <span className="flex items-center ml-4 pl-4 p-2 hover:bg-slate-200">
-                              <span className="ml-2 text-lg">           <LikeBlog postId={post?.id ?? ""} /> </span>
+                              <span className="ml-2 text-base">           <LikeBlog postId={post?.id ?? ""} /> </span>
                             </span>
                             <span className="flex items-center p-2 ">
-                              <span className="ml-2 text-lg">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
+                              <span className="ml-2 text-base">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
                             </span>
                             {post?.type === BlogType.Recruit ? (
                               <span className="flex items-center mr-4 pr-4 p-2  hover:bg-slate-200">
@@ -1054,7 +1065,7 @@ export default function Blog() {
                               </span>
                             ) : (
 
-                              <span className="ml-2 text-lg ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
+                              <span className="ml-2 text-base ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
                             )}
                           </div>
                         </div>
@@ -1075,14 +1086,14 @@ export default function Blog() {
 
         </div>
         {/* blog right */}
-        <div className='blog-right basis-1/5'>
+        <div className='blog-right basis-1/5 mr-6 min-w-[180px]'>
           <div className='box-title'>
             <div className=" w-full relative max-w-xs mx-3 m-3">
-              <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-500 to-teal-500 transform scale-[0.80] bg-red-500 rounded-full blur-3xl" />
-              <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-2xl flex flex-col justify-end items-start">
+              <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-500 to-teal-500 transform scale-[0.80] bg-red-500 rounded-md blur-3xl" />
+              <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-md flex flex-col justify-end items-start">
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
-                    <h1 className='text-xl text-black'># 💬🧐 Discuss</h1>
+                    <h1 className='text-xl text-black font-semibold'># 💬🧐 Discuss</h1>
                     <p className="font-normal text-xm text-gray-700 px-4 py-2  ">
                       Discussion threads targeting the whole community
                     </p>
@@ -1095,7 +1106,7 @@ export default function Blog() {
                       <h2 className="font-bold  text-gray-700 mb-2 ">
                         {postNt.title}
                       </h2>
-                      <p className='text-xm'>{postNt.comments.length ?? 0} comments</p>
+                      <p className='text-xm text-gray-500'>{postNt.comments.length ?? 0} comments</p>
                     </div>
                   </div>
                 )
@@ -1112,11 +1123,11 @@ export default function Blog() {
 
           <div className='box-info'>
             <div className=" w-full relative max-w-xs mx-3 m-3">
-              <div className="absolute inset-0 h-full w-full bg-gradient-to-r transform scale-[0.80] rounded-full blur-3xl" />
-              <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-2xl flex flex-col justify-end items-start">
+              <div className="absolute inset-0 h-full w-full bg-gradient-to-r transform scale-[0.80] rounded-md blur-3xl" />
+              <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-md flex flex-col justify-end items-start">
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
-                    <h1 className='text-xl text-black'># 🔔 Notification</h1>
+                    <h1 className='text-xl text-black font-semibold'># 🔔 Notification</h1>
                     <p className="font-normal text-xm text-gray-700 px-4 py-2  ">
                       Hóng hớt drama trường FPT thân yêu
                     </p>
@@ -1129,7 +1140,7 @@ export default function Blog() {
                       <h2 className="font-bold  text-gray-700 mb-2 ">
                         {blogfpt.title}
                       </h2>
-                      <p className='text-xm'>  {blogfpt.comments.length ?? 0} Comment</p>
+                      <p className='text-xm text-gray-500'>  {blogfpt.comments.length ?? 0} Comment</p>
                     </div>
                   </div>
 
@@ -1147,7 +1158,7 @@ export default function Blog() {
 
           <div className='box-trending'>
             <div className='w-full h-auto  px-2 py-2'>
-              <div className='text-black font-extrabold text-lg'>🔥🔥 Trending</div>
+              <div className='text-black  text-lg font-semibold'>🔥🔥 Trending</div>
               <div className='title-trending p-3  hover:bg-white hover:text-blue-900 '>
                 <h2 className=" mb-2 z-50 w-full ">
                   Thu va Loc sang ngay bi ia chay
