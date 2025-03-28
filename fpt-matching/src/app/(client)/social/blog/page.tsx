@@ -2,7 +2,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faUser, faVideo, faFaceSmile, faPhotoFilm, faPencil, faNoteSticky, faShareFromSquare, faComments, faHouse, faShare, faCircleUser } from "@fortawesome/free-solid-svg-icons";
+import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faUser, faVideo, faFaceSmile, faPhotoFilm, faPencil, faNoteSticky, faShareFromSquare, faComments, faHouse, faShare, faCircleUser, faMessage } from "@fortawesome/free-solid-svg-icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -208,128 +208,101 @@ export default function Blog() {
             <div className="py-3 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3">
               <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
               <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>
-              <a href="">
-                <div className='Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline'> Login</div>
-              </a>
-              <a href="">
-                <div className='Register w-full mt-2 text-center  p-1 text-xl  hover:bg-blue-200 hover:underline'> Register</div>
-              </a>
+
+              {!user?.id && (
+                <>
+                  <a href="">
+                    <div className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
+                      Login
+                    </div>
+                  </a>
+                  <a href="">
+                    <div className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
+                      Register
+                    </div>
+                  </a>
+                </>
+              )}
+
             </div>
-            <nav className="text-sm ">
+            <nav className="text-[16px] ">
               <ul className="flex flex-col">
-                <li className="px-4 cursor-pointer bg-gray-100 text-gray-800 hover:bg-blue-300  hover:text-white">
+                <li className="px-4 cursor-pointer text-gray-800 hover:bg-blue-300  hover:text-white">
                   <a className="py-3 flex items-center" href="/">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                      stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                    </svg>
+                    🏠
                     Trang chủ
                   </a>
                 </li>
-                <li className="px-4 py-2 text-xs uppercase tracking-wider text-gray-500 font-bold">USER MANAGEMENT</li>
+                <li className="px-4 py-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">USER MANAGEMENT</li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a className="py-3 flex items-center" href="/">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                      stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
-                    </svg>
+                    👥
                     Users
                   </a>
                 </li>
-                <li className="px-4 py-2 text-xs uppercase tracking-wider text-gray-500 font-bold">Blog Management</li>
+                <li className="px-4 py-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Blog Management</li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a className="py-3 flex items-center" href="/social/blog/blogmanagerment">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                      stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M6 6.878V6a2.25 2.25 0 0 1 2.25-2.25h7.5A2.25 2.25 0 0 1 18 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 0 0 4.5 9v.878m13.5-3A2.25 2.25 0 0 1 19.5 9v.878m0 0a2.246 2.246 0 0 0-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0 1 21 12v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6c0-.98.626-1.813 1.5-2.122" />
-                    </svg>
+                    😀
 
                     Blog Cá nhân
                   </a>
                 </li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a className="py-3 flex items-center" href="/">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                      stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                    </svg>
-                    Blog Sharing
+                    🖇   Blog Sharing
                   </a>
                 </li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a className="py-3 flex items-center" href="/">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                      stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round"
-                        d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
-                    </svg>
+                    📖
                     Blog Project
                   </a>
                 </li>
-                <li className="px-4 py-2 mt-2 text-xs uppercase tracking-wider text-gray-500 font-bold">Apps</li>
+                <li className="px-4 py-2 mt-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Apps</li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a href="#" className="py-2 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3" />
-                    </svg>
-
+                    ✉️
                     Messages
-                    <span className="ml-auto text-xs bg-gray-500 px-2 py-1 rounded-sm">16</span>
+                    <span className="ml-auto text-xs bg-gray-300 px-2 py-1 rounded-sm">16</span>
                   </a>
                 </li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a href="blog/notification" className="py-2 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3" />
-                    </svg>
-
+                    🔔
                     Notification
-                    <span className="ml-auto text-xs bg-gray-500 px-2 py-1 rounded-sm">16</span>
+                    <span className="ml-auto text-xs bg-gray-300 px-2 py-1 rounded-sm">16</span>
                   </a>
                 </li>
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a href="#" className="py-2 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
-                    </svg>
+                    📅
 
                     Calendar
                   </a>
                 </li>
-                <li className="px-4 py-2 text-xs uppercase tracking-wider text-gray-500 font-bold">Other</li>
+                <li className="px-4 py-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Other</li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
-                    </svg>
+                    ⚠️
                     Privacy Policy
                   </a>
                 </li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
-                    </svg>
+                    🔒
                     Term of use
                   </a>
                 </li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
-                    </svg>
+                    💡
                     About
                   </a>
                 </li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-4 mr-3">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
-                    </svg>
+                    📧
                     Contact
                   </a>
                 </li>
@@ -339,6 +312,7 @@ export default function Blog() {
         </div>
         {/* blog center */}
         <div className='blog-center flex flex-col items-center basis-3/5 mr-4 ml-4'>
+          {/* Form tạo blog */}
           <div className='form-create-blog bg-white rounded-xl w-full max-w-3xl p-3 mx-2 mt-3'>
 
             <div className="flex items-center ">
@@ -498,26 +472,57 @@ export default function Blog() {
 
           </div>
           {/* filter blog */}
-          <div className='header-button  pt-3'>
-            <div className='header-button pt-3 h-10'>
-              <span
-                className={` h-full  px-2 p-3 mx-3 hover:bg-white hover:text-blue-900 ${filterType === null ? "bg-white font-extrabold" : ""}`}
-                onClick={() => handleNoFilter()}
-              >
-                <FontAwesomeIcon icon={faHouse} /> Liên quan
-              </span>
-              <span
-                className={`h-full px-2 p-3 mx-3 hover:bg-white hover:text-blue-900 ${filterType === BlogType.Share ? "bg-white font-extrabold" : ""}`}
-                onClick={() => handleFilterChange(BlogType.Share)}
-              >
-                <FontAwesomeIcon icon={faShare} /> Chia sẻ
-              </span>
-              <span
-                className={`h-full px-2 p-3 mx-3  hover:bg-white hover:text-blue-900 ${filterType === BlogType.Recruit ? "bg-white font-extrabold" : ""}`}
-                onClick={() => handleFilterChange(BlogType.Recruit)}
-              >
-                <FontAwesomeIcon icon={faCircleUser} /> Tìm thành viên
-              </span>
+          <div className='blog-center flex  w-full justify-center'>
+            <div className="mt-6 flex-row bg-white min-w-[650px] max-w-3xl mx-3 my-4 p-6 pb-3 rounded-xl ">
+              <div className='flex justify-between  pb-1'>
+                {/* Tiêu đề */}
+                <h2 className="text-xl font-semibold">Bài viết</h2>
+
+                {/* Nút chức năng */}
+                <div className="flex gap-2">
+                  <button className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium border rounded-md hover:bg-gray-100">
+                    <span className="text-lg">⚙</span> Bộ lọc
+                  </button>
+                  <button className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium border rounded-md hover:bg-gray-100">
+                    <span className="text-lg">⚙</span> Quản lý bài viết
+                  </button>
+
+
+                </div>
+              </div>
+              <div className='border-b-2 w-full my-2 border-black'></div>
+
+              {/* Chế độ xem */}
+              <div className="flex border-b w-full mt-2">
+                {/* Chế độ xem tất cả */}
+                <button
+                  className={`flex-1 py-2 text-sm font-medium border-b-2 ${filterType === null ? "text-blue-600 border-blue-600" : "text-gray-500 hover:text-black border-transparent"
+                    }`}
+                  onClick={handleNoFilter}
+                >
+                  ☰ Chế độ xem tất cả
+                </button>
+
+                {/* Chế độ xem share */}
+                <button
+                  className={`flex-1 py-2 text-sm font-medium border-b-2 ${filterType === BlogType.Share ? "text-blue-600 border-blue-600" : "text-gray-500 hover:text-black border-transparent"
+                    }`}
+                  onClick={() => handleFilterChange(BlogType.Share)}
+                >
+                  <FontAwesomeIcon icon={faShare} className="mr-1" />
+                  Chế độ xem share
+                </button>
+
+                {/* Chế độ xem tìm thành viên */}
+                <button
+                  className={`flex-1 py-2 text-sm font-medium border-b-2 ${filterType === BlogType.Recruit ? "text-blue-600 border-blue-600" : "text-gray-500 hover:text-black border-transparent"
+                    }`}
+                  onClick={() => handleFilterChange(BlogType.Recruit)}
+                >
+                  <FontAwesomeIcon icon={faCircleUser} className="mr-1" />
+                  Chế độ xem tìm thành viên
+                </button>
+              </div>
             </div>
           </div>
           {/* Blog */}
@@ -873,7 +878,7 @@ export default function Blog() {
                   result?.data?.results?.map((post) => (
                     // Cho blog detail
 
-                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md min-w-[715px] '>
+                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md min-w-[650px] '>
                       <div>
                         {/* Post Header with Avatar, Username, and Date */}
                         <div className="flex items-center space-x-4">
@@ -914,10 +919,11 @@ export default function Blog() {
 
 
                         {/* Post Title */}
-                        <div className="text-xl md:text-2xl font-bold text-gray-900 leading-tight pt-3 mt-2">
+                        <div className="text-lg md:text-xl font-bold text-gray-900 leading-tight pt-3 mt-2">
                           <Modal>
-                            <ModalTrigger className=" ">
-                              <span className="  ">
+                            <ModalTrigger className="text-xl ">
+                              <div className='text-left'> {post?.type === BlogType.Recruit && (<div>[🔎Đăng tuyển,tìm thành viên]</div>)}</div>
+                              <span className={`${post?.type === BlogType.Recruit ? "text-none font-medium text-lg" : ""}`}>
                                 {post.title}
                               </span>
                             </ModalTrigger>
@@ -1014,7 +1020,7 @@ export default function Blog() {
 
                                 {/* Post Stats (Likes, Comments, Upload Count) */}
                                 <div className="flex w-full text-gray-600 border-y-2 p-3">
-                                  <div className="flex w-full text-xl justify-between  items-center space-x-4">
+                                  <div className="flex w-full text-base justify-between  items-center space-x-4">
                                     <span className="flex items-center">
                                       <i className="fas fa-thumbs-up text-blue-500"></i>
                                       <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp} />  Lượt thích </span>
@@ -1047,10 +1053,10 @@ export default function Blog() {
                         <div className="flex  text-gray-600">
                           <div className="flex justify-between items-center  w-full space-x-4">
                             <span className="flex items-center ml-4 pl-4 p-2 hover:bg-slate-200">
-                              <span className="ml-2 text-lg">           <LikeBlog postId={post?.id ?? ""} /> </span>
+                              <span className="ml-2 text-base">           <LikeBlog postId={post?.id ?? ""} /> </span>
                             </span>
                             <span className="flex items-center p-2 ">
-                              <span className="ml-2 text-lg">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
+                              <span className="ml-2 text-base">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
                             </span>
                             {post?.type === BlogType.Recruit ? (
                               <span className="flex items-center mr-4 pr-4 p-2  hover:bg-slate-200">
@@ -1059,7 +1065,7 @@ export default function Blog() {
                               </span>
                             ) : (
 
-                              <span className="ml-2 text-lg ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
+                              <span className="ml-2 text-base ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
                             )}
                           </div>
                         </div>
@@ -1080,14 +1086,14 @@ export default function Blog() {
 
         </div>
         {/* blog right */}
-        <div className='blog-right basis-1/5'>
+        <div className='blog-right basis-1/5 mr-6 min-w-[180px]'>
           <div className='box-title'>
             <div className=" w-full relative max-w-xs mx-3 m-3">
-              <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-500 to-teal-500 transform scale-[0.80] bg-red-500 rounded-full blur-3xl" />
-              <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-2xl flex flex-col justify-end items-start">
+              <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-500 to-teal-500 transform scale-[0.80] bg-red-500 rounded-md blur-3xl" />
+              <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-md flex flex-col justify-end items-start">
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
-                    <h1 className='text-xl text-black'># 💬🧐 Discuss</h1>
+                    <h1 className='text-xl text-black font-semibold'># 💬🧐 Discuss</h1>
                     <p className="font-normal text-xm text-gray-700 px-4 py-2  ">
                       Discussion threads targeting the whole community
                     </p>
@@ -1100,7 +1106,7 @@ export default function Blog() {
                       <h2 className="font-bold  text-gray-700 mb-2 ">
                         {postNt.title}
                       </h2>
-                      <p className='text-xm'>{postNt.comments.length ?? 0} comments</p>
+                      <p className='text-xm text-gray-500'>{postNt.comments.length ?? 0} comments</p>
                     </div>
                   </div>
                 )
@@ -1117,11 +1123,11 @@ export default function Blog() {
 
           <div className='box-info'>
             <div className=" w-full relative max-w-xs mx-3 m-3">
-              <div className="absolute inset-0 h-full w-full bg-gradient-to-r transform scale-[0.80] rounded-full blur-3xl" />
-              <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-2xl flex flex-col justify-end items-start">
+              <div className="absolute inset-0 h-full w-full bg-gradient-to-r transform scale-[0.80] rounded-md blur-3xl" />
+              <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-md flex flex-col justify-end items-start">
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
-                    <h1 className='text-xl text-black'># 🔔 Notification</h1>
+                    <h1 className='text-xl text-black font-semibold'># 🔔 Notification</h1>
                     <p className="font-normal text-xm text-gray-700 px-4 py-2  ">
                       Hóng hớt drama trường FPT thân yêu
                     </p>
@@ -1134,7 +1140,7 @@ export default function Blog() {
                       <h2 className="font-bold  text-gray-700 mb-2 ">
                         {blogfpt.title}
                       </h2>
-                      <p className='text-xm'>  {blogfpt.comments.length ?? 0} Comment</p>
+                      <p className='text-xm text-gray-500'>  {blogfpt.comments.length ?? 0} Comment</p>
                     </div>
                   </div>
 
@@ -1152,7 +1158,7 @@ export default function Blog() {
 
           <div className='box-trending'>
             <div className='w-full h-auto  px-2 py-2'>
-              <div className='text-black font-extrabold text-lg'>🔥🔥 Trending</div>
+              <div className='text-black  text-lg font-semibold'>🔥🔥 Trending</div>
               <div className='title-trending p-3  hover:bg-white hover:text-blue-900 '>
                 <h2 className=" mb-2 z-50 w-full ">
                   Thu va Loc sang ngay bi ia chay
