@@ -21,10 +21,16 @@ import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { blogService } from "@/services/blog-service";
 import { FileUpload } from "@/components/ui/file-upload";
+import { useState } from "react";
 
-const UploadCv = ({  blogId }: {  blogId: string }) => {
+const UploadCv = ({ blogId }: { blogId: string }) => {
     //gọi thông tin user đã đăng nhập
     const user = useSelector((state: RootState) => state.user.user)
+    const [files, setFiles] = useState<File[]>([]);
+    const handleFileUpload = (files: File[]) => {
+        setFiles(files);
+        console.log(files);
+    };
 
     const {
         data: result,
@@ -34,7 +40,7 @@ const UploadCv = ({  blogId }: {  blogId: string }) => {
         queryFn: () => blogService.fetchById(blogId),
         refetchOnWindowFocus: false,
     });
-    console.log("resu",result?.data)
+    console.log("resu", result?.data)
 
     // const {
     //     data: projectInfo,
@@ -43,12 +49,12 @@ const UploadCv = ({  blogId }: {  blogId: string }) => {
     //     queryFn: () => projectService.getProjectInfo(),
     //     refetchOnWindowFocus: false,
     // });
-   
+
 
     const submit = async () => {
 
         const projectInfo = await projectService.getProjectInfo();
-        console.log("Check prj",projectInfo)
+        console.log("Check prj", projectInfo)
         //check xem người nộp có team chưa
         if (projectInfo.status === 1) {
             toast("Bạn đã có team rồi không thể nộp ứng tuyển")
@@ -75,7 +81,7 @@ const UploadCv = ({  blogId }: {  blogId: string }) => {
             <DialogTrigger asChild>
                 <div><span className="ml-2 text-lg ">{result?.data?.blogCvs.length} Uploads <FontAwesomeIcon icon={faPaperclip} /></span></div>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[505px]  min-h-[450px]">
                 <DialogHeader>
                     <DialogTitle className="text-lg" >Nộp đơn ứng tuyển</DialogTitle>
                     <DialogDescription className="text-base">
@@ -85,7 +91,9 @@ const UploadCv = ({  blogId }: {  blogId: string }) => {
                 <div className="col-auto ">
                     <div className="grid grid-cols-1 gap-2 mt-3">
                         <div className="flex pt-3"><h3>Vui lòng nộp file CV   </h3> <span> </span><h3 className="text-red-500">(nếu có)</h3></div>
-                        <Input type="file" className="w-full mb-2" />
+                        <div className="w-full max-w-4xl mx-auto min-h-96 border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg">
+                            <FileUpload onChange={handleFileUpload} />
+                        </div>
                     </div>
                 </div>
                 <DialogFooter>
