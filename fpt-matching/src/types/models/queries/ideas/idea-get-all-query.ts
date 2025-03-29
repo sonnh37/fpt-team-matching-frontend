@@ -6,7 +6,7 @@ export interface IdeaGetAllQuery extends BaseQueryableQuery {
   semesterId?: string;
   mentorId?: string;
   subMentorId?: string;
-  type?: IdeaType;
+  types: IdeaType[];
   specialtyId?: string;
   ideaCode?: string;
   description?: string;

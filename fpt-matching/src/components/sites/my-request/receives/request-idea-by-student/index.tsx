@@ -1,8 +1,14 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
+import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
+import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
+import { Card } from "@/components/ui/card";
 import { useQueryParams } from "@/hooks/use-query-params";
+import { isExistedTeam_options } from "@/lib/filter-options";
 import { invitationService } from "@/services/invitation-service";
 import { InvitationType } from "@/types/enums/invitation";
-import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
+import { FilterEnum } from "@/types/models/filter-enum";
+import { InvitationGetAllQuery } from "@/types/models/queries/invitations/invitation-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -20,19 +26,21 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
+import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
+import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
+import { MentorIdeaRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
+import { mentoridearequestService } from "@/services/mentor-idea-request-service";
 
 //#region INPUT
-const defaultSchema = z.object({
-  type: z.nativeEnum(InvitationType).optional(),
-});
+const defaultSchema = z.object({});
 //#endregion
-export default function InvitationReceiveByTeamTable() {
+export default function InvitationReceiveToGetIdeaByStudentTable() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
     {
       id: "createdDate",
-      desc: true,
+      desc: true, 
     },
   ]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -58,14 +66,12 @@ export default function InvitationReceiveByTeamTable() {
 
   // default field in table
   const queryParams = useMemo(() => {
-    const params: InvitationGetByTypeQuery = useQueryParams(
+    const params: MentorIdeaRequestGetAllQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
-
-    params.type = InvitationType.SendByTeam;
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -78,9 +84,10 @@ export default function InvitationReceiveByTeamTable() {
       }));
     }
   }, [columnFilters, inputFields]);
+
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => invitationService.getUserInvitationsByType(queryParams),
+    queryFn: () => mentoridearequestService.getMentorMentorIdeaRequests(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

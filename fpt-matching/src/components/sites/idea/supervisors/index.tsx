@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
 import { ideaService } from "@/services/idea-service";
-import { IdeaType } from "@/types/enums/idea";
+import { IdeaStatus, IdeaType } from "@/types/enums/idea";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -82,14 +82,18 @@ export default function IdeasOfSupervisorsTableTable() {
 
   // default field in table
   const queryParams: IdeaGetAllQuery = useMemo(() => {
-    const params: IdeaGetAllQuery = useQueryParams(
+    const baseParams = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
 
-    params.type = IdeaType.Lecturer;
+    const params: IdeaGetAllQuery = {
+      ...baseParams,
+      types: [IdeaType.Lecturer, IdeaType.Enterprise],
+      status: IdeaStatus.Approved,
+    };
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -188,7 +192,7 @@ export default function IdeasOfSupervisorsTableTable() {
                 shrinkZero
               />
             ) : (
-                <DataTableComponent table={table} />
+              <DataTableComponent table={table} />
             )}
             <DataTablePagination table={table} />
           </Card>

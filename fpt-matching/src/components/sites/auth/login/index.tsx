@@ -92,7 +92,7 @@ export const LoginGoogleForm = ({
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  <Button variant="outline" className="w-full" type="submit">
+                  <Button variant="default" className="w-full" type="submit">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"

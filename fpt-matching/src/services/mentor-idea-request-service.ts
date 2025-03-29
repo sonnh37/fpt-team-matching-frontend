@@ -29,6 +29,22 @@ class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
         return this.handleError(error);
       });
   };
+
+  public getMentorMentorIdeaRequests = (
+    query?: MentorIdeaRequestGetAllQuery
+  ): Promise<BusinessResult<PaginatedResult<MentorIdeaRequest>>> => {
+    const cleanedQuery = cleanQueryParams(query!);
+    return axiosInstance
+      .get<BusinessResult<PaginatedResult<MentorIdeaRequest>>>(
+        `${this.endpoint}/get-mentor-mentor-idea-requests?isPagination=true&${cleanedQuery}`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
  
 }
 

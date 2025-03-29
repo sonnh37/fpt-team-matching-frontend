@@ -1,6 +1,9 @@
 "use client";
 
+import PageNoTeam from "@/app/(client)/(dashboard)/team/page-no-team/page";
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
+import ErrorSystem from "@/components/_common/errors/error-system";
+import { LoadingComponent } from "@/components/_common/loading-page";
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -17,15 +20,22 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { mentoridearequestService } from "@/services/mentor-idea-request-service";
+import { projectService } from "@/services/project-service";
+import { MentorIdeaRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Idea } from "@/types/idea";
+import { MentorIdeaRequestCreateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-create-command";
 import { Project } from "@/types/project";
 import { User } from "@/types/user";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal, Send } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -102,9 +112,7 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const project = row.getValue("project") as Project;
-      console.log("check_project", project);
       const isExistedTeam = row.getValue("isExistedTeam") as boolean;
-      console.log("check_project_", isExistedTeam);
 
       if (!project && !isExistedTeam) {
         return <Checkbox checked={true} />;
@@ -117,7 +125,9 @@ export const columns: ColumnDef<Idea>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Actions" />
+    ),
     cell: ({ row }) => {
       return <Actions row={row} />;
     },
@@ -132,26 +142,113 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const model = row.original;
   const router = useRouter();
   const pathName = usePathname();
+  const [isSending, setIsSending] = useState(false);
+  const queryClient = useQueryClient();
   const handleViewDetailsClick = () => {
     // router.push(`${pathName}/${model.id}`);
   };
 
-  return (
-    <>
-      {model.isExistedTeam ? (
-        <Button variant={"secondary"}>Enough</Button>
-      ) : (
+  if (model.isExistedTeam) return <Button variant={"secondary"}>Enough</Button>;
+
+  // project của user
+  const {
+    data: result,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["getTeamInfo"],
+    queryFn: projectService.getProjectInfo,
+    refetchOnWindowFocus: false,
+  });
+
+  if (isLoading) return <LoadingComponent />;
+  if (isError) {
+    console.error("Error fetching:", error);
+    return <ErrorSystem />;
+  }
+
+  // ko có thì return null ko hiển thị nút
+  if (!result || !result.data)
+    return (
+      <>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button variant={"default"}>
+            <Button variant={"secondary"}>
               <Send />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Request</p>
+            <p>You have not in project</p>
           </TooltipContent>
         </Tooltip>
-      )}
+      </>
+    );
+
+  model.mentorIdeaRequests = model.mentorIdeaRequests ?? [];
+  const isSent =
+    model.mentorIdeaRequests.length > 0
+      ? model.mentorIdeaRequests.some((m) => m.projectId == result.data?.id)
+      : false;
+
+      console.log("check_mentoridearequest", model.mentorIdeaRequests)
+
+  if (isSent)
+    return (
+      <>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant={"secondary"}>
+              <Send />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>You have sent in recently.</p>
+          </TooltipContent>
+        </Tooltip>
+      </>
+    );
+
+  const project = result.data;
+
+  const handleSendRequest = async () => {
+    setIsSending(true);
+    try {
+      if (!model.id) throw new Error("Idea ID is undefined");
+      if (!project.id) throw new Error("Project ID is undefined");
+      const command: MentorIdeaRequestCreateCommand = {
+        projectId: project.id,
+        ideaId: model.id,
+        status: MentorIdeaRequestStatus.Pending,
+      };
+      const res = await mentoridearequestService.create(command);
+      if (res.status != 1) {
+        toast.error(res.message);
+        return;
+      }
+
+      toast.success(`Invitation canceled successfully`);
+      queryClient.invalidateQueries({ queryKey: ["data"] });
+    } catch (error) {
+      toast.error(error as string);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  return (
+    <>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button onClick={handleSendRequest} variant={"default"}>
+            {isSending ? "Loading..." : <Send />}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Request</p>
+        </TooltipContent>
+      </Tooltip>
     </>
   );
 };

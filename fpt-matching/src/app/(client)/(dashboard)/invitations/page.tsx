@@ -1,4 +1,5 @@
 "use client";
+import { InivitationReceive } from "@/components/sites/my-request/receives";
 import InvitationSendByTeamTable from "@/components/sites/my-request/receives/by-team";
 import { InivitationSent } from "@/components/sites/my-request/sends";
 import InvitationSentByStudentTable from "@/components/sites/my-request/sends/by-me";
@@ -10,8 +11,8 @@ import {
 } from "@/components/ui/tabs-shadcn";
 
 export default function Page() {
-  const tab_1 = "Send By me";
-  const tab_2 = "Receive By team";
+  const tab_1 = "Send";
+  const tab_2 = "Receive";
   return (
     <>
       <Tabs defaultValue={tab_1} className="w-full container mx-auto">
@@ -23,7 +24,7 @@ export default function Page() {
           <InivitationSent />
         </TabsContent>
         <TabsContent value={tab_2}>
-          <InvitationSendByTeamTable />
+          <InivitationReceive />
         </TabsContent>
       </Tabs>
     </>
