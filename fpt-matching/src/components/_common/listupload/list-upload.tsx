@@ -114,7 +114,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                                 <TableCell >{cv.user?.email}</TableCell>
                                 <TableCell>{Department[cv.user?.department ?? 0]}</TableCell>
                                 <TableCell className="max-w-[400px] overflow-x-auto whitespace-nowrap"><a href={`${cv.fileCv}`} className="border-b-2 border-blue-500 text-blue-500">Link Dowload</a></TableCell>
-                                <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`social/blog/profile-social/${cv.user?.id}`}>Xem profile</a></button></TableCell>
+                                <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`/social/blog/profile-social/${cv.user?.id}`}>Xem profile</a></button></TableCell>
                                 <TableCell >   <button className="p-2 bg-red-600 ml-3 rounded-sm" onClick={() => handleDelete(cv.id ?? "")}> Xóa CV</button></TableCell>
                             </TableRow>
                         ))}

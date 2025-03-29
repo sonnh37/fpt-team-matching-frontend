@@ -46,8 +46,10 @@ import { isExists } from 'date-fns';
 import { projectService } from '@/services/project-service';
 import { Project } from '@/types/project';
 import ProjectInfo from '@/components/_common/projectInfo/project-info';
-import { Upload } from 'lucide-react';
 import UploadCv from '@/components/_common/uploadCv/upload-cv';
+import { DirectionAwareHover } from '@/components/ui/direction-aware-hover';
+import { FaXTwitter, FaFacebookF, FaGithub, FaInstagram, FaTwitch, FaMastodon } from "react-icons/fa6";
+import { PiButterflyFill, PiGearSixBold } from 'react-icons/pi';
 
 
 
@@ -200,31 +202,18 @@ export default function Blog() {
 
 
   return (
-    <div className='bg-slate-200'>
-      <div className='blog-center flex flex-row max-w-screen-2xl h-auto mx-auto bg-slate-200 '>
+    <div className='bg-slate-100'>
+      <div className='blog-center flex flex-row max-w-screen-2xl h-auto mx-auto bg-[#f5f5f5] '>
         {/* blog left */}
-        <div className='blog-left basis-1/5 bg-slate-200 bg-orange-400 max-h-fit pl-3 pb-3'>
+        <div className='blog-left basis-1/5 bg-[#f5f5f5] bg-orange-400 max-h-fit pl-3 pb-3'>
           <aside className="hidden w-64 md:block min-h-screen">
-            <div className="py-3 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3">
-              <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
-              <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>
 
-              {!user?.id && (
-                <>
-                  <a href="">
-                    <div className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
-                      Login
-                    </div>
-                  </a>
-                  <a href="">
-                    <div className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
-                      Register
-                    </div>
-                  </a>
-                </>
-              )}
-
+            <div className="h-[30px] my-40  flex items-center justify-center">
+              <DirectionAwareHover imageUrl={"https://daihoc.fpt.edu.vn/wp-content/uploads/2022/08/dai-hoc-fpt-tp-hcm-1.jpeg"}>
+                <img className='h-20' src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/FPT_Education_logo.svg/1200px-FPT_Education_logo.svg.png" alt="" />
+              </DirectionAwareHover>
             </div>
+
             <nav className="text-[16px] ">
               <ul className="flex flex-col">
                 <li className="px-4 cursor-pointer text-gray-800 hover:bg-blue-300  hover:text-white">
@@ -296,8 +285,7 @@ export default function Blog() {
                 </li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
-                    💡
-                    About
+                    💡   About
                   </a>
                 </li>
                 <li className="px-4 hover:bg-blue-300">
@@ -308,6 +296,27 @@ export default function Blog() {
                 </li>
               </ul>
             </nav>
+            <div className="p-6 min-h-20 flex flex-col items-start">
+              {/* Icons */}
+              <div className="flex flex-wrap gap-4 text-gray-700 text-xl">
+                <FaXTwitter />
+                <FaFacebookF />
+                <FaGithub />
+                <FaInstagram />
+                <FaTwitch />
+                <FaMastodon />
+                <PiButterflyFill />
+              </div>
+
+              {/* My Tags */}
+              <div className=" flex mt-3 w-full  justify-between gap-2">
+                <p className="font-semibold text-lg">My Tags</p>
+                <PiGearSixBold className="text-gray-700 text-xl" />
+              </div>
+            </div>
+      
+
+
           </aside>
         </div>
         {/* blog center */}
@@ -472,8 +481,8 @@ export default function Blog() {
 
           </div>
           {/* filter blog */}
-          <div className='blog-center flex  w-full justify-center'>
-            <div className="mt-6 flex-row bg-white min-w-[650px] max-w-3xl mx-3 my-4 p-6 pb-3 rounded-xl ">
+          <div className='blog-center flex w-full justify-center'>
+            <div className="mt-6 flex-row bg-white min-w-[760px] max-w-3xl mx-3 my-2 p-4 pb-2 rounded-xl ">
               <div className='flex justify-between  pb-1'>
                 {/* Tiêu đề */}
                 <h2 className="text-xl font-semibold">Bài viết</h2>
@@ -878,7 +887,7 @@ export default function Blog() {
                   result?.data?.results?.map((post) => (
                     // Cho blog detail
 
-                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md min-w-[650px] '>
+                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-5 p-6 pb-3 rounded-xl shadow-md min-w-[650px] '>
                       <div>
                         {/* Post Header with Avatar, Username, and Date */}
                         <div className="flex items-center space-x-4">
@@ -921,11 +930,16 @@ export default function Blog() {
                         {/* Post Title */}
                         <div className="text-lg md:text-xl font-bold text-gray-900 leading-tight pt-3 mt-2">
                           <Modal>
-                            <ModalTrigger className="text-xl ">
-                              <div className='text-left'> {post?.type === BlogType.Recruit && (<div>[🔎Đăng tuyển,tìm thành viên]</div>)}</div>
-                              <span className={`${post?.type === BlogType.Recruit ? "text-none font-medium text-lg" : ""}`}>
-                                {post.title}
-                              </span>
+                            <ModalTrigger className="text-xl  ">
+                              <div className='hover:text-orange-300 text-left'>  <div className='text-left '> {post?.type === BlogType.Recruit && (<div>[🔎Đăng tuyển,tìm thành viên]</div>)}</div>
+                                <span className={` ${post?.type === BlogType.Recruit ? "text-none font-medium text-lg" : ""}`}>
+                                  {post.title}
+                                </span> </div>
+
+                              <p className="text-left text-base font-medium line-clamp-2 overflow-hidden relative after:content-['...Xem_thêm'] after:text-blue-500 after:absolute after:bottom-0 after:right-0 after:bg-white after:cursor-pointer after:hover:underline">
+                                {post?.content}
+                              </p>
+
                             </ModalTrigger>
                             <ModalBody>
                               <ModalContent className='w-full max-h-[80vh] overflow-y-auto '>
@@ -1087,9 +1101,39 @@ export default function Blog() {
         </div>
         {/* blog right */}
         <div className='blog-right basis-1/5 mr-6 min-w-[180px]'>
+          {/* <div className='box-qcao'>
+            <div className=" w-full relative max-w-xs mx-3 m-3">
+              <div className="h-[4rem] relative  flex items-center justify-center">
+                <DirectionAwareHover imageUrl={"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSmZDDiSOnUm5PwmDRXejARSnlrrsvu6e9Qhw&s"} children={undefined}>
+                  <p className="font-bold text-xl">In the mountains</p>
+                  <p className="font-normal text-sm">$1299 / night</p>
+                </DirectionAwareHover>
+              </div>
+            </div>
+          </div> */}
+                <div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3">
+              <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
+              <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>
+
+              {!user?.id && (
+                <>
+                  <a href="">
+                    <div className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
+                      Login
+                    </div>
+                  </a>
+                  <a href="">
+                    <div className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
+                      Register
+                    </div>
+                  </a>
+                </>
+              )}
+
+            </div>
           <div className='box-title'>
             <div className=" w-full relative max-w-xs mx-3 m-3">
-              <div className="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-500 to-teal-500 transform scale-[0.80] bg-red-500 rounded-md blur-3xl" />
+              <div className="absolute inset-0 h-full w-full  rounded-md " />
               <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-md flex flex-col justify-end items-start">
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
