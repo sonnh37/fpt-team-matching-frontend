@@ -21,10 +21,18 @@ import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { blogService } from "@/services/blog-service";
 import { FileUpload } from "@/components/ui/file-upload";
+import { useState } from "react";
+import { cloudinaryService } from "@/services/cloudinary-service";
 
-const UploadCv = ({  blogId }: {  blogId: string }) => {
+const UploadCv = ({ blogId }: { blogId: string }) => {
     //gọi thông tin user đã đăng nhập
     const user = useSelector((state: RootState) => state.user.user)
+    const [files, setFiles] = useState<File[]>([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const handleFileUpload = (files: File[]) => {
+        setFiles(files);
+        console.log(files);
+    };
 
     const {
         data: result,
@@ -34,31 +42,48 @@ const UploadCv = ({  blogId }: {  blogId: string }) => {
         queryFn: () => blogService.fetchById(blogId),
         refetchOnWindowFocus: false,
     });
-    console.log("resu",result?.data)
+    const userIsExist = result?.data?.user?.id ?? ""
 
-    // const {
-    //     data: projectInfo,
-    // } = useQuery({
-    //     queryKey: ["getProjecttInfo", blogId],
-    //     queryFn: () => projectService.getProjectInfo(),
-    //     refetchOnWindowFocus: false,
-    // });
-   
+
 
     const submit = async () => {
+        if (isSubmitting) return; // Nếu API đang chạy, không cho phép bấm tiếp
+        setIsSubmitting(true); // Đánh dấu API đang chạy
 
+        if(user?.id == userIsExist ){
+            toast("Bạn không thể gửi vì bạn đã có nhóm")
+            setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
+            return
+        }
         const projectInfo = await projectService.getProjectInfo();
-        console.log("Check prj",projectInfo)
+     
         //check xem người nộp có team chưa
         if (projectInfo.status === 1) {
             toast("Bạn đã có team rồi không thể nộp ứng tuyển")
+            setIsSubmitting(false);
             return
         }
+
+        let fileurl = "";
+
+        if (files?.length) {
+            try {
+                fileurl = await cloudinaryService.uploadFile(files[0] ) ?? "";
+            } catch (error) {
+                console.error("Upload failed:", error);
+                setIsSubmitting(false);
+                return
+            }
+        }
+        console.log("check" , fileurl)
+
         let query: BlogCvCommand = {
             blogId: blogId,
-            userId: user?.id ?? ""
-            // fileCv: ""
-        }
+            userId: user?.id ?? "",
+            fileCv: fileurl
+        };
+
+
         // if(query.fileCv)
         const result = await blogCvService.create(query);
         if (result.status == 1) {
@@ -67,7 +92,7 @@ const UploadCv = ({  blogId }: {  blogId: string }) => {
         } else {
             toast.error("Đã xảy ra lỗi ,bạn đã nộp đơn thất bại!")
         }
-
+        setIsSubmitting(false); // Hoàn tất, cho phép bấm tiếp
     }
 
     return (
@@ -75,7 +100,7 @@ const UploadCv = ({  blogId }: {  blogId: string }) => {
             <DialogTrigger asChild>
                 <div><span className="ml-2 text-lg ">{result?.data?.blogCvs.length} Uploads <FontAwesomeIcon icon={faPaperclip} /></span></div>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[505px]  min-h-[450px]">
                 <DialogHeader>
                     <DialogTitle className="text-lg" >Nộp đơn ứng tuyển</DialogTitle>
                     <DialogDescription className="text-base">
@@ -85,7 +110,9 @@ const UploadCv = ({  blogId }: {  blogId: string }) => {
                 <div className="col-auto ">
                     <div className="grid grid-cols-1 gap-2 mt-3">
                         <div className="flex pt-3"><h3>Vui lòng nộp file CV   </h3> <span> </span><h3 className="text-red-500">(nếu có)</h3></div>
-                        <Input type="file" className="w-full mb-2" />
+                        <div className="w-full max-w-4xl mx-auto min-h-96 border border-dashed bg-white dark:bg-black border-neutral-200 dark:border-neutral-800 rounded-lg">
+                            <FileUpload onChange={handleFileUpload} />
+                        </div>
                     </div>
                 </div>
                 <DialogFooter>

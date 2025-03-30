@@ -23,6 +23,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Department } from "@/types/enums/user";
 import { blogCvService } from "@/services/blogcv-service";
 import { BlogCvGetAllQuery } from "@/types/models/queries/blogcv/blogcv-get-all-query";
+import { toast } from "sonner";
+import { useConfirm } from "../formdelete/confirm-context";
 
 const ListUploadCv = ({ blogId }: { blogId: string }) => {
 
@@ -32,12 +34,40 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
     }
     const {
         data: post,
+        refetch
     } = useQuery({
         queryKey: ["getBlogCVAllById", query],
         queryFn: () => blogCvService.fetchAll(query),
         refetchOnWindowFocus: false,
     });
 
+
+    
+  //Đây là form delete trả về true false tái sử dụng được
+  const confirm = useConfirm()
+
+   
+    const handleDelete = async (id: string) => {
+
+         // Gọi confirm để mở dialog
+    const confirmed = await confirm({
+        title: "Xóa yêu cầu gia nhập",
+        description: "Bạn có muốn xóa đơn này không?",
+        confirmText: "Có,xóa nó đi",
+        cancelText: "Không,cảm ơn",
+      })
+      if(confirmed){
+        const result = await blogCvService.deletePermanent(id)
+        if(result.status ==1 ){
+         toast.success("Xóa thành công lời mời!")
+         refetch();
+        }
+      }else{
+        return
+      }
+      
+     
+    }
 
 
     return (
@@ -64,8 +94,9 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                             <TableHead>Tên người nộp</TableHead>
                             <TableHead>Email</TableHead>
                             <TableHead>Department</TableHead>
-                            <TableHead>File CV</TableHead>
+                            <TableHead className="max-h-[500px] overflow-x-auto whitespace-nowrap">File CV</TableHead>
                             <TableHead className="text-center">Profile </TableHead>
+                            <TableHead className="text-center">Action </TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -76,13 +107,15 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                                                                     day: "2-digit",
                                                                     month: "2-digit",
                                                                     year: "numeric",
+                                                                    hour: "2-digit"
                                                                 })
                                                                 : "Không có ngày "}</TableCell>
                                 <TableCell>{cv.user?.lastName} {cv.user?.firstName}  </TableCell>
-                                <TableCell>{cv.user?.email}</TableCell>
+                                <TableCell >{cv.user?.email}</TableCell>
                                 <TableCell>{Department[cv.user?.department ?? 0]}</TableCell>
-                                <TableCell>{cv.fileCv}</TableCell>
-                                <TableCell >   <button className="p-1 bg-orange-400 ml-3"><a href={`/profile-detail/${cv.user?.id}`}>Xem profile</a></button></TableCell>
+                                <TableCell className="max-w-[400px] overflow-x-auto whitespace-nowrap"><a href={`${cv.fileCv}`} className="border-b-2 border-blue-500 text-blue-500">Link Dowload</a></TableCell>
+                                <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`social/blog/profile-social/${cv.user?.id}`}>Xem profile</a></button></TableCell>
+                                <TableCell >   <button className="p-2 bg-red-600 ml-3 rounded-sm" onClick={() => handleDelete(cv.id ?? "")}> Xóa CV</button></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

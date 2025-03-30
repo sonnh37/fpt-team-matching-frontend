@@ -1,24 +1,22 @@
 'use client'
-import { reviewService } from '@/services/review-service';
-import { Review } from '@/types/review';
-import { useSearchParams } from 'next/navigation';
+import {reviewService} from '@/services/review-service';
+import {Review} from '@/types/review';
+import {useSearchParams} from 'next/navigation';
 import React, {useEffect, useState} from 'react';
 
-import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardContent,
-    CardFooter,
+import {Button} from "@/components/ui/button"
+import {Card, CardContent, CardFooter,} from "@/components/ui/card"
 
-} from "@/components/ui/card"
-
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {semesterService} from "@/services/semester-service";
-import { Semester } from '@/types/semester';
+import {Semester} from '@/types/semester';
 import BreadcrumbReviewDetails from './breadcrum-review-details';
 import SheetFileUpload from './file-upload_review_details';
 import {reviewDetailsRBAC} from "@/app/(client)/(dashboard)/manage-review/review-details/mange-role";
-import { useCurrentRole } from '@/hooks/use-current-role';
+import {useCurrentRole} from '@/hooks/use-current-role';
+import {UpdateIdeaSheet} from "@/app/(client)/(dashboard)/team/manage-review/review-details/update-idea-sheet";
+import {IdeaHistoryStatus} from "@/types/enums/idea-history";
+import {IdeaHistory} from "@/types/idea-history";
 
 
 const Page = () => {
@@ -28,6 +26,8 @@ const Page = () => {
     const [semester, setSemester] = useState<Semester | null>(null)
     const [fileUpload, setFileupload] = useState<File | null>(null)
     const currentRole = useCurrentRole()
+    const [ideaHistory, setIdeaHistory] = useState<IdeaHistory[]>([])
+    // const [fileEditIdea, setFileEditIdea] = React.useState<File[]>([]);
 
     useEffect( () => {
         if (reviewId){
@@ -41,6 +41,16 @@ const Page = () => {
                         const fileName = result.data.fileUpload.split("Checklist_")
                         const file = new File([blob], fileName[1], {type: blob.type || ".xlsx"} )
                         setFileupload(file)
+                    }
+                    if (result.data.project?.idea && result.data.project.idea.ideaHistories){
+                        const listIdeaHis : IdeaHistory[] = []
+                        // const listFile : File[] = []
+                        for (const ideaHistory of result.data.project.idea.ideaHistories) {
+                            if (ideaHistory.reviewStage === result.data?.number) {
+                                listIdeaHis.push(ideaHistory);
+                            }
+                        }
+                        setIdeaHistory(listIdeaHis)
                     }
                 }
             }
@@ -64,6 +74,7 @@ const Page = () => {
         registerRole()
         fetchCurrentSemester()
     }, []);
+    console.log(ideaHistory)
     return (
         <div className={"px-8 mt-4"}>
             {
@@ -79,8 +90,14 @@ const Page = () => {
                              <div>
                                  {reviewDetails.project?.idea?.englishName}
                              </div>
-                            <div>
-                                <Button variant={"default"}>Chỉnh sửa đề tài</Button>
+                            <div className={"pt-4"}>
+                                {(reviewDetails.number != 3 && reviewDetails.number != 4) ? <UpdateIdeaSheet ideaId={reviewDetails && reviewDetails.project!.ideaId!} reviewStage={reviewDetails.number} ideaHis={ideaHistory} /> : <div></div>}
+                                {
+                                    ideaHistory &&
+                                    ideaHistory?.length > 0 &&
+                                    ideaHistory.every(x => x.status == IdeaHistoryStatus.Pending) &&
+                                    <div className={"font-medium pt-2 pl-2 text-sm text-red-600 "}>*Bạn đã nộp yêu cầu chỉnh sửa đề tài. Đề tài đang trong quá trình chờ được chỉnh sửa từ mentor</div>
+                                }
                             </div>
                         </div>
                         <div className={"w-full"}>
