@@ -5,6 +5,7 @@ import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import { TypographyP } from "@/components/_common/typography/typography-p";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -29,7 +30,7 @@ import { Project } from "@/types/project";
 import { User } from "@/types/user";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal, Send } from "lucide-react";
+import { MoreHorizontal, Send, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -54,18 +55,7 @@ export const columns: ColumnDef<Idea>[] = [
       );
     },
   },
-  {
-    accessorKey: "vietNamName",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Vietnamese name" />
-    ),
-  },
-  {
-    accessorKey: "abbreviations",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Abbreviations" />
-    ),
-  },
+  
   {
     accessorKey: "specialty.profession.professionName",
     header: ({ column }) => (
@@ -101,11 +91,6 @@ export const columns: ColumnDef<Idea>[] = [
     ),
   },
   {
-    accessorKey: "createdDate",
-    header: ({ column }) => null,
-    cell: ({ row }) => null,
-  },
-  {
     accessorKey: "isExistedTeam",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Slot" />
@@ -115,14 +100,20 @@ export const columns: ColumnDef<Idea>[] = [
       const isExistedTeam = row.getValue("isExistedTeam") as boolean;
 
       if (!project && !isExistedTeam) {
-        return <Checkbox checked={true} />;
+        return <Badge variant={"default"}>Available</Badge>;
       }
-      return <Checkbox checked={false} />;
+      return <Badge variant={"destructive"}>UnAvailable</Badge>;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
   },
+  {
+    accessorKey: "createdDate",
+    header: ({ column }) => null,
+    cell: ({ row }) => null,
+  },
+
   {
     accessorKey: "actions",
     header: ({ column }) => (
@@ -148,7 +139,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     // router.push(`${pathName}/${model.id}`);
   };
 
-  if (model.isExistedTeam) return <Button variant={"secondary"}>Enough</Button>;
+  if (model.isExistedTeam) return null;
 
   // project của user
   const {
@@ -180,7 +171,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            <p>You have not in project</p>
+            <p>Let's create team first</p>
           </TooltipContent>
         </Tooltip>
       </>
@@ -191,24 +182,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     model.mentorIdeaRequests.length > 0
       ? model.mentorIdeaRequests.some((m) => m.projectId == result.data?.id)
       : false;
-
-      console.log("check_mentoridearequest", model.mentorIdeaRequests)
-
-  if (isSent)
-    return (
-      <>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant={"secondary"}>
-              <Send />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>You have sent in recently.</p>
-          </TooltipContent>
-        </Tooltip>
-      </>
-    );
 
   const project = result.data;
 
@@ -236,6 +209,77 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       setIsSending(false);
     }
   };
+
+  if (isSent) {
+    const isRejected =
+      model.mentorIdeaRequests.length > 0
+        ? model.mentorIdeaRequests.some(
+            (m) =>
+              m.projectId == result.data?.id &&
+              m.status == MentorIdeaRequestStatus.Rejected
+          )
+        : false;
+
+    if (isRejected) {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button onClick={handleSendRequest} variant={"default"}>
+              {isSending ? (
+                "Loading..."
+              ) : (
+                <>
+                  <Send />
+                </>
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Request</p>
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    const isApproved =
+      model.mentorIdeaRequests.length > 0
+        ? model.mentorIdeaRequests.some(
+            (m) =>
+              m.projectId == result.data?.id &&
+              m.status == MentorIdeaRequestStatus.Approved
+          )
+        : false;
+
+    if (isApproved) {
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant={"secondary"}>
+              <Send />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Approved.</p>
+          </TooltipContent>
+        </Tooltip>
+      );
+    }
+
+    return (
+      <>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant={"secondary"}>
+              <Send />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>You have sent in recently.</p>
+          </TooltipContent>
+        </Tooltip>
+      </>
+    );
+  }
 
   return (
     <>

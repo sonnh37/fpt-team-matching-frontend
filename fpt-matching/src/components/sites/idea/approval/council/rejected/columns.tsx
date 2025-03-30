@@ -90,13 +90,6 @@ export const columns: ColumnDef<IdeaRequest>[] = [
       return value.includes(row.getValue(id));
     },
   },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-    cell: ({ row }) => {
-      return <Actions row={row} />;
-    },
-  },
 ];
 
 interface ActionsProps {

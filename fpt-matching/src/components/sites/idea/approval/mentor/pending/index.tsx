@@ -203,8 +203,13 @@ export function IdeaRequestPendingByMentorTable() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium">
                         Timeline:{" "}
-                        {new Date(stageIdea.startDate).toLocaleString()} -{" "}
-                        {new Date(stageIdea.endDate).toLocaleString()}
+                        {stageIdea.startDate
+                          ? new Date(stageIdea.startDate).toLocaleDateString()
+                          : "N/A"}{" "}
+                        -{" "}
+                        {stageIdea.endDate
+                          ? new Date(stageIdea.endDate).toLocaleDateString()
+                          : "N/A"}
                       </p>
                     </div>
                   </div>
@@ -213,7 +218,9 @@ export function IdeaRequestPendingByMentorTable() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium">
                         Date of results:{" "}
-                        {new Date(stageIdea.resultDate).toLocaleString()}
+                        {stageIdea.resultDate
+                          ? new Date(stageIdea.resultDate).toLocaleDateString()
+                          : "N/A"}
                       </p>
                     </div>
                   </div>

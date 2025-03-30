@@ -17,11 +17,13 @@ import { InvitationStatus } from "@/types/enums/invitation";
 import { MentorIdeaRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Invitation } from "@/types/invitation";
 import { MentorIdeaRequest } from "@/types/mentor-idea-request";
+import { MentorIdeaRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
 import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<MentorIdeaRequest>[] = [
   {
@@ -106,7 +108,9 @@ export const columns: ColumnDef<MentorIdeaRequest>[] = [
 
       return (
         <>
-          {model.status === MentorIdeaRequestStatus.Pending && <Actions row={row} />}
+          {model.status === MentorIdeaRequestStatus.Pending && (
+            <Actions row={row} />
+          )}
         </>
       );
     },
@@ -124,37 +128,47 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
 
   const handleCancel = async () => {
-    // try {
-    //   // Gọi API cancelInvite
-    // //   if (!model.projectId) throw new Error("Project ID is undefined");
-    // //   const res = await invitationService.cancelInvite_(model.projectId);
-    // //   if (res.status != 1) {
-    // //     toast.error(res.message);
-    // //     return;
-    // //   }
+    try {
+      // Gọi API cancelInvite
+      const command: MentorIdeaRequestUpdateCommand = {
+        id: model.id,
+        status: MentorIdeaRequestStatus.Rejected,
+        projectId: model.projectId,
+        ideaId: model.ideaId,
+      };
+      const res = await mentoridearequestService.update(command);
+      if (res.status != 1) {
+        toast.error(res.message);
+        return;
+      }
 
-    // //   toast.success(`Invitation canceled successfully`);
-    // //   queryClient.invalidateQueries({ queryKey: ["data"] });
-    // // } catch (error) {
-    // //   toast.error(error as string);
-    // }
+      toast.success(`Canceled`);
+      queryClient.invalidateQueries({ queryKey: ["data"] });
+    } catch (error) {
+      toast.error(error as string);
+    }
   };
 
   const handleApprove = async () => {
-    // try {
-    //   // Gọi API approveInvite
-    // //   if (!model.projectId) throw new Error("Project ID is undefined");
-    // //   const res = await mentoridearequestService.approveInvite(model.projectId);
-    // //   if (res.status != 1) {
-    // //     toast.error(res.message);
-    // //     return;
-    // //   }
+    try {
+      // Gọi API approveInvite
+      const command: MentorIdeaRequestUpdateCommand = {
+        id: model.id,
+        status: MentorIdeaRequestStatus.Approved,
+        projectId: model.projectId,
+        ideaId: model.ideaId,
+      };
+      const res = await mentoridearequestService.update(command);
+      if (res.status != 1) {
+        toast.error(res.message);
+        return;
+      }
 
-    // //   toast.success(`Invitation approved successfully`);
-    // //   queryClient.invalidateQueries({ queryKey: ["data"] });
-    // // } catch (error) {
-    // //   toast.error(error as string);
-    // }
+      toast.success(`Approved`);
+      queryClient.invalidateQueries({ queryKey: ["data"] });
+    } catch (error) {
+      toast.error(error as string);
+    }
   };
 
   return (

@@ -9,6 +9,7 @@ import axiosInstance from "@/lib/interceptors/axios-instance";
 import { BusinessResultWithoutData } from "@/types/models/responses/business-result-without-data";
 import { MentorIdeaRequest } from "@/types/mentor-idea-request";
 import { MentorIdeaRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
+import { MentorIdeaRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
 
 class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
   constructor() {
@@ -45,6 +46,13 @@ class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
         return this.handleError(error);
       });
   };
+
+  public update = (command: MentorIdeaRequestUpdateCommand): Promise<BusinessResult<MentorIdeaRequest>> => {
+      return axiosInstance
+        .put<BusinessResult<MentorIdeaRequest>>(`${this.endpoint}/status`, command)
+        .then((response) => response.data)
+        .catch((error) => this.handleError(error));
+    };
  
 }
 

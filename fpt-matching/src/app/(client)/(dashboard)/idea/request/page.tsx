@@ -30,6 +30,7 @@ import { useSelectorUser } from "@/hooks/use-auth";
 import { IdeaStatus } from "@/types/enums/idea";
 import { Idea } from "@/types/idea";
 import { Badge } from "@/components/ui/badge";
+import TimeStageIdea from "@/components/_common/time-stage-idea";
 export default function Page() {
   const user = useSelectorUser();
   if (!user) return;
@@ -73,67 +74,19 @@ export default function Page() {
 
   const stageIdea = res_stageIdea?.data;
 
-  const idea_current =
-    res_ideas?.data
-      ?.filter((m) => m.ownerId === user.id)
-      .sort(
-        (a, b) =>
-          new Date(b.createdDate || 0).getTime() -
-          new Date(a.createdDate || 0).getTime()
-      )?.[0];
+  const idea_current = res_ideas?.data
+    ?.filter((m) => m.ownerId === user.id)
+    .sort(
+      (a, b) =>
+        new Date(b.createdDate || 0).getTime() -
+        new Date(a.createdDate || 0).getTime()
+    )?.[0];
 
   const countIdeasByStatus = (status: IdeaStatus) => {
     return res_ideas?.data?.filter((m) => m.status == status).length ?? 0;
   };
   return (
     <>
-      <div className="container pt-3 pb-6 space-y-4">
-        <div className="flex items-center gap-8 space-y-2">
-          <div>
-            <Card className={cn("w-[380px]")}>
-              <CardHeader>
-                <CardTitle>Stage {stageIdea?.stageNumber} idea</CardTitle>
-                <CardDescription>You have new review stages.</CardDescription>
-              </CardHeader>
-              <CardContent className="grid gap-4">
-                {stageIdea ? (
-                  <div className="space-y-4">
-                    <div className="space-y-1">
-                      <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-                        <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium">
-                            Timeline:{" "}
-                            {stageIdea.startDate ? new Date(stageIdea.startDate).toLocaleDateString() : "N/A"} -{" "}
-                            {stageIdea.endDate ? new Date(stageIdea.endDate).toLocaleDateString() : "N/A"}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-                        <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium">
-                            Date of results:{" "}
-                            {stageIdea.resultDate ? new Date(stageIdea.resultDate).toLocaleDateString() : "N/A"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    Không có thông báo mới.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-          {/* <div className="w-full">
-            <HorizontalLinearStepper idea={idea_current} />
-          </div> */}
-        </div>
-        <Separator />
-      </div>
 
       <Tabs defaultValue={tab_1} className="w-full container mx-auto">
         <div className="flex justify-between">
