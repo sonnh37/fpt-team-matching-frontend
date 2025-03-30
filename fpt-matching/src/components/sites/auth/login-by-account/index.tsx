@@ -48,11 +48,11 @@ export const LoginAccountForm = ({
 
   const onSubmit = async (data: FormSchema) => {
     try {
-      if (!data.department) {
+      const department = form.getValues("department");
+      if (department === undefined || department === null) {
         toast.warning("Vui lòng chọn Campus trước khi đăng nhập.");
         return;
       }
-
       const res = await authService.login(
         data.account,
         data.password,
