@@ -23,13 +23,17 @@ export const InformationBaseCard: React.FC<InformationBaseCardProps> = ({
       <CardContent>
         <div className="grid gap-6">
           <div className="grid gap-3">
-            <FormInput
-              form={form}
-              name="createdBy"
-              label="Created By"
-              placeholder="N/A"
+            <Label>Created By</Label>
+            <Button
+              type="button"
               disabled={true}
-            />
+              variant={"outline"}
+              className={cn(
+                "w-full flex flex-row justify-between pl-3 text-left font-normal text-muted-foreground"
+              )}
+            >
+              {initialData?.createdBy ? initialData.createdBy : "Unknown"}
+            </Button>
           </div>
           <div className="grid gap-3">
             <Label>Created Date</Label>
@@ -41,8 +45,8 @@ export const InformationBaseCard: React.FC<InformationBaseCardProps> = ({
                 "w-full flex flex-row justify-between pl-3 text-left font-normal text-muted-foreground"
               )}
             >
-              {initialData?.lastUpdatedDate ? (
-                format(initialData.lastUpdatedDate, "dd/MM/yyyy")
+              {initialData?.createdDate ? (
+                format(initialData.createdDate, "dd/MM/yyyy")
               ) : (
                 <span>{format(new Date(), "dd/MM/yyyy")}</span>
               )}

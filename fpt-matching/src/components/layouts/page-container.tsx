@@ -11,7 +11,7 @@ export default function PageContainer({
   return (
     <>
       {scrollable ? (
-        <ScrollArea>
+        <ScrollArea className='overflow-auto h-full'>
           <div className="py-4">{children}</div>
         </ScrollArea>
       ) : (

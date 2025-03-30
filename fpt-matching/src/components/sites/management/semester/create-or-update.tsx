@@ -12,7 +12,7 @@ import { z } from "zod";
 import { HeaderForm } from "@/components/_common/create-update-forms/header-form";
 import { InformationBaseCard } from "@/components/_common/create-update-forms/information-base-form";
 import { usePreviousPath } from "@/hooks/use-previous-path";
-import ConfirmationDialog, { FormInput } from "@/lib/form-custom-shadcn";
+import ConfirmationDialog, { FormInput, FormInputDate } from "@/lib/form-custom-shadcn";
 import { SemesterCreateCommand } from "@/types/models/commands/semesters/semester-create-command";
 import { SemesterUpdateCommand } from "@/types/models/commands/semesters/semester-update-command";
 import { BusinessResult } from "@/types/models/responses/business-result";
@@ -180,6 +180,17 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                           label="Semester Name"
                           description="This is your public display name."
                           placeholder="Enter name"
+                        />
+
+                        <FormInputDate
+                          form={form}
+                          name="startDate"
+                          label="Start Date"
+                        />
+                        <FormInputDate
+                          form={form}
+                          name="endDate"
+                          label="End Date"
                         />
 
                         <FormInput

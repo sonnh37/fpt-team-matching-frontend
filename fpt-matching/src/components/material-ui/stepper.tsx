@@ -16,6 +16,7 @@ import { IdeaRequestStatus } from "@/types/enums/idea-request";
 import { Idea } from "@/types/idea";
 import { Box, Button, Typography } from "@mui/material";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { useCallback } from "react";
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -169,169 +170,137 @@ function ColorlibStepIcon(props: StepIconProps) {
 }
 interface StepperProps {
   label: string;
-  status?: string;
+  status?: "pending" | "approved" | "rejected" | "skipped";
+  optionalLabel?: string;
 }
-const steps: StepperProps[] = [
-  {
-    label: "Mentor",
-  },
-  {
-    label: "Council",
-  },
-  {
-    label: "Finish",
-  },
-];
 
 interface HorizontalLinearStepperProps {
   idea?: Idea;
 }
+
 export default function HorizontalLinearStepper({
   idea,
 }: HorizontalLinearStepperProps) {
-  if (!idea) return;
+  if (!idea) return null;
   const user = useSelectorUser();
-  if (!user) return;
-  const idea_request = idea.ideaRequests;
-  const totalCouncilApprove = idea_request?.filter(
-    (req) => req.status === IdeaRequestStatus.Approved && req.role === "Council"
-  ).length;
+  if (!user) return null;
 
-  const totalCouncil = idea_request?.filter(
-    (req) => req.role === "Council"
-  ).length;
-
-  const isStudent = user?.userXRoles.some((m) => m.role?.roleName == "Student");
-
-  const totalCouncilPending = idea_request?.filter(
-    (req) => req.status === IdeaRequestStatus.Pending && req.role === "Council"
-  ).length;
-
-  console.log("check", totalCouncilPending);
-
-  const isResultDay = idea.stageIdea?.resultDate
-    ? new Date(idea.stageIdea.resultDate).getTime() < Date.now()
-    : false;
-
-  const isMentorApprove = idea_request?.some(
-    (req) => req.status === IdeaRequestStatus.Approved && req.role === "Mentor"
-  );
-  const isMentorRejected = idea_request?.some(
-    (req) => req.status === IdeaRequestStatus.Rejected && req.role === "Mentor"
-  );
-  // xét thêm && stageIdea
-  const isCouncilApprove = totalCouncilApprove >= 2;
-  const isCouncilRejected = totalCouncilApprove < 2;
+  // State management
   const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set<number>());
+  const [steps, setSteps] = React.useState<StepperProps[]>([]);
 
-  const isStepOptional = (step: number) => {
-    return step === -1;
-  };
+  // Derived data calculation
+  const calculateStepData = useCallback(() => {
+    const ideaRequests = idea.ideaRequests || [];
+    const isStudent = user.userXRoles?.some(
+      (m) => m.role?.roleName === "Student"
+    );
+    const isLecturer = user.userXRoles?.some(
+      (m) => m.role?.roleName === "Lecturer"
+    );
+    const resultDate = idea.stageIdea?.resultDate
+      ? new Date(idea.stageIdea.resultDate)
+      : null;
+    const isResultDay = resultDate ? resultDate.getTime() <= Date.now() : false;
 
-  const isStepSkipped = (step: number) => {
-    return skipped.has(step);
-  };
+    const mentorApproval = ideaRequests.find((req) => req.role === "Mentor");
+    const councilApprovals = ideaRequests.filter(
+      (req) => req.role === "Council"
+    );
 
-  const handleNext = () => {
-    let newSkipped = skipped;
-    if (isStepSkipped(activeStep)) {
-      newSkipped = new Set(newSkipped.values());
-      newSkipped.delete(activeStep);
+    const isMentorApproved =
+      mentorApproval?.status === IdeaRequestStatus.Approved;
+    const isMentorRejected =
+      mentorApproval?.status === IdeaRequestStatus.Rejected;
+
+    const totalCouncilApproved = councilApprovals.filter(
+      (req) => req.status === IdeaRequestStatus.Approved
+    ).length;
+
+    const isCouncilApproved = isResultDay && totalCouncilApproved >= 2;
+    const isCouncilRejected =
+      isResultDay && !isCouncilApproved && councilApprovals.length > 0;
+
+    // Step configuration
+    const newSteps: StepperProps[] = [
+      {
+        label: "Create Idea",
+        status: "approved",
+      },
+      {
+        label: "Mentor Approval",
+        status: isMentorRejected
+          ? "rejected"
+          : isMentorApproved
+          ? "approved"
+          : "pending",
+        optionalLabel: isMentorRejected ? "Rejected" : undefined,
+      },
+      {
+        label: "Council Approval",
+        status: isCouncilRejected
+          ? "rejected"
+          : isCouncilApproved
+          ? "approved"
+          : "pending",
+        optionalLabel: isCouncilRejected ? "Rejected" : undefined,
+      },
+    ];
+
+    // Active step calculation
+    let newActiveStep = 0;
+    if (isLecturer && councilApprovals.length === 0) {
+      newActiveStep = 1;
+    } else if (isStudent) {
+      if (isMentorApproved && !isCouncilApproved) newActiveStep = 1;
+      if (isResultDay) {
+        if (isCouncilApproved) newActiveStep = 2;
+      }
     }
 
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped(newSkipped);
-  };
+    return { newSteps, newActiveStep };
+  }, [idea, user]);
 
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  const handleSkip = () => {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
-
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped((prevSkipped) => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  };
-
-  const handleReset = () => {
-    setActiveStep(0);
-  };
-
-  const isStepFailed = (step: number) => {
-    return step === -1;
-  };
-
-  const isLecturer = user?.userXRoles.some(
-    (m) => m.role?.roleName == "Lecturer"
-  );
+  // Effect for updating steps and active step
   React.useEffect(() => {
-    if (idea) {
-      if (isLecturer && totalCouncil == 0) {
-        console.log("first step");
-        setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        return;
-      }
-      if (isStudent) {
-        if (isMentorApprove) {
-          console.log("first step");
-          setActiveStep((prevActiveStep) => prevActiveStep + 1);
-        }
-        if (isCouncilApprove && isResultDay) {
-          console.log("two step");
-          setActiveStep((prevActiveStep) => prevActiveStep + 2);
-        }
-      }
-    } else {
-      setActiveStep((prevActiveStep) => prevActiveStep + 0);
-    }
-  }, [idea]);
+    const { newSteps, newActiveStep } = calculateStepData();
+    setSteps(newSteps);
+    setActiveStep(newActiveStep);
+  }, [calculateStepData]);
 
+  // Render function remains the same
   return (
     <Box sx={{ width: "100%" }}>
-      <Stepper activeStep={activeStep}>
+      <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map((step, index) => {
           const stepProps: { completed?: boolean } = {};
-          const labelProps: {
-            optional?: React.ReactNode;
-            error?: boolean;
-          } = {};
+          const labelProps: { optional?: React.ReactNode; error?: boolean } =
+            {};
 
-          if (isMentorRejected && index == 0) {
+          if (step.status === "rejected") {
             labelProps.optional = (
               <Typography variant="caption" color="error">
-                Rejected
+                {step.optionalLabel || "Rejected"}
               </Typography>
             );
             labelProps.error = true;
           }
 
-          if (
-            (totalCouncilPending > 0 ||
-              (isMentorApprove && isCouncilRejected)) &&
-            isResultDay &&
-            index == 1
-          ) {
-            labelProps.optional = (
-              <Typography variant="caption" color="error">
-                Rejected
-              </Typography>
-            );
-            labelProps.error = true;
+          if (step.status === "approved") {
+            stepProps.completed = true;
           }
 
           return (
-            <Step key={step.label} {...stepProps}>
-              <StepLabel {...labelProps}>{step.label}</StepLabel>
+            <Step key={`${step.label}-${index}`} {...stepProps}>
+              <StepLabel {...labelProps}>
+                {step.label}
+                {/* {idea.stageIdea?.resultDate && index === steps.length - 1 && (
+                  <Typography variant="caption" display="block">
+                    Deadline:{" "}
+                    {new Date(idea.stageIdea.resultDate).toLocaleDateString()}
+                  </Typography>
+                )} */}
+              </StepLabel>
             </Step>
           );
         })}

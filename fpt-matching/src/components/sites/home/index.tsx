@@ -47,12 +47,10 @@ import { ProjectGetAllQuery } from "@/types/models/queries/projects/project-get-
 
 //#region INPUT
 const defaultSchema = z.object({
-  idea: z.object({
-    englishName: z.string().optional(),
-    type: z.string().optional(),
-    specialtyId: z.string().optional(),
-    professionId: z.string().optional(),
-  }).optional()
+  englishName: z.string().optional(),
+  type: z.string().optional(),
+  specialtyId: z.string().optional(),
+  professionId: z.string().optional(),
 });
 //#endregion
 export default function ProjectSearchList() {
@@ -163,7 +161,7 @@ export default function ProjectSearchList() {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
                 control={form.control}
-                name="idea.englishName"
+                name="englishName"
                 render={({ field }) => {
                   return (
                     <FormItem>
@@ -190,7 +188,7 @@ export default function ProjectSearchList() {
               <div className="flex gap-2">
                 <FormField
                   control={form.control}
-                  name="idea.professionId"
+                  name="professionId"
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel>Profession</FormLabel>
@@ -220,7 +218,7 @@ export default function ProjectSearchList() {
                 />
                 <FormField
                   control={form.control}
-                  name="idea.specialtyId"
+                  name="specialtyId"
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormLabel>Specialty</FormLabel>
