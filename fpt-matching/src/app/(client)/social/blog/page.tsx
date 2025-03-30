@@ -27,7 +27,6 @@ import {
 import {
   Pagination
 } from "@/components/ui/pagination"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Meteors } from '@/components/ui/meteors'
@@ -50,6 +49,7 @@ import UploadCv from '@/components/_common/uploadCv/upload-cv';
 import { DirectionAwareHover } from '@/components/ui/direction-aware-hover';
 import { FaXTwitter, FaFacebookF, FaGithub, FaInstagram, FaTwitch, FaMastodon } from "react-icons/fa6";
 import { PiButterflyFill, PiGearSixBold } from 'react-icons/pi';
+import { Button } from '@/components/ui/moving-border';
 
 
 
@@ -205,7 +205,7 @@ export default function Blog() {
     <div className='bg-slate-100'>
       <div className='blog-center flex flex-row max-w-screen-2xl h-auto mx-auto bg-[#f5f5f5] '>
         {/* blog left */}
-        <div className='blog-left basis-1/5 bg-[#f5f5f5] bg-orange-400 max-h-fit pl-3 pb-3'>
+        <div className='blog-left basis-1/5 bg-[#f5f5f5] max-h-fit pl-3 pb-3'>
           <aside className="hidden w-64 md:block min-h-screen">
 
             <div className="h-[30px] my-40  flex items-center justify-center">
@@ -314,7 +314,7 @@ export default function Blog() {
                 <PiGearSixBold className="text-gray-700 text-xl" />
               </div>
             </div>
-      
+
 
 
           </aside>
@@ -1111,30 +1111,30 @@ export default function Blog() {
               </div>
             </div>
           </div> */}
-                <div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3">
-              <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
-              <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>
+          <div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">
+            <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
+            <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>
 
-              {!user?.id && (
-                <>
-                  <a href="">
-                    <div className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
-                      Login
-                    </div>
-                  </a>
-                  <a href="">
-                    <div className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
-                      Register
-                    </div>
-                  </a>
-                </>
-              )}
+            {!user?.id && (
+              <>
+                <a href="">
+                  <div className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
+                    Login
+                  </div>
+                </a>
+                <a href="">
+                  <div className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
+                    Register
+                  </div>
+                </a>
+              </>
+            )}
 
-            </div>
+          </div>
           <div className='box-title'>
             <div className=" w-full relative max-w-xs mx-3 m-3">
               <div className="absolute inset-0 h-full w-full  rounded-md " />
-              <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-md flex flex-col justify-end items-start">
+              <div className="relative shadow-xl bg-white border border-gray-200   py-4 h-full overflow-hidden rounded-md flex flex-col justify-end items-start">
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
                     <h1 className='text-xl text-black font-semibold'># 💬🧐 Discuss</h1>
@@ -1168,7 +1168,7 @@ export default function Blog() {
           <div className='box-info'>
             <div className=" w-full relative max-w-xs mx-3 m-3">
               <div className="absolute inset-0 h-full w-full bg-gradient-to-r transform scale-[0.80] rounded-md blur-3xl" />
-              <div className="relative shadow-xl bg-gray-100 border border-gray-200   py-4 h-full overflow-hidden rounded-md flex flex-col justify-end items-start">
+              <div className="relative shadow-xl bg-white border border-gray-200   py-4 h-full overflow-hidden rounded-md flex flex-col justify-end items-start">
                 <div className='w-full border-b-2 border-gray-200   '>
                   <div className=' mx-3'>
                     <h1 className='text-xl text-black font-semibold'># 🔔 Notification</h1>
@@ -1200,25 +1200,34 @@ export default function Blog() {
             </div>
           </div>
 
-          <div className='box-trending'>
-            <div className='w-full h-auto  px-2 py-2'>
-              <div className='text-black  text-lg font-semibold'>🔥🔥 Trending</div>
-              <div className='title-trending p-3  hover:bg-white hover:text-blue-900 '>
-                <h2 className=" mb-2 z-50 w-full ">
-                  Thu va Loc sang ngay bi ia chay
-                </h2>
-              </div>
-              <div className='title-trending p-3 w-full hover:bg-white hover:text-blue-900'>
-                <h2 className=" mb-2 ">
-                  Thu va Loc sang ngay bi ia chay
-                </h2>
-              </div>
-              <div className='title-trending p-3 w-full  hover:bg-white hover:text-blue-900'>
-                <h2 className=" mb-2 ">
-                  Thu va Loc sang ngay bi ia chay
-                </h2>
-              </div>
+          <div className='box-trending ml-4 bg-white border-gray-200 rounded-lg  shadow-lg'
+          >
+            <div className='w-full h-auto  px-3 py-3'>
+             
+                <div className='text-black  text-lg font-semibold pl-11'>🔥🔥 Trending 🔥🔥</div>
+                <div className='title-trending p-3 pl-6  hover:bg-gray-100 hover:text-blue-900 '>
+                  <h2 className=" mb-2 z-50 w-full ">
+                    1. Thu va Loc sang ngay bi ia chay do ăn gì đó xung quanh trường ?
+                  </h2>
+                </div>
+                <div>
+
+
+
+                </div>
+                <div className='title-trending p-3 pl-6 w-full hover:bg-gray-100 hover:text-blue-900'>
+                  <h2 className=" mb-2 ">
+                    2. Chuyện tình cực hot của 2 nam sinh Sơn Lộc
+                  </h2>
+                </div>
+                <div className='title-trending p-3 pl-6 w-full  hover:bg-gray-100 hover:text-blue-900'>
+                  <h2 className=" mb-2 ">
+                    3.  Anh thanh niên đẹp trai quá tài năng tên Q
+                  </h2>
+                </div>
+          
             </div>
+
           </div>
         </div>
       </div>
