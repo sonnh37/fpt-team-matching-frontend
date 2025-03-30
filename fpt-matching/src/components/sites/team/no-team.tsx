@@ -12,7 +12,7 @@ import {
 import { LuUsersRound } from "react-icons/lu";
 import { TbUsersPlus } from "react-icons/tb";
 import { TeamForm } from "@/components/sites/team/create";
-export const PageNoTeam = () => {
+export const NoTeam = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const showCreateModal = searchParams.get("create") === "true";

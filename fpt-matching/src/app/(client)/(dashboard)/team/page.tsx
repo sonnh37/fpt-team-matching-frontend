@@ -41,7 +41,7 @@ import { Button } from "@/components/ui/button";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
 import Link from "next/link";
 import { TypographyH4 } from "@/components/_common/typography/typography-h4";
-import { PageNoTeam } from "./page-no-team/page";
+import { NoTeam } from "@/components/sites/team/no-team";
 
 // const groupData = {
 //   title: "FPT Team Matching - Social networking for students project teams",
@@ -85,11 +85,11 @@ export default function TeamInfo() {
     return <ErrorSystem />;
   }
   if (result?.status == -1) {
-    return <PageNoTeam />;
+    return <NoTeam />;
   }
 
   const project = result?.data;
-  if (!project) return <PageNoTeam />;
+  if (!project) return <NoTeam />;
 
   const infoMember = project?.teamMembers?.find(
     (member) => member.userId === user?.id
