@@ -46,33 +46,34 @@ export const LoginAccountForm = ({
     },
   });
 
-  const onSubmit = (data: FormSchema) => {
+  const onSubmit = async (data: FormSchema) => {
     try {
-      if (data.department === null || data.department === undefined) {
+      if (!data.department) {
         toast.warning("Vui lòng chọn Campus trước khi đăng nhập.");
         return;
       }
 
-      authService
-        .login(data.account, data.password, data.department!)
-        .then((res) => {
-          if (res.status != 1) {
-            toast.warning(res.message);
-            return;
-          }
-          toast.success("Chào mừng bạn đã đến với FPT Team Matching");
-          window.location.href = "/";
-        });
+      const res = await authService.login(
+        data.account,
+        data.password,
+        data.department
+      );
+      if (res.status != 1) {
+        toast.warning(res.message);
+        return;
+      }
+
+      localStorage.setItem("showToast", "true");
+      window.location.href = "/";
     } catch (error: any) {
       console.error(error);
       toast.error(error.message);
     }
   };
-
   return (
     <Form {...form}>
       <div className={cn("flex flex-col gap-6", className)} {...props}>
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden border-0">
           <CardContent className="grid p-0 md:grid-cols-2">
             <form className="p-6 md:p-8" onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-6">

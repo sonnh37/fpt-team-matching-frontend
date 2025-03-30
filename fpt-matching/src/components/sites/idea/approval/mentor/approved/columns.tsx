@@ -181,12 +181,12 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         <div className="flex gap-2">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button
+               <Button
                 size="sm"
-                variant={"default"}
+                variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 // disabled={hasCouncilRequests}
               >
-                View
+                View {hasCouncilRequests ? "(Sent)" : ""}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">

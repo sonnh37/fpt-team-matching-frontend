@@ -61,7 +61,7 @@ const formSchema = z.object({
     .min(2, { message: "English Title must be at least 2 characters." }),
   maxTeamSize: z
     .number({ invalid_type_error: "Team size must be a number." })
-    .gte(2, { message: "Team size must be at least 2." }),
+    .gte(4, { message: "Team size must be at least 4." }),
   abbreviations: z
     .string()
     .max(20, { message: "Abbreviation must be less than 20 characters." }),
@@ -105,7 +105,7 @@ const CreateProjectForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      maxTeamSize: 2,
+      maxTeamSize: 4,
     },
   });
 
@@ -480,7 +480,7 @@ const CreateProjectForm = () => {
                         <SelectValue placeholder={"Select team size"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {[2, 3, 4, 5, 6].map((option) => (
+                        {[4, 5, 6].map((option) => (
                           <SelectItem key={option} value={option.toString()}>
                             {option}
                           </SelectItem>

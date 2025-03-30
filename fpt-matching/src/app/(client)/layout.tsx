@@ -1,14 +1,10 @@
 "use client";
 import { RootState } from "@/lib/redux/store";
 
-import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-const Header = dynamic(
-  () => import("@/components/layouts/navbar/header").then((mod) => mod.Header),
-  { ssr: false }
-);
+import { toast } from "sonner";
 export default function ClientLayout({
   children,
 }: {
@@ -16,6 +12,7 @@ export default function ClientLayout({
 }) {
   const router = useRouter();
   const user = useSelector((state: RootState) => state.user.user);
+
   useEffect(() => {
     if (!user) {
       router.replace("/login");
@@ -23,6 +20,11 @@ export default function ClientLayout({
   }, [user, router]);
 
   if (!user) return null;
+
+  if (localStorage.getItem("showToast") === "true") {
+    toast.success(`Chào mừng ${user.firstName} đến với hệ sinh thái kết nối tài năng FPT! 🌍`);
+    localStorage.removeItem("showToast");
+  }
 
   return <>{children}</>;
 }

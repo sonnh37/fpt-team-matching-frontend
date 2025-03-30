@@ -21,9 +21,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { ideaService } from "@/services/idea-service";
+import { projectService } from "@/services/project-service";
 import { professionService } from "@/services/profession-service";
-import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { Profession } from "@/types/profession";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -43,18 +42,18 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
-import { IdeaStatus } from "@/types/enums/idea";
+import { ProjectStatus } from "@/types/enums/project";
+import { ProjectGetAllQuery } from "@/types/models/queries/projects/project-get-all-query";
 
 //#region INPUT
 const defaultSchema = z.object({
   englishName: z.string().optional(),
   type: z.string().optional(),
-  major: z.string().optional(),
   specialtyId: z.string().optional(),
   professionId: z.string().optional(),
 });
 //#endregion
-export default function IdeaSearchList() {
+export default function ProjectSearchList() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -105,15 +104,10 @@ export default function IdeaSearchList() {
 
   // default field in table
   const queryParams = useMemo(() => {
-    const params: IdeaGetAllQuery = useQueryParams(
-      inputFields,
-      columnFilters,
-      pagination,
-      sorting
-    );
-
-    params.isExistedTeam = true;
-    params.status = IdeaStatus.Approved;
+    const params: ProjectGetAllQuery = {
+      ...useQueryParams(inputFields, columnFilters, pagination, sorting),
+      isHasTeam: true,
+    };
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -129,7 +123,7 @@ export default function IdeaSearchList() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaService.fetchPaginated(queryParams),
+    queryFn: () => projectService.fetchPaginated(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -277,8 +271,8 @@ export default function IdeaSearchList() {
             />
           ) : (
             <DataTableComponent
-              deletePermanent={ideaService.deletePermanent}
-              restore={ideaService.restore}
+              deletePermanent={projectService.deletePermanent}
+              restore={projectService.restore}
               table={table}
             />
           )}

@@ -21,8 +21,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ideaService } from "@/services/idea-service";
-import { Idea } from "@/types/idea";
+import { projectService } from "@/services/project-service";
+import { Project } from "@/types/project";
 import { MoreHorizontal } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -35,18 +35,21 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { formatDate } from "@/lib/utils";
 import { TypographyH3 } from "@/components/_common/typography/typography-h3";
 import { TypographyLead } from "@/components/_common/typography/typography-lead";
-export const columns: ColumnDef<Idea>[] = [
+import { Idea } from "@/types/idea";
+import { User } from "@/types/user";
+export const columns: ColumnDef<Project>[] = [
   {
-    accessorKey: "name",
+    accessorKey: "englishName",
     header: ({ column }) => null,
     cell: ({ row }) => {
       const model = row.original;
 
       const id = model.id;
-      const englishName = model.englishName;
-      const vietNamName = model.vietNamName;
-      const createdDate = model.createdDate;
-      const user = model.owner!;
+      const idea = model.idea ?? ({} as Idea);
+      const englishName = idea.englishName;
+      const vietNamName = idea.vietNamName;
+      const createdDate = idea.createdDate;
+      const user = idea.owner ?? ({} as User);
       const createdBy = model.createdBy;
 
       const initials = `${user.firstName?.charAt(0).toUpperCase() ?? ""}${
@@ -65,7 +68,7 @@ export const columns: ColumnDef<Idea>[] = [
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
-                  <Link href={`/team-detail/${model.project?.id}`}>
+                    <Link href={`/team-detail/${id}`}>
                       <TypographyH3>{englishName}</TypographyH3>
                     </Link>
                   </TooltipTrigger>
@@ -102,7 +105,7 @@ export const columns: ColumnDef<Idea>[] = [
 ];
 
 interface ActionsProps {
-  row: Row<Idea>;
+  row: Row<Project>;
 }
 
 const Actions: React.FC<ActionsProps> = ({ row }) => {
@@ -132,9 +135,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           >
             Copy model ID
           </DropdownMenuItem>
-          {/*<DropdownMenuItem onClick={handleIdeasClick}>*/}
-          {/*    View photos*/}
-          {/*</DropdownMenuItem>*/}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleEditClick}>Edit</DropdownMenuItem>
           <DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>
@@ -144,7 +144,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         </DropdownMenuContent>
       </DropdownMenu>
       <DeleteBaseEntitysDialog
-        deleteById={ideaService.delete}
+        deleteById={projectService.delete}
         open={showDeleteTaskDialog}
         onOpenChange={setShowDeleteTaskDialog}
         list={[model]}

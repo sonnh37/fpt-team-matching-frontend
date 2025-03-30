@@ -79,7 +79,9 @@ const Page = () => {
                              <div>
                                  {reviewDetails.project?.idea?.englishName}
                              </div>
-                            <div></div>
+                            <div>
+                                <Button variant={"default"}>Chỉnh sửa đề tài</Button>
+                            </div>
                         </div>
                         <div className={"w-full"}>
                             <Card className="w-full mt-4">

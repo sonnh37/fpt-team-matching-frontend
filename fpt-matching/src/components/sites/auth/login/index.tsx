@@ -8,9 +8,7 @@ import { cn, getEnumOptions } from "@/lib/utils";
 import { authService } from "@/services/auth-service";
 import { Department } from "@/types/enums/user";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  useGoogleLogin
-} from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -54,7 +52,7 @@ export const LoginGoogleForm = ({
             toast.warning(res.message);
             return;
           }
-          toast.success("Chào mừng bạn đã đến với FPT Team Matching");
+          localStorage.setItem("showToast", "true");
           window.location.href = "/";
         });
     },
@@ -76,7 +74,7 @@ export const LoginGoogleForm = ({
   return (
     <Form {...form}>
       <div className={cn("flex flex-col gap-6", className)} {...props}>
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden border-0">
           <CardContent className="grid p-0 md:grid-cols-2">
             <form className="p-6 md:p-8" onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-6">
@@ -94,7 +92,7 @@ export const LoginGoogleForm = ({
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                  <Button variant="outline" className="w-full" type="submit">
+                  <Button variant="default" className="w-full" type="submit">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       viewBox="0 0 24 24"
