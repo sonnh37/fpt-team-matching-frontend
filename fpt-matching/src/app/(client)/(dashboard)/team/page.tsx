@@ -323,7 +323,7 @@ export default function TeamInfo() {
                                       <DropdownMenuContent>
                                         <DropdownMenuItem>
                                           <a
-                                            href={`/profile-detail/${member.user?.id}`}
+                                            href={`/social/blog/profile-social/${member.user?.id}`}
                                           >
                                             Xem profile
                                           </a>
@@ -349,7 +349,7 @@ export default function TeamInfo() {
                                         <DropdownMenuItem>
                                           {" "}
                                           <a
-                                            href={`/profile-detail/${member.user?.id}`}
+                                            href={`/social/blog/profile-social/${member.user?.id}`}
                                           >
                                             Xem profile
                                           </a>
@@ -506,7 +506,7 @@ export default function TeamInfo() {
                                       <DropdownMenuContent>
                                         <DropdownMenuItem>
                                           <a
-                                            href={`/profile-detail/${member.user?.id}`}
+                                            href={`/social/blog/profile-social/${member.user?.id}`}
                                           >
                                             Xem profile
                                           </a>
@@ -532,7 +532,7 @@ export default function TeamInfo() {
                                         <DropdownMenuItem>
                                           {" "}
                                           <a
-                                            href={`/profile-detail/${member.user?.id}`}
+                                            href={`/social/blog/profile-social/${member.user?.id}`}
                                           >
                                             Xem profile
                                           </a>
