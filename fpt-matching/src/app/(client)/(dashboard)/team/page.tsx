@@ -34,7 +34,6 @@ import { TypographyP } from "@/components/_common/typography/typography-p";
 import { useRouter } from "next/navigation";
 import { teammemberService } from "@/services/team-member-service";
 import ErrorSystem from "@/components/_common/errors/error-system";
-import PageNoTeam from "./page-no-team/page";
 import { useEffect } from "react";
 import { TypographyLead } from "@/components/_common/typography/typography-lead";
 import { TypographyH3 } from "@/components/_common/typography/typography-h3";
@@ -42,6 +41,7 @@ import { Button } from "@/components/ui/button";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
 import Link from "next/link";
 import { TypographyH4 } from "@/components/_common/typography/typography-h4";
+import { NoTeam } from "@/components/sites/team/no-team";
 
 // const groupData = {
 //   title: "FPT Team Matching - Social networking for students project teams",
@@ -85,11 +85,11 @@ export default function TeamInfo() {
     return <ErrorSystem />;
   }
   if (result?.status == -1) {
-    return <PageNoTeam />;
+    return <NoTeam />;
   }
 
   const project = result?.data;
-  if (!project) return <PageNoTeam />;
+  if (!project) return <NoTeam />;
 
   const infoMember = project?.teamMembers?.find(
     (member) => member.userId === user?.id
@@ -127,8 +127,22 @@ export default function TeamInfo() {
 
     if (confirmed) {
       // Người dùng chọn Yes
-      toast.success("Item deleted!");
-      // Thực hiện xóa
+      const data = await teammemberService.deletePermanent(
+        leaders[0].id as string
+      );
+      if (data.status === 1) {
+        const data_ = await projectService.deletePermanent(
+          project?.id as string
+        );
+        if (data_.status === 1) {
+          refetch();
+          toast.success("Bạn đã xóa nhóm");
+        } else {
+          toast.error("Fail");
+        }
+      } else {
+        toast.error("Fail");
+      }
     }
   }
 
@@ -436,7 +450,10 @@ export default function TeamInfo() {
                 <TypographyP className="text-red-600">
                   Not have idea yet.{" "}
                   <Button variant="link" className="p-0 m-0" asChild>
-                    <Link className="text-red-600 font-semibold" href="/idea/supervisors">
+                    <Link
+                      className="text-red-600 font-semibold"
+                      href="/idea/supervisors"
+                    >
                       Click hear to view list idea from lecturer
                     </Link>
                   </Button>
