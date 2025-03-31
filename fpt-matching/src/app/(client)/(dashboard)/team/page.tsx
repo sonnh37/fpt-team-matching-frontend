@@ -55,6 +55,8 @@ import { useCurrentRole } from "@/hooks/use-current-role";
 import { Badge } from "@/components/ui/badge";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import InvitationsInComingToLeaderTable from "@/components/sites/team/request-join-team-incoming";
+import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/invitation-get-by-status-query";
+import { invitationService } from "@/services/invitation-service";
 // const groupData = {
 //   title: "FPT Team Matching - Social networking for students project teams",
 //   createdAt: "1/2/2025 7:25:37 PM",
@@ -82,6 +84,9 @@ export default function TeamInfo() {
   const [teamName, setTeamName] = useState("");
   const confirm = useConfirm();
   const queryClient = useQueryClient();
+
+ 
+
   //goi api bang tanstack
   const {
     data: result,
@@ -95,6 +100,7 @@ export default function TeamInfo() {
     refetchOnWindowFocus: false,
   });
 
+ 
   useEffect(() => {
     if (result?.data?.teamName) {
       setTeamName(result.data.teamName);
@@ -102,7 +108,7 @@ export default function TeamInfo() {
   }, [result?.data?.teamName]);
 
   if (isLoading) return <LoadingComponent />;
-  if (!result || isError) {
+  if (isError) {
     console.error("Error fetching:", error);
     return <ErrorSystem />;
   }
@@ -112,6 +118,7 @@ export default function TeamInfo() {
 
   const project = result?.data;
   if (!project) return <NoTeam />;
+  const isLockProject = project.idea != undefined ? true : false;
 
   const handleSave = async () => {
     // Gọi API để lưu tên mới ở đây
@@ -149,8 +156,6 @@ export default function TeamInfo() {
     result?.data?.teamMembers?.find((member) => member.userId === user?.id)
       ?.role === TeamMemberRole.Leader;
 
-  console.log("check_isleader", isLeader);
-
   const teamMembers = result?.data?.teamMembers ?? [];
   // Tách Leader ra trước
   const leaders = teamMembers.filter(
@@ -173,6 +178,9 @@ export default function TeamInfo() {
   }
   //Đây là form delete trả về true false tái sử dụng được
   async function handleDelete() {
+    if (isLockProject) {
+      toast.warning("This project is locked and cannot be deleted.");
+    }
     // Gọi confirm để mở dialog
     const confirmed = await confirm({
       title: "Delete Item",
@@ -194,6 +202,9 @@ export default function TeamInfo() {
   }
 
   async function handleLeaveTeam() {
+    if (isLockProject) {
+      toast.warning("This project is locked and cannot be leave.");
+    }
     // Gọi confirm để mở dialog
     const confirmed = await confirm({
       title: "Delete Item",
@@ -214,7 +225,9 @@ export default function TeamInfo() {
   }
 
   async function handleDeleteMember(id: string) {
-    console.log("testid", id);
+    if (isLockProject) {
+      toast.warning("This project is locked and cannot be deleted member.");
+    }
     if (!id) {
       toast("Invalid member ID!");
       return;
@@ -245,7 +258,6 @@ export default function TeamInfo() {
       m.status == InvitationStatus.Pending
   );
 
-  const isLockProject = project.idea != undefined ? true : false;
   return (
     <div className="grid grid-cols-4 p-4 gap-4">
       <div className="col-span-3 space-y-2">
@@ -296,7 +308,7 @@ export default function TeamInfo() {
                   <DialogTrigger asChild>
                     <Button
                       variant="ghost"
-                      disabled={isLockProject}
+                       disabled={isLockProject}
                       size="icon"
                       className="relative"
                     >

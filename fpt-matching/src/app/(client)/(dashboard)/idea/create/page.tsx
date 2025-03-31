@@ -51,6 +51,13 @@ import {
 import { useSelectorUser } from "@/hooks/use-auth";
 import { semesterService } from "@/services/semester-service";
 import { stageideaService } from "@/services/stage-idea-service";
+import { NoTeam } from "@/components/sites/team/no-team";
+import { HasTeam } from "@/components/sites/team/has-team";
+import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
+import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
+import { invitationService } from "@/services/invitation-service";
+import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/invitation-get-by-status-query";
+import { AlertMessage } from "@/components/_common/alert-message";
 // Các đuôi file cho phép
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
@@ -91,6 +98,12 @@ const formSchema = z.object({
 });
 
 const CreateProjectForm = () => {
+  const user = useSelectorUser();
+  if (!user) return;
+  const isStudent = user?.userXRoles.some((m) => m.role?.roleName == "Student");
+  const isLecturer = user?.userXRoles.some(
+    (m) => m.role?.roleName == "Lecturer"
+  );
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedProfession, setSelectedProfession] =
     useState<Profession | null>(null);
@@ -99,8 +112,16 @@ const CreateProjectForm = () => {
   const [isError, setIsError] = useState(false);
   const [isNotUpdateSettingYet, setIsNotUpdateSettingYet] = useState(false);
   const [showPageIsIdea, setShowPageIsIdea] = useState(false);
-
   const router = useRouter();
+  const query: UserGetAllQuery = {
+    role: "Lecturer",
+  };
+
+  const query_invitations: InvitationGetByStatudQuery = {
+    status: InvitationStatus.Pending,
+    pageNumber: 1,
+    pageSize: 100,
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -109,9 +130,33 @@ const CreateProjectForm = () => {
     },
   });
 
-  const query: UserGetAllQuery = {
-    role: "Lecturer",
-  };
+  const isEnterpriseIdea = form.watch("isEnterpriseTopic");
+
+  const {
+    data: result_project,
+    isLoading: isLoadingProject,
+    isError: isErrorProject,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["getProjectInfo"],
+    queryFn: projectService.getProjectInfo,
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    data: result_invitations,
+    isLoading: isLoadingInvitations,
+    isError: isErrorInvitations,
+    error: error_invitations,
+  } = useQuery({
+    queryKey: ["getUserInvitationsByType", query_invitations],
+    queryFn: async () =>
+      await invitationService.getUserInvitationsStatus(query_invitations),
+    refetchOnWindowFocus: false,
+  });
+
+  const invitationPendings = result_invitations?.data?.results ?? [];
 
   const { data: result } = useQuery({
     queryKey: ["getUsersByRole", query],
@@ -120,13 +165,6 @@ const CreateProjectForm = () => {
   });
 
   const users = result?.data ?? [];
-  const user = useSelectorUser();
-  if (!user) return;
-
-  const isStudent = user?.userXRoles.some((m) => m.role?.roleName == "Student");
-  const isLecturer = user?.userXRoles.some(
-    (m) => m.role?.roleName == "Lecturer"
-  );
 
   useEffect(() => {
     if (users.length > 0 && users[0].id !== undefined) {
@@ -202,8 +240,20 @@ const CreateProjectForm = () => {
     checkIdea();
   }, []);
 
-  if (isLoading) return <LoadingComponent />;
-  if (isError) return <ErrorSystem />;
+  if (!user) return null;
+  if (isLoadingProject || isLoading || isLoadingInvitations)
+    return <LoadingComponent />;
+  if (isErrorProject || isError || isErrorInvitations) return <ErrorSystem />;
+
+  if (result_project?.status == 1) return <HasTeam />;
+  if (invitationPendings.length > 0)
+    return (
+      <AlertMessage
+        message="You already have a request for some team"
+        messageType="error"
+      />
+    );
+  if (showPageIsIdea) return <PageIsIdea />;
 
   //Tao idea
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -250,11 +300,6 @@ const CreateProjectForm = () => {
     const userId = event.target.value;
     setSelectedUserId(userId); // Lưu ID
   };
-
-  const isEnterpriseIdea = form.watch("isEnterpriseTopic");
-
-  if (showPageIsIdea) return <PageIsIdea />;
-
   return (
     <Form {...form}>
       <form

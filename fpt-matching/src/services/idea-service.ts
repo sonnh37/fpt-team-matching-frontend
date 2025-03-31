@@ -52,7 +52,7 @@ class IdeaService extends BaseService<Idea> {
 
     return axiosInstance
       .get<BusinessResult<Idea[]>>(
-        `${this.endpoint}/me/get-by-status?${cleanedQuery}&isPagination=true`
+        `${this.endpoint}/me/by-status?${cleanedQuery}&isPagination=true`
       )
       .then((response) => response.data)
       .catch((error) => this.handleError(error));

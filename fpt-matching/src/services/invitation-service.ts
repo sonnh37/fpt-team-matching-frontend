@@ -23,7 +23,23 @@ class InvitationService extends BaseService<Invitation> {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
       .get<BusinessResult<PaginatedResult<Invitation>>>(
-        `${this.endpoint}/get-user-invitations-by-type?isPagination=true&${cleanedQuery}`
+        `${this.endpoint}/me/by-type?isPagination=true&${cleanedQuery}`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
+
+  public getUserInvitationsStatus = (
+    query?: InvitationGetByTypeQuery
+  ): Promise<BusinessResult<PaginatedResult<Invitation>>> => {
+    const cleanedQuery = cleanQueryParams(query!);
+    return axiosInstance
+      .get<BusinessResult<PaginatedResult<Invitation>>>(
+        `${this.endpoint}/me/by-status?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {
         return response.data;
@@ -39,7 +55,7 @@ class InvitationService extends BaseService<Invitation> {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
       .get<BusinessResult<PaginatedResult<Invitation>>>(
-        `${this.endpoint}/get-leader-invitations-by-type?isPagination=true&${cleanedQuery}`
+        `${this.endpoint}/me/by-type-with-role-leader?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {
         return response.data;
