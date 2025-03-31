@@ -103,14 +103,13 @@ export default function Blog() {
         toast.error("⚠️ Vui lòng nhập tiêu đề và nội dung!");
         return;
       }
-
       const blognew: BlogCreateCommand = {
         title: formData.title,
         content: formData.content,
         skillRequired: formData.skillRequired,
         type: postType,
         status: formData.status,
-        projectId: formData.projectId
+        ...(formData.projectId ? { projectId: formData.projectId } : {})
       };
 
       const result = await blogService.create(blognew);
@@ -315,6 +314,27 @@ export default function Blog() {
               </div>
             </div>
 
+            <div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">
+            <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
+            <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>
+
+            {!user?.id && (
+              <>
+                <a href="">
+                  <div className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
+                    Login
+                  </div>
+                </a>
+                <a href="">
+                  <div className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
+                    Register
+                  </div>
+                </a>
+              </>
+            )}
+
+          </div>
+
 
 
           </aside>
@@ -340,7 +360,7 @@ export default function Blog() {
 
                 <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
                   <ModalContent >
-                    <div className="header-blog mb-4 py-4 border-b-slate-100 h-1/5 bg-orange-400">
+                    <div className="header-blog mb-4 py-4 border-b-slate-100 h-1/6 bg-orange-400">
                       <h4 className='text-lg md:text-2xl text-neutral-100 dark:text-neutral-100 font-bold text-center' >
                         Tạo bài viết của bạn đi
                       </h4>
@@ -448,8 +468,8 @@ export default function Blog() {
                           <div></div>
                         )}
                       </div>
-                      <div className='flex w-full h-14 absolute bottom-0  items-center justify-center'>
-                        <button onClick={() => handleSubmit()} className='bg-blue-500 h-3/4 w-1/3 mx-2 rounded-xl hover:bg-blue-400 hover:text-black '>Post Bài</button>
+                      <div className='flex w-full h-14 sticky bottom-0  items-center justify-center'>
+                        <button onClick={() => handleSubmit()} className='bg-blue-500 h-3/4 w-1/3 mx-2 rounded-xl hover:bg-blue-400 hover:text-black  mt-2 mb-4'>Post Bài</button>
                       </div>
                     </div>
                   </ModalContent>
@@ -1111,25 +1131,23 @@ export default function Blog() {
               </div>
             </div>
           </div> */}
-          <div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">
-            <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
-            <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>
-
-            {!user?.id && (
-              <>
-                <a href="">
-                  <div className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
-                    Login
-                  </div>
-                </a>
-                <a href="">
-                  <div className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
-                    Register
-                  </div>
-                </a>
-              </>
-            )}
-
+    
+          <div className="py-3 text-2xl items-start  w-full">
+            <h3 className='text-lg mb-1 ml-1'>Được tài trợ</h3>
+            <div className="flex text-sm hover:bg-gray-200">
+              <div><img src="https://yt3.googleusercontent.com/NgFT6lwJNt9040g74VOq-yLNukcKJtq5AhJV4Pwzv7fp7jU4foWqfhx6RUg9MHxNZPU1kasF7g=s900-c-k-c0x00ffffff-no-rj" className='h-32 w-32 p-1' /></div>
+              <div className='flex flex-col justify-center ml-2'>
+                <a href="https://fptshop.com.vn/" className='text-base font-semibold'>Cửa hàng FPT</a>
+                <p className=''>https://fptshop.com.vn</p>
+              </div>
+            </div>
+            <div className="flex text-sm mt-2 hover:bg-gray-200">
+              <div className=''><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQx9E56U-LUmsx2Kln8a4ZLcH-9eSJeBoLACw&s" className='h-32 w-32 p-1' /></div>
+              <div className='flex flex-col justify-center ml-2'>
+                <a href="https://daihoc.fpt.edu.vn/" className='text-base font-semibold'>Tuyển sinh ĐH FPT</a>
+                <p className=''>https://daihoc.fpt.edu.vn</p>
+              </div>
+            </div>
           </div>
           <div className='box-title'>
             <div className=" w-full relative max-w-xs mx-3 m-3">
@@ -1203,29 +1221,29 @@ export default function Blog() {
           <div className='box-trending ml-4 bg-white border-gray-200 rounded-lg  shadow-lg'
           >
             <div className='w-full h-auto  px-3 py-3'>
-             
-                <div className='text-black  text-lg font-semibold pl-11'>🔥🔥 Trending 🔥🔥</div>
-                <div className='title-trending p-3 pl-6  hover:bg-gray-100 hover:text-blue-900 '>
-                  <h2 className=" mb-2 z-50 w-full ">
-                    1. Thu va Loc sang ngay bi ia chay do ăn gì đó xung quanh trường ?
-                  </h2>
-                </div>
-                <div>
+
+              <div className='text-black  text-lg font-semibold pl-11'>🔥🔥 Trending 🔥🔥</div>
+              <div className='title-trending p-3 pl-6  hover:bg-gray-100 hover:text-blue-900 '>
+                <h2 className=" mb-2 z-50 w-full ">
+                  1. Thu va Loc sang ngay bi ia chay do ăn gì đó xung quanh trường ?
+                </h2>
+              </div>
+              <div>
 
 
 
-                </div>
-                <div className='title-trending p-3 pl-6 w-full hover:bg-gray-100 hover:text-blue-900'>
-                  <h2 className=" mb-2 ">
-                    2. Chuyện tình cực hot của 2 nam sinh Sơn Lộc
-                  </h2>
-                </div>
-                <div className='title-trending p-3 pl-6 w-full  hover:bg-gray-100 hover:text-blue-900'>
-                  <h2 className=" mb-2 ">
-                    3.  Anh thanh niên đẹp trai quá tài năng tên Q
-                  </h2>
-                </div>
-          
+              </div>
+              <div className='title-trending p-3 pl-6 w-full hover:bg-gray-100 hover:text-blue-900'>
+                <h2 className=" mb-2 ">
+                  2. Chuyện tình cực hot của 2 nam sinh Sơn Lộc
+                </h2>
+              </div>
+              <div className='title-trending p-3 pl-6 w-full  hover:bg-gray-100 hover:text-blue-900'>
+                <h2 className=" mb-2 ">
+                  3.  Anh thanh niên đẹp trai quá tài năng tên Q
+                </h2>
+              </div>
+
             </div>
 
           </div>
