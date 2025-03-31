@@ -184,7 +184,14 @@ export default function TeamInfoDetail() {
   );
 
   //  Tính số slot trống
-  const availableSlots = (teamInfo?.teamSize ?? 0) - (teamMembers.length ?? 0);
+  const IsExistedIdea = teamInfo?.idea ? true : false;
+
+  let availableSlots = 6;
+  if (!IsExistedIdea) {
+    availableSlots = availableSlots - (teamInfo?.teamMembers?.length ?? 0);
+  } else {
+    availableSlots = (teamInfo?.teamSize ?? 0) - (teamMembers.length ?? 0);
+  }
 
   const requestJoinTeam = async (id: string) => {
     setOpen(false);
@@ -201,17 +208,16 @@ export default function TeamInfoDetail() {
       setTimeout(() => {
         setLoading(false);
         checkInvitation();
-        toast.success("Bạn đã gửi thành công ");
+        toast.success(result.message);
       }, 2000);
     } else {
-      toast.success("Bạn đã gửi thất bại ");
+      toast.success(result.message);
     }
   };
 
   const cancelRequest = async (teamInfoId: string) => {
     const result = await invitationService.cancelInvite(teamInfoId);
     if (result.status === 1) {
-
       // Hiển thị loading page
       setLoading(true);
 

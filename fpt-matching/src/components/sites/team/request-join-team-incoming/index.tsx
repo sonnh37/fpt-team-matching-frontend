@@ -26,7 +26,14 @@ const defaultSchema = z.object({
   type: z.nativeEnum(InvitationType).optional(),
 });
 //#endregion
-export default function InvitationsInComingToLeaderTable() {
+interface InvitationsInComingToLeaderTableProps {
+  projectId: string;
+}
+export default function InvitationsInComingToLeaderTable({
+  projectId,
+}: InvitationsInComingToLeaderTableProps) {
+  console.log("check_project___", projectId)
+
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -57,6 +64,7 @@ export default function InvitationsInComingToLeaderTable() {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
+
   const queryParams = useMemo(() => {
     const params: InvitationGetByTypeQuery = useQueryParams(
       inputFields,
@@ -67,6 +75,7 @@ export default function InvitationsInComingToLeaderTable() {
 
     params.type = InvitationType.SentByStudent;
     params.status = InvitationStatus.Pending;
+    params.projectId = projectId;
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
