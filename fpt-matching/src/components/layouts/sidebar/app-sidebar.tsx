@@ -86,6 +86,11 @@ const data = {
       url: "/management/semester",
       icon: ShieldHalf,
     },
+    {
+      title: "Manage defense",
+      url: "/manage-defense",
+      icon: ShieldHalf,
+    },
   ],
 };
 

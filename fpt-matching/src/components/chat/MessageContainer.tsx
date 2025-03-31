@@ -36,7 +36,7 @@ const MessageContainer = ({messages, refer, containerRef, lastHeight, scrollHand
 
     return (
        <>
-           <div ref={containerRef} onScroll={scrollHandler} className={`px-2 h-[83.9%] overflow-auto`}>
+           <div ref={containerRef} onScroll={scrollHandler} className={`px-2 h-[85vh] overflow-auto`}>
                {messages.map((message, index) => {
                    if (index == 0) {
                        return (
