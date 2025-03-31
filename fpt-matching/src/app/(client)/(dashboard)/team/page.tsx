@@ -1,48 +1,62 @@
 "use client";
-import { Card, CardContent } from "@/components/ui/card";
+import ErrorSystem from "@/components/_common/errors/error-system";
+import { useConfirm } from "@/components/_common/formdelete/confirm-context";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import { TypographyH3 } from "@/components/_common/typography/typography-h3";
+import { TypographyH4 } from "@/components/_common/typography/typography-h4";
+import { TypographyMuted } from "@/components/_common/typography/typography-muted";
+import { TypographyP } from "@/components/_common/typography/typography-p";
+import { NoTeam } from "@/components/sites/team/no-team";
+import {
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalTrigger,
+} from "@/components/ui/animated-modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalTrigger,
-  ModalClose,
-} from "@/components/ui/animated-modal";
-import UpdateProjectTeam from "../idea/updateidea/page";
-import { useConfirm } from "@/components/_common/formdelete/confirm-context";
-import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-import { projectService } from "@/services/project-service";
-import { LoadingComponent } from "@/components/_common/loading-page";
-import { format } from "path";
-import { formatDate } from "@/lib/utils";
-import { TeamMemberRole } from "@/types/enums/team-member";
-import { teardownHeapProfiler } from "next/dist/build/swc";
-import { useSelector } from "react-redux";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { RootState } from "@/lib/redux/store";
-import { TypographyLarge } from "@/components/_common/typography/typography-large";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import { useRouter } from "next/navigation";
+import { projectService } from "@/services/project-service";
 import { teammemberService } from "@/services/team-member-service";
-import ErrorSystem from "@/components/_common/errors/error-system";
-import { useEffect } from "react";
-import { TypographyLead } from "@/components/_common/typography/typography-lead";
-import { TypographyH3 } from "@/components/_common/typography/typography-h3";
-import { Button } from "@/components/ui/button";
-import { TypographyMuted } from "@/components/_common/typography/typography-muted";
+import { TeamMemberRole } from "@/types/enums/team-member";
+import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { EllipsisVertical, Pencil, Save, Trash, Users, X } from "lucide-react";
 import Link from "next/link";
-import { TypographyH4 } from "@/components/_common/typography/typography-h4";
-import { NoTeam } from "@/components/sites/team/no-team";
-
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import UpdateProjectTeam from "../idea/updateidea/page";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import PageContainer from "@/components/layouts/page-container";
+import { useEffect, useState } from "react";
+import { ProjectCreateCommand } from "@/types/models/commands/projects/project-create-command";
+import { ProjectUpdateCommand } from "@/types/models/commands/projects/project-update-command";
+import { useCurrentRole } from "@/hooks/use-current-role";
+import { Badge } from "@/components/ui/badge";
+import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
+import InvitationsInComingToLeaderTable from "@/components/sites/team/request-join-team-incoming";
+import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/invitation-get-by-status-query";
+import { invitationService } from "@/services/invitation-service";
 // const groupData = {
 //   title: "FPT Team Matching - Social networking for students project teams",
 //   createdAt: "1/2/2025 7:25:37 PM",
@@ -66,6 +80,13 @@ export default function TeamInfo() {
   const router = useRouter();
   //lay thong tin tu redux luc dang nhap
   const user = useSelector((state: RootState) => state.user.user);
+  const [isEditing, setIsEditing] = useState(false);
+  const [teamName, setTeamName] = useState("");
+  const confirm = useConfirm();
+  const queryClient = useQueryClient();
+
+ 
+
   //goi api bang tanstack
   const {
     data: result,
@@ -79,8 +100,15 @@ export default function TeamInfo() {
     refetchOnWindowFocus: false,
   });
 
+ 
+  useEffect(() => {
+    if (result?.data?.teamName) {
+      setTeamName(result.data.teamName);
+    }
+  }, [result?.data?.teamName]);
+
   if (isLoading) return <LoadingComponent />;
-  if (!result || isError) {
+  if (isError) {
     console.error("Error fetching:", error);
     return <ErrorSystem />;
   }
@@ -90,13 +118,41 @@ export default function TeamInfo() {
 
   const project = result?.data;
   if (!project) return <NoTeam />;
+  const isLockProject = project.idea != undefined ? true : false;
+
+  const handleSave = async () => {
+    // Gọi API để lưu tên mới ở đây
+    try {
+      const command: ProjectUpdateCommand = {
+        ...project,
+        teamName: teamName,
+      };
+      const res = await projectService.update(command);
+      if (res.status != 1) {
+        toast.error(res.message);
+        setIsEditing(false);
+        return;
+      }
+      toast.success(res.message);
+      setIsEditing(false);
+      refetch();
+    } catch (ex) {
+      toast.error(ex as string);
+      setIsEditing(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setTeamName(project.teamName ?? "");
+    setIsEditing(false);
+  };
 
   const infoMember = project?.teamMembers?.find(
     (member) => member.userId === user?.id
   );
 
   //check xem thang dang nhap coi no phai member va la leader khong
-  const checkRole =
+  const isLeader =
     result?.data?.teamMembers?.find((member) => member.userId === user?.id)
       ?.role === TeamMemberRole.Leader;
 
@@ -112,11 +168,19 @@ export default function TeamInfo() {
   // Ghép lại, đảm bảo Leader luôn ở đầu
   const sortedMembers = [...leaders, ...others];
 
-  const availableSlots =
-    (result?.data?.teamSize ?? 0) - (result?.data?.teamMembers?.length ?? 0);
+  const IsExistedIdea = project?.idea ? true : false;
+
+  let availableSlots = 6;
+  if (!IsExistedIdea) {
+    availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
+  } else {
+    availableSlots = (project?.teamSize ?? 0) - (teamMembers.length ?? 0);
+  }
   //Đây là form delete trả về true false tái sử dụng được
-  const confirm = useConfirm();
   async function handleDelete() {
+    if (isLockProject) {
+      toast.warning("This project is locked and cannot be deleted.");
+    }
     // Gọi confirm để mở dialog
     const confirmed = await confirm({
       title: "Delete Item",
@@ -127,19 +191,10 @@ export default function TeamInfo() {
 
     if (confirmed) {
       // Người dùng chọn Yes
-      const data = await teammemberService.deletePermanent(
-        leaders[0].id as string
-      );
-      if (data.status === 1) {
-        const data_ = await projectService.deletePermanent(
-          project?.id as string
-        );
-        if (data_.status === 1) {
-          refetch();
-          toast.success("Bạn đã xóa nhóm");
-        } else {
-          toast.error("Fail");
-        }
+      const data_ = await projectService.deletePermanent(project?.id as string);
+      if (data_.status === 1) {
+        refetch();
+        toast.success("Bạn đã xóa nhóm");
       } else {
         toast.error("Fail");
       }
@@ -147,6 +202,9 @@ export default function TeamInfo() {
   }
 
   async function handleLeaveTeam() {
+    if (isLockProject) {
+      toast.warning("This project is locked and cannot be leave.");
+    }
     // Gọi confirm để mở dialog
     const confirmed = await confirm({
       title: "Delete Item",
@@ -167,7 +225,9 @@ export default function TeamInfo() {
   }
 
   async function handleDeleteMember(id: string) {
-    console.log("testid", id);
+    if (isLockProject) {
+      toast.warning("This project is locked and cannot be deleted member.");
+    }
     if (!id) {
       toast("Invalid member ID!");
       return;
@@ -181,49 +241,135 @@ export default function TeamInfo() {
     });
 
     if (confirmed) {
-      teammemberService.deletePermanent(id);
-      // Người dùng chọn Yes
-      toast("Member is deleted!");
-      // Thực hiện xóa
+      const res = await teammemberService.deletePermanent(id);
+      if (res.status != 1) {
+        toast.error(res.message);
+      }
+
+      toast.success(res.message);
+      refetch();
     } else {
-      // Người dùng chọn No
-      toast("User canceled!");
     }
   }
 
+  const invitationFromPersonalize = project.invitations.filter(
+    (m) =>
+      m.type == InvitationType.SentByStudent &&
+      m.status == InvitationStatus.Pending
+  );
+
   return (
-    <div className="grid grid-cols-3 p-4 gap-4">
-      <div className="col-span-2 space-y-2">
+    <div className="grid grid-cols-4 p-4 gap-4">
+      <div className="col-span-3 space-y-2">
         <div className="flex w-full justify-between items-center">
-          <TypographyH3>Team Information</TypographyH3>
+          <div className="flex items-center gap-2">
+            {isEditing ? (
+              <div className="flex items-center gap-2">
+                <Input
+                  value={teamName}
+                  onChange={(e) => setTeamName(e.target.value)}
+                  className="w-64"
+                />
+                <Button
+                  size="sm"
+                  onClick={handleSave}
+                  disabled={!teamName.trim()}
+                >
+                  <Save className="h-4 w-4 mr-1" />
+                  Lưu
+                </Button>
+                <Button size="sm" variant="ghost" onClick={handleCancel}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <TypographyH3>{project.teamName ?? "No name"}</TypographyH3>
+                {isLeader ? (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    disabled={isLockProject}
+                    onClick={() => setIsEditing(true)}
+                    className="h-8 w-8"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <></>
+                )}
+              </>
+            )}
+          </div>
           {infoMember && infoMember?.role === TeamMemberRole.Leader ? (
             <>
-              {project.ideaId != null ? (
-                <>
-                  <div className="flex items-center">
-                    <Modal>
-                      <ModalTrigger className="=">
-                        <Button variant="outline">Cập nhật Idea</Button>
-                      </ModalTrigger>
+              <div className="flex items-center">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                       disabled={isLockProject}
+                      size="icon"
+                      className="relative"
+                    >
+                      <Users />
+                      {invitationFromPersonalize.length > 0 && (
+                        <Badge
+                          variant="destructive"
+                          className="absolute right-1 top-1 h-4 w-4 translate-x-1/2 -translate-y-1/2 p-0 flex items-center justify-center"
+                        >
+                          {invitationFromPersonalize.length}
+                        </Badge>
+                      )}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-fit">
+                    <DialogHeader>
+                      <DialogTitle>Request incoming</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      {project.id != undefined && (
+                        <InvitationsInComingToLeaderTable
+                          projectId={project.id}
+                        />
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
 
-                      <ModalBody className="min-h-[60%] max-h-[90%] md:max-w-[70%] overflow-auto">
-                        <ModalContent>
-                          <UpdateProjectTeam />
-                        </ModalContent>
-                      </ModalBody>
-                    </Modal>
-                  </div>
-                </>
-              ) : (
-                <></>
-              )}
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      disabled={isLockProject}
+                      size={"icon"}
+                    >
+                      <Pencil />
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:min-w-[60%] pt-12 sm:max-w-fit h-[90vh] max-h-[90vh]">
+                    <div className="h-full overflow-y-auto">
+                      <UpdateProjectTeam />
+                    </div>
+                  </DialogContent>
+                </Dialog>
 
-              <Button variant="destructive" onClick={handleDelete}>
-                Xóa nhóm
-              </Button>
+                <Button
+                  variant="ghost"
+                  disabled={isLockProject}
+                  size={"icon"}
+                  onClick={handleDelete}
+                >
+                  <Trash />
+                </Button>
+              </div>
             </>
           ) : (
-            <Button variant="destructive" onClick={handleLeaveTeam}>
+            <Button
+              variant="destructive"
+              disabled={isLockProject}
+              onClick={handleLeaveTeam}
+            >
               Rời nhóm
             </Button>
           )}
@@ -272,178 +418,6 @@ export default function TeamInfo() {
                   <p className="text-gray-500">Description</p>
                   <p className="italic">{result?.data?.idea?.description}</p>
                 </div>
-                {/* Members */}
-                <div>
-                  <div className="flex justify-between">
-                    <p className="text-gray-500">Members</p>
-                    <p className="text-gray-500">
-                      Available Slot: {availableSlots}
-                    </p>
-                  </div>
-
-                  {
-                    // user?.email == member.user?.email &&
-                    checkRole ? (
-                      <div className="space-y-3 mt-2">
-                        {sortedMembers?.map((member, index) => {
-                          const initials = `${
-                            member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                          }`;
-
-                          return (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-2 border rounded-lg"
-                            >
-                              <div className="flex items-center space-x-3">
-                                <Avatar className="h-10 rounded-lg">
-                                  <AvatarImage
-                                    src={member.user?.avatar!}
-                                    alt={member.user?.email!}
-                                  />
-                                  <AvatarFallback className="rounded-lg">
-                                    {initials}
-                                  </AvatarFallback>
-                                </Avatar>
-
-                                <div>
-                                  <p className="font-semibold">
-                                    {member.user?.email}
-                                  </p>
-                                  <p className="text-sm text-gray-500">
-                                    {member.user?.firstName}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex">
-                                {member.role === TeamMemberRole.Leader ? (
-                                  <p className="text-sm text-gray-500">
-                                    {TeamMemberRole[member.role ?? 0]} | Owner
-                                  </p>
-                                ) : (
-                                  <p className="text-sm text-gray-500">
-                                    {TeamMemberRole[member.role ?? 0]}
-                                  </p>
-                                )}
-                                <div className="relative ml-3">
-                                  {user?.email == member.user?.email ? (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger>
-                                        <FontAwesomeIcon
-                                          className="size-4"
-                                          icon={faEllipsisVertical}
-                                        />
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent>
-                                        <DropdownMenuItem>
-                                          <a
-                                            href={`/social/blog/profile-social/${member.user?.id}`}
-                                          >
-                                            Xem profile
-                                          </a>
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  ) : (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger>
-                                        <FontAwesomeIcon
-                                          className="size-4"
-                                          icon={faEllipsisVertical}
-                                        />
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent>
-                                        <DropdownMenuItem
-                                          onClick={() =>
-                                            handleDeleteMember(member?.id ?? "")
-                                          }
-                                        >
-                                          Xóa thành viên
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                          {" "}
-                                          <a
-                                            href={`/social/blog/profile-social/${member.user?.id}`}
-                                          >
-                                            Xem profile
-                                          </a>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                          Phân chức leader
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="space-y-3 mt-2">
-                        {sortedMembers.map((member, index) => {
-                          const initials = `${
-                            member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                          }`;
-                          return (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-2 border rounded-lg"
-                            >
-                              <div className="flex items-center space-x-3">
-                                <Avatar className="h-10 rounded-lg">
-                                  <AvatarImage
-                                    src={member.user?.avatar!}
-                                    alt={member.user?.email!}
-                                  />
-                                  <AvatarFallback className="rounded-lg">
-                                    {initials}
-                                  </AvatarFallback>
-                                </Avatar>
-
-                                <div>
-                                  <p className="font-semibold">
-                                    {member.user?.email}
-                                  </p>
-                                  <p className="text-sm text-gray-500">
-                                    {member.user?.firstName}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex">
-                                {member.role === TeamMemberRole.Leader ? (
-                                  <p className="text-sm text-gray-500">
-                                    {TeamMemberRole[member.role ?? 0]} | Owner
-                                  </p>
-                                ) : (
-                                  <p className="text-sm text-gray-500">
-                                    {TeamMemberRole[member.role ?? 0]}
-                                  </p>
-                                )}
-                                <div className="relative ml-3">
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger>
-                                      <FontAwesomeIcon
-                                        className="size-4"
-                                        icon={faEllipsisVertical}
-                                      />
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                      <DropdownMenuItem>
-                                        View profile
-                                      </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )
-                  }
-                </div>
               </>
             ) : (
               <>
@@ -458,180 +432,178 @@ export default function TeamInfo() {
                     </Link>
                   </Button>
                 </TypographyP>
-                {/* Members */}
-                <div>
-                  <div className="flex justify-between">
-                    <p className="text-gray-500">Members</p>
-                    <p className="text-gray-500">
-                      Available Slot: {availableSlots}
-                    </p>
-                  </div>
-
-                  {
-                    // user?.email == member.user?.email &&
-                    checkRole ? (
-                      <div className="space-y-3 mt-2">
-                        {sortedMembers?.map((member, index) => {
-                          const initials = `${
-                            member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                          }`;
-
-                          return (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-2 border rounded-lg"
-                            >
-                              <div className="flex items-center space-x-3">
-                                <Avatar className="h-10 rounded-lg">
-                                  <AvatarImage
-                                    src={member.user?.avatar!}
-                                    alt={member.user?.email!}
-                                  />
-                                  <AvatarFallback className="rounded-lg">
-                                    {initials}
-                                  </AvatarFallback>
-                                </Avatar>
-
-                                <div>
-                                  <p className="font-semibold">
-                                    {member.user?.email}
-                                  </p>
-                                  <p className="text-sm text-gray-500">
-                                    {member.user?.firstName}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex">
-                                {member.role === TeamMemberRole.Leader ? (
-                                  <p className="text-sm text-gray-500">
-                                    {TeamMemberRole[member.role ?? 0]} | Owner
-                                  </p>
-                                ) : (
-                                  <p className="text-sm text-gray-500">
-                                    {TeamMemberRole[member.role ?? 0]}
-                                  </p>
-                                )}
-                                <div className="relative ml-3">
-                                  {user?.email == member.user?.email ? (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger>
-                                        <FontAwesomeIcon
-                                          className="size-4"
-                                          icon={faEllipsisVertical}
-                                        />
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent>
-                                        <DropdownMenuItem>
-                                          <a
-                                            href={`/social/blog/profile-social/${member.user?.id}`}
-                                          >
-                                            Xem profile
-                                          </a>
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  ) : (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger>
-                                        <FontAwesomeIcon
-                                          className="size-4"
-                                          icon={faEllipsisVertical}
-                                        />
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent>
-                                        <DropdownMenuItem
-                                          onClick={() =>
-                                            handleDeleteMember(member?.id ?? "")
-                                          }
-                                        >
-                                          Xóa thành viên
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                          {" "}
-                                          <a
-                                            href={`/social/blog/profile-social/${member.user?.id}`}
-                                          >
-                                            Xem profile
-                                          </a>
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem>
-                                          Phân chức leader
-                                        </DropdownMenuItem>
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="space-y-3 mt-2">
-                        {sortedMembers.map((member, index) => {
-                          const initials = `${
-                            member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                          }`;
-                          return (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between p-2 border rounded-lg"
-                            >
-                              <div className="flex items-center space-x-3">
-                                <Avatar className="h-10 rounded-lg">
-                                  <AvatarImage
-                                    src={member.user?.avatar!}
-                                    alt={member.user?.email!}
-                                  />
-                                  <AvatarFallback className="rounded-lg">
-                                    {initials}
-                                  </AvatarFallback>
-                                </Avatar>
-
-                                <div>
-                                  <p className="font-semibold">
-                                    {member.user?.email}
-                                  </p>
-                                  <p className="text-sm text-gray-500">
-                                    {member.user?.firstName}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="flex">
-                                {member.role === TeamMemberRole.Leader ? (
-                                  <p className="text-sm text-gray-500">
-                                    {TeamMemberRole[member.role ?? 0]} | Owner
-                                  </p>
-                                ) : (
-                                  <p className="text-sm text-gray-500">
-                                    {TeamMemberRole[member.role ?? 0]}
-                                  </p>
-                                )}
-                                <div className="relative ml-3">
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger>
-                                      <FontAwesomeIcon
-                                        className="size-4"
-                                        icon={faEllipsisVertical}
-                                      />
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent>
-                                      <DropdownMenuItem>
-                                        View profile
-                                      </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )
-                  }
-                </div>
               </>
             )}
+            {/* Members */}
+            <div>
+              <div className="flex justify-between">
+                <TypographyMuted>Members</TypographyMuted>
+                <TypographyMuted>
+                  Available Slot: {availableSlots}
+                </TypographyMuted>
+              </div>
+
+              {
+                // user?.email == member.user?.email &&
+                isLeader ? (
+                  <div className="space-y-3 mt-2">
+                    {sortedMembers?.map((member, index) => {
+                      const initials = `${
+                        member.user?.lastName?.charAt(0).toUpperCase() ?? ""
+                      }`;
+
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-2 border rounded-lg"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="h-10">
+                              <AvatarImage
+                                src={member.user?.avatar!}
+                                alt={member.user?.email!}
+                              />
+                              <AvatarFallback className="">
+                                {initials}
+                              </AvatarFallback>
+                            </Avatar>
+
+                            <div>
+                              <TypographyP>{member.user?.email}</TypographyP>
+                              <TypographyMuted>
+                                {member.user?.firstName}
+                              </TypographyMuted>
+                            </div>
+                          </div>
+                          <div className="flex items-center">
+                            {member.role === TeamMemberRole.Leader ? (
+                              <TypographyMuted>
+                                {TeamMemberRole[member.role ?? 0]} | Owner
+                              </TypographyMuted>
+                            ) : (
+                              <TypographyMuted>
+                                {TeamMemberRole[member.role ?? 0]}
+                              </TypographyMuted>
+                            )}
+                            <div className="relative ml-3">
+                              {user?.email == member.user?.email ? (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant={"ghost"}
+                                      className="focus-visible:ring-0"
+                                      size={"icon"}
+                                    >
+                                      <EllipsisVertical />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem>
+                                      <a
+                                        href={`/social/blog/profile-social/${member.user?.id}`}
+                                      >
+                                        Xem profile
+                                      </a>
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              ) : (
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger>
+                                    <EllipsisVertical />
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleDeleteMember(member?.id ?? "")
+                                      }
+                                    >
+                                      Xóa thành viên
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                      {" "}
+                                      <a
+                                        href={`/social/blog/profile-social/${member.user?.id}`}
+                                      >
+                                        Xem profile
+                                      </a>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                      Phân chức leader
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="space-y-3 mt-2">
+                    {sortedMembers.map((member, index) => {
+                      const initials = `${
+                        member.user?.lastName?.charAt(0).toUpperCase() ?? ""
+                      }`;
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-2 border rounded-lg"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Avatar className="h-10 rounded-lg">
+                              <AvatarImage
+                                src={member.user?.avatar!}
+                                alt={member.user?.email!}
+                              />
+                              <AvatarFallback className="rounded-lg">
+                                {initials}
+                              </AvatarFallback>
+                            </Avatar>
+
+                            <div>
+                              <p className="font-semibold">
+                                {member.user?.email}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {member.user?.firstName}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex">
+                            {member.role === TeamMemberRole.Leader ? (
+                              <p className="text-sm text-gray-500">
+                                {TeamMemberRole[member.role ?? 0]} | Owner
+                              </p>
+                            ) : (
+                              <p className="text-sm text-gray-500">
+                                {TeamMemberRole[member.role ?? 0]}
+                              </p>
+                            )}
+                            <div className="relative ml-3">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger>
+                                  <FontAwesomeIcon
+                                    className="size-4"
+                                    icon={faEllipsisVertical}
+                                  />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                  <DropdownMenuItem>
+                                    View profile
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )
+              }
+            </div>
           </CardContent>
         </Card>
       </div>

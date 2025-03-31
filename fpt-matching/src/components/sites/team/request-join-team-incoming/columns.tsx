@@ -25,20 +25,27 @@ import { toast } from "sonner";
 
 export const columns: ColumnDef<Invitation>[] = [
   {
-    accessorKey: "project.teamName",
+    accessorKey: "sender.email",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Project" />
+      <DataTableColumnHeader column={column} title="User" />
     ),
     cell: ({ row }) => {
-      const teamName = row.original.project?.teamName ?? "Unknown"; // Tránh lỗi undefined
-      const projectId = row.original.project?.id ?? "#";
+      const email = row.original.sender?.email ?? "Unknown";
+      const senderId = row.original.senderId ?? "#";
 
       return (
         <Button variant="link" className="p-0 m-0" asChild>
-          <Link href={`/team-detail/${projectId}`}>{teamName}</Link>
+          <Link href={`/social/blog/profile-social/${senderId}`}>{email}</Link>
         </Button>
       );
     },
+  },
+
+  {
+    accessorKey: "content",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Process Note" />
+    ),
   },
   {
     accessorKey: "createdDate",
@@ -48,48 +55,6 @@ export const columns: ColumnDef<Invitation>[] = [
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
       return <p>{date.toLocaleString()}</p>;
-    },
-  },
-  {
-    accessorKey: "content",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Process Note" />
-    ),
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
-    ),
-    cell: ({ row }) => {
-      const status = row.getValue("status") as InvitationStatus;
-      const statusText = InvitationStatus[status];
-
-      let badgeVariant:
-        | "secondary"
-        | "destructive"
-        | "default"
-        | "outline"
-        | null = "default";
-
-      switch (status) {
-        case InvitationStatus.Pending:
-          badgeVariant = "secondary";
-          break;
-        case InvitationStatus.Accepted:
-          badgeVariant = "default";
-          break;
-        case InvitationStatus.Rejected:
-          badgeVariant = "destructive";
-          break;
-        default:
-          badgeVariant = "outline";
-      }
-
-      return <Badge variant={badgeVariant}>{statusText}</Badge>;
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
     },
   },
   {
@@ -125,7 +90,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: model.id,
         status: InvitationStatus.Rejected,
       };
-      const res = await invitationService.approveOrRejectFromTeamByMe(command);
+      const res =
+        await invitationService.approveOrRejectFromPersonalizeByLeader(command);
       if (res.status != 1) {
         toast.error(res.message);
         return;
@@ -146,14 +112,16 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: model.id,
         status: InvitationStatus.Accepted,
       };
-      const res = await invitationService.approveOrRejectFromTeamByMe(command);
+      const res =
+        await invitationService.approveOrRejectFromPersonalizeByLeader(command);
       if (res.status != 1) {
         toast.error(res.message);
         return;
       }
 
       toast.success(res.message);
-      queryClient.refetchQueries({ queryKey: ["data"] });
+      await queryClient.refetchQueries({ queryKey: ["data"] });
+      await queryClient.refetchQueries({ queryKey: ["getTeamInfo"] });
     } catch (error) {
       toast.error(error as string);
     }
