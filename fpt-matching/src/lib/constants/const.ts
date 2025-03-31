@@ -28,6 +28,7 @@ export class Const {
     static readonly STAGE_IDEA = "stage-ideas";
     static readonly AUTH = "auth";
     static readonly IDEA_HISTORY = "idea-histories";
+    static readonly CAPSTONE_SCHEDULE = "capstone-schedules";
 
     static readonly DASHBOARD = "dashboard";
     static readonly DASHBOARD_URL = "/dashboard";

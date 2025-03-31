@@ -5,11 +5,12 @@ import {useState} from "react";
 import WaitingRoom from "@/components/chat/WaitingRoom";
 import ChatRoom from '@/components/chat/ChatRoom';
 import {MessageModel} from "@/types/message-model";
+import {ConversationMemberInfo} from "@/types/conversation-member-info";
 
 export default function Page() {
   const [conn, setConnection] = useState<HubConnection>();
   const [messages, setMessages] = useState<MessageModel[]>([]);
-  const [chatroom, setChatroom] = useState<string>();
+  const [chatroom, setChatroom] = useState<ConversationMemberInfo>();
 
   const joinChatRoom = async (username: string,  partnerId: string , chatroom: string) => {
     try {
@@ -44,7 +45,7 @@ export default function Page() {
           <ConversationList chatRoom={chatroom} setChatRoom={setChatroom} joinChatRoom={joinChatRoom} />
           <div className={"w-[75%] "}>
             {!conn
-                ?  <WaitingRoom joinChatRoom={joinChatRoom}/>
+                ?  <WaitingRoom />
                 : <ChatRoom chatRoom={chatroom} setMessages={setMessages} messages={messages} conn={conn}/>}
           </div>
         </div>

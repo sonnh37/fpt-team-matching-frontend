@@ -7,7 +7,7 @@ const SendMessageForm = ({sendMessage} : {sendMessage: any}) => {
             sendMessage(msg);
             setMessage('');
         }}>
-            <div className={"flex"}>
+            <div className={"flex h-[5vh]"}>
                 <input className={"w-full text-lg border-[1px] border-gray-300 px-4"}
                        placeholder={"Enter message"}
                        onChange={e => setMessage(e.target.value)}
