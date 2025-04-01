@@ -1,6 +1,5 @@
 import { Project } from "@/types/project";
 import { Const } from "@/lib/constants/const";
-import React from "react";
 import { BaseService } from "./_base/base-service";
 import { BusinessResult } from "@/types/models/responses/business-result";
 import axiosInstance from "@/lib/interceptors/axios-instance";
@@ -33,7 +32,22 @@ class ProjectSerivce extends BaseService<Project> {
     }
   };
 
+  public getAvailableTeamDefense = async (stage: number): Promise<File> => {
+      try {
+        const response = await axiosInstance.get<Blob>(
+            `${this.endpoint}/export-excel/${stage}`, {responseType: "blob"}
+        );
 
+        const blob = response.data
+        const fileName = "DanhSachRaHoiDong.xlsx"
+        const file = new File([blob!], fileName, {type: blob!.type || ".xlsx"} )
+        return file;
+      }
+      catch (error) {
+        this.handleError(error);
+        return Promise.reject(error);
+      }
+  }
 
   
 }
