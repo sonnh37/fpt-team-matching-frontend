@@ -9,164 +9,52 @@ import {
   SidebarMenuButton,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { filterNavItemsByRole, NAV_CONFIG } from "@/configs/nav-config";
 import { useCurrentRole } from "@/hooks/use-current-role";
 import { initializeRole, updateUserCache } from "@/lib/redux/slices/roleSlice";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import { semesterService } from "@/services/semester-service";
 import { useQuery } from "@tanstack/react-query";
 import {
-  Calendar,
-  Globe,
-  Home,
-  Lightbulb,
-  MessageCircleQuestion,
-  Pencil,
-  Send,
-  ShieldHalf,
-  SquareUserRound,
-  UsersRound,
+  Calendar
 } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
-import { GiWideArrowDunk } from "react-icons/gi";
-import {
-  MdOutlineRateReview,
-  MdOutlineSupervisorAccount,
-} from "react-icons/md";
-import { PiUserList } from "react-icons/pi";
 import { useDispatch, useSelector } from "react-redux";
 import { NavMain } from "./nav-main";
-import { RoleSwitcher } from "./role-switcher";
 import { NavManagement } from "./nav-management";
-
-const data = {
-  navMain: [
-    { title: "Home", url: "/", icon: Home, isActive: true },
-    { title: "Social", url: "/social/blog", icon: Globe },
-    { title: "Team",
-      url: "/team",
-      icon: UsersRound,
-      items: [
-        { title: "My Team", icon: Pencil, url: "/team" },
-        { title: "Manage review", icon: Pencil, url: "/team/manage-review" },
-      ]
-    },
-    { title: "Invitations", url: "/invitations", icon: Send },
-    {
-      title: "Idea",
-      url: "/idea",
-      icon: Lightbulb,
-      items: [
-        { title: "Create Idea", icon: Pencil, url: "/idea/create" },
-        { title: "Request Idea", icon: GiWideArrowDunk, url: "/idea/request" },
-        {
-          title: "Ideas of Supervisor",
-          icon: PiUserList,
-          url: "/idea/supervisors",
-        },
-      ],
-    },
-    {
-      title: "List supervisors",
-      url: "/supervisors",
-      icon: MdOutlineSupervisorAccount,
-    },
-    { title: "Support", url: "/#", icon: MessageCircleQuestion },
-  ],
-
-  navManage: [
-    {
-      title: "Manage review",
-      url: "/manage-review",
-      icon: SquareUserRound,
-    },
-
-    {
-      title: "Manage semester",
-      url: "/management/semester",
-      icon: ShieldHalf,
-    },
-    {
-      title: "Manage defense",
-      url: "/manage-defense",
-      icon: ShieldHalf,
-    },
-  ],
-};
+import { RoleSwitcher } from "./role-switcher";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user.user);
-  if (!user) return null;
+  const role = useCurrentRole();
 
-  const { data: result } = useQuery({
+  const { data: semesterData } = useQuery({
     queryKey: ["getSemesterLatest_AppSidebar"],
     queryFn: () => semesterService.fetchLatest(),
     refetchOnWindowFocus: false,
   });
 
   React.useEffect(() => {
+    if (!user) return;
+
     if (user.cache) {
       dispatch(initializeRole(user.cache));
     } else {
       const firstRole = user.userXRoles[0]?.role?.roleName;
-
       dispatch(updateUserCache({ newCache: { role: firstRole } }));
     }
   }, [user, dispatch]);
 
-  const role = useCurrentRole();
-  const isCouncil = role === "Council";
-  const isLecturer = role === "Lecturer";
-  const isReviewer = role === "Reviewer";
-  const isManager = role === "Manager";
+  if (!user) return null;
 
-  const navMain = data.navMain.map((item) => {
-    if (item.title !== "Idea") return item;
-
-    const commonItems = [
-      { title: "Create Idea", icon: Pencil, url: "/idea/create" },
-      { title: "Request Idea", icon: GiWideArrowDunk, url: "/idea/request" },
-      {
-        title: "Ideas of Supervisor",
-        icon: PiUserList,
-        url: "/idea/supervisors",
-      },
-    ];
-
-    let ideaItems = commonItems;
-
-    switch (true) {
-      case isCouncil:
-        ideaItems = [
-          ...commonItems,
-          { title: "Approve Idea", icon: Lightbulb, url: "/idea/approve-idea" },
-        ];
-        break;
-      case isReviewer:
-        ideaItems = [
-          {
-            title: "Review Idea",
-            icon: MdOutlineRateReview,
-            url: "/idea/review-idea",
-          },
-          {
-            title: "Ideas of Supervisor",
-            icon: PiUserList,
-            url: "/idea/supervisors",
-          },
-        ];
-        break;
-      case isLecturer:
-        ideaItems = [
-          ...commonItems,
-          { title: "Approve Idea", icon: Lightbulb, url: "/idea/approve-idea" },
-        ];
-        break;
-    }
-
-    return { ...item, items: ideaItems };
-  });
+  // Lọc navigation items theo role
+  const filteredNavMain = filterNavItemsByRole(NAV_CONFIG.main, role as string);
+  const filteredNavManage = filterNavItemsByRole(
+    NAV_CONFIG.management,
+    role as string
+  );
 
   return (
     <Sidebar collapsible="icon" {...props} variant="inset">
@@ -187,25 +75,33 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </div>
           </Link>
         </SidebarMenuButton>
+
         <RoleSwitcher />
+
         <SidebarMenuButton
           size="lg"
-          className="flex items-center  data-[state=open]:bg-sidebar-accent hover:cursor-default data-[state=open]:text-sidebar-accent-foreground"
-          tooltip={result?.data?.semesterName}
-
-          // isActive={isActive}
+          className="flex items-center data-[state=open]:bg-sidebar-accent hover:cursor-default data-[state=open]:text-sidebar-accent-foreground"
+          tooltip={semesterData?.data?.semesterName}
         >
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-            {<Calendar className="size-4 dark:text-white text-black" />}
+            <Calendar className="size-4 dark:text-white text-black" />
           </div>
-          <span>{result?.data?.semesterCode}</span>
+          <span>{semesterData?.data?.semesterCode}</span>
         </SidebarMenuButton>
       </SidebarHeader>
+
       <Separator />
+
       <SidebarContent>
-        <NavMain items={navMain} />
-        {isManager && <NavManagement items={data.navManage} />}
+        <NavMain items={filteredNavMain} />
+        {filteredNavManage.length > 0 && (
+          <>
+            <Separator className="my-2" />
+            <NavManagement items={filteredNavManage} />
+          </>
+        )}
       </SidebarContent>
+
       <SidebarRail />
     </Sidebar>
   );

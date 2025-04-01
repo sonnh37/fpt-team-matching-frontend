@@ -8,12 +8,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { RootState } from "@/lib/redux/store";
+import { ideaService } from "@/services/idea-service";
 import { stageideaService } from "@/services/stage-idea-service";
 import { IdeaStatus } from "@/types/enums/idea";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
@@ -23,6 +31,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -96,14 +105,44 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
   const initialFeedback = row.getValue("content") as string;
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const idea = row.original;
+  const hasMentorApproval = idea.ideaRequests.some(
+    (request) =>
+      (request.status === IdeaRequestStatus.Approved ||
+        request.status === IdeaRequestStatus.Rejected) &&
+      request.role === "Mentor"
+  );
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      if (!idea.id) {
+        toast.error("Idea ID is missing. Cannot delete the idea.");
+        return;
+      }
+      const res = await ideaService.deletePermanent(idea.id);
+      if (res.status != 1) {
+        toast.error(res.message);
+        return;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Invalidate queries to refresh data
+      queryClient.refetchQueries({ queryKey: ["data"] });
+      setIsDeleteDialogOpen(false);
+    } catch (error) {
+      console.error("Error deleting idea:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2">
-      {/* Hiển thị trạng thái Mentor Approve */}
-
-      {/* Nút View */}
       <Dialog>
         <DialogTrigger asChild>
           <Button size="sm" variant="default">
@@ -118,6 +157,47 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <TimeStageIdea stageIdea={idea.stageIdea} />
             <HorizontalLinearStepper idea={idea} />
           </div>
+          <DialogFooter>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button size="sm" variant="destructive">
+                        Delete idea
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Confirm Deletion</DialogTitle>
+                      </DialogHeader>
+                      <TypographyP>
+                        Are you sure you want to delete this idea? This action
+                        cannot be undone.
+                      </TypographyP>
+                      <DialogFooter>
+                        <DialogClose asChild>
+                          <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <Button
+                          variant="destructive"
+                          onClick={handleDelete}
+                          disabled={isDeleting}
+                        >
+                          {isDeleting ? "Deleting..." : "Confirm Delete"}
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </TooltipTrigger>
+              {hasMentorApproval && (
+                <TooltipContent>
+                  <p>Mentor approval has been granted for this idea.</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

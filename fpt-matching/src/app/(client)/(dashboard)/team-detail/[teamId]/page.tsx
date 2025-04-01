@@ -72,6 +72,17 @@ import {
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info, User } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ideaService } from "@/services/idea-service";
+import { IdeaStatus } from "@/types/enums/idea";
+import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-get-current-by-status";
+import { TypographyP } from "@/components/_common/typography/typography-p";
+import { TypographyLarge } from "@/components/_common/typography/typography-large";
+import { TypographySmall } from "@/components/_common/typography/typography-small";
 
 export default function TeamInfoDetail() {
   // const { teamId } = useParams();
@@ -129,6 +140,19 @@ export default function TeamInfoDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [open, setOpen] = useState<boolean>(false);
+  const query: IdeaGetCurrentByStatusQuery = {
+    status: IdeaStatus.Pending,
+  };
+
+  const {
+    data: result_idea_current,
+    isLoading: isLoadingIdeaCurrent,
+    isError: isErrorIdeaCurrent,
+  } = useQuery({
+    queryKey: ["getIdeaCurrentAccepted", query],
+    queryFn: () => ideaService.getCurrentIdeaOfMeByStatus(query),
+    refetchOnWindowFocus: false,
+  });
 
   //  Gọi API lấy thông tin team
   useEffect(() => {
@@ -232,6 +256,10 @@ export default function TeamInfoDetail() {
     }
   };
 
+  if (isLoadingIdeaCurrent) return <LoadingComponent />;
+  if (isErrorIdeaCurrent) return <ErrorSystem />;
+
+  const hasPendingIdea = (result_idea_current?.data?.length ?? 0) > 0;
   return (
     <div className="p-4">
       {loading && (
@@ -255,7 +283,7 @@ export default function TeamInfoDetail() {
                 //check xem con slot khong va no khog co trong team nay va no khong co team vo nao khac roi
                 availableSlots > 0 &&
                   !check &&
-                  !teamUserLogin &&
+                  !teamUserLogin && // nếu như ko có project
                   //Check xem da gui moi chua
                   (isInvited ? (
                     <Button
@@ -266,69 +294,82 @@ export default function TeamInfoDetail() {
                     </Button>
                   ) : (
                     // <button className="bg-blue-500- text-xl p-2 bg-blue-500  hover:bg-blue-200" onChange={() => requestJoinTeam()}>Request</button>
-                    <Dialog open={open} onOpenChange={setOpen}>
-                      <DialogTrigger asChild>
-                        <Button className="gap-2">
-                          <TbUsersPlus className="h-4 w-4" />
-                          Join Team
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>
-                            Join {teamInfo?.teamName || "this team"}?
-                          </DialogTitle>
-                          <DialogDescription>
-                            You're about to send a join request
-                          </DialogDescription>
-                        </DialogHeader>
 
-                        <div className="grid gap-4 pb-4">
-                          <div className="flex space-y-2">
-                            {teamInfo?.leader && (
-                              <div className="flex items-center gap-2 text-sm">
-                                <User className="h-4 w-4 opacity-70" />
-                                <span>
-                                  Team Leader:{" "}
-                                  {teamInfo.leader.firstName ||
-                                    teamInfo.leader.email}
-                                </span>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div>
+                          <Dialog open={open} onOpenChange={setOpen}>
+                            <DialogTrigger asChild>
+                              <Button
+                                disabled={hasPendingIdea}
+                                className="gap-2"
+                              >
+                                <TbUsersPlus className="h-4 w-4" />
+                                Join Team
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[425px]">
+                              <DialogHeader>
+                                <DialogTitle>
+                                  Join {teamInfo?.teamName || "this team"}?
+                                </DialogTitle>
+                                <DialogDescription>
+                                  You're about to send a join request
+                                </DialogDescription>
+                              </DialogHeader>
+
+                              <div className="grid gap-4 pb-4">
+                                <div className="flex space-y-2">
+                                  {teamInfo?.leader && (
+                                    <div className="flex items-center gap-2 text-sm">
+                                      <User className="h-4 w-4 opacity-70" />
+                                      <span>
+                                        Team Leader:{" "}
+                                        {teamInfo.leader.firstName ||
+                                          teamInfo.leader.email}
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {teamInfo?.description && (
+                                    <TypographyMuted className="text-sm italic">
+                                      "{teamInfo.description}"
+                                    </TypographyMuted>
+                                  )}
+
+                                  <TypographySmall>Your request needs approval from the team
+                                  leader before you can join.</TypographySmall>
+                                </div>
                               </div>
-                            )}
 
-                            {teamInfo?.description && (
-                              <TypographyMuted className="text-sm italic">
-                                "{teamInfo.description}"
-                              </TypographyMuted>
-                            )}
-
-                            <Alert className="mt-3">
-                              <Info className="h-4 w-4" />
-                              <AlertTitle>Note</AlertTitle>
-                              <AlertDescription>
-                                Your request needs approval from the team leader
-                                before you can join.
-                              </AlertDescription>
-                            </Alert>
-                          </div>
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <Button type="button" variant="outline">
+                                    Cancel
+                                  </Button>
+                                </DialogClose>
+                                <Button
+                                  type="submit"
+                                  onClick={() =>
+                                    requestJoinTeam(teamInfo?.id || "")
+                                  }
+                                >
+                                  <TbUsersPlus />
+                                  Confirm Join
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                         </div>
-
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button type="button" variant="outline">
-                              Cancel
-                            </Button>
-                          </DialogClose>
-                          <Button
-                            type="submit"
-                            onClick={() => requestJoinTeam(teamInfo?.id || "")}
-                          >
-                            <TbUsersPlus />
-                            Confirm Join
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                      </TooltipTrigger>
+                      {hasPendingIdea && (
+                        <TooltipContent>
+                            <TypographyLarge>
+                            You have a pending idea, so you cannot request to join a team.
+                            </TypographyLarge>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
                   ))
               }
             </CardTitle>
