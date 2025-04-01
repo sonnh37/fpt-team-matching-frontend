@@ -33,7 +33,7 @@ export const NoTeam = () => {
   let showCreateModal = searchParams.get("create") === "true";
 
   const query: IdeaGetCurrentByStatusQuery = {
-    status: IdeaStatus.Pending,
+    status: IdeaStatus.Approved,
   };
 
   const query_invitations: InvitationGetByStatudQuery = {
@@ -49,7 +49,7 @@ export const NoTeam = () => {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["getIdeaCurrentPending", query],
+    queryKey: ["getIdeaCurrentAccepted", query],
     queryFn: () => ideaService.getCurrentIdeaOfMeByStatus(query),
     refetchOnWindowFocus: false,
   });
@@ -82,9 +82,9 @@ export const NoTeam = () => {
       />
     );
 
-  const hasPendingIdea = (result?.data?.length ?? 0) > 0;
+  const hasAcceptedIdea = (result?.data?.length ?? 0) > 0;
 
-  if (hasPendingIdea) {
+  if (hasAcceptedIdea) {
     showCreateModal = false;
     router.replace("/team");
   }
@@ -110,7 +110,7 @@ export const NoTeam = () => {
               <div>
                 <Dialog open={showCreateModal} onOpenChange={handleOpenChange}>
                   <DialogTrigger asChild>
-                    <Button disabled={hasPendingIdea}>
+                    <Button disabled={hasAcceptedIdea}>
                       <TbUsersPlus /> Create team
                     </Button>
                   </DialogTrigger>
@@ -125,9 +125,9 @@ export const NoTeam = () => {
                 </Dialog>
               </div>
             </TooltipTrigger>
-            {hasPendingIdea && (
+            {hasAcceptedIdea && (
               <TooltipContent>
-                <p>You have a pending idea, so you do not have create team</p>
+                <p>You have a accepted idea, so you do not have create team</p>
               </TooltipContent>
             )}
           </Tooltip>
@@ -136,14 +136,14 @@ export const NoTeam = () => {
           <Tooltip>
             <TooltipTrigger asChild>
               <div>
-                <Button variant={"default"} disabled={hasPendingIdea}>
+                <Button variant={"default"} disabled={hasAcceptedIdea}>
                   <LuUsersRound /> Find teams
                 </Button>
               </div>
             </TooltipTrigger>
-            {hasPendingIdea && (
+            {hasAcceptedIdea && (
               <TooltipContent>
-                <p>You have a pending idea, so you do not have find teams</p>
+                <p>You have a accepted idea, so you do not have find teams</p>
               </TooltipContent>
             )}
           </Tooltip>
