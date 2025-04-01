@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faPaperPlane, faAngleDown, faTrophy, faShare, faCircleUser, faPencil, faNoteSticky, faUser, faVideo, faPhotoFilm, faFaceSmile } from "@fortawesome/free-solid-svg-icons";
+import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faTrophy, faShare, faCircleUser, faPencil, faNoteSticky, faUser, faVideo, faPhotoFilm, faFaceSmile, faPenNib, faBolt } from "@fortawesome/free-solid-svg-icons";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -73,6 +73,15 @@ export default function Blogmanagement() {
 
     //gọi thông tin user đã đăng nhập
     const user = useSelector((state: RootState) => state.user.user)
+    // Lấy tất cả kỹ năng từ skillProfiles, loại bỏ trùng lặp
+    // Chuyển Set thành mảng để tránh lỗi
+    const uniqueSkills = Array.from(
+        new Set(
+            user?.profileStudent?.skillProfiles?.flatMap(profile =>
+                profile?.fullSkill?.split(",").map(skill => skill.trim())
+            ) || []
+        )
+    );
 
 
     let query: BlogGetAllQuery = {
@@ -165,7 +174,7 @@ export default function Blogmanagement() {
         }
     };
     return (
-        
+
         <div className="bg-gray-50 dark:bg-gray-900 min-h-screen  transition-colors duration-200">
             <div className='w-full bg-white dark:bg-gray-800 rounded-xl shadow-lg  overflow-hidden transition-colors duration-200 '>
                 <div className="max-w-4xl mx-auto">
@@ -207,16 +216,24 @@ export default function Blogmanagement() {
                             </div>
 
                             <p className="mt-6 text-gray-600 dark:text-gray-300">
-                                Hi, I'm a passionate developer with expertise in Node.js, React, and Tailwind CSS. I love building efficient and scalable web applications.
+                                {user?.profileStudent?.bio ?? "Hiện tại người dùng chưa cập nhập bio"}
                             </p>
 
                             <div className="mt-6">
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Skills</h2>
                                 <div className="flex flex-wrap gap-2">
-                                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-lg text-sm font-medium">Node.js</span>
-                                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-lg text-sm font-medium">React</span>
-                                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-lg text-sm font-medium">Tailwind CSS</span>
-                                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-lg text-sm font-medium">MySQL</span>
+                                    {uniqueSkills.length > 0 ? (
+                                        uniqueSkills.map((skill, index) => (
+                                            <span
+                                                key={index}
+                                                className="px-3 py-1 bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 rounded-lg text-sm font-medium"
+                                            >
+                                                {skill}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="text-gray-600 dark:text-gray-400  "><FontAwesomeIcon icon={faBolt} /> Chưa có kỹ năng nào</span>
+                                    )}
                                 </div>
                             </div>
 
@@ -224,6 +241,13 @@ export default function Blogmanagement() {
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Achievement</h2>
                                 <p className="mt-3 text-gray-600 dark:text-gray-300">
                                     <FontAwesomeIcon icon={faTrophy} />  {user?.profileStudent?.achievement ?? "  Người dùng chưa điền thông tin các thành tựu"}
+
+                                </p>
+                            </div>
+                            <div className="mt-6">
+                                <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Experience Project</h2>
+                                <p className="mt-3 text-gray-600 dark:text-gray-300">
+                                    <FontAwesomeIcon icon={faPenNib} />  {user?.profileStudent?.experienceProject ?? "  Người dùng chưa điền thông tin"}
 
                                 </p>
                             </div>

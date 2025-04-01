@@ -35,6 +35,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import {reviewService} from "@/services/review-service";
 import {Toast} from "@/components/ui/toast";
+import {semesterService} from "@/services/semester-service";
+import {toast} from "sonner";
 
 export function DropdownReviewListMenu({review, setReview} : {review: string, setReview: Dispatch<React.SetStateAction<string>>}) {
     return (
@@ -116,12 +118,18 @@ export default function Page() {
     const [review, setReview] = useState<string>("1")
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [open, setOpen] = React.useState<boolean>(false);
-
+    const [currentSemester, setCurrentSemester] = useState<string | null>(null);
     const postFileXLSX = async () => {
-        const result = await reviewService.importReviewFromXLSX(file!, parseInt(review), "ab61a0c5-4cef-455f-8903-e32ffa05861e")
-        console.log(result)
-        if (result.status == -1) {
-
+        if(currentSemester) {
+            const result = await reviewService.importReviewFromXLSX(file!, parseInt(review), "fd61a0c5-4cef-455f-8903-e32ffa05861e")
+            console.log(result)
+            if (result.status == -1) {
+                toast.error(result.message)
+            } else {
+                toast.success(result.message)
+            }
+        } else {
+            toast.error("Not found semester")
         }
         setIsLoading(false)
     }
@@ -183,7 +191,15 @@ export default function Page() {
 
         reader.onerror = (error) => console.error("File reading error:", error);
     }, [file]);
-
+    useEffect(() => {
+        const fetchData = async () => {
+            const result = await semesterService.getCurrentSemester()
+            if (result.data && result.status == 1) {
+                setCurrentSemester(result.data.id!)
+            }
+            fetchData()
+        }
+    }, []);
     return (
         <div className={" items-center gap-1.5 px-8 py-2"}>
             <DropdownReviewListMenu setReview={setReview} review={review} />

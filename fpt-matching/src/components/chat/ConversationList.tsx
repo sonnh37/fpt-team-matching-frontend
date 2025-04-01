@@ -4,8 +4,7 @@ import {useSelector} from "react-redux";
 import {RootState} from "@/lib/redux/store";
 import {ConversationMemberInfo} from "@/types/conversation-member-info";
 
-const ConversationList = ({joinChatRoom, setChatRoom, chatRoom}: { joinChatRoom : any, setChatRoom: any, chatRoom: string | undefined}) => {
-    const [partner, setPartner] = useState<string>();
+const ConversationList = ({joinChatRoom, setChatRoom, chatRoom}: { joinChatRoom : any, setChatRoom: any, chatRoom: ConversationMemberInfo | undefined}) => {
 
 
     const user = useSelector((state: RootState)=> state.user.user)
@@ -29,7 +28,7 @@ const ConversationList = ({joinChatRoom, setChatRoom, chatRoom}: { joinChatRoom 
     useEffect(() => {
         // username: string,  partnerId: string , chatroom: string
         if(chatRoom != null)
-            joinChatRoom(user.id, null, chatRoom)
+            joinChatRoom(user.id, null, chatRoom.conversationId)
     }, [chatRoom]);
     return (
         <div className={"w-[25%] h-screen text-center bg-white"}>
@@ -41,7 +40,7 @@ const ConversationList = ({joinChatRoom, setChatRoom, chatRoom}: { joinChatRoom 
                     <div
                         onClick={(e) => {
                             e.preventDefault();
-                            setChatRoom(conversation.conversationId);
+                            setChatRoom(conversation);
                         }}
                         key={index}
                          className={`hover:cursor-pointer min-h-16 border-[1px] border-gray-200 flex justify-between
