@@ -62,7 +62,7 @@ export const NAV_CONFIG = {
       title: "Idea",
       url: "/idea",
       icon: Lightbulb,
-      roles: ["Student", "Lecturer", "Reviewer", "Council"],
+      roles: ["*"],
       items: [
         {
           title: "Create Idea",
@@ -134,6 +134,12 @@ export const NAV_CONFIG = {
       url: "/management/projects",
       icon: RiTimeLine,
       roles: ["Lecturer"],
+    },
+    {
+      title: "Manage defense",
+      url: "/manage-defense",
+      icon: ShieldHalf,
+      roles: ["Manager"],
     },
   ],
 };
