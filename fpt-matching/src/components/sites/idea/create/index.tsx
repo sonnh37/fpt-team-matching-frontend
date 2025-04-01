@@ -145,8 +145,6 @@ export const CreateProjectForm = () => {
     refetchOnWindowFocus: false,
   });
 
-
-
   const project = result_project?.data;
 
   const {
@@ -196,13 +194,16 @@ export const CreateProjectForm = () => {
         }
         setSelectedProfession(profess ?? null);
 
+        // Lấy tất cả idea các kì của user đã tạo
         const ideaExists = await ideaService.getIdeaByUser();
         const teamExist = await projectService.getProjectInfo();
         //check xem user co idea nao dang pending or Done khong
         const isPendingOrDone = ideaExists.data?.some(
-          (m) => m.status !== IdeaStatus.Rejected
+          (m) =>
+            m.status === IdeaStatus.Pending || m.status === IdeaStatus.Approved
         );
-        if ((ideaExists.data && isPendingOrDone) || teamExist.data) {
+        
+        if (isPendingOrDone) {
           if (isStudent) {
             setShowPageIsIdea(true);
           }
