@@ -5,6 +5,8 @@ import { BaseService } from "./_base/base-service";
 import { BusinessResult } from "@/types/models/responses/business-result";
 import axiosInstance from "@/lib/interceptors/axios-instance";
 import { TeamCreateCommand } from "@/types/models/commands/projects/team-create-command";
+import { ProjectGetListForMentorQuery } from "@/types/models/queries/projects/project-get-list-for-mentor-query";
+import { cleanQueryParams } from "@/lib/utils";
 
 class ProjectSerivce extends BaseService<Project> {
   constructor() {
@@ -21,6 +23,23 @@ class ProjectSerivce extends BaseService<Project> {
       return Promise.reject(error);
     }
   };
+
+  public fetchPaginatedForMentor = (
+      query?: ProjectGetListForMentorQuery
+    ): Promise<BusinessResult<PaginatedResult<Project>>> => {
+      const cleanedQuery = cleanQueryParams(query ?? {});
+  
+      return axiosInstance
+        .get<BusinessResult<PaginatedResult<Project>>>(
+          `${this.endpoint}/me/mentor-projects?${cleanedQuery}&isPagination=true`
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) => {
+          return this.handleError(error);
+        });
+    };
 
   public getProjectInfoCheckLeader = async (): Promise<
     BusinessResult<Project>
