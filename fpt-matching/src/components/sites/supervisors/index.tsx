@@ -172,7 +172,7 @@ export default function SupervisorsTable() {
         </div>
 
         <div className="">
-          <Card className="space-y-4 p-4 w-[70%] mx-auto">
+          <Card className="space-y-4 overflow-hidden w-full p-4 mx-auto">
             {isFetching && !isTyping ? (
               <DataTableSkeleton
                 columnCount={1}

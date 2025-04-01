@@ -183,10 +183,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <DialogTrigger asChild>
               <Button
                 size="sm"
-                variant={`${hasCouncilRequests ? "secondary" : "default"}`}
+                variant={"default"}
                 // disabled={hasCouncilRequests}
               >
-                View {hasCouncilRequests ? "(Sent)" : ""}
+                View
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
@@ -240,7 +240,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 )}
                 {/* Option: approve or reject */}
               </div>
-             
             </DialogContent>
           </Dialog>
         </div>

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
 import { ideaService } from "@/services/idea-service";
-import { IdeaType } from "@/types/enums/idea";
+import { IdeaStatus, IdeaType } from "@/types/enums/idea";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,6 +38,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
+import { IdeaGetListOfSupervisorsQuery } from "@/types/models/queries/ideas/idea-get-list-of-supervisor-query";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -49,7 +50,7 @@ export default function IdeasOfSupervisorsTableTable() {
   const filterEnums: FilterEnum[] = [
     {
       columnId: "isExistedTeam",
-      title: "Slot register",
+      title: "Slot idea",
       options: isExistedTeam_options,
     },
   ];
@@ -81,15 +82,19 @@ export default function IdeasOfSupervisorsTableTable() {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaGetAllQuery = useMemo(() => {
-    const params: IdeaGetAllQuery = useQueryParams(
+  const queryParams: IdeaGetListOfSupervisorsQuery = useMemo(() => {
+    const baseParams = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
 
-    params.type = IdeaType.Lecturer;
+    const params: IdeaGetListOfSupervisorsQuery = {
+      ...baseParams,
+      types: [IdeaType.Lecturer, IdeaType.Enterprise],
+      status: IdeaStatus.Approved,
+    };
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -105,7 +110,7 @@ export default function IdeasOfSupervisorsTableTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaService.fetchPaginated(queryParams),
+    queryFn: () => ideaService.fetchPaginatedIdeasOfSupervisors(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -171,11 +176,14 @@ export default function IdeasOfSupervisorsTableTable() {
         </div>
 
         <div className="">
-          <Card className="space-y-4 p-4 w-full">
+          <Card className="space-y-4 p-4 ">
             <DataTableToolbar
               form={form}
               table={table}
               filterEnums={filterEnums}
+              isCreateButton={false}
+              isSelectColumns={false}
+              isSortColumns={false}
             />
             {isFetching ? (
               <DataTableSkeleton

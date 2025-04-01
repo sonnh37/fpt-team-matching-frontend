@@ -40,7 +40,9 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Actions" />
+    ),
     cell: ({ row }) => {
       return <Actions row={row} />;
     },

@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import { TeamInvitationCommand } from "@/types/models/commands/invitation/invitation-team-command";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { userService } from "@/services/user-service";
+import { Badge } from "@/components/ui/badge";
 
 
 
@@ -155,17 +156,17 @@ const UpdateProjectTeam = () => {
 
   return (
     <Form  {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-4 bg-white shadow-md rounded-lg">
-        <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-xl">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <div className="p-4">
           <h2 className="text-2xl font-semibold text-center mb-6">Update Group Detail</h2>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
               <p className="text-sm font-medium">Profession *</p>
-              <p className="text-gray-700">{result?.data?.idea?.specialty?.profession?.professionName} (K15 trở đi)</p>
+              <p className="text-gray-700 dark:text-primary-foreground">{result?.data?.idea?.specialty?.profession?.professionName} (K15 trở đi)</p>
             </div>
             <div>
               <p className="text-sm font-medium">Specialty *</p>
-              <p className="text-gray-700">{result?.data?.idea?.specialty?.specialtyName}</p>
+              <p className="text-gray-700 dark:text-primary-foreground">{result?.data?.idea?.specialty?.specialtyName}</p>
             </div>
           </div>
 
@@ -232,16 +233,16 @@ const UpdateProjectTeam = () => {
 
           {/* Team Members */}
           <div className="mb-4 mt-4">
-            <p className="text-sm font-medium">Team Members</p>
-            <p className="text-gray-500 text-sm">Existed Members</p>
+            <p className="text-sm font-medium">Team Members <Badge variant={"secondary"}>{sortedMembers?.length}</Badge></p>
+            <p className="text-gray-500 dark:text-primary-foreground text-sm">Existed Members</p>
             {sortedMembers?.map((member, index) => (
-              <div key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded-lg mt-2">
+              <div key={index} className="flex items-center justify-between bg-gray-100 dark:bg-slate-900 p-2 rounded-lg mt-2">
                 <span className="text-sm">{member.user?.email}</span>
                 {member.role === TeamMemberRole.Leader ? (
-                  <span className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]} | Owner</span>
+                  <span className="text-sm text-gray-500 dark:text-primary-foreground">{TeamMemberRole[member.role ?? 0]} | Owner</span>
 
                 ) : (
-                  <span className="text-sm text-gray-500">{TeamMemberRole[member.role ?? 0]}</span>
+                  <span className="text-sm text-gray-500 dark:text-primary-foreground">{TeamMemberRole[member.role ?? 0]}</span>
                 )}
               </div>
             ))}
@@ -269,9 +270,9 @@ const UpdateProjectTeam = () => {
             </FormItem>
           </div>
           {/* Submit Button */}
-          <button type="submit" className="w-full bg-purple-400 text-white mt-6 p-3 rounded-lg hover:bg-purple-500 transition">
+          <Button type="submit" className="mt-8 text-center">
             Update Idea
-          </button>
+          </Button>
         </div>
       </form>
     </Form>

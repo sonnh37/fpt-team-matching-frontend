@@ -8,6 +8,7 @@ import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-g
 import { cleanQueryParams } from "@/lib/utils";
 import { IdeaUpdateStatusCommand } from "@/types/models/commands/idea/idea-update-status-command";
 import { IdeaRequest } from "@/types/idea-request";
+import { IdeaGetListOfSupervisorsQuery } from "@/types/models/queries/ideas/idea-get-list-of-supervisor-query";
 
 class IdeaService extends BaseService<Idea> {
   constructor() {
@@ -51,18 +52,37 @@ class IdeaService extends BaseService<Idea> {
 
     return axiosInstance
       .get<BusinessResult<Idea[]>>(
-        `${this.endpoint}/me/get-by-status?${cleanedQuery}&isPagination=true`
+        `${this.endpoint}/me/by-status?${cleanedQuery}&isPagination=true`
       )
       .then((response) => response.data)
       .catch((error) => this.handleError(error));
   };
 
-  public updateStatus = (command: IdeaUpdateStatusCommand): Promise<BusinessResult<IdeaRequest>> => {
-      return axiosInstance
-        .put<BusinessResult<IdeaRequest>>(`${this.endpoint}/status`, command)
-        .then((response) => response.data)
-        .catch((error) => this.handleError(error)); // Xử lý lỗi
-    };
+  public updateStatus = (
+    command: IdeaUpdateStatusCommand
+  ): Promise<BusinessResult<IdeaRequest>> => {
+    return axiosInstance
+      .put<BusinessResult<IdeaRequest>>(`${this.endpoint}/status`, command)
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public fetchPaginatedIdeasOfSupervisors = (
+    query?: IdeaGetListOfSupervisorsQuery
+  ): Promise<BusinessResult<PaginatedResult<Idea>>> => {
+    const cleanedQuery = cleanQueryParams(query ?? {});
+
+    return axiosInstance
+      .get<BusinessResult<PaginatedResult<Idea>>>(
+        `${this.endpoint}/supervisors?${cleanedQuery}&isPagination=true`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
 }
 
 export const ideaService = new IdeaService();

@@ -12,10 +12,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/utils";
-import { invitationService } from "@/services/invitation-service";
+import { mentoridearequestService } from "@/services/mentor-idea-request-service";
 import { InvitationStatus } from "@/types/enums/invitation";
+import { MentorIdeaRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Invitation } from "@/types/invitation";
-import { InvitationUpdateCommand } from "@/types/models/commands/invitation/invitation-update-command";
+import { MentorIdeaRequest } from "@/types/mentor-idea-request";
+import { MentorIdeaRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
 import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -23,7 +25,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-export const columns: ColumnDef<Invitation>[] = [
+export const columns: ColumnDef<MentorIdeaRequest>[] = [
   {
     accessorKey: "project.teamName",
     header: ({ column }) => (
@@ -40,21 +42,22 @@ export const columns: ColumnDef<Invitation>[] = [
       );
     },
   },
+
   {
-    accessorKey: "createdDate",
+    accessorKey: "idea.englishName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date created" />
+      <DataTableColumnHeader column={column} title="Idea" />
     ),
     cell: ({ row }) => {
-      const date = new Date(row.getValue("createdDate"));
-      return <p>{date.toLocaleString()}</p>;
+      const englishName = row.original.idea?.englishName ?? "Unknown"; // Tránh lỗi undefined
+      const ideaId = row.original.idea?.id ?? "#";
+
+      return (
+        <Button variant="link" className="p-0 m-0" asChild>
+          <Link href={`/idea-detail/${ideaId}`}>{englishName}</Link>
+        </Button>
+      );
     },
-  },
-  {
-    accessorKey: "content",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Process Note" />
-    ),
   },
   {
     accessorKey: "status",
@@ -62,8 +65,8 @@ export const columns: ColumnDef<Invitation>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as InvitationStatus;
-      const statusText = InvitationStatus[status];
+      const status = row.getValue("status") as MentorIdeaRequestStatus;
+      const statusText = MentorIdeaRequestStatus[status];
 
       let badgeVariant:
         | "secondary"
@@ -73,13 +76,13 @@ export const columns: ColumnDef<Invitation>[] = [
         | null = "default";
 
       switch (status) {
-        case InvitationStatus.Pending:
+        case MentorIdeaRequestStatus.Pending:
           badgeVariant = "secondary";
           break;
-        case InvitationStatus.Accepted:
+        case MentorIdeaRequestStatus.Approved:
           badgeVariant = "default";
           break;
-        case InvitationStatus.Rejected:
+        case MentorIdeaRequestStatus.Rejected:
           badgeVariant = "destructive";
           break;
         default:
@@ -93,6 +96,11 @@ export const columns: ColumnDef<Invitation>[] = [
     },
   },
   {
+    accessorKey: "createdDate",
+    header: ({ column }) => null,
+    cell: ({ row }) => null,
+  },
+  {
     accessorKey: "actions",
     header: "Actions",
     cell: ({ row }) => {
@@ -100,7 +108,9 @@ export const columns: ColumnDef<Invitation>[] = [
 
       return (
         <>
-          {model.status === InvitationStatus.Pending && <Actions row={row} />}
+          {model.status === MentorIdeaRequestStatus.Pending && (
+            <Actions row={row} />
+          )}
         </>
       );
     },
@@ -108,7 +118,7 @@ export const columns: ColumnDef<Invitation>[] = [
 ];
 
 interface ActionsProps {
-  row: Row<Invitation>;
+  row: Row<MentorIdeaRequest>;
 }
 
 const Actions: React.FC<ActionsProps> = ({ row }) => {
@@ -120,14 +130,19 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const handleCancel = async () => {
     try {
       // Gọi API cancelInvite
-      if (!model.projectId) throw new Error("Project ID is undefined");
-      const res = await invitationService.cancelInvite_(model.projectId);
+      const command: MentorIdeaRequestUpdateCommand = {
+        id: model.id,
+        status: MentorIdeaRequestStatus.Rejected,
+        projectId: model.projectId,
+        ideaId: model.ideaId,
+      };
+      const res = await mentoridearequestService.update(command);
       if (res.status != 1) {
         toast.error(res.message);
         return;
       }
 
-      toast.success(`Invitation canceled successfully`);
+      toast.success(`Canceled`);
       queryClient.invalidateQueries({ queryKey: ["data"] });
     } catch (error) {
       toast.error(error as string);
@@ -137,14 +152,19 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const handleApprove = async () => {
     try {
       // Gọi API approveInvite
-      if (!model.projectId) throw new Error("Project ID is undefined");
-      const res = await invitationService.approveInvite(model.projectId);
+      const command: MentorIdeaRequestUpdateCommand = {
+        id: model.id,
+        status: MentorIdeaRequestStatus.Approved,
+        projectId: model.projectId,
+        ideaId: model.ideaId,
+      };
+      const res = await mentoridearequestService.update(command);
       if (res.status != 1) {
         toast.error(res.message);
         return;
       }
 
-      toast.success(`Invitation approved successfully`);
+      toast.success(`Approved`);
       queryClient.invalidateQueries({ queryKey: ["data"] });
     } catch (error) {
       toast.error(error as string);
