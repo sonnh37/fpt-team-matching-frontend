@@ -82,6 +82,7 @@ import { IdeaStatus } from "@/types/enums/idea";
 import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-get-current-by-status";
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { TypographyLarge } from "@/components/_common/typography/typography-large";
+import { TypographySmall } from "@/components/_common/typography/typography-small";
 
 export default function TeamInfoDetail() {
   // const { teamId } = useParams();
@@ -336,14 +337,8 @@ export default function TeamInfoDetail() {
                                     </TypographyMuted>
                                   )}
 
-                                  <Alert className="mt-3">
-                                    <Info className="h-4 w-4" />
-                                    <AlertTitle>Note</AlertTitle>
-                                    <AlertDescription>
-                                      Your request needs approval from the team
-                                      leader before you can join.
-                                    </AlertDescription>
-                                  </Alert>
+                                  <TypographySmall>Your request needs approval from the team
+                                  leader before you can join.</TypographySmall>
                                 </div>
                               </div>
 
