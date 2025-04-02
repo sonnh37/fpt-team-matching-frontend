@@ -2,14 +2,14 @@
   "name": "fpt-matching",
   "version": "0.1.0",
   "private": true,
-  "scripts": {
-    "copy-assets": "cross-env OS=$(node -e \"console.log(process.platform)\") npm run copy-assets:platform",
-    "copy-assets:platform": "node -e \"process.platform === 'win32' ? require('child_process').execSync('xcopy /E /I /Y node_modules\\\\@nutrient-sdk\\\\viewer\\\\dist public\\\\nutrient-viewer', {stdio: 'inherit'}) : require('child_process').execSync('cp -R ./node_modules/@nutrient-sdk/viewer/dist/ public/nutrient-viewer', {stdio: 'inherit'})\"",
-    "dev": "npm run copy-assets && next --experimental-https --turbo",
-    "build": "npm run copy-assets && next build",
-    "start": "next start",
-    "lint": "next lint"
+ "scripts": {
+  "copy-assets": "cross-env cpx \"node_modules/@nutrient-sdk/viewer/dist/**\" \"public/nutrient-viewer\"",
+  "dev": "npm run copy-assets && next --experimental-https --turbo",
+  "build": "npm run copy-assets && next build",
+  "start": "next start",
+  "lint": "next lint"
   },
+
   "dependencies": {
     "@cloudinary-util/types": "^1.6.0",
     "@cloudinary/react": "^1.14.1",
@@ -67,7 +67,6 @@
     "cloudinary": "^2.6.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
-    "cross-env": "^7.0.3",
     "date-fns": "^3.6.0",
     "deepmerge": "^4.3.1",
     "formidable": "^3.5.2",
@@ -110,6 +109,8 @@
     "@types/qs": "^6.9.18",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "cpx": "^1.5.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8",
     "eslint-config-next": "14.2.23",
     "postcss": "^8",
