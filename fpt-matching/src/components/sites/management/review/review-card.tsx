@@ -11,7 +11,7 @@ import {
 
 import { Review } from "@/types/review"
 import { Badge } from "@/components/ui/badge"
-import { useRouter } from "next/navigation"
+import {usePathname, useRouter} from "next/navigation"
 
 function BadgeDestructive() {
     return <Badge variant="destructive">Not assigned</Badge>
@@ -26,6 +26,7 @@ function BadgeSuccess() {
 
 
 export function ReviewCard({review} : {review: Review}) {
+    const pathName = usePathname()
     const router = useRouter()
     return (
         <Card className="w-[350px]">
@@ -55,7 +56,7 @@ export function ReviewCard({review} : {review: Review}) {
             </CardContent>
             <CardFooter className="flex justify-between">
                 <Button onClick={() => {
-                    router.push(`/team/manage-review/review-details?reviewId=${review.id}`)
+                    router.push(`${pathName}/review-details?reviewId=${review.id}`)
                 }}>View details</Button>
             </CardFooter>
         </Card>

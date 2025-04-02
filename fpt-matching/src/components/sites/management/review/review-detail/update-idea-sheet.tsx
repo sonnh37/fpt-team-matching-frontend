@@ -20,7 +20,7 @@ import {IdeaHistory} from "@/types/idea-history";
 import Link from "next/link";
 import {IdeaHistoryStatus} from "@/types/enums/idea-history";
 import { Badge } from "@/components/ui/badge";
-import {EditIdeaDialog} from "@/app/(client)/(dashboard)/team/manage-review/review-details/edit-idea-dialog";
+import {EditIdeaDialog} from "@/components/sites/management/review/review-detail/edit-idea-dialog";
 
 function CollapsibleFile({ideaHis}:{ideaHis:IdeaHistory[]}) {
     const [isOpen, setIsOpen] = React.useState(false)

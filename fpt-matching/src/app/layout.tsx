@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LayoutClient from "./layout-client";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -13,6 +14,12 @@ export default function RootLayout({
 }>) {
   return (
     <html suppressHydrationWarning={true} lang="en">
+        <head>
+            <Script
+                src="/nutrient-viewer/nutrient-viewer.js"
+                strategy="beforeInteractive"
+            />
+        </head>
       <body className={`antialiased`}>
         <LayoutClient>{children}</LayoutClient>
       </body>
