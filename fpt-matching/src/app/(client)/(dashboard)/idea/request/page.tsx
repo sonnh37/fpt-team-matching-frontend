@@ -42,19 +42,6 @@ export default function Page() {
   const tab_3 = "Rejected";
 
   const {
-    data: res_stageIdea,
-    isFetching,
-    isLoading,
-    error,
-    isError,
-  } = useQuery({
-    queryKey: ["data_stage-idea_latest"],
-    queryFn: async () => await stageideaService.fetchLatest(),
-    placeholderData: keepPreviousData,
-    refetchOnWindowFocus: false,
-  });
-
-  const {
     data: res_ideas,
     isLoading: isLoadingAnother,
     error: errorAnother,
@@ -66,28 +53,16 @@ export default function Page() {
     refetchOnWindowFocus: false,
   });
 
-  if (isLoading || isLoadingAnother) return <LoadingComponent />;
-  if (isError || isErrorAnother) {
-    console.error("Error fetching stage ideas:", error);
+  if (isLoadingAnother) return <LoadingComponent />;
+  if (isErrorAnother) {
     return <ErrorSystem />;
   }
-
-  const stageIdea = res_stageIdea?.data;
-
-  const idea_current = res_ideas?.data
-    ?.filter((m) => m.ownerId === user.id)
-    .sort(
-      (a, b) =>
-        new Date(b.createdDate || 0).getTime() -
-        new Date(a.createdDate || 0).getTime()
-    )?.[0];
 
   const countIdeasByStatus = (status: IdeaStatus) => {
     return res_ideas?.data?.filter((m) => m.status == status).length ?? 0;
   };
   return (
     <>
-
       <Tabs defaultValue={tab_1} className="w-full container mx-auto">
         <div className="flex justify-between">
           <TabsList>

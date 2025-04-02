@@ -67,7 +67,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
         {/* list notification */}
         <div className="grid">
           <TypographyH3 className="p-4 pb-2 tracking-[0.015em]">
-            Notification
+            Notifications
           </TypographyH3>
 
           <Separator className="" />
@@ -80,7 +80,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
               return (
                 <div
                   key={noti.id}
-                  className="flex items-start px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none"
+                  className="flex gap-2 items-center justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none"
                 >
                   {noti.user != null ? (
                     <Avatar className="size-8">
@@ -101,9 +101,9 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
                     </Avatar>
                   ) : null}
                   <div className="flex-1">
-                    <TypographyP className="tracking-[0.015em]">
+                    <TypographySmall className="tracking-[0.015em] truncate">
                       {noti.description}
-                    </TypographyP>
+                    </TypographySmall>
                     <TypographyMuted>
                       {formatDate(noti.createdDate)}
                     </TypographyMuted>

@@ -49,29 +49,6 @@ export function MainNav({ user = null }: MainNavProps) {
             <NotificationPopover />
             <AuthDropdown user={user} />
           </div>
-          {/* <LinkItem href="/" title="Trang chủ" />
-          <Dropdown label="Diễn đàn">
-            <DropdownItem href={"#"} title="Instagram" />
-            <DropdownItem href={"#"} title="Bài mới" />
-            <DropdownItem href={"#"} title="Tìm trong diễn đàn" />
-          </Dropdown>
-
-          <Dropdown label="Có gì mới">
-            <DropdownItem href={"#"} title="Featured content" />
-            <DropdownItem href={"#"} title="Bài mới" />
-            <DropdownItem href={"#"} title="Ảnh mới" />
-          </Dropdown>
-
-          <Dropdown label="Học tập">
-            <DropdownItem href={"#"} title="Thư viện ảnh" />
-          </Dropdown>
-
-          <Dropdown label="Danh hiệu">
-            <DropdownItem href={"#"} title="Thành viên" />
-            <DropdownItem href={"#"} title="Người đang truy cập" />
-          </Dropdown>
-
-          <LinkItem href="#" title="Shop" /> */}
         </div>
       </div>
     </div>
