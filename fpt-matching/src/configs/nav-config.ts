@@ -33,6 +33,12 @@ export const NAV_CONFIG = {
       roles: ["*"],
     },
     {
+      title: "Invitations",
+      url: "/invitations",
+      icon: Send,
+      roles: ["*"],
+    },
+    {
       title: "Team",
       url: "/team",
       icon: UsersRound,
@@ -52,12 +58,7 @@ export const NAV_CONFIG = {
         },
       ],
     },
-    {
-      title: "Invitations",
-      url: "/invitations",
-      icon: Send,
-      roles: ["*"],
-    },
+
     {
       title: "Idea",
       url: "/idea",

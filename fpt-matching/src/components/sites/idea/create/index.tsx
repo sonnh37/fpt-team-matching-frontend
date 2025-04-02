@@ -47,6 +47,14 @@ import {
   FormSelectObject,
   FormSwitch,
 } from "@/lib/form-custom-shadcn";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { semesterService } from "@/services/semester-service";
 import { stageideaService } from "@/services/stage-idea-service";
@@ -59,6 +67,7 @@ import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/i
 import { AlertMessage } from "@/components/_common/alert-message";
 import PageIsIdea from "@/app/(client)/(dashboard)/idea/idea-is-exist/page";
 import { TeamMemberRole } from "@/types/enums/team-member";
+import Link from "next/link";
 // Các đuôi file cho phép
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
@@ -202,7 +211,7 @@ export const CreateProjectForm = () => {
           (m) =>
             m.status === IdeaStatus.Pending || m.status === IdeaStatus.Approved
         );
-        
+
         if (isPendingOrDone) {
           if (isStudent) {
             setShowPageIsIdea(true);
@@ -339,296 +348,309 @@ export const CreateProjectForm = () => {
     }
   }
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const userId = event.target.value;
-    setSelectedUserId(userId); // Lưu ID
-  };
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 p-4 bg-white shadow-md rounded-lg"
+        className="space-y-4 p-4 flex justify-center"
       >
-        <div className="space-y-8 max-w-3xl mx-auto p-6 shadow-lg border rounded-xl">
-          <h2 className="text-2xl font-semibold text-center">
-            Create New Project
-          </h2>
-          <div className="space-y-4">
-            {/* isEnterPrise */}
-            {!isStudent && (
-              <FormSwitch
-                form={form}
-                name="isEnterpriseTopic"
-                description="Switch to enterprise idea"
-                label="How Would You Classify This Project?"
-              />
-            )}
+        <Card className="max-w-3xl  w-full">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Create New Idea</CardTitle>
+            <CardDescription>
+              Fill out the form below to create a new idea for your project.
+              Ensure all required fields are completed accurately.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* isEnterPrise */}
+              {!isStudent && (
+                <FormSwitch
+                  form={form}
+                  name="isEnterpriseTopic"
+                  description="Switch to enterprise idea"
+                  label="How Would You Classify This Project?"
+                />
+              )}
 
-            <div className="grid grid-cols-2 gap-4">
-              {isNotUpdateSettingYet ? (
-                <div>
-                  <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    Profession
-                  </Label>
-                  <TypographyP className="text-red-600 !mt-0">
-                    * Update your setting with profession and specialty
-                  </TypographyP>
-                </div>
-              ) : (
+              <div className="grid grid-cols-2 gap-4">
+                {isNotUpdateSettingYet ? (
+                  <div className="col-span-2">
+                    <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      Profession
+                    </Label>
+                    <TypographyP className="text-red-600 !mt-0">
+                      * Update your{" "}
+                      <Button className="p-0 m-0 text-base font-bold" variant={"link"} asChild>
+                        <Link className=" text-red-600 " href={"/settings"}>
+                          setting
+                        </Link>
+                      </Button> {" "}
+                      with profession and specialty
+                    </TypographyP>
+                  </div>
+                ) : (
+                  <>
+                    <FormItem>
+                      <FormLabel>Profession</FormLabel>
+                      <Select
+                        onValueChange={(value) => {
+                          const selectedProfession = professions?.find(
+                            (cat) => cat.id === value
+                          );
+                          setSelectedProfession(selectedProfession ?? null);
+                        }}
+                        value={
+                          selectedProfession ? selectedProfession.id : undefined
+                        }
+                        disabled={true}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select profession" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {professions?.map((pro) => (
+                            <SelectItem key={pro.id} value={pro.id!}>
+                              {pro.professionName}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+
+                    <FormField
+                      control={form.control}
+                      name="specialtyId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Specialty</FormLabel>
+                          <FormControl>
+                            <Select
+                              onValueChange={(value) => {
+                                if (value) {
+                                  field.onChange(value);
+                                }
+                              }}
+                              value={
+                                field.value ??
+                                form.watch("specialtyId") ??
+                                undefined
+                              }
+                              disabled={true}
+                            >
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select specialty" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {selectedProfession ? (
+                                  <>
+                                    {selectedProfession?.specialties!.map(
+                                      (spec) => (
+                                        <SelectItem
+                                          key={spec.id}
+                                          value={spec.id!}
+                                        >
+                                          {spec.specialtyName}
+                                        </SelectItem>
+                                      )
+                                    )}
+                                  </>
+                                ) : null}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </>
+                )}
+              </div>
+
+              {isEnterpriseIdea ? (
                 <>
+                  <FormInput
+                    form={form}
+                    name="enterpriseName"
+                    placeholder="What your idea enterprise?"
+                    label="Enterprise title"
+                  />
+                </>
+              ) : null}
+
+              {/* English Title */}
+              <FormField
+                control={form.control}
+                name="englishName"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Profession</FormLabel>
+                    <FormLabel>English Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="What's your idea?" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Abbreviation */}
+              <FormField
+                control={form.control}
+                name="abbreviations"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Abbreviation</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter the abbreviations for your title"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Vietnamese Title */}
+              <FormField
+                control={form.control}
+                name="vietNamName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Vietnamese Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="What's your idea in Vietnamese"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Description */}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe your project"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {/* File */}
+              <FormField
+                control={form.control}
+                name="fileschema"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>File Upload</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="file"
+                        onChange={(e) => {
+                          if (e.target.files?.[0]) {
+                            field.onChange(e.target.files[0]);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* TeamMember */}
+              <FormField
+                control={form.control}
+                name="maxTeamSize"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Team size</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) => {
+                          field.onChange(Number(value));
+                        }}
+                        value={field.value?.toString()}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={"Select team size"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[4, 5, 6].map((option) => (
+                            <SelectItem key={option} value={option.toString()}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div>
+                {isStudent && (
+                  <FormItem>
+                    <FormLabel>Mentor</FormLabel>
                     <Select
                       onValueChange={(value) => {
-                        const selectedProfession = professions?.find(
+                        const selectedUser = users?.find(
                           (cat) => cat.id === value
                         );
-                        setSelectedProfession(selectedProfession ?? null);
+                        setSelectedUserId(selectedUser?.id ?? null);
                       }}
-                      value={
-                        selectedProfession ? selectedProfession.id : undefined
-                      }
-                      disabled={true}
+                      value={selectedUserId ? selectedUserId : undefined}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Select profession" />
+                        <SelectValue placeholder="Select mentor" />
                       </SelectTrigger>
                       <SelectContent>
-                        {professions?.map((pro) => (
+                        {users?.map((pro) => (
                           <SelectItem key={pro.id} value={pro.id!}>
-                            {pro.professionName}
+                            {pro.lastName} {pro.firstName} {", "} {pro.email}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </FormItem>
+                )}
+              </div>
 
-                  <FormField
-                    control={form.control}
-                    name="specialtyId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Specialty</FormLabel>
-                        <FormControl>
-                          <Select
-                            onValueChange={(value) => {
-                              if (value) {
-                                field.onChange(value);
-                              }
-                            }}
-                            value={
-                              field.value ??
-                              form.watch("specialtyId") ??
-                              undefined
-                            }
-                            disabled={true}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select specialty" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {selectedProfession ? (
-                                <>
-                                  {selectedProfession?.specialties!.map(
-                                    (spec) => (
-                                      <SelectItem
-                                        key={spec.id}
-                                        value={spec.id!}
-                                      >
-                                        {spec.specialtyName}
-                                      </SelectItem>
-                                    )
-                                  )}
-                                </>
-                              ) : null}
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </>
-              )}
-            </div>
-
-            {isEnterpriseIdea ? (
-              <>
-                <FormInput
-                  form={form}
-                  name="enterpriseName"
-                  placeholder="What your idea enterprise?"
-                  label="Enterprise title"
-                />
-              </>
-            ) : null}
-
-            {/* English Title */}
-            <FormField
-              control={form.control}
-              name="englishName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>English Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="What's your idea?" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Abbreviation */}
-            <FormField
-              control={form.control}
-              name="abbreviations"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Abbreviation</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter the abbreviations for your title"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Vietnamese Title */}
-            <FormField
-              control={form.control}
-              name="vietNamName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Vietnamese Title</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="What's your idea in Vietnamese"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Describe your project" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {/* File */}
-            <FormField
-              control={form.control}
-              name="fileschema"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>File Upload</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      onChange={(e) => {
-                        if (e.target.files?.[0]) {
-                          field.onChange(e.target.files[0]);
-                        }
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* TeamMember */}
-            <FormField
-              control={form.control}
-              name="maxTeamSize"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Team size</FormLabel>
-                  <FormControl>
-                    <Select
-                      onValueChange={(value) => {
-                        field.onChange(Number(value));
-                      }}
-                      value={field.value?.toString()}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={"Select team size"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[4, 5, 6].map((option) => (
-                          <SelectItem key={option} value={option.toString()}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div>
-              {isStudent && (
-                <FormItem>
-                  <FormLabel>Mentor</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      const selectedUser = users?.find(
-                        (cat) => cat.id === value
-                      );
-                      setSelectedUserId(selectedUser?.id ?? null);
-                    }}
-                    value={selectedUserId ? selectedUserId : undefined}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select mentor" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {users?.map((pro) => (
-                        <SelectItem key={pro.id} value={pro.id!}>
-                          {pro.lastName} {pro.firstName} {", "} {pro.email}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-              )}
-            </div>
-
-            {/* Team Members */}
-            <div className="mb-4">
-              <p className="text-sm font-medium">Team Members</p>
-              <p className="text-gray-500 text-sm">Existed Members</p>
-              {/* {teamMembers.map((member, index) => (
+              {/* Team Members */}
+              <div className="mb-4">
+                <p className="text-sm font-medium">Team Members</p>
+                <p className="text-gray-500 text-sm">Existed Members</p>
+                {/* {teamMembers.map((member, index) => (
               <div key={index} className="flex items-center justify-between bg-gray-100 p-2 rounded-lg mt-2">
                 <span className="text-sm">{member.email}</span>
                 <span className="text-xs text-gray-500">{member.role}</span>
               </div>
             ))} */}
-              <div className="flex items-center justify-between bg-gray-100 dark:bg-neutral-500 p-2 rounded-lg mt-2">
-                <span className="text-sm">{user?.email}</span>
-                <span className="text-xs text-gray-500">Owner</span>
+                <div className="flex items-center justify-between bg-gray-100 dark:bg-neutral-500 p-2 rounded-md mt-2">
+                  <span className="text-sm">{user?.email}</span>
+                  <span className="text-xs text-gray-500">Owner</span>
+                </div>
               </div>
-            </div>
 
-            {/* Submit Button */}
-          </div>
-          <Button className="w-full">Create</Button>
-        </div>
+              {/* Submit Button */}
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button className="w-full">Create</Button>
+          </CardFooter>
+        </Card>
       </form>
     </Form>
   );

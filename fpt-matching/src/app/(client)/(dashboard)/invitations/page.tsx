@@ -9,13 +9,19 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs-shadcn";
+import { useCurrentRole } from "@/hooks/use-current-role";
 
 export default function Page() {
-  const tab_1 = "Send";
-  const tab_2 = "Receive";
+  const roleCurrent = useCurrentRole();
+  if (roleCurrent == null) return;
+  const tab_1 = "Send request";
+  const tab_2 = "Receive request";
+  const defaultTab = roleCurrent == "Lecturer" ? tab_2 : tab_1;
+
+  console.log("check_defaulttabv", defaultTab);
   return (
     <>
-      <Tabs defaultValue={tab_1} className="w-full container mx-auto">
+      <Tabs defaultValue={defaultTab} className="w-full p-4">
         <TabsList>
           <TabsTrigger value={tab_1}>{tab_1}</TabsTrigger>
           <TabsTrigger value={tab_2}>{tab_2}</TabsTrigger>

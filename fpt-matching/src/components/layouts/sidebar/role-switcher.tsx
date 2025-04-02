@@ -26,19 +26,18 @@ import {
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import { useDispatch, useSelector } from "react-redux";
 import { useCurrentRole } from "@/hooks/use-current-role";
+import { useSelectorUser } from "@/hooks/use-auth";
+import { TypographyList } from "@/components/_common/typography/typography-list";
+import { TypographyP } from "@/components/_common/typography/typography-p";
 
 export function RoleSwitcher() {
   const { isMobile } = useSidebar();
   const dispatch = useDispatch<AppDispatch>();
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelectorUser();
 
   if (!user) {
     return null;
   }
-
-  // khởi tạo
-
- 
 
   // lọc ra user hiện tại có bao nhiêu role
   const userRoles = user.userXRoles.map((m) => m.role?.roleName);
@@ -63,18 +62,12 @@ export function RoleSwitcher() {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg ">
-                <UserRoundCog className="size-4 dark:text-white text-black" />
+            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+              <div className="flex aspect-square size-4 items-center justify-center rounded-lg ">
+                <UserRoundCog className=" dark:text-white text-black" />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">
-                  {activeRole.name}
-                </span>
-                <span className="truncate text-xs">{activeRole.plan}</span>
+              <div className="flex flex-row items-center gap-2 text-sm leading-tight">
+                <TypographyP className="truncate">Role: {activeRole.plan}</TypographyP>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>

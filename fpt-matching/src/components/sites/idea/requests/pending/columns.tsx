@@ -20,6 +20,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useCurrentRole } from "@/hooks/use-current-role";
 import { RootState } from "@/lib/redux/store";
 import { ideaService } from "@/services/idea-service";
 import { stageideaService } from "@/services/stage-idea-service";
@@ -107,7 +108,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const initialFeedback = row.getValue("content") as string;
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-
+  const role = useCurrentRole();
   const idea = row.original;
   const hasMentorApproval = idea.ideaRequests.some(
     (request) =>
@@ -115,6 +116,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         request.status === IdeaRequestStatus.Rejected) &&
       request.role === "Mentor"
   );
+
+  const isLock = role != "Lecturer" ? hasMentorApproval : false;
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -131,8 +134,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      // Invalidate queries to refresh data
-      queryClient.refetchQueries({ queryKey: ["data"] });
+      toast.success(res.message);
+      await queryClient.refetchQueries({ queryKey: ["data"] });
+      await queryClient.refetchQueries({ queryKey: ["data_ideas"] });
       setIsDeleteDialogOpen(false);
     } catch (error) {
       console.error("Error deleting idea:", error);
@@ -163,7 +167,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 <div>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button size="sm" variant="destructive">
+                      <Button size="sm" variant="destructive" disabled={isLock}>
                         Delete idea
                       </Button>
                     </DialogTrigger>
@@ -191,7 +195,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                   </Dialog>
                 </div>
               </TooltipTrigger>
-              {hasMentorApproval && (
+              {isLock && (
                 <TooltipContent>
                   <p>Mentor approval has been granted for this idea.</p>
                 </TooltipContent>

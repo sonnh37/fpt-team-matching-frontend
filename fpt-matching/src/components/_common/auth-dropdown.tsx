@@ -50,8 +50,8 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className={cn("size-8 focus-visible:ring-0")}>
-          <Avatar className="size-8">
+        <Button variant="ghost" className={cn("size-10 focus-visible:ring-0")}>
+          <Avatar className="size-10 p-0 m-0">
             <AvatarImage
               src={
                 user.avatar && user.avatar.trim() !== ""
@@ -61,7 +61,7 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
               alt={user.username ?? ""}
               onError={(e) => (e.currentTarget.style.display = "none")}
             />
-            <AvatarFallback className="bg-slate-200 rounded hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500">
+            <AvatarFallback className="rounded-md">
               {initials}
             </AvatarFallback>
           </Avatar>
