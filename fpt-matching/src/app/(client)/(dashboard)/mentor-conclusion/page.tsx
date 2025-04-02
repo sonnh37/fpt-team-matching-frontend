@@ -1,8 +1,9 @@
+'use client'
 import React from 'react';
 import { useSearchParams } from "next/navigation";
 const Page = () => {
     const searchParams = useSearchParams();
-    const projectId = searchParams.get("projectId");
+    // const projectId = searchParams.get("projectId");
 
     return (
         <div>
