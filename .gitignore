@@ -394,17 +394,4 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
-# JetBrains Rider
-*.sln.iml
-/*/.vs/*/v17/.suo
-/*/obj/Debug/net6.0/apphost.exe
-/*/obj/Debug/net6.0/*.csproj.FileListAbsolute.txt
-#
-/*/.vs/*/v17/DocumentLayout.json
-/Studio.API/.vs/ProjectEvaluation/studio.api.metadata.v7.bin
-/Studio.API/.vs/Studio.API/DesignTimeBuild/.dtbcache.v2
-/Studio.API/.vs/ProjectEvaluation/studio.api.projects.v7.bin
-/Studio.API/.vs/Studio.API/v17/.futdcache.v2
-/Studio.API/obj/Debug/net6.0/Studio.API.csproj.AssemblyReference.cache
-/Studio.API/obj/project.assets.json
-/Studio.API/obj/Studio.API.csproj.nuget.dgspec.json
+fpt-matching/public/nutrient-viewer/*
