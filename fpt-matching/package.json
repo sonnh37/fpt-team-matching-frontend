@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "copy-assets": "cross-env OS=$(node -e \"console.log(process.platform)\") npm run copy-assets:platform",
-    "copy-assets:platform": "node -e \"process.platform === 'win32' ? require('child_process').execSync('xcopy /E /I /Y node_modules\\\\@nutrient-sdk\\\\viewer\\\\dist public\\\\nutrient-viewer', {stdio: 'inherit'}) : require('child_process').execSync('cp -R ./node_modules/@nutrient-sdk/viewer/dist/ public/nutrient-viewer', {stdio: 'inherit'})\"",
+    "copy-assets": "xcopy /E /I /Y .\\node_modules\\@nutrient-sdk\\viewer\\dist\\ public\\nutrient-viewer\\",
     "dev": "npm run copy-assets && next --experimental-https --turbo",
     "build": "npm run copy-assets && next build",
     "start": "next start",
