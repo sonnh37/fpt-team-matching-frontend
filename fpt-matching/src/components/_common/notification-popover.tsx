@@ -52,15 +52,13 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className={cn("size-8 rounded-full")}>
-          <Avatar className="size-8 overflow-visible bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500 flex items-center justify-center">
-            <Bell className="!w-5 !h-5 text-foreground/80" />
-            {totalRecords > 0 && (
-              <Badge className="absolute inline-flex items-center justify-center w-4 h-4 font-bold text-white bg-red-500 border-1 border-white -top-2 -end-2 dark:border-gray-900">
-                {businessResult?.data?.totalRecords}
-              </Badge>
-            )}
-          </Avatar>
+        <Button variant="ghost" className={cn("size-8")}>
+          <Bell className="!w-5 !h-5 text-foreground/80" />
+          {totalRecords > 0 && (
+            <Badge className="absolute inline-flex items-center justify-center w-4 h-4 font-bold text-white bg-red-500 border-1 border-white -top-2 -end-2 dark:border-gray-900">
+              {businessResult?.data?.totalRecords}
+            </Badge>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end" forceMount>

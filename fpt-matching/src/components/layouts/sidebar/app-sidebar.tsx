@@ -15,15 +15,15 @@ import { initializeRole, updateUserCache } from "@/lib/redux/slices/roleSlice";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import { semesterService } from "@/services/semester-service";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Calendar
-} from "lucide-react";
+import { Calendar } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavMain } from "./nav-main";
 import { NavManagement } from "./nav-management";
 import { RoleSwitcher } from "./role-switcher";
+import { TypographyMuted } from "@/components/_common/typography/typography-muted";
+import { TypographyP } from "@/components/_common/typography/typography-p";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch<AppDispatch>();
@@ -61,7 +61,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenuButton
           asChild
-          size="lg"
+          size={"lg"}
           className="overflow-visible data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-3"
         >
           <Link href="/">
@@ -79,14 +79,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <RoleSwitcher />
 
         <SidebarMenuButton
-          size="lg"
-          className="flex items-center data-[state=open]:bg-sidebar-accent hover:cursor-default data-[state=open]:text-sidebar-accent-foreground"
+          className="flex items-center data-[state=open]:bg-sidebar-accent hover:cursor-default hover:bg-transparent data-[state=open]:text-sidebar-accent-foreground"
           tooltip={semesterData?.data?.semesterName}
         >
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
-            <Calendar className="size-4 dark:text-white text-black" />
+          <div className="flex aspect-square size-4 items-center justify-center rounded-lg">
+            <Calendar className="dark:text-white text-black" />
           </div>
-          <span>{semesterData?.data?.semesterCode}</span>
+          <div>
+            <TypographyP className="truncate">
+              Semester: 
+              {` ` + semesterData?.data?.semesterName + ""}
+            </TypographyP>
+          </div>
         </SidebarMenuButton>
       </SidebarHeader>
 

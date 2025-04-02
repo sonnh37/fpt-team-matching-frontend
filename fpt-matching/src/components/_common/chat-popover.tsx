@@ -22,10 +22,8 @@ export function ChatPopover({ user = null }: ChatPopoverProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className={cn("size-8 rounded-full")}>
-          <Avatar className="size-8 bg-slate-200 hover:bg-slate-300 flex items-center justify-center">
+        <Button variant="ghost" className={cn("size-8")}>
           <RiMessengerLine className="!w-5 !h-5 text-foreground/80" />
-          </Avatar>
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-56" align="end" forceMount>

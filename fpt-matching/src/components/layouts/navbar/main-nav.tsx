@@ -1,6 +1,7 @@
 "use client";
 import { AuthDropdown } from "@/components/_common/auth-dropdown";
 import { ChatPopover } from "@/components/_common/chat-popover";
+import { ModeToggle } from "@/components/_common/mode-toggle";
 import { NotificationPopover } from "@/components/_common/notification-popover";
 import { Search } from "@/components/_common/search";
 import { TypographyH4 } from "@/components/_common/typography/typography-h4";
@@ -44,7 +45,7 @@ export function MainNav({ user = null }: MainNavProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* <ModeToggle /> */}
+            <ModeToggle />
             <ChatPopover />
             <NotificationPopover />
             <AuthDropdown user={user} />
