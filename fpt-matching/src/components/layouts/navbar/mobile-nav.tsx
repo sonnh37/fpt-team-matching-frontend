@@ -114,7 +114,7 @@ export function MobileNav({ items, user = null }: MobileNavProps) {
         </SheetContent>
       </Sheet>
       <div className="flex lg:hidden flex-1 items-center justify-end space-x-4">
-        <nav className="flex items-center space-x-4">
+        <nav className="flex items-center">
           <ModeToggle />
           <ProductsCombobox />
           {/* <CartSheet /> */}

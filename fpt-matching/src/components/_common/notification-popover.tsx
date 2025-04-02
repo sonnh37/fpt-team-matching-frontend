@@ -52,12 +52,18 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" className={cn("size-8")}>
-          <Bell className="!w-5 !h-5 text-foreground/80" />
+        <Button variant="ghost" size={"icon"} className={cn("size-10 relative")}>
+          {" "}
+          {/* Thêm relative vào đây */}
+          <Bell strokeWidth={1.5} className="!size-5 text-foreground/80" />
           {totalRecords > 0 && (
-            <Badge className="absolute inline-flex items-center justify-center w-4 h-4 font-bold text-white bg-red-500 border-1 border-white -top-2 -end-2 dark:border-gray-900">
-              {businessResult?.data?.totalRecords}
-            </Badge>
+            <span className="absolute -top-0.5 -right-0.5">
+              {" "}
+              {/* Điều chỉnh vị trí */}
+              <Badge className="flex items-center justify-center w-4 h-4 p-0 text-xs font-bold text-white bg-red-500 border border-white rounded-full dark:border-gray-900">
+                {businessResult?.data?.totalRecords}
+              </Badge>
+            </span>
           )}
         </Button>
       </PopoverTrigger>

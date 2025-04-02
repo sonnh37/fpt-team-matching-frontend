@@ -40,7 +40,7 @@ export default function InvitationReceiveToGetIdeaByStudentTable() {
   const [sorting, setSorting] = React.useState<SortingState>([
     {
       id: "createdDate",
-      desc: true, 
+      desc: true,
     },
   ]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -87,7 +87,8 @@ export default function InvitationReceiveToGetIdeaByStudentTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => mentoridearequestService.getMentorMentorIdeaRequests(queryParams),
+    queryFn: () =>
+      mentoridearequestService.getMentorMentorIdeaRequests(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -114,9 +115,9 @@ export default function InvitationReceiveToGetIdeaByStudentTable() {
   return (
     <>
       <div className="space-y-8">
-        <div className="">
-          <DataTableComponent table={table} />
-        </div>
+        <Card>
+          <DataTableComponent isEnableHeader={false} table={table} />
+        </Card>
       </div>
     </>
   );

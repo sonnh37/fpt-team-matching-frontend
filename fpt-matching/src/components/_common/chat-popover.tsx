@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { User } from "@/types/user";
-import { Bell } from "lucide-react";
+import { Bell, MessageCircle, MessageCircleCode } from "lucide-react";
 import { RiMessengerLine } from "react-icons/ri";
 
 interface ChatPopoverProps
@@ -22,8 +22,8 @@ export function ChatPopover({ user = null }: ChatPopoverProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" className={cn("size-8")}>
-          <RiMessengerLine className="!w-5 !h-5 text-foreground/80" />
+        <Button variant="ghost" size={"icon"} className={cn("size-10")}>
+          <MessageCircleCode strokeWidth={1.5} className="!size-5 text-foreground/80" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-56" align="end" forceMount>

@@ -114,9 +114,9 @@ export default function InvitationSentForIdeaTable() {
   return (
     <>
       <div className="space-y-8">
-        <div className="">
-          <DataTableComponent table={table} />
-        </div>
+        <Card>
+          <DataTableComponent isEnableHeader={false} table={table} />
+        </Card>
       </div>
     </>
   );
