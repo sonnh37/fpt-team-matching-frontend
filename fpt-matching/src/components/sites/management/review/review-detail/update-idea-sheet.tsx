@@ -108,11 +108,16 @@ export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHi
                     <Button className={"w-[15vw]"} variant="default">Chỉnh sửa đề tài</Button>
                 </SheetTrigger>
                 <SheetContent className={"sm:h-[50vh]"} side={"bottom"}>
-                    <SheetHeader>
-                        <SheetTitle>Cập nhập lại đề tài</SheetTitle>
-                        <SheetDescription>
-                            Vui lòng upload lại file đề tài mới tại đây để chỉnh sửa.
-                        </SheetDescription>
+                    <SheetHeader className={"flex justify-between"}>
+                        <div>
+                            <SheetTitle>Cập nhập lại đề tài</SheetTitle>
+                            <SheetDescription>
+                                Vui lòng upload lại file đề tài mới tại đây để chỉnh sửa.
+                            </SheetDescription>
+                        </div>
+                        <div>
+                            <Link className={" font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/team/view-update-idea?ideaId=${ideaId}`} >Xem chi tiết chỉnh sửa</Link>
+                        </div>
                     </SheetHeader>
                     <div className={"m-2 h-1/2 flex flex-row gap-2 justify-between"}>
                         {!fileChange ? (

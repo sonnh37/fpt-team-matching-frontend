@@ -12,5 +12,6 @@ export interface IdeaHistory extends BaseEntity {
   reviewStage: number;
   idea?: Idea;
   council?: User;
+  comment?: string;
   ideaHistoryRequests: IdeaHistoryRequest[];
 }
