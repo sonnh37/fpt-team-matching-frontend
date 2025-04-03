@@ -1,4 +1,4 @@
-import { Modal, ModalBody, ModalContent, ModalFooter, ModalTrigger } from '@/components/ui/animated-modal';
+import { Modal, ModalBody, ModalClose, ModalContent, ModalFooter, ModalTrigger } from '@/components/ui/animated-modal';
 import { DialogFooter, DialogHeader } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/moving-border';
 import { RootState } from '@/lib/redux/store';
@@ -98,7 +98,7 @@ const RateStudent = ({ id }: { id: string }) => {
 
             <Modal>
                 <ModalTrigger className="=">
-                    <button >Danh gia</button>
+                    <button className='bg-blue-400 p-2 rounded-md' >Đánh giá</button>
                 </ModalTrigger>
 
                 <ModalBody className="min-h-[80%] max-h-[90%] min-w-[30%] md:max-w-[40%] overflow-auto">
@@ -107,7 +107,7 @@ const RateStudent = ({ id }: { id: string }) => {
                             <h2 className="text-2xl font-bold mb-4">Feedback Form</h2>
                             {/* Name Field */}
                             <div className="mb-4  text-base text-left">
-                                <label htmlFor="name" className="block mb-1 ml-4">Tên người đánh giá</label>
+                                <label htmlFor="name" className="block mb-1 ml-4 text-base">Tên người đánh giá</label>
                                 <div
                                     id="name"
                                     className="w-full py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ml-4"
@@ -116,7 +116,7 @@ const RateStudent = ({ id }: { id: string }) => {
 
                             {/* Email Field */}
                               <div className="mb-4  text-base text-left">
-                                <label htmlFor="name" className="block mb-1 ml-4">Người nhận đánh giá</label>
+                                <label htmlFor="name" className="block mb-1 ml-4  text-base">Người nhận đánh giá</label>
                                 <div
                                     id="name"
                                     className="w-full py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 ml-4"
@@ -147,21 +147,20 @@ const RateStudent = ({ id }: { id: string }) => {
                                 <label htmlFor="message" className="block mb-1 text-left ml-4">Đóng góp ý kiến</label>
                                 <textarea
                                     id="message"
-                                    className="w-full py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full py-2 px-4 ml-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 ></textarea>
                             </div>
                      
 
                     </ModalContent>
-                    <ModalFooter className='text-base'>
+                    <ModalFooter className='text-base justify-end'>
                         {/* Submit Button */}
-                        <button
-                            type="submit"
-                            className="py-2 px-2 bg-blue-500 text-white rounded hover:bg-blue-600 "
+                        <div                            className="  text-white   "
                         >
-                            Submit
-                        </button>
-                        <Button type="cancel">Không, cảm ơn</Button>
+                           <button type='submit' className='py-2 px-2 hover:bg-blue-600 bg-blue-500'>Submit</button> 
+                        </div>
+                        <ModalClose>   <button className='py-2 px-2 bg-gray-300 rounded hover:bg-gray-600'>Không, cảm ơn</button></ModalClose>
+                     
                     </ModalFooter>
                 </ModalBody>
 
