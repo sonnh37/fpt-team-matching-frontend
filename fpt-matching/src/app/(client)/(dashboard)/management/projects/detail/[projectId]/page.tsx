@@ -93,7 +93,7 @@ export default function ProjectDetail() {
                   </TypographyMuted>
                 </div>
               </CardTitle>
-              <MenuAction />
+              <MenuAction ideaId={project.ideaId!} />
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Abbreviation & Vietnamese Title */}
