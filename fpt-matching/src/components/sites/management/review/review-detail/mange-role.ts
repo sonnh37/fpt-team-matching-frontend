@@ -16,6 +16,9 @@ class ReviewDetailsRBAC {
         }
         return this.RBACDetails[roleName].has(action) ?? false
     }
+    public getRBAC() : Record<string, Set<string>> {
+        return this.RBACDetails
+    }
 }
 
 export const reviewDetailsRBAC = new ReviewDetailsRBAC();

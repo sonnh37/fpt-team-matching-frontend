@@ -1,8 +1,7 @@
 'use client'
-
-import UpdateIdea from '@/components/sites/management/update-idea/update-idea';
 import { useSearchParams } from 'next/navigation';
-
+import React from 'react';
+import UpdateIdea from "@/components/sites/management/update-idea/update-idea";
 
 const Page = () => {
     const searchParams = useSearchParams();

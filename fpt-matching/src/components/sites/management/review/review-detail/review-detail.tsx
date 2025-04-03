@@ -64,14 +64,13 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
         const registerRole = () => {
             // Manage: readDetails,
             reviewDetailsRBAC.registerRole("Manager", ["readDetails", "writeDetails", "editDetails", "assignReview"])
-            reviewDetailsRBAC.registerRole("Student", ["readDetails", "writeDetails", "editDetails", "writeFile", "updateFile"])
+            reviewDetailsRBAC.registerRole("Student", ["readDetails", "writeDetails", "editDetails", "writeFile", "updateFile", "viewUpdateCapstone"])
             reviewDetailsRBAC.registerRole("Lecturer", ["readDetails", "writeDetails", "editDetails", "feedbackReview", "feedbackUpdatedCapstone"])
         }
 
         registerRole()
         fetchCurrentSemester()
     }, []);
-    console.log(reviewDetails)
     return (
         <div className={"px-8 mt-4"}>
             {
