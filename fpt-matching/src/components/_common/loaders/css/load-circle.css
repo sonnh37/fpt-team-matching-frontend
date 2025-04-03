@@ -1,4 +1,4 @@
-/* .loader {
+.loader {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -16,9 +16,9 @@
   100% {
     transform: rotate(360deg);
   }
-}  */
+} 
 
-
+/* 
 .loader {
   width: 96px;
   box-sizing: content-box;
@@ -57,4 +57,4 @@
 }
 @keyframes yinYang {
   100%{transform: rotate(360deg)}
-}
+} */

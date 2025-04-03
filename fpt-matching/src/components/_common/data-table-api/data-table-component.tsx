@@ -78,7 +78,7 @@ export function DataTableComponent<TData>({
   };
 
   return (
-    <div className="overflow-auto">
+    <div className="overflow-auto rounded-md border">
       <Table className={className}>
         {isEnableHeader && (
           <TableHeader>

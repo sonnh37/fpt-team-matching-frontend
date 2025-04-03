@@ -271,6 +271,7 @@ export default function ProjectSearchList() {
             />
           ) : (
             <DataTableComponent
+              isEnableHeader={false}
               deletePermanent={projectService.deletePermanent}
               restore={projectService.restore}
               table={table}
