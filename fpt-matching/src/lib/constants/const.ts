@@ -10,6 +10,7 @@ export class Const {
     static readonly API_BASE = `${process.env.NEXT_PUBLIC_API_BASE}`;
     static readonly BASE_URL = `${process.env.NEXT_PUBLIC_SITE_URL}`;
     //#endregion
+    static readonly FILE_UPLOAD = "file-upload";
     static readonly BLOG = "blogs";
     static readonly RATE = "rates";
     static readonly BLOGCV = "blog-cvs";

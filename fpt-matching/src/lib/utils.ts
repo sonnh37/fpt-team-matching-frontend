@@ -12,6 +12,22 @@ export function isMacOs() {
   return window.navigator.userAgent.includes("Mac");
 }
 
+export const getFileNameFromUrl = (url: string) => {
+  const parts = url.split('/');
+  const lastPart = parts[parts.length - 1];
+
+  const fileName = lastPart.split('?')[0];
+
+  return fileName.split('#')[0];
+};
+
+export const getPreviewUrl = (fileUrl: string) => {
+  if (fileUrl.includes('cloudinary.com')) {
+    return fileUrl.replace('/raw/', '/image/');
+  }
+  return fileUrl;
+};
+
 export const convertToISODate = (
   date: Date | string | null | undefined
 ): string | null => {
