@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const Loader = () => {
   return (
     <StyledWrapper>
-      <div className="loader">
+      <div className="loader_">
         <div className="truckWrapper">
           <div className="truckBody">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 198 93" className="trucksvg">
@@ -46,7 +46,7 @@ const Loader = () => {
 }
 
 const StyledWrapper = styled.div`
-  .loader {
+  .loader_ {
     width: fit-content;
     height: fit-content;
     display: flex;
