@@ -294,16 +294,18 @@ export const CreateProjectForm = () => {
     }
 
     // ** if project has no idea and the user login is leader project => create idea
+  } else {
+    // * if project has not and request for some team => not create idea
+    if (invitationPendings.length > 0)
+      return (
+          <AlertMessage
+              message="You have pending invitations for a team. Creating a new idea is not allowed."
+              messageType="error"
+          />
+      );
+
   }
 
-  // * if project has not and request for some team => not create idea
-  if (invitationPendings.length > 0)
-    return (
-      <AlertMessage
-        message="You have pending invitations for a team. Creating a new idea is not allowed."
-        messageType="error"
-      />
-    );
 
   if (showPageIsIdea) return <PageIsIdea />;
 
