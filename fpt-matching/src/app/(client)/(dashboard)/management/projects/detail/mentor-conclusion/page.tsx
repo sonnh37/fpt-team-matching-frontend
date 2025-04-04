@@ -20,6 +20,11 @@ import {Textarea} from "@/components/ui/textarea";
 import SupervisorComment from './supervisor-comment';
 import {Button} from "@/components/ui/button";
 import {MentorFeedback} from "@/types/mentor-feedback";
+import {teammemberService} from "@/services/team-member-service";
+import TeamMemberUpdateMentorConclusion
+    from "@/types/models/commands/team-members/team-member-update-mentor-conclusion";
+import {toast} from "sonner";
+import {mentorFeedbackService} from "@/services/mentor-feedback-service";
 const TableOfSinhVien = ({sinhViens} : {sinhViens: TeamMember[]}) => {
     return (
         <Table>
@@ -60,10 +65,10 @@ const Page = () => {
             if (response && response.data) {
                 setProject(response.data)
                 console.log(response.data)
-                if (response.data.mentorFeedBack){
-                    setMentorFeedback(response.data.mentorFeedBack);
+                if (response.data.mentorFeedback){
+                    setMentorFeedback(response.data.mentorFeedback);
                 } else {
-                    const newMentorFeedback : MentorFeedback = {} as MentorFeedback;
+                    const newMentorFeedback : MentorFeedback = {projectId: projectId} as MentorFeedback;
                     setMentorFeedback(newMentorFeedback)
                 }
                 if (response.data.teamMembers) {
@@ -73,11 +78,33 @@ const Page = () => {
         }
         fetchData()
     }, [projectId]);
-
-    const handleSaveChange = () => {
-        console.log(sinhViens);
-        console.log(mentorFeedback);
+    console.log(mentorFeedback)
+    const handleSaveChange = async () => {
+        if (sinhViens.some(x => x.id == null)) {
+            toast.error("Có lỗi khi cập nhật")
+            return;
+        }
+        if (sinhViens.filter(x => x.attitude == null || x.attitude == "").length > 0 || sinhViens.filter(x => x.mentorConclusion == null).length > 0) {
+            toast.error("Vui lòng điền tất cả các field")
+            return;
+        }
+        const teamMemberConclusion : TeamMemberUpdateMentorConclusion[] = [] as TeamMemberUpdateMentorConclusion[];
+        sinhViens.forEach((sinhVien) => {
+            return teamMemberConclusion.push({id: sinhVien.id!, mentorConclusion: sinhVien.mentorConclusion!, attitude: sinhVien.attitude!});
+        })
+        if (!mentorFeedback || !mentorFeedback.limitation || !mentorFeedback.thesisContent || !mentorFeedback.thesisForm || !mentorFeedback.achievementLevel) {
+            toast.error("Vui lòng điền tất cả các field")
+            return;
+        }
+        const teamMemberResponse = await  teammemberService.updateByMentor({teamMembersConclusion: teamMemberConclusion})
+        const mentorFeedbackResponse = await mentorFeedbackService.postFeedback(mentorFeedback);
+        if (mentorFeedbackResponse.status == 1 || teamMemberResponse.status == 1) {
+            toast.success("Save success")
+        } else {
+            toast.error(teamMemberResponse.status != 1 ? teamMemberResponse.message : mentorFeedbackResponse.message)
+        }
     }
+    console.log(mentorFeedback);
     return (
         <div className={"p-8"}>
             {/*Start 1*/}

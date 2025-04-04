@@ -26,5 +26,5 @@ export interface Project extends BaseEntity {
   blogs: Blog[]
   mentorIdeaRequests: MentorIdeaRequest[];
   capstoneSchedules: CapstoneSchedule[];
-  mentorFeedBack: MentorFeedback | null;
+  mentorFeedback: MentorFeedback | null;
 }
