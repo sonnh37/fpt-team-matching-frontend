@@ -19,6 +19,7 @@ import {
 import {Textarea} from "@/components/ui/textarea";
 import SupervisorComment from './supervisor-comment';
 import {Button} from "@/components/ui/button";
+import {MentorFeedback} from "@/types/mentor-feedback";
 const TableOfSinhVien = ({sinhViens} : {sinhViens: TeamMember[]}) => {
     return (
         <Table>
@@ -48,6 +49,8 @@ const Page = () => {
     const searchParams = useSearchParams();
     const projectId = searchParams.get("projectId");
     const [project, setProject] = useState<Project | null>(null);
+    const [sinhViens, setSinhViens] = useState<TeamMember[]>([]);
+    const [mentorFeedback, setMentorFeedback] = useState<MentorFeedback | null>(null);
     useEffect(() => {
         if (!projectId) {
             return;
@@ -55,13 +58,26 @@ const Page = () => {
         const fetchData = async () => {
             const response = await projectService.fetchById(projectId);
             if (response && response.data) {
-                console.log(response.data)
                 setProject(response.data)
+                console.log(response.data)
+                if (response.data.mentorFeedBack){
+                    setMentorFeedback(response.data.mentorFeedBack);
+                } else {
+                    const newMentorFeedback : MentorFeedback = {} as MentorFeedback;
+                    setMentorFeedback(newMentorFeedback)
+                }
+                if (response.data.teamMembers) {
+                    setSinhViens(response.data.teamMembers);
+                }
             }
         }
         fetchData()
     }, [projectId]);
-    // console.log(project);
+
+    const handleSaveChange = () => {
+        console.log(sinhViens);
+        console.log(mentorFeedback);
+    }
     return (
         <div className={"p-8"}>
             {/*Start 1*/}
@@ -72,13 +88,13 @@ const Page = () => {
                     {/*1.1.1*/}
                     <div className={"mx-4 mt-2 flex flex-col gap-2 "}>
                         <Label className={"text-sm mt-2 font-bold flex flex-row items-center gap-2"}>{<Plus className={"size-4"} />} Tiếng việt | Vietnamese: </Label>
-                        <Input className={"w-3/4"} placeholder={"Nhập tên đề tài tiếng việt"} />
+                        <Input readOnly={true} className={"w-3/4"} value={project?.idea?.vietNamName ?? ""} />
                     </div>
 
                     {/*1.1.2*/}
                     <div className={"mx-4 mt-2 flex flex-col gap-2"}>
                         <Label className={"text-sm mt-2 font-bold flex flex-row items-center gap-2"}>{<Plus className={"size-4"} />} Tiếng anh | English: </Label>
-                        <Input className={"w-3/4"} placeholder={"Nhập tên đề tài tiếng anh"} />
+                        <Input readOnly={true} className={"w-3/4"} value={project?.idea?.englishName ?? ""} />
                     </div>
                 </div>
 
@@ -99,7 +115,16 @@ const Page = () => {
                         <p>3.1 - Nội dung khoá luận (so với mục tiêu nghiên cứu, cơ sở lý luận, số liệu, phân tích, tính ứng dụng)</p>
                         <p className={"ml-8"}>Thesis content (compare the research objectives, theoretical basis, data, analysis, application, etc)</p>
                     </Label>
-                    <Textarea className={"w-1/2"}/>
+                    <Textarea
+                        onChange={(event) => {
+                            setMentorFeedback((prev) => {
+                                if (!prev)
+                                    return null;
+                            prev.thesisContent = event.target.value
+                            return prev
+                            })
+                        }}
+                        value={mentorFeedback && mentorFeedback.thesisContent ? mentorFeedback.thesisContent : undefined} className={"w-1/2"}/>
                 </div>
 
                 {/*2.2*/}
@@ -108,7 +133,16 @@ const Page = () => {
                         <p>3.2 - Hình thức của khoá luận (bố cục, phương pháp trình bày, tiếng Anh, trích dẫn)</p>
                         <p className={"ml-8"}>Thesis form (Layout, presentation, methods, English, citation)</p>
                     </Label>
-                    <Textarea className={"w-1/2"}/>
+                    <Textarea
+                        onChange={(event) => {
+                            setMentorFeedback((prev) => {
+                                if (!prev)
+                                    return null;
+                                prev.thesisForm = event.target.value
+                                return prev
+                            })
+                        }}
+                        value={mentorFeedback && mentorFeedback.thesisForm ? mentorFeedback.thesisForm : undefined} className={"w-1/2"}/>
                 </div>
 
 
@@ -125,7 +159,16 @@ const Page = () => {
                             <p>4.1 - Mức độ đạt được so với mục tiêu (so với đề cương)</p>
                             <p className={"ml-8"}>Achivement level compare to the target (compare to the plan)</p>
                         </Label>
-                        <Textarea className={"w-2/3"}/>
+                        <Textarea
+                            onChange={(event) => {
+                                setMentorFeedback((prev) => {
+                                    if (!prev)
+                                        return null;
+                                    prev.achievementLevel = event.target.value
+                                    return prev
+                                })
+                            }}
+                            value={mentorFeedback && mentorFeedback.achievementLevel ? mentorFeedback.achievementLevel : undefined} className={"w-2/3"}/>
                     </div>
 
                     {/*3.2*/}
@@ -133,7 +176,16 @@ const Page = () => {
                         <Label className={"text-sm mt-2 ml-4 mb-5 font-bold items-center gap-2"}>
                             <p>4.2 - Hạn chế | Limitation</p>
                         </Label>
-                        <Textarea className={"w-2/3"}/>
+                        <Textarea
+                            onChange={(event) => {
+                                setMentorFeedback((prev) => {
+                                    if (!prev)
+                                        return null;
+                                    prev.limitation = event.target.value
+                                    return prev
+                                })
+                            }}
+                            value={mentorFeedback && mentorFeedback.limitation ? mentorFeedback.limitation : undefined} className={"w-2/3"}/>
                     </div>
                 </div>
             </div>
@@ -146,10 +198,12 @@ const Page = () => {
                     <p className={"ml-8"}>Proposed Supervisor comment</p>
                 </Label>
                 <div>
-                    {(project && project.teamMembers?.length > 0) &&  <SupervisorComment sinhViens={project?.teamMembers} />}
+                    {(project && project.teamMembers?.length > 0) &&  <SupervisorComment setSinhViens={setSinhViens} sinhViens={sinhViens} />}
                 </div>
                 <div className={"mt-6"}>
-                    <Button variant={"default"} >Save change</Button>
+                    <Button onClick={()=>{
+                        handleSaveChange()
+                    }} variant={"default"} >Save change</Button>
                 </div>
             </div>
             {/*End 4*/}

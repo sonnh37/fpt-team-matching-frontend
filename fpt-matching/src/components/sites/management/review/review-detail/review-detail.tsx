@@ -71,6 +71,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
         registerRole()
         fetchCurrentSemester()
     }, []);
+    console.log(ideaHistory.some(x => x.status == IdeaHistoryStatus.Pending))
     return (
         <div className={"px-8 mt-4"}>
             {
@@ -95,12 +96,13 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                         ? <UpdateIdeaSheet ideaId={reviewDetails && reviewDetails.project!.ideaId!} reviewStage={reviewDetails.number} ideaHis={ideaHistory} />
                                         : <div></div>}
                                 {
-                                    ideaHistory &&
+                                    (ideaHistory &&
                                     ideaHistory?.length > 0 &&
-                                    ideaHistory.every(x => x.status == IdeaHistoryStatus.Pending) &&
+                                    ideaHistory.some(x => x.status == IdeaHistoryStatus.Pending)) ?
                                     reviewDetailsRBAC.hasPermission(currentRole, "feedbackUpdatedCapstone")
                                     ?<div className={"font-medium pt-2 pl-2 text-sm text-red-600"}>*Đang có file đề tài được chỉnh sửa. Bạn nên kiểm tra qua.</div>
                                     : <div className={"font-medium pt-2 pl-2 text-sm text-red-600"}>*Bạn đã nộp yêu cầu chỉnh sửa đề tài. Đề tài đang trong quá trình chờ được chỉnh sửa từ mentor</div>
+                                        : <div></div>
                                 }
                             </div>
                         </div>
