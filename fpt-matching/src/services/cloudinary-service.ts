@@ -1,4 +1,3 @@
-import axiosInstance from "@/lib/interceptors/axios-instance";
 import axios from "axios";
 
 class CloudinaryService {

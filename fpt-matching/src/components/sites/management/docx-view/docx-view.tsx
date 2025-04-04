@@ -1,8 +1,8 @@
 import React, {useEffect, useRef} from 'react';
 
+
 const DocxView = ({url}:{url:string}) => {
     const containerRef = useRef(null);
-
     useEffect(() => {
         const container = containerRef.current;
 
@@ -12,7 +12,6 @@ const DocxView = ({url}:{url:string}) => {
         if (container && NutrientViewer) {
             NutrientViewer.load({
                 container,
-                // You can specify a file in public directory, for example /document.pdf
                 document: url,
             });
         }
@@ -20,7 +19,7 @@ const DocxView = ({url}:{url:string}) => {
         return () => {
             NutrientViewer?.unload(container);
         };
-    }, []);
+    }, [url]);
     return <div ref={containerRef} style={{ height: "85vh", width: "75%" }} />;
 };
 

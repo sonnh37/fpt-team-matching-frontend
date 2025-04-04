@@ -20,7 +20,7 @@ import {faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import {useParams} from "next/navigation";
 
-export function MenuAction() {
+export function MenuAction({ideaId} : {ideaId: string}) {
   const { projectId } = useParams();
   return (
     <DropdownMenu>
@@ -43,15 +43,15 @@ export function MenuAction() {
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Book />
-            <span>Quản lí cập nhật đề tài</span>
+            <Link href={`idea/update-idea?ideaId=${ideaId}`}>Quản lí cập nhật đề tài</Link>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Pickaxe />
-            <span>Quản lí tiến độ</span>
-          </DropdownMenuItem>
+          {/*<DropdownMenuItem>*/}
+          {/*  <Pickaxe />*/}
+          {/*  <span>Quản lí tiến độ</span>*/}
+          {/*</DropdownMenuItem>*/}
           <DropdownMenuItem>
             <Gavel />
-            <span>Đánh giá nhóm</span>
+            <Link href={`mentor-conclusion?projectId=${projectId}`}>Đánh giá nhóm</Link>
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
