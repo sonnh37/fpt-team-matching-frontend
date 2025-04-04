@@ -11,7 +11,7 @@ export interface TeamMember extends BaseEntity {
     joinDate?: string;
     leaveDate?: string;
     status?: TeamMemberStatus;
-    mentorConclusion? : MentorConclusionOptions
+    mentorConclusion? : MentorConclusionOptions;
     attitude? :string;
     project?: Project;
     user?: User;

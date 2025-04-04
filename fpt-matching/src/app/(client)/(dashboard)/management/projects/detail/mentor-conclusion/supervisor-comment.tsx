@@ -28,50 +28,65 @@ export default function SupervisorComment({sinhViens, setSinhViens}: {sinhViens:
                             <TableCell>{sinhVien.user && sinhVien.user.firstName! + sinhVien.user.lastName}</TableCell>
                             <TableCell className={""}>
                                 <input
-                                    onClick={() => {
+                                    checked={MentorConclusionOptions[sinhVien.mentorConclusion!] == "Agree_to_defense" ? true : false}
+                                    onChange={() => {
                                         setSinhViens((prev) => {
-                                            prev.filter(x =>x.id == sinhVien.id)[0].mentorConclusion = MentorConclusionOptions.Agree_to_defense
-                                            return prev
+                                            return prev.map(x =>
+                                                x.id === sinhVien.id
+                                                    ? {...x, mentorConclusion: MentorConclusionOptions.Agree_to_defense}
+                                                    : x)
                                         })
                                     }}
                                     type={"radio"} name={`${sinhVien.id}`} className={" border-2 border-gray-400"} />
                             </TableCell>
                             <TableCell>
                                 <input
-                                    onClick={() => {
+                                    checked={sinhVien.mentorConclusion ? sinhVien.mentorConclusion  as MentorConclusionOptions === MentorConclusionOptions.Revised_for_the_second_defense : false}
+                                    onChange={() => {
                                         setSinhViens((prev) => {
-                                            prev.filter(x =>x.id == sinhVien.id)[0].mentorConclusion = MentorConclusionOptions.Revised_for_the_second_defense
-                                            return prev
+                                            return prev.map(x =>
+                                                x.id === sinhVien.id
+                                                    ? {...x, mentorConclusion: MentorConclusionOptions.Revised_for_the_second_defense}
+                                                    : x)
                                         })
                                     }}
                                     type={"radio"}  name={`${sinhVien.id}`} className={" border-2 border-gray-400"} />
                             </TableCell>
                             <TableCell>
                                 <input
-                                    onClick={() => {
+                                    checked={sinhVien.mentorConclusion ? sinhVien.mentorConclusion as MentorConclusionOptions === MentorConclusionOptions.Disagree_to_defense : false}
+                                    onChange={() => {
                                         setSinhViens((prev) => {
-                                            prev.filter(x =>x.id == sinhVien.id)[0].mentorConclusion = MentorConclusionOptions.Disagree_to_defense
-                                            return prev
+                                            return prev.map(x =>
+                                                x.id === sinhVien.id
+                                                    ? {...x, mentorConclusion: MentorConclusionOptions.Disagree_to_defense}
+                                                    : x)
                                         })
                                     }}
                                     type={"radio"}  name={`${sinhVien.id}`} className={" border-2 border-gray-400"} />
                             </TableCell>
                             <TableCell>
                                 <Input
+                                    value={sinhVien.attitude ?? ""}
                                     onChange={(e) => {
                                         setSinhViens((prev) => {
-                                            prev.filter(x =>x.id == sinhVien.id)[0].attitude = e.target.value
-                                            return prev
+                                            return prev.map(x =>
+                                                x.id === sinhVien.id
+                                                    ? {...x, attitude: e.target.value}
+                                                    : x)
                                         })
                                     }}
                                     type={"text"} className={"border-2 border-gray-400"}  />
                             </TableCell>
                             <TableCell>
                                 <Input
+                                    value={sinhVien.note ?? ""}
                                     onChange={(e) => {
                                         setSinhViens((prev) => {
-                                            prev.filter(x =>x.id == sinhVien.id)[0].note = e.target.value
-                                            return prev
+                                            return prev.map(x =>
+                                                x.id === sinhVien.id
+                                                    ? {...x, note: e.target.value}
+                                                    : x)
                                         })
                                     }}
                                     type={"text"} className={"border-2 border-gray-400"}  />
