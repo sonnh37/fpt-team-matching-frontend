@@ -302,8 +302,8 @@ export const CreateProjectForm = () => {
                     toast.success(res.message);
                     await new Promise((resolve) => setTimeout(resolve, 2000));
                     setShowPageIsIdea(true);
+                    return;
                 }
-                return;
             }
 
             if (isLecturer) {
@@ -318,8 +318,9 @@ export const CreateProjectForm = () => {
                     toast.success(res.message);
                     await new Promise((resolve) => setTimeout(resolve, 2000));
                     setShowPageIsIdea(true);
+                    return;
                 }
-                return;
+
             }
 
             toast.error("You have not access for create Idea");
