@@ -83,6 +83,15 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
+  public updateStatusByLecturer = (
+      command: IdeaRequestUpdateStatusCommand
+  ): Promise<BusinessResult<IdeaRequest>> => {
+    return axiosInstance
+        .put<BusinessResult<IdeaRequest>>(`${this.endpoint}/lecturer-response`, command)
+        .then((response) => response.data)
+        .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
   public createCouncilRequestsForIdea = (
     ideaId: string
   ): Promise<BusinessResult<IdeaRequest>> => {
