@@ -152,7 +152,7 @@ export default function ProjectSearchList() {
   };
   return (
     <>
-      <div className="container mx-auto space-y-8">
+      <div className="space-x-4 mx-auto space-y-8">
         <div className="w-fit mx-auto space-y-4">
           <TypographyH2 className="text-center tracking-wide">
             Capstone Project / Thesis Proposal
@@ -271,6 +271,7 @@ export default function ProjectSearchList() {
             />
           ) : (
             <DataTableComponent
+              isEnableHeader={false}
               deletePermanent={projectService.deletePermanent}
               restore={projectService.restore}
               table={table}

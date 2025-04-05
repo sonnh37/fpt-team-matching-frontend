@@ -64,6 +64,11 @@ class ReviewService extends BaseService<Review>{
         const response = await axiosInstance.get(`${this.endpoint}/get-by-projectId/${projectId}`);
         return response.data;
     }
+
+    public async getTemplateReview () : Promise<BusinessResult<object>> {
+        const response = await axiosInstance.get(`${this.endpoint}/export-excel-for-reviews`);
+        return response.data;
+    }
 }
 
 

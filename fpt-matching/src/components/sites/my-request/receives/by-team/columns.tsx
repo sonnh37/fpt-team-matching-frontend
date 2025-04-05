@@ -121,14 +121,18 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     try {
       // Gọi API cancelInvite
       if (!model.projectId) throw new Error("Project ID is undefined");
-      const res = await invitationService.cancelInvite_(model.projectId);
+      const command: InvitationUpdateCommand = {
+        id: model.id,
+        status: InvitationStatus.Rejected,
+      };
+      const res = await invitationService.approveOrRejectFromTeamByMe(command);
       if (res.status != 1) {
         toast.error(res.message);
         return;
       }
 
-      toast.success(`Invitation canceled successfully`);
-      queryClient.invalidateQueries({ queryKey: ["data"] });
+      toast.success(res.message);
+      queryClient.refetchQueries({ queryKey: ["data"] });
     } catch (error) {
       toast.error(error as string);
     }
@@ -138,14 +142,18 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     try {
       // Gọi API approveInvite
       if (!model.projectId) throw new Error("Project ID is undefined");
-      const res = await invitationService.approveInvite(model.projectId);
+      const command: InvitationUpdateCommand = {
+        id: model.id,
+        status: InvitationStatus.Accepted,
+      };
+      const res = await invitationService.approveOrRejectFromTeamByMe(command);
       if (res.status != 1) {
         toast.error(res.message);
         return;
       }
 
-      toast.success(`Invitation approved successfully`);
-      queryClient.invalidateQueries({ queryKey: ["data"] });
+      toast.success(res.message);
+      queryClient.refetchQueries({ queryKey: ["data"] });
     } catch (error) {
       toast.error(error as string);
     }

@@ -52,22 +52,26 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className={cn("size-8 rounded-full")}>
-          <Avatar className="size-8 overflow-visible bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-500 flex items-center justify-center">
-            <Bell className="!w-5 !h-5 text-foreground/80" />
-            {totalRecords > 0 && (
-              <Badge className="absolute inline-flex items-center justify-center w-4 h-4 font-bold text-white bg-red-500 border-1 border-white -top-2 -end-2 dark:border-gray-900">
+        <Button variant="ghost" size={"icon"} className={cn("size-10 relative")}>
+          {" "}
+          {/* Thêm relative vào đây */}
+          <Bell strokeWidth={1.5} className="!size-5 text-foreground/80" />
+          {totalRecords > 0 && (
+            <span className="absolute -top-0.5 -right-0.5">
+              {" "}
+              {/* Điều chỉnh vị trí */}
+              <Badge className="flex items-center justify-center w-4 h-4 p-0 text-xs font-bold text-white bg-red-500 border border-white rounded-full dark:border-gray-900">
                 {businessResult?.data?.totalRecords}
               </Badge>
-            )}
-          </Avatar>
+            </span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end" forceMount>
         {/* list notification */}
         <div className="grid">
           <TypographyH3 className="p-4 pb-2 tracking-[0.015em]">
-            Notification
+            Notifications
           </TypographyH3>
 
           <Separator className="" />
@@ -80,7 +84,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
               return (
                 <div
                   key={noti.id}
-                  className="flex items-start px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none"
+                  className="flex gap-2 items-center justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none"
                 >
                   {noti.user != null ? (
                     <Avatar className="size-8">
@@ -101,9 +105,9 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
                     </Avatar>
                   ) : null}
                   <div className="flex-1">
-                    <TypographyP className="tracking-[0.015em]">
+                    <TypographySmall className="tracking-[0.015em] truncate">
                       {noti.description}
-                    </TypographyP>
+                    </TypographySmall>
                     <TypographyMuted>
                       {formatDate(noti.createdDate)}
                     </TypographyMuted>

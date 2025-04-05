@@ -29,6 +29,7 @@ export interface User extends BaseEntity {
   dob?: string;
   phone?: string;
   address?: string;
+  code?: string;
   department?: Department;
   blogs: Blog[];
   ideaRequestOfReviewers: IdeaRequest[];

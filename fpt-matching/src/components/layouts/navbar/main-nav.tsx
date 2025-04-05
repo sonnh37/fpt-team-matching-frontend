@@ -1,6 +1,7 @@
 "use client";
 import { AuthDropdown } from "@/components/_common/auth-dropdown";
 import { ChatPopover } from "@/components/_common/chat-popover";
+import { ModeToggle } from "@/components/_common/mode-toggle";
 import { NotificationPopover } from "@/components/_common/notification-popover";
 import { Search } from "@/components/_common/search";
 import { TypographyH4 } from "@/components/_common/typography/typography-h4";
@@ -43,35 +44,12 @@ export function MainNav({ user = null }: MainNavProps) {
             <Search />
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* <ModeToggle /> */}
+          <div className="flex items-center gap-1">
+            <ModeToggle />
             <ChatPopover />
             <NotificationPopover />
             <AuthDropdown user={user} />
           </div>
-          {/* <LinkItem href="/" title="Trang chủ" />
-          <Dropdown label="Diễn đàn">
-            <DropdownItem href={"#"} title="Instagram" />
-            <DropdownItem href={"#"} title="Bài mới" />
-            <DropdownItem href={"#"} title="Tìm trong diễn đàn" />
-          </Dropdown>
-
-          <Dropdown label="Có gì mới">
-            <DropdownItem href={"#"} title="Featured content" />
-            <DropdownItem href={"#"} title="Bài mới" />
-            <DropdownItem href={"#"} title="Ảnh mới" />
-          </Dropdown>
-
-          <Dropdown label="Học tập">
-            <DropdownItem href={"#"} title="Thư viện ảnh" />
-          </Dropdown>
-
-          <Dropdown label="Danh hiệu">
-            <DropdownItem href={"#"} title="Thành viên" />
-            <DropdownItem href={"#"} title="Người đang truy cập" />
-          </Dropdown>
-
-          <LinkItem href="#" title="Shop" /> */}
         </div>
       </div>
     </div>

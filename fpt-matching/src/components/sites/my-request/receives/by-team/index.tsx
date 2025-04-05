@@ -20,6 +20,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
+import { Card } from "@/components/ui/card";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -107,9 +108,9 @@ export default function InvitationReceiveByTeamTable() {
   return (
     <>
       <div className="space-y-8">
-        <div className="">
-          <DataTableComponent table={table} />
-        </div>
+        <Card>
+          <DataTableComponent isEnableHeader={false} table={table} />
+        </Card>
       </div>
     </>
   );
