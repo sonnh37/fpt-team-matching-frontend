@@ -310,6 +310,7 @@ export const CreateProjectForm = () => {
                 const ideacreate: IdeaCreateCommand = {
                     ...values,
                     mentorId: undefined,
+                    file: res_.data
                 };
 
                 const res = await ideaService.createIdeaByLecturer(ideacreate);

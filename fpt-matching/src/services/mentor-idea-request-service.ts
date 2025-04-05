@@ -10,6 +10,7 @@ import { BusinessResultWithoutData } from "@/types/models/responses/business-res
 import { MentorIdeaRequest } from "@/types/mentor-idea-request";
 import { MentorIdeaRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
 import { MentorIdeaRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
+import {CreateCommand} from "@/types/models/commands/_base/base-command";
 
 class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
   constructor() {
@@ -53,6 +54,13 @@ class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
         .then((response) => response.data)
         .catch((error) => this.handleError(error));
     };
+
+  public sendRequestIdeaByStudent = (command: CreateCommand): Promise<BusinessResult<null>> => {
+    return axiosInstance
+        .post<BusinessResult<null>>(`${this.endpoint}/student-request-idea`, command)
+        .then((response) => response.data)
+        .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
  
 }
 

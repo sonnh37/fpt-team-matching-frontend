@@ -193,9 +193,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       const command: MentorIdeaRequestCreateCommand = {
         projectId: project.id,
         ideaId: model.id,
-        status: MentorIdeaRequestStatus.Pending,
       };
-      const res = await mentoridearequestService.create(command);
+      const res = await mentoridearequestService.sendRequestIdeaByStudent(command);
       if (res.status != 1) {
         toast.error(res.message);
         return;
