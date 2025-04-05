@@ -32,6 +32,7 @@ export class Const {
     static readonly MENTOR_IDEA_REQUESTS = "mentor-idea-requests";
     static readonly IDEA_HISTORY = "idea-histories";
     static readonly CAPSTONE_SCHEDULE = "capstone-schedules";
+    static readonly MENTOR_FEEDBACKS = "mentor-feedbacks";
 
     static readonly DASHBOARD = "dashboard";
     static readonly DASHBOARD_URL = "/dashboard";

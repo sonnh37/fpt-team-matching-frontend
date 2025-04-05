@@ -112,14 +112,16 @@ export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHi
                         <div>
                             <SheetTitle>Cập nhập lại đề tài</SheetTitle>
                             <SheetDescription>
-                                Vui lòng upload lại file đề tài mới tại đây để chỉnh sửa.
+                                {
+                                    ideaHis.some(x => x.status == IdeaHistoryStatus.Pending) ? "Bạn đã nộp file chỉnh sửa trước đó. Vui lòng chờ được mentor cập nhật" : "Vui lòng upload lại file đề tài mới tại đây để chỉnh sửa."
+                                }
                             </SheetDescription>
                         </div>
                         <div>
-                            <Link className={" font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/team/view-update-idea?ideaId=${ideaId}`} >Xem chi tiết chỉnh sửa</Link>
+                            <Link className={" mt-4 font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/team/view-update-idea?ideaId=${ideaId}`} >Xem chi tiết chỉnh sửa</Link>
                         </div>
                     </SheetHeader>
-                    <div className={"m-2 h-1/2 flex flex-row gap-2 justify-between"}>
+                    <div className={"m-2 mt-0 h-1/2 flex flex-row gap-2 justify-between"}>
                         {!fileChange ? (
                             <div className="flex items-center justify-center w-1/2">
                                 <label htmlFor="dropzone-file"
@@ -131,17 +133,20 @@ export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHi
                                                   d="M13 13h3a3 3 0 0 0 0-6h-.025A5.56 5.56 0 0 0 16 6.5 5.5 5.5 0 0 0 5.207 5.021C5.137 5.017 5.071 5 5 5a4 4 0 0 0 0 8h2.167M10 15V6m0 0L8 8m2-2 2 2"/>
                                         </svg>
                                         <p className="mb-2 text-sm text-gray-500 dark:text-gray-400"><span
-                                            className="font-semibold">Click to upload</span> or drag and drop</p>
+                                            className="font-semibold">Click để tải lên</span> hoặc kéo thả tại đây</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Import your review file with template</p>
                                     </div>
-                                    <input id="dropzone-file" onChange={handleFileChange} type="file" className="hidden"/>
+                                    <input disabled={ideaHis.some(x => x.status == IdeaHistoryStatus.Pending)} id="dropzone-file" onChange={handleFileChange} type="file" className="hidden"/>
                                 </label>
+
                             </div>
+
                         ) : (
                             <div>
                                 <div className={"flex gap-2 mt-4"}><Paperclip />{fileChange!.name}</div>
                             </div>
                         )}
+
                         <div className={"w-1/2 flex flex-col "}>
                             {
                                 ideaHis.length == 0 ? (<div></div>) : (

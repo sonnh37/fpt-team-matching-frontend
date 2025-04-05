@@ -8,6 +8,7 @@ import { MentorIdeaRequest } from "./mentor-idea-request";
 import { Review } from "./review";
 import { TeamMember } from "./team-member";
 import { User } from "./user";
+import {MentorFeedback} from "@/types/mentor-feedback";
 
 export interface Project extends BaseEntity {
   leaderId?: string;
@@ -25,4 +26,5 @@ export interface Project extends BaseEntity {
   blogs: Blog[]
   mentorIdeaRequests: MentorIdeaRequest[];
   capstoneSchedules: CapstoneSchedule[];
+  mentorFeedback: MentorFeedback | null;
 }

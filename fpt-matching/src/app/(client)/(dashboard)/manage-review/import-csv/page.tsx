@@ -1,8 +1,8 @@
 'use client'
 import React, {Dispatch, useEffect, useState} from 'react';
 import * as XLSX from "xlsx"
-import { FileData } from './FileData';
-import { InputFile } from './InputFile';
+import {FileData} from './FileData';
+import {InputFile} from './InputFile';
 import {DataTable} from "@/app/(client)/(dashboard)/manage-review/import-csv/DataTable";
 import {columnsFileCsv} from "@/app/(client)/(dashboard)/manage-review/import-csv/ColumsDef";
 import {Button} from "@/components/ui/button";
@@ -17,7 +17,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-import { ChevronDown } from "lucide-react"
+import {ChevronDown} from "lucide-react"
 
 import {
     Breadcrumb,
@@ -34,11 +34,14 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {reviewService} from "@/services/review-service";
-import {Toast} from "@/components/ui/toast";
 import {semesterService} from "@/services/semester-service";
 import {toast} from "sonner";
+import {Semester} from "@/types/semester";
 
-export function DropdownReviewListMenu({review, setReview} : {review: string, setReview: Dispatch<React.SetStateAction<string>>}) {
+export function DropdownReviewListMenu({review, setReview}: {
+    review: string,
+    setReview: Dispatch<React.SetStateAction<string>>
+}) {
     return (
         <Breadcrumb className={"mb-4"}>
             <BreadcrumbList>
@@ -46,13 +49,13 @@ export function DropdownReviewListMenu({review, setReview} : {review: string, se
                     SPSE25
                 </BreadcrumbItem>
                 <BreadcrumbSeparator>
-                    <ChevronRight />
+                    <ChevronRight/>
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
                     <DropdownMenu>
                         <DropdownMenuTrigger className="flex items-center gap-1">
                             Review {review}
-                            <ChevronDown className="h-4 w-4" />
+                            <ChevronDown className="h-4 w-4"/>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="start">
                             <DropdownMenuLabel>Select review number</DropdownMenuLabel>
@@ -74,13 +77,15 @@ function AlertDialogImport({loading, setLoading, callApiPostXLSXFunction, open, 
                            {
                                loading: boolean,
                                setLoading: Dispatch<React.SetStateAction<boolean>>,
+                               // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
                                callApiPostXLSXFunction: Function,
                                open: boolean,
                                setOpen: Dispatch<React.SetStateAction<boolean>>,
                            }) {
     const handleClickContinueAction = async () => {
         setLoading(true)
-        await callApiPostXLSXFunction()
+        const response = await callApiPostXLSXFunction()
+        if (response)
         setOpen(false)
     }
     return (
@@ -99,9 +104,11 @@ function AlertDialogImport({loading, setLoading, callApiPostXLSXFunction, open, 
                     <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
                     {
                         !loading
-                            ? ( <Button onClick={() => {handleClickContinueAction()}}>Continue</Button>)
-                            : ( <Button disabled>
-                                <Loader2 className="animate-spin" />
+                            ? (<Button onClick={() => {
+                                handleClickContinueAction()
+                            }}>Continue</Button>)
+                            : (<Button disabled>
+                                <Loader2 className="animate-spin"/>
                                 Please wait
                             </Button>)
                     }
@@ -118,10 +125,10 @@ export default function Page() {
     const [review, setReview] = useState<string>("1")
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [open, setOpen] = React.useState<boolean>(false);
-    const [currentSemester, setCurrentSemester] = useState<string | null>(null);
+    const [currentSemester, setCurrentSemester] = useState<Semester | null>(null);
     const postFileXLSX = async () => {
-        if(currentSemester) {
-            const result = await reviewService.importReviewFromXLSX(file!, parseInt(review), "fd61a0c5-4cef-455f-8903-e32ffa05861e")
+        if (currentSemester) {
+            const result = await reviewService.importReviewFromXLSX(file!, parseInt(review), currentSemester.id!)
             console.log(result)
             if (result.status == -1) {
                 toast.error(result.message)
@@ -143,12 +150,12 @@ export default function Page() {
             if (!e.target?.result) return;
 
             const data = new Uint8Array(e.target.result as ArrayBuffer);
-            const workbook = XLSX.read(data, { type: "array" });
+            const workbook = XLSX.read(data, {type: "array"});
 
             const sheetName = workbook.SheetNames[0]; // Get first sheet
             const worksheet = workbook.Sheets[sheetName];
 
-            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
+            const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false});
 
             if (rows.length < 4) {
                 console.error("Sheet does not contain enough rows.");
@@ -195,23 +202,34 @@ export default function Page() {
         const fetchData = async () => {
             const result = await semesterService.getCurrentSemester()
             if (result.data && result.status == 1) {
-                setCurrentSemester(result.data.id!)
+                setCurrentSemester(result.data)
             }
-            fetchData()
         }
+        fetchData()
     }, []);
+    const handleDownTemplate = async () => {
+        const filePath = process.env.NEXT_PUBLIC_API_BASE+"/api/reviews/export-excel-for-reviews"
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        window.location = filePath
+    }
     return (
         <div className={" items-center gap-1.5 px-8 py-2"}>
-            <DropdownReviewListMenu setReview={setReview} review={review} />
+            <DropdownReviewListMenu setReview={setReview} review={review}/>
+            <div className={"mb-4"}>
+                <Button onClick={() => handleDownTemplate()}>Tải template tại đây</Button>
+            </div>
             {
                 (data == null) && (header == null) ? (
                     <div className={"w-full"}>
-                        <InputFile file={file} setFile={setFile} />
+                        <InputFile file={file} setFile={setFile}/>
                     </div>
                 ) : (
                     <div className="w-full">
-                        <DataTable data={data!} columns={columnsFileCsv} />
-                        <div onClick={() => {setOpen(true)}}>
+                        <DataTable data={data!} columns={columnsFileCsv}/>
+                        <div onClick={() => {
+                            setOpen(true)
+                        }}>
                             <AlertDialogImport
                                 callApiPostXLSXFunction={postFileXLSX}
                                 loading={isLoading}
