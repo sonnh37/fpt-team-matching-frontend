@@ -24,6 +24,7 @@ import { CommentCreateCommand } from '@/types/models/commands/comment/comment-cr
 import { toast } from 'sonner'
 import { ModalFooter } from '@/components/ui/animated-modal'
 import { useConfirm } from '../formdelete/confirm-context'
+import { Comment } from '@/types/comment'
 
 
 interface CommentBlogProps {
@@ -32,32 +33,53 @@ interface CommentBlogProps {
 
 const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
     const [commentUser, setComment] = useState("");
-    const user = useSelector((state: RootState) => state.user.user)
-
+    const [allData, setAllData] = useState<Comment[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
     const [postId, setPostId] = useState(id);
 
-    console.log(id, "test day ne")
+    const user = useSelector((state: RootState) => state.user.user)
 
     const query: CommentGetAllQuery = {
         blogId: postId,
         isDeleted: false
     };
-    console.log(query, "test day ")
     const {
         data: result,
         refetch,
-        isLoading
     } = useQuery({
         queryKey: ["getCommentAllByProject", query],
-        queryFn: () => commentService.fetchAll(query),
+        queryFn: () => commentService.fetchPaginated(query),
         refetchOnWindowFocus: false,
     });
+    // lay du lieu
+    setAllData(result?.data?.results ?? []);
+    // check xem dang o trang nao
+    setHasMore((result?.data?.pageNumber ?? 1) < (result?.data?.totalPages ?? 1));
 
     useEffect(() => {
         if (postId) {
             refetch();
         }
     }, [postId, refetch]);
+
+    const fetchMoreData = async () => {
+        const nextPage = currentPage + 1;
+        let query: CommentGetAllQuery = {
+            pageNumber: nextPage,
+            blogId: postId,
+            isDeleted: false,
+        };
+
+        const result = await commentService.fetchPaginated(query);
+
+        if ((result?.data?.results?.length ?? 0) > 0) {
+            setAllData(prev => [...prev, ...(result?.data?.results || [])]);
+            setCurrentPage(nextPage);
+        } else {
+            setHasMore(false);
+        }
+    };
 
 
 
@@ -137,13 +159,20 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                 </Popover>
             </div>
 
-            {result?.data?.length === 0 ? (
+            {result?.data?.results?.length === 0 ? (
                 <div className="min-h-[300px] max-h-[600px] w-full px-3 pt-1 my-5 flex justify-center">
                     <p className="text-xl">Chưa có bình luận nào</p>
                 </div>
             ) : (
                 <div className="min-h-[300px] max-h-[600px] overflow-y-auto border rounded-lg p-2">
-                    {result?.data?.map((comment, index) => (
+                    <InfiniteScroll
+                        dataLength={allData.length}
+                        next={fetchMoreData}
+                        hasMore={hasMore}
+                        loader={<p>Đang tải thêm...</p>}
+                        endMessage={<p className="text-center text-gray-500">Hết dữ liệu rồi 🫡</p>}
+                    >
+                    {allData.map((comment, index) => (
                         <div key={index} className="comment-content w-full px-3 pt-1">
                             <div className="account flex p-2">
                                 <div className="img pr-1">
@@ -191,6 +220,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                             </div>
                         </div>
                     ))}
+                    </InfiniteScroll>
                 </div>
             )}
 
