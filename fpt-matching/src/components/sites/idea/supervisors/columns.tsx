@@ -1,6 +1,15 @@
 "use client";
-
-import PageNoTeam from "@/app/(client)/(dashboard)/team/page-no-team/page";
+import { Loader2, AlertTriangle } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
@@ -37,6 +46,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 import { toast } from "sonner";
+import { TypographyH4 } from "@/components/_common/typography/typography-h4";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -55,7 +65,7 @@ export const columns: ColumnDef<Idea>[] = [
       );
     },
   },
-  
+
   {
     accessorKey: "specialty.profession.professionName",
     header: ({ column }) => (
@@ -100,9 +110,9 @@ export const columns: ColumnDef<Idea>[] = [
       const isExistedTeam = row.getValue("isExistedTeam") as boolean;
 
       if (!project && !isExistedTeam) {
-        return <Badge variant={"default"}>Available</Badge>;
+        return <Badge variant={"default"}>Open</Badge>;
       }
-      return <Badge variant={"destructive"}>UnAvailable</Badge>;
+      return <Badge variant={"destructive"}>Closed</Badge>;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
@@ -139,7 +149,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     // router.push(`${pathName}/${model.id}`);
   };
 
-  if (model.isExistedTeam) return null;
+  // if (model.isExistedTeam) return null;
 
   // project của user
   const {
@@ -182,19 +192,25 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     model.mentorIdeaRequests.length > 0
       ? model.mentorIdeaRequests.some((m) => m.projectId == result.data?.id)
       : false;
-
   const project = result.data;
+  const teammembers = project.teamMembers;
 
   const handleSendRequest = async () => {
     setIsSending(true);
     try {
       if (!model.id) throw new Error("Idea ID is undefined");
       if (!project.id) throw new Error("Project ID is undefined");
+      // if (teammembers.length != model.maxTeamSize) {
+      //     toast.warning("Please add members to match the size requirement of this idea.");
+      //     return;
+      // }
       const command: MentorIdeaRequestCreateCommand = {
         projectId: project.id,
         ideaId: model.id,
       };
-      const res = await mentoridearequestService.sendRequestIdeaByStudent(command);
+      const res = await mentoridearequestService.sendRequestIdeaByStudent(
+        command
+      );
       if (res.status != 1) {
         toast.error(res.message);
         return;
@@ -209,87 +225,62 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     }
   };
 
-  if (isSent) {
-    const isRejected =
-      model.mentorIdeaRequests.length > 0
-        ? model.mentorIdeaRequests.some(
-            (m) =>
-              m.projectId == result.data?.id &&
-              m.status == MentorIdeaRequestStatus.Rejected
-          )
-        : false;
-
-    if (isRejected) {
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button onClick={handleSendRequest} variant={"default"}>
-              {isSending ? (
-                "Loading..."
-              ) : (
-                <>
-                  <Send />
-                </>
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Request</p>
-          </TooltipContent>
-        </Tooltip>
-      );
-    }
-
-    const isApproved =
-      model.mentorIdeaRequests.length > 0
-        ? model.mentorIdeaRequests.some(
-            (m) =>
-              m.projectId == result.data?.id &&
-              m.status == MentorIdeaRequestStatus.Approved
-          )
-        : false;
-
-    if (isApproved) {
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant={"secondary"}>
-              <Send />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Approved.</p>
-          </TooltipContent>
-        </Tooltip>
-      );
-    }
-
-    return (
-      <>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button variant={"secondary"}>
-              <Send />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>You have sent in recently.</p>
-          </TooltipContent>
-        </Tooltip>
-      </>
-    );
-  }
-
   return (
     <>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button onClick={handleSendRequest} variant={"default"}>
-            {isSending ? "Loading..." : <Send />}
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button
+                disabled={model.isExistedTeam ? true : isSent}
+                variant={model.isExistedTeam ? "secondary" : "default"}
+              >
+                {isSent ? "Request Sent" : <Send />}
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Confirm Request</DialogTitle>
+                <DialogDescription>
+                  Are you sure you want to send a request to mentor{" "}
+                  <span className="font-bold">
+                    {model.mentor?.email ?? "Unknown"}
+                  </span>{" "}
+                  for the idea{" "}
+                  <span className="font-bold">"{model.englishName}"</span>?
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="flex items-center gap-4">
+                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                  <p className="text-sm text-muted-foreground">
+                    Once sent, you'll need to wait for the mentor's and
+                    council's approval.
+                  </p>
+                </div>
+              </div>
+              <DialogFooter>
+                <DialogClose>
+                  <Button variant="outline" disabled={isSending}>
+                    Cancel
+                  </Button>
+                </DialogClose>
+                <Button onClick={handleSendRequest} disabled={isSending}>
+                  {isSending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Sending...
+                    </>
+                  ) : (
+                    "Confirm"
+                  )}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </TooltipTrigger>
         <TooltipContent>
-          <p>Request</p>
+          <p>{isSent ? "Request already sent" : "Send request to mentor"}</p>
         </TooltipContent>
       </Tooltip>
     </>
