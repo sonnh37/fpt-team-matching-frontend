@@ -170,10 +170,16 @@ export default function TeamInfoDetail() {
   if (!IsExistedIdea) {
     availableSlots = availableSlots - (teamInfo?.teamMembers?.length ?? 0);
   } else {
-    availableSlots = (teamInfo?.teamSize ?? 0) - (teamMembers.length ?? 0);
+    availableSlots = (teamInfo?.idea?.maxTeamSize ?? 0) - (teamInfo?.teamMembers.length ?? 0);
   }
 
   const requestJoinTeam = async (id: string) => {
+    // Kiểm tra size idea có lớn hơn số thành viên hiện tại không
+    if (availableSlots <= 0) {
+      toast.error("Team is full. Cannot send request.");
+      return;
+    }
+
     setOpen(false);
     const ideacreate: StudentInvitationCommand = {
       projectId: id,
