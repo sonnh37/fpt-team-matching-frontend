@@ -28,6 +28,29 @@ export const getPreviewUrl = (fileUrl: string) => {
   return fileUrl;
 };
 
+export const sheet2arr = (sheet) => {
+  const result = [];
+  let row;
+  let rowNum;
+  let colNum;
+  const range = XLSX.utils.decode_range(sheet['!ref']);
+  for(rowNum = range.s.r; rowNum <= range.e.r; rowNum++){
+    row = [];
+    for(colNum=range.s.c; colNum<=range.e.c; colNum++){
+      const nextCell = sheet[
+          XLSX.utils.encode_cell({r: rowNum, c: colNum})
+          ];
+      if( typeof nextCell === 'undefined' || nextCell == "" ){
+
+      } else row.push(nextCell.w);
+    }
+    if(row.length > 0){
+      result.push(row);
+    }
+  }
+  return result;
+};
+
 export const convertToISODate = (
   date: Date | string | null | undefined
 ): string | null => {
