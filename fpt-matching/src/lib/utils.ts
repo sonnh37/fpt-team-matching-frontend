@@ -1,7 +1,7 @@
 import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import * as XLSX from "xlsx"
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -11,6 +11,22 @@ export function isMacOs() {
 
   return window.navigator.userAgent.includes("Mac");
 }
+
+export const getFileNameFromUrl = (url: string) => {
+  const parts = url.split('/');
+  const lastPart = parts[parts.length - 1];
+
+  const fileName = lastPart.split('?')[0];
+
+  return fileName.split('#')[0];
+};
+
+export const getPreviewUrl = (fileUrl: string) => {
+  if (fileUrl.includes('cloudinary.com')) {
+    return fileUrl.replace('/raw/', '/image/');
+  }
+  return fileUrl;
+};
 
 export const sheet2arr = (sheet) => {
   const result = [];

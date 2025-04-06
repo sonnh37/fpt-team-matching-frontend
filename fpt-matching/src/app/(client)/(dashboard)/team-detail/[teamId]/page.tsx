@@ -85,50 +85,6 @@ import { TypographyLarge } from "@/components/_common/typography/typography-larg
 import { TypographySmall } from "@/components/_common/typography/typography-small";
 
 export default function TeamInfoDetail() {
-  // const { teamId } = useParams();
-  // console.log("sonngu", teamId);
-
-  // // Lấy thông tin user từ Redux store
-  // const user = useSelector((state: RootState) => state.user.user);
-
-  // //  Gọi API lấy thông tin team bằng useQuery (đúng cách)
-  // const {
-  //   data: result,
-  //   isLoading,
-  //   isError,
-  //   error,
-  // } = useQuery({
-  //   queryKey: ["getTeamInfo", teamId], // `teamId` vào key để caching đúng
-  //   queryFn: () => projectService.fetchById(teamId?.toString() ?? ""), //
-  //   refetchOnWindowFocus: false,
-  //   enabled: !!teamId, // ✅ Chỉ chạy query nếu có `teamId`
-  // });
-
-  // // Nếu đang load hoặc có lỗi thì return sớm
-  // if (isLoading) return <LoadingComponent />;
-  // if (isError || !result?.data) {
-  //   console.error("Error fetching:", error);
-  //   return <ErrorSystem />;
-  // }
-
-  // //  Gọi API lấy team member của user (Đúng cách)
-  // const { data: result1 } = useQuery({
-  //   queryKey: ["getTeammemberById", user?.id], // Định danh dữ liệu đúng
-  //   queryFn: () => teammemberService.fetchById(user?.id ?? ""),
-  //   refetchOnWindowFocus: false,
-  //   enabled: !!user?.id, // ✅ Chỉ chạy nếu `user?.id` tồn tại
-  // });
-
-  // //  Kiểm tra `hasTeam` đúng cách
-  // const hasTeam = !!result1?.data; // ✅ Chuyển đổi thành boolean
-
-  // Xử lý logic sắp xếp
-  //   const sortedMembers = result.data.teamMembers
-  //   ?.slice()
-  //   .sort((a, b) => (a.role === TeamMemberRole.Leader ? -1 : b.role === TeamMemberRole.Leader ? 1 : 0));
-
-  // //Tính số slot trống
-  // const availableSlots = (result.data.teamSize ?? 0) - (result.data.teamMembers?.length ?? 0)
 
   const { teamId } = useParams();
   const user = useSelector((state: RootState) => state.user.user);
@@ -214,10 +170,16 @@ export default function TeamInfoDetail() {
   if (!IsExistedIdea) {
     availableSlots = availableSlots - (teamInfo?.teamMembers?.length ?? 0);
   } else {
-    availableSlots = (teamInfo?.teamSize ?? 0) - (teamMembers.length ?? 0);
+    availableSlots = (teamInfo?.idea?.maxTeamSize ?? 0) - (teamInfo?.teamMembers.length ?? 0);
   }
 
   const requestJoinTeam = async (id: string) => {
+    // Kiểm tra size idea có lớn hơn số thành viên hiện tại không
+    if (availableSlots <= 0) {
+      toast.error("Team is full. Cannot send request.");
+      return;
+    }
+
     setOpen(false);
     const ideacreate: StudentInvitationCommand = {
       projectId: id,

@@ -1,3 +1,6 @@
 export enum NotificationType {
-    General
+    SystemWide,
+    Individual,
+    Team,
+    RoleBased
 }

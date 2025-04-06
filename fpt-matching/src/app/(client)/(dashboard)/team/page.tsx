@@ -57,24 +57,6 @@ import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import InvitationsInComingToLeaderTable from "@/components/sites/team/request-join-team-incoming";
 import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/invitation-get-by-status-query";
 import { invitationService } from "@/services/invitation-service";
-// const groupData = {
-//   title: "FPT Team Matching - Social networking for students project teams",
-//   createdAt: "1/2/2025 7:25:37 PM",
-//   abbreviation: "FPT Team Matching",
-//   vietnameseTitle: "FPT Team Matching - Mạng xã hội dành cho các nhóm dự án của sinh viên",
-//   profession: "Information Technology",
-//   specialty: "Software Engineering",
-//   description:
-//     "FPT Team Matching is a platform designed to help FPTU students connect with teams and find collaborators for academic or personal projects. It supports both academic teams (for projects in the final terms) and external teams (for personal, lecturer-led, or extracurricular projects). The system aims to simplify team formation and promote collaboration by matching students with relevant projects based on their skills and interests.",
-//   keywords: ["Networking", "Collaboration", "Academic", "Project"],
-//   members: [
-//     { email: "thubttse171984@fpt.edu.vn", name: "thubttse171984", role: "Owner | Leader", avatar: "B" },
-//     { email: "loctlse172111@fpt.edu.vn", name: "loctlse172111", role: "Member", avatar: "" },
-//     { email: "sonnhse172092@fpt.edu.vn", name: "sonnhse172092", role: "Member", avatar: "N" },
-//     { email: "quancmse172093@fpt.edu.vn", name: "quancmse172093", role: "Member", avatar: "C" },
-//   ],
-//   maxMembers: 5,
-// };
 
 export default function TeamInfo() {
   const router = useRouter();
@@ -85,7 +67,7 @@ export default function TeamInfo() {
   const confirm = useConfirm();
   const queryClient = useQueryClient();
 
- 
+
 
   //goi api bang tanstack
   const {
@@ -100,7 +82,7 @@ export default function TeamInfo() {
     refetchOnWindowFocus: false,
   });
 
- 
+
   useEffect(() => {
     if (result?.data?.teamName) {
       setTeamName(result.data.teamName);
@@ -174,8 +156,10 @@ export default function TeamInfo() {
   if (!IsExistedIdea) {
     availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
   } else {
-    availableSlots = (project?.teamSize ?? 0) - (teamMembers.length ?? 0);
-  }
+    availableSlots = (project?.idea?.maxTeamSize ?? 0) - (project?.teamMembers.length ?? 0);
+    }
+
+  const isLockListInviteRequest = availableSlots === 0;
   //Đây là form delete trả về true false tái sử dụng được
   async function handleDelete() {
     if (isLockProject) {
@@ -308,7 +292,7 @@ export default function TeamInfo() {
                   <DialogTrigger asChild>
                     <Button
                       variant="ghost"
-                       disabled={isLockProject}
+                       disabled={isLockListInviteRequest}
                       size="icon"
                       className="relative"
                     >

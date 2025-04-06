@@ -47,6 +47,7 @@ import { useState } from "react";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
+import {IdeaDetailForm} from "@/components/sites/idea/detail";
 
 export const columns: ColumnDef<IdeaRequest>[] = [
   {
@@ -172,7 +173,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: row.original.id,
         content: feedback,
       };
-      const res = await ideaRequestService.updateStatus(command);
+      const res = await ideaRequestService.updateStatusByLecturer(command);
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
@@ -195,7 +196,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: row.original.id,
         content: feedback,
       };
-      const res = await ideaRequestService.updateStatus(command);
+      const res = await ideaRequestService.updateStatusByLecturer(command);
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
@@ -223,53 +224,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 <DialogTitle>Idea detail</DialogTitle>
                 <DialogDescription></DialogDescription>
               </DialogHeader>
-              <div className="grid p-4">
-                <TypographyP>
-                  <strong>Idea Code:</strong> {idea.ideaCode}
-                </TypographyP>
-                <TypographyP>
-                  <strong>Vietnamese Name:</strong> {idea.vietNamName}
-                </TypographyP>
-                <TypographyP>
-                  <strong>English Name:</strong> {idea.englishName}
-                </TypographyP>
-                <TypographyP>
-                  <strong>Description:</strong> {idea.description}
-                </TypographyP>
-                <TypographyP>
-                  <strong>Owner ID:</strong> {idea.ownerId}
-                </TypographyP>
-                <TypographyP>
-                  <strong>Mentor ID:</strong> {idea.mentorId}
-                </TypographyP>
-                <TypographyP>
-                  <strong>Sub-Mentor ID:</strong> {idea.subMentorId}
-                </TypographyP>
-                <TypographyP>
-                  <strong>Enterprise Name:</strong> {idea.enterpriseName}
-                </TypographyP>
-                <TypographyP>
-                  <strong>Max Team Size:</strong> {idea.maxTeamSize}
-                </TypographyP>
+              <div className="grid p-4 space-y-24">
+                <IdeaDetailForm idea={idea}/>
 
-                {idea.file && (
-                  <div>
-                    <TypographyP>
-                      <strong>File:</strong>
-                    </TypographyP>
-                    <a
-                      href={idea.file}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 underline"
-                    >
-                      View File
-                    </a>
-                  </div>
-                )}
-                {/* Option: approve or reject */}
-
-                {/* Input feedback */}
                 <div className="space-y-4">
                   <TypographyP>
                     <strong>Feedback:</strong>

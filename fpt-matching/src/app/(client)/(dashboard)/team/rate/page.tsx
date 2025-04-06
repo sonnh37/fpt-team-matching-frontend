@@ -1,87 +1,115 @@
 "use client"
 import { RootState } from '@/lib/redux/store';
+import { projectService } from '@/services/project-service';
 import { ProjectStatus } from '@/types/enums/project';
+import { Rate } from '@/types/rate';
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import RateStudent from '@/components/_common/rate-student/rate-student';
+import { rateService } from '@/services/rate-service';
 
 export default function Page() {
-        //gọi thông tin user đã đăng nhập
-        const user = useSelector((state: RootState) => state.user.user)
 
-        const project = user?.projects.find(x=> x.isDeleted = false && x.status == ProjectStatus.InProgress)
 
-        const{
-            data: result,
-            refetch
-        } = useQuery({
-            queryKey: ["getBlogAllById", query],
-            queryFn: () => bl.fetchPaginated(query),
-            refetchOnWindowFocus: false,
-        });
-        
+
+
+    //gọi thông tin user đã đăng nhập
+    const user = useSelector((state: RootState) => state.user.user)
+    const {
+        data: result,
+        refetch,
+    } = useQuery({
+        queryKey: ["getTeamInfo"],
+        queryFn: projectService.getProjectInfo,
+        refetchOnWindowFocus: false,
+    });
+    //   Loc member ngoai thang danh gia
+    const member = result?.data?.teamMembers.filter(x => x.userId != user?.id)
+
+
+    const { data: ratingData } = useQuery({
+        queryKey: ["getAllRates"],
+        queryFn: () => rateService.fetchAll(), // API trả về danh sách các đánh giá
+        refetchOnWindowFocus: false,
+    });
+
+    console.log(ratingData, "test")
+
 
     return (
-        
-        <form className="max-w-md mx-auto mt-16 p-4 bg-white shadow rounded">
-            <h2 className="text-2xl font-bold mb-4">Form đánh giá</h2>
+        <div>
+            <h1 className='font-semibold text-2xl ml-4'>Danh sách đánh giá </h1>
+            <Table className='ml-4 mt-5 text-lg'>
+                <TableCaption>Danh sách thành viên trong nhóm.</TableCaption>
+                <TableHeader>
+                    <TableRow className=''>
+                        <TableHead className="w-[100px]">Số thứ tự</TableHead>
+                        <TableHead className="">Tên nhóm</TableHead>
+                        <TableHead className="">Chuyên ngành</TableHead>
+                        <TableHead className="">Người hướng dẫn</TableHead>
+                        <TableHead>Tên thành viên</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Đánh giá</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {member?.map((cv, index) => {
+                        const hasRated = ratingData?.data?.some(
+                            (r) => r.rateById === user?.teamMembers.find(x=> x.userId == user?.id)?.id && r.rateForId === cv.id
+                        );
 
-            {/* Name Field */}
-            <div className="mb-4">
-                <label htmlFor="name" className="block mb-1">Tên người đánh giá</label>
-                <div 
-                    id="name" 
-                    className="w-full py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                >{user?.email}</div>
-            </div>
+                        return (
+                            <TableRow key={cv.id}>
+                                <TableCell className="font-medium">{index + 1}</TableCell>
+                                <TableCell>{result?.data?.teamName}</TableCell>
+                                <TableCell>
+                                    {cv.user?.profileStudent?.specialty?.profession?.professionName}
+                                </TableCell>
+                                <TableCell>{result?.data?.idea?.mentorId}</TableCell>
+                                <TableCell>
+                                    {cv.user?.lastName} {cv.user?.firstName}
+                                </TableCell>
+                                <TableCell>{cv.user?.email}</TableCell>
 
-            {/* Email Field */}
-            <div className="mb-4">
-                <label htmlFor="email" className="block mb-1">Người nhận đánh giá</label>
-                <select 
-              
-                    className="w-full py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                >
-                    <option value="">Xin mời lựa chọn</option>
-                    <option value="">Bạn A</option>
-                </select>
-            </div>
+                                <TableCell>
+                                    {hasRated ? (
+                                        <span className="text-green-600 font-semibold">Bạn đã đánh giá</span>
+                                    ) : (
+                                        <RateStudent id={cv.id ?? ""} />
+                                    )}
+                                </TableCell>
+                            </TableRow>
+                        );
+                    })}
+                </TableBody>
+                <TableFooter>
 
-            {/* Rating Field */}
-            <div className="mb-4">
-                <label className="block mb-1">Đánh giá</label>
-                <div className="flex items-center space-x-2">
-                    {[1, 2, 3, 4, 5].map((num) => (
-                        <div key={num} className="flex items-center space-x-1">
-                            <input 
-                                type="radio" 
-                                name="rating" 
-                                id={`rating${num}`} 
-                                value={num} 
-                                className="focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                            <label htmlFor={`rating${num}`}>{num}</label>
-                        </div>
-                    ))}
-                </div>
-            </div>
+                </TableFooter>
+            </Table>
 
-            {/* Message Field */}
-            <div className="mb-4">
-                <label htmlFor="message" className="block mb-1">Đóng góp ý kiến</label>
-                <textarea 
-                    id="message" 
-                    className="w-full py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                ></textarea>
-            </div>
 
-            {/* Submit Button */}
-            <button 
-                type="submit" 
-                className="py-2 px-4 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-                Submit
-            </button>
-        </form>
+
+        </div>
+
     );
 }
