@@ -17,6 +17,11 @@ class ApiHubsService {
       throw error;
     }
   }
+
+  async getSimilaritiesProject(context: string) : Promise<object> {
+    const response = await axiosInstance.post<object>("api_hubs/get-similarities-project", {context})
+    return response.data;
+  }
 }
 
 export const apiHubsService = new ApiHubsService();
