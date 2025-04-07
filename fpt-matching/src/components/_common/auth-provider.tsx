@@ -34,7 +34,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setMinLoadingDone(true);
       // delay show content,
       setTimeout(() => setShowContent(true), 500);
-    }, 1000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);
