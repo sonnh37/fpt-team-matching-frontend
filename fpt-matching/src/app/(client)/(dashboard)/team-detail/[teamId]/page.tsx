@@ -83,11 +83,14 @@ import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-g
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { TypographyLarge } from "@/components/_common/typography/typography-large";
 import { TypographySmall } from "@/components/_common/typography/typography-small";
+import { useSelectorUser } from "@/hooks/use-auth";
+import { useCurrentRole } from "@/hooks/use-current-role";
 
 export default function TeamInfoDetail() {
 
   const { teamId } = useParams();
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelectorUser();
+  const roleCurrent = useCurrentRole();
   //  State lưu dữ liệu từ API
   const [teamInfo, setTeamInfo] = useState<Project | null>(null);
   const [teamUserLogin, setTeamUser] = useState<Project | null>(null);
@@ -244,6 +247,7 @@ export default function TeamInfoDetail() {
               {
                 //check xem con slot khong va no khog co trong team nay va no khong co team vo nao khac roi
                 availableSlots > 0 &&
+                roleCurrent == "Student" && // nếu như ko phai student
                   !check &&
                   !teamUserLogin && // nếu như ko có project
                   //Check xem da gui moi chua

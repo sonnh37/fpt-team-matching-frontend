@@ -168,7 +168,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: row.original.id,
         content: feedback,
       };
-      const res = await ideaRequestService.updateStatus(command);
+      const res = await ideaRequestService.updateStatusByLecturer(command);
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
@@ -191,7 +191,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: row.original.id,
         content: feedback,
       };
-      const res = await ideaRequestService.updateStatus(command);
+      const res = await ideaRequestService.updateStatusByLecturer(command);
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");

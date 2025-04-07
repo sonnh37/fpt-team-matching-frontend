@@ -1,5 +1,4 @@
 import Link from "next/link";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button, type ButtonProps } from "@/components/ui/button";
 import {
@@ -53,13 +52,9 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="ghost" size={"icon"} className={cn("size-10 relative")}>
-          {" "}
-          {/* Thêm relative vào đây */}
           <Bell strokeWidth={1.5} className="!size-5 text-foreground/80" />
           {totalRecords > 0 && (
             <span className="absolute -top-0.5 -right-0.5">
-              {" "}
-              {/* Điều chỉnh vị trí */}
               <Badge className="flex items-center justify-center w-4 h-4 p-0 text-xs font-bold text-white bg-red-500 border border-white rounded-full dark:border-gray-900">
                 {businessResult?.data?.totalRecords}
               </Badge>
@@ -67,16 +62,15 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="end" forceMount>
-        {/* list notification */}
+      <PopoverContent className="w-96 p-0" align="end" forceMount>
         <div className="grid">
           <TypographyH3 className="p-4 pb-2 tracking-[0.015em]">
             Notifications
           </TypographyH3>
 
-          <Separator className="" />
-          {/* Danh sách thông báo */}
-          <ScrollArea className="max-h-[50vh] w-full">
+          <Separator />
+          
+          <ScrollArea className="max-h-[50vh] w-96">
             {notifications.map((noti) => {
               const initials = `${
                 noti.user?.firstName?.toUpperCase().charAt(0) ?? ""
@@ -84,15 +78,13 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
               return (
                 <div
                   key={noti.id}
-                  className="flex gap-2 items-center justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none"
+                  className="flex w-full gap-2 items-center justify-between px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-none"
                 >
-                  {noti.user != null ? (
-                    <Avatar className="size-8">
+                  {noti.user != null && (
+                    <Avatar className="size-8 shrink-0">
                       <AvatarImage
                         src={
-                          noti.user?.avatar && noti.user?.avatar.trim() !== ""
-                            ? noti.user?.avatar
-                            : undefined
+                          noti.user?.avatar?.trim() ? noti.user.avatar : undefined
                         }
                         alt={noti.user?.username ?? ""}
                         onError={(e) =>
@@ -103,9 +95,9 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
                         {initials}
                       </AvatarFallback>
                     </Avatar>
-                  ) : null}
-                  <div className="flex-1">
-                    <TypographySmall className="tracking-[0.015em] truncate">
+                  )}
+                  <div className="flex-1 min-w-0 overflow-hidden">
+                    <TypographySmall className="tracking-[0.015em] truncate text-ellipsis overflow-hidden">
                       {noti.description}
                     </TypographySmall>
                     <TypographyMuted>
