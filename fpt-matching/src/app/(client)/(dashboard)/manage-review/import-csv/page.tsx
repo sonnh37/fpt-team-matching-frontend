@@ -37,6 +37,7 @@ import {reviewService} from "@/services/review-service";
 import {semesterService} from "@/services/semester-service";
 import {toast} from "sonner";
 import {Semester} from "@/types/semester";
+import {sheet2arr} from "@/lib/utils";
 
 export function DropdownReviewListMenu({review, setReview}: {
     review: string,
@@ -86,7 +87,9 @@ function AlertDialogImport({loading, setLoading, callApiPostXLSXFunction, open, 
         setLoading(true)
         const response = await callApiPostXLSXFunction()
         if (response)
-        setOpen(false)
+            setOpen(false)
+
+        setLoading(false)
     }
     return (
         <AlertDialog open={open}>
@@ -152,15 +155,14 @@ export default function Page() {
             const data = new Uint8Array(e.target.result as ArrayBuffer);
             const workbook = XLSX.read(data, {type: "array"});
 
-            const sheetName = workbook.SheetNames[0]; // Get first sheet
+            const sheetName = workbook.SheetNames[parseInt(review) - 1]; // Get first sheet
             const worksheet = workbook.Sheets[sheetName];
-
+            const dataRowFilter = sheet2arr(worksheet)
             const rows = XLSX.utils.sheet_to_json(worksheet, {header: 1, raw: false});
-
-            if (rows.length < 4) {
-                console.error("Sheet does not contain enough rows.");
-                return;
-            }
+            // if (rows.length < 4) {
+            //     console.error("Sheet does not contain enough rows.");
+            //     return;
+            // }
 
             // Get headers from row 2 and row 3
             const headerRow1 = rows[1]
@@ -169,16 +171,17 @@ export default function Page() {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
             const filterHeader2 = headerRow2.filter(function (el) {
-                return el != null;
+                return el != null && el != "";
             });
 
 
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-expect-error
             const headers = [...headerRow1, ...filterHeader2];
-
+            console.log(headers)
             // Data starts from row 4 (index 3)
-            const dataRows = rows.slice(3); // Skip first 3 rows
+            const dataRows = dataRowFilter.slice(3); // Skip first 3 rows
+            console.log(dataRows)
 
             // Convert to structured JSON
             const formattedData = dataRows.map((row) => {

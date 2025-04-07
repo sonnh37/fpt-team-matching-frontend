@@ -15,7 +15,18 @@ import { User } from "@/types/user";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import {IdeaStatus} from "@/types/enums/idea";
+import {Badge} from "@/components/ui/badge";
+import {Department} from "@/types/enums/user";
+import {TypographyH4} from "@/components/_common/typography/typography-h4";
 export const columns: ColumnDef<User>[] = [
+  {
+    accessorKey: "code",
+    header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Code" />
+    ),
+  },
+
   {
     accessorKey: "fullName",
     header: ({ column }) => (
@@ -39,53 +50,19 @@ export const columns: ColumnDef<User>[] = [
     ),
   },
   {
-    accessorKey: "actions",
+    accessorKey: "department",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Actions" />
+        <DataTableColumnHeader column={column} title="Department" />
     ),
     cell: ({ row }) => {
-      return <Actions row={row} />;
+      const status = row.getValue("department") as Department | undefined;
+      const statusText = status !== undefined ? Department[status] : "Unknown";
+
+      return <TypographyP>{statusText}</TypographyP>;
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
     },
   },
 ];
 
-interface ActionsProps {
-  row: Row<User>;
-}
-
-const Actions: React.FC<ActionsProps> = ({ row }) => {
-  const model = row.original;
-  const router = useRouter();
-  const pathName = usePathname();
-  const handleViewDetailsClick = () => {
-    // router.push(`${pathName}/${model.id}`);
-  };
-
-  return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => navigator.clipboard.writeText(model.avatar!)}
-          >
-            Copy model ID
-          </DropdownMenuItem>
-          {/*<DropdownMenuItem onClick={handleUsersClick}>*/}
-          {/*    View photos*/}
-          {/*</DropdownMenuItem>*/}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleViewDetailsClick}>
-            View details
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
-  );
-};

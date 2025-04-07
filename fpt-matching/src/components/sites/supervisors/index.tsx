@@ -148,7 +148,7 @@ export default function SupervisorsTable() {
                 render={({ field }) => {
                   return (
                     <FormItem>
-                      <FormLabel>FE Email or Name</FormLabel>
+                      <FormLabel>Search email or name</FormLabel>
                       <div className="flex items-center gap-2">
                         <FormControl>
                           <Input
@@ -172,7 +172,6 @@ export default function SupervisorsTable() {
         </div>
 
         <div className="">
-          <Card className="space-y-4 overflow-hidden w-full p-4 mx-auto">
             {isFetching && !isTyping ? (
               <DataTableSkeleton
                 columnCount={1}
@@ -187,7 +186,6 @@ export default function SupervisorsTable() {
               <DataTableComponent table={table} />
             )}
             <DataTablePagination table={table} />
-          </Card>
         </div>
       </div>
     </>

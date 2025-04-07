@@ -12,6 +12,45 @@ export function isMacOs() {
   return window.navigator.userAgent.includes("Mac");
 }
 
+export const getFileNameFromUrl = (url: string) => {
+  const parts = url.split('/');
+  const lastPart = parts[parts.length - 1];
+
+  const fileName = lastPart.split('?')[0];
+
+  return fileName.split('#')[0];
+};
+
+export const getPreviewUrl = (fileUrl: string) => {
+  if (fileUrl.includes('cloudinary.com')) {
+    return fileUrl.replace('/raw/', '/image/');
+  }
+  return fileUrl;
+};
+
+export const sheet2arr = (sheet) => {
+  const result = [];
+  let row;
+  let rowNum;
+  let colNum;
+  const range = XLSX.utils.decode_range(sheet['!ref']);
+  for(rowNum = range.s.r; rowNum <= range.e.r; rowNum++){
+    row = [];
+    for(colNum=range.s.c; colNum<=range.e.c; colNum++){
+      const nextCell = sheet[
+          XLSX.utils.encode_cell({r: rowNum, c: colNum})
+          ];
+      if( typeof nextCell === 'undefined' || nextCell == "" ){
+
+      } else row.push(nextCell.w);
+    }
+    if(row.length > 0){
+      result.push(row);
+    }
+  }
+  return result;
+};
+
 export const convertToISODate = (
   date: Date | string | null | undefined
 ): string | null => {
