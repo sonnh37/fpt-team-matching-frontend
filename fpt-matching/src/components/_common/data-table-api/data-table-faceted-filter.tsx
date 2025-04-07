@@ -55,18 +55,20 @@ export function DataTableFacetedFilter<TData, TValue>({
   const handleSelect = (value: any) => {
     if (type === "single") {
       // Single select: Gửi giá trị trực tiếp hoặc undefined khi bỏ chọn
-      column?.setFilterValue(selectedValues.has(value) ? undefined : value);
+      column?.setFilterValue(selectedValues.has(value.toString()) ? undefined : value.toString());
     } else {
       // Multiple select: Xử lý mảng giá trị
       const newValues = new Set(selectedValues);
-      if (selectedValues.has(value)) {
-        newValues.delete(value);
+      if (selectedValues.has(value.toString())) {
+        newValues.delete(value.toString());
       } else {
-        newValues.add(value);
+        newValues.add(value.toString());
       }
       column?.setFilterValue(Array.from(newValues));
     }
   };
+
+  console.log("check_options", options);
 
   return (
     <Popover>
@@ -93,11 +95,11 @@ export function DataTableFacetedFilter<TData, TValue>({
                   </Badge>
                 ) : (
                   options
-                    .filter((option) => selectedValues.has(option.value))
+                    .filter((option) => selectedValues.has(option.value.toString()))
                     .map((option) => (
                       <Badge
                         variant="secondary"
-                        key={option.value}
+                        key={option.value.toString()}
                         className="rounded-sm px-1 font-normal"
                       >
                         {option.label}
@@ -119,11 +121,11 @@ export function DataTableFacetedFilter<TData, TValue>({
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
-                const isSelected = selectedValues.has(option.value);
+                const isSelected = selectedValues.has(option.value.toString());
                 return (
                   <CommandItem
-                    key={option.value}
-                    onSelect={() => handleSelect(option.value)}
+                    key={option.value.toString()}
+                    onSelect={() => handleSelect(option.value.toString())}
                   >
                     {type === "multiple" ? (
                       <Checkbox

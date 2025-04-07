@@ -91,14 +91,24 @@ export const formatCurrency = (value: number | undefined): string => {
   }).format(value);
 };
 
+// export function getEnumOptions(enumObject: any) {
+//   return Object.keys(enumObject)
+//     .filter((key) => isNaN(Number(key))) 
+//     .map((key) => ({
+//       label: key, 
+//       value: key,
+//     }));
+// }
+
 export function getEnumOptions(enumObject: any) {
   return Object.keys(enumObject)
-    .filter((key) => isNaN(Number(key))) 
+    .filter((key) => isNaN(Number(key))) // Lọc ra các key không phải số
     .map((key) => ({
-      label: key, 
-      value: key,
+      label: key, // Sử dụng key làm label
+      value: enumObject[key], // Sử dụng giá trị thực của enum làm value
     }));
 }
+
 
 type EnumType = { [key: string]: string | number };
 
