@@ -126,7 +126,7 @@ export const NAV_CONFIG = {
         },
         {
             title: "Manage semester",
-            url: "/management/semester",
+            url: "/management/semesters",
             icon: ShieldHalf,
             roles: ["Manager"],
         },

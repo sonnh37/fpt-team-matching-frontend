@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { useSearchParams } from "next/navigation";
 import { UpdateCommand } from "@/types/models/commands/_base/base-command";
 import { BusinessResult } from "@/types/models/responses/business-result";
+import { cn } from "@/lib/utils";
 
 interface TableComponentProps<TData> {
   table: ReactTable<TData>;
@@ -79,7 +80,7 @@ export function DataTableComponent<TData>({
 
   return (
     <div className="overflow-auto rounded-md border">
-      <Table className={className}>
+      <Table className={cn("", className)}>
         {isEnableHeader && (
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -126,6 +127,7 @@ export function DataTableComponent<TData>({
                       style={{
                         opacity: isDeleted ? 0.5 : 1,
                       }}
+                      className="p-3"
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

@@ -44,6 +44,7 @@ import { z } from "zod";
 import { columns } from "./columns";
 import { ProjectStatus } from "@/types/enums/project";
 import { ProjectGetAllQuery } from "@/types/models/queries/projects/project-get-all-query";
+import { LoadingComponent } from "@/components/_common/loading-page";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -258,17 +259,9 @@ export default function ProjectSearchList() {
           </Form>
         </div>
 
-        <Card className="space-y-4 p-4">
+        <div className="space-y-4 h-full">
           {isFetching ? (
-            <DataTableSkeleton
-              columnCount={1}
-              showViewOptions={false}
-              withPagination={false}
-              rowCount={pagination.pageSize}
-              searchableColumnCount={0}
-              filterableColumnCount={0}
-              shrinkZero
-            />
+            <LoadingComponent />
           ) : (
             <DataTableComponent
               isEnableHeader={false}
@@ -278,7 +271,7 @@ export default function ProjectSearchList() {
             />
           )}
           <DataTablePagination table={table} />
-        </Card>
+        </div>
       </div>
     </>
   );
