@@ -8,6 +8,7 @@ import {
     Send,
     ShieldHalf,
     SquareUserRound,
+    Users,
     UsersRound,
 } from "lucide-react";
 import {GiWideArrowDunk} from "react-icons/gi";
@@ -140,6 +141,12 @@ export const NAV_CONFIG = {
             title: "Manage defense",
             url: "/manage-defense",
             icon: ShieldHalf,
+            roles: ["Manager"],
+        },
+        {
+            title: "Manage users",
+            url: "/management/users",
+            icon: Users,
             roles: ["Manager"],
         },
     ],

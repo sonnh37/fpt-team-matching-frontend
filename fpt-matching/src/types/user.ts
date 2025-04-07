@@ -31,6 +31,7 @@ export interface User extends BaseEntity {
   address?: string;
   code?: string;
   department?: Department;
+  profileStudent?: ProfileStudent;
   blogs: Blog[];
   ideaRequestOfReviewers: IdeaRequest[];
   ideaHistoryRequestOfReviewers: IdeaHistoryRequest[];
@@ -45,7 +46,6 @@ export interface User extends BaseEntity {
   blogCvs: BlogCv[];
   likes: Like[];
   notifications: Notification[];
-  profileStudent?: ProfileStudent;
   projects: Project[];
   projectOfLeaders: Project[];
   refreshTokens: RefreshToken[];
