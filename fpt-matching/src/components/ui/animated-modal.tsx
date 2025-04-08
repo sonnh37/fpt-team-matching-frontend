@@ -178,7 +178,7 @@ export const ModalFooter = ({
     return (
         <div
             className={cn(
-                "flex p-3 bg-gray-100 dark:bg-neutral-900",
+                "flex p-3  dark:bg-neutral-900",
                 className
             )}
         >

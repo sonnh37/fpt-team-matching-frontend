@@ -29,10 +29,6 @@ import RateStudent from '@/components/_common/rate-student/rate-student';
 import { rateService } from '@/services/rate-service';
 
 export default function Page() {
-
-
-
-
     //gọi thông tin user đã đăng nhập
     const user = useSelector((state: RootState) => state.user.user)
     const {
@@ -52,9 +48,6 @@ export default function Page() {
         queryFn: () => rateService.fetchAll(), // API trả về danh sách các đánh giá
         refetchOnWindowFocus: false,
     });
-
-    console.log(ratingData, "test")
-
 
     return (
         <div>

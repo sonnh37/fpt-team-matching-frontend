@@ -18,11 +18,11 @@ import { useForm } from "react-hook-form";
 
 
 const formSchema = z.object({
-  englishTitle: z.string().min(2, { message: "English Title must be at least 2 characters." }),
-  abbreviation: z.string().max(20, { message: "Abbreviation must be less than 20 characters." }),
-  vietnameseTitle: z.string().min(2, { message: "Vietnamese Title must be at least 2 characters." }),
-  description: z.string().min(10, { message: "Description must be at least 10 characters." }),
-  inviteEmail: z.string().email({ message: "Invalid email format." }),
+  englishTitle: z.string().min(2, { message: "Tên đề tài bằng Tiếng Anh ít nhất 2 ký tự." }),
+  abbreviation: z.string().max(20, { message: "Tên viết tắt đề tài ít nhất 20 ký tự " }),
+  vietnameseTitle: z.string().min(2, { message: "Tên đề bài bằng Tiếng Việt ít nhất 2 ký tự." }),
+  description: z.string().min(10, { message: "Nội dung có ít nhất 10 ký tự." }),
+  inviteEmail: z.string().email({ message: "Sai đinh dạng email." }),
 })
 
 
