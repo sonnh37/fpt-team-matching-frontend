@@ -24,16 +24,16 @@ export const capstoneScheduleColumn: ColumnDef<CapstoneScheduleImportCommands>[]
         header: "Tên đề tài tiếng anh",
     },
     {
-        accessorKey: "Date",
+        accessorKey: "Ngày",
         header: "Ngày"
     },
     {
-        accessorKey: "Time",
+        accessorKey: "Thời gian",
         header: "Thời gian"
     },
     {
-        accessorKey: "Hall Name",
-        header: "Địa điểm",
+        accessorKey: "Hội trường",
+        header: "Hội trường",
     }
 ]
 

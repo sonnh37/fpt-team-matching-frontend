@@ -93,6 +93,11 @@ class UserService extends BaseService<User> {
       return Promise.reject(error);
     }
   };
+
+  public getAllReviewer = async () : Promise<BusinessResult<User[]>> => {
+      const response = await axiosInstance.get<BusinessResult<User[]>>(`${this.endpoint}/role/reviewer`);
+      return response.data;
+  }
 }
 
 export const userService = new UserService();

@@ -19,11 +19,11 @@ import { Button } from "@/components/ui/button";
 const formSchema = z.object({
   teamName: z
     .string()
-    .min(2, { message: "English Title must be at least 2 characters." }),
+    .min(2, { message: "Tên đề tài Tiếng Anh bắt buộc có 2 ký tự." }),
   teamSize: z
-    .number({ invalid_type_error: "Team size must be a number." })
-    .gte(1, { message: "Team size must be at least 1." })
-    .default(1),
+    .number({ invalid_type_error: "Thành viên nhóm bắt buộc nhập số." })
+    .gte(4, { message: "Thành viên nhóm phải từ 4 thành viên." })
+    .default(4),
 });
 
 export const TeamForm = () => {
@@ -54,7 +54,7 @@ export const TeamForm = () => {
       const response = await projectService.createTeam(createdValues);
       if (response.status !== 1) throw new Error(response.message);
 
-      toast.success(response.message);
+      toast.success("Chúc mừng bạn đã tạo idea thành công!");
       await queryClient.refetchQueries({ queryKey: ["getTeamInfo"] });
       router.push("/team");
     } catch (error: any) {

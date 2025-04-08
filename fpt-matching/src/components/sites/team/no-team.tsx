@@ -101,7 +101,7 @@ export const NoTeam = () => {
     <div className="absolute inset-0 flex justify-center items-center">
       <div className="flex flex-col gap-4">
         <div className="text-3xl text-red-500 pb-4 text-center">
-          You don't have any team. Let's find your team with options:
+          Bạn chưa có nhóm.Hãy tìm nhóm bạn đi nào.
         </div>
 
         <div className="w-full flex justify-center">
@@ -111,12 +111,12 @@ export const NoTeam = () => {
                 <Dialog open={showCreateModal} onOpenChange={handleOpenChange}>
                   <DialogTrigger asChild>
                     <Button disabled={hasAcceptedIdea}>
-                      <TbUsersPlus /> Create team
+                      <TbUsersPlus /> Tạo nhóm
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="">
                     <DialogHeader>
-                      <DialogTitle>New project</DialogTitle>
+                      <DialogTitle>Đề tài mới</DialogTitle>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
                       <TeamForm />
@@ -127,7 +127,7 @@ export const NoTeam = () => {
             </TooltipTrigger>
             {hasAcceptedIdea && (
               <TooltipContent>
-                <p>You have a accepted idea, so you do not have create team</p>
+                <p>Bạn đang trong quá trình kiểm duyệt idea,bạn không có quyền tạo nhóm lúc này.</p>
               </TooltipContent>
             )}
           </Tooltip>
@@ -137,13 +137,13 @@ export const NoTeam = () => {
             <TooltipTrigger asChild>
               <div>
                 <Button variant={"default"} disabled={hasAcceptedIdea}>
-                  <LuUsersRound /> Find teams
+                  <LuUsersRound /> Tìm thành viên
                 </Button>
               </div>
             </TooltipTrigger>
             {hasAcceptedIdea && (
               <TooltipContent>
-                <p>You have a accepted idea, so you do not have find teams</p>
+                <p>Bạn đang trong quá trình kiểm duyệt idea,bạn không có quyền thêm thành viên lúc này.</p>
               </TooltipContent>
             )}
           </Tooltip>

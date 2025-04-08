@@ -44,7 +44,7 @@ export function UpdateIdeaDialog(
             })
 
             if (result && result.status == 1) {
-                toast.success("Successfully updated idea history");
+                toast.success("Cập nhập lại đề tài thành công!");
                 setStatus(decision);
             } else {
                 toast.error(`Error updating idea history: ${result.message}`);

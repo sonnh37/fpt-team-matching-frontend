@@ -7,16 +7,6 @@ import {DataTable} from "@/app/(client)/(dashboard)/manage-review/import-csv/Dat
 import {columnsFileCsv} from "@/app/(client)/(dashboard)/manage-review/import-csv/ColumsDef";
 import {Button} from "@/components/ui/button";
 import {ChevronRight, Import, Loader2} from "lucide-react";
-import {
-    AlertDialog,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import {ChevronDown} from "lucide-react"
 
 import {
@@ -38,8 +28,10 @@ import {semesterService} from "@/services/semester-service";
 import {toast} from "sonner";
 import {Semester} from "@/types/semester";
 import {sheet2arr} from "@/lib/utils";
+import { Label } from '@/components/ui/label';
+import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 
-export function DropdownReviewListMenu({review, setReview}: {
+export function DropdownReviewListMenu({review}: {
     review: string,
     setReview: Dispatch<React.SetStateAction<string>>
 }) {
@@ -53,20 +45,21 @@ export function DropdownReviewListMenu({review, setReview}: {
                     <ChevronRight/>
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger className="flex items-center gap-1">
-                            Review {review}
-                            <ChevronDown className="h-4 w-4"/>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="start">
-                            <DropdownMenuLabel>Select review number</DropdownMenuLabel>
-                            <DropdownMenuRadioGroup value={review} onValueChange={setReview}>
-                                <DropdownMenuRadioItem value="1">Review 1</DropdownMenuRadioItem>
-                                <DropdownMenuRadioItem value="2">Review 2</DropdownMenuRadioItem>
-                                <DropdownMenuRadioItem value="3">Review 3</DropdownMenuRadioItem>
-                            </DropdownMenuRadioGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    {/*<DropdownMenu>*/}
+                    {/*    <DropdownMenuTrigger className="flex items-center gap-1">*/}
+                    {/*        Review {review}*/}
+                    {/*        <ChevronDown className="h-4 w-4"/>*/}
+                    {/*    </DropdownMenuTrigger>*/}
+                    {/*    <DropdownMenuContent align="start">*/}
+                    {/*        <DropdownMenuLabel>Select review number</DropdownMenuLabel>*/}
+                    {/*        <DropdownMenuRadioGroup value={review} onValueChange={setReview}>*/}
+                    {/*            <DropdownMenuRadioItem value="1">Review 1</DropdownMenuRadioItem>*/}
+                    {/*            <DropdownMenuRadioItem value="2">Review 2</DropdownMenuRadioItem>*/}
+                    {/*            <DropdownMenuRadioItem value="3">Review 3</DropdownMenuRadioItem>*/}
+                    {/*        </DropdownMenuRadioGroup>*/}
+                    {/*    </DropdownMenuContent>*/}
+                    {/*</DropdownMenu>*/}
+                    Review {review}
                 </BreadcrumbItem>
             </BreadcrumbList>
         </Breadcrumb>
@@ -86,38 +79,45 @@ function AlertDialogImport({loading, setLoading, callApiPostXLSXFunction, open, 
     const handleClickContinueAction = async () => {
         setLoading(true)
         const response = await callApiPostXLSXFunction()
-        if (response)
-            setOpen(false)
-
-        setLoading(false)
+        if (response){
+            setLoading(false)
+        }
+        setOpen(false)
+    }
+    const handleCancelClick =  () => {
+        setOpen(false)
     }
     return (
-        <AlertDialog open={open}>
-            <AlertDialogTrigger asChild>
-                <Button className={"px-6 py-4 mt-6"} variant="default"><Import/> Save to Database</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure to import ?</AlertDialogTitle>
-                    <AlertDialogDescription>
+        <Dialog open={open} onOpenChange={setOpen} >
+            <DialogTrigger asChild>
+                <Button onClick={() => {setOpen(true)}} className={"px-6 py-4 mt-6"} variant="default"><Import/> Save to Database</Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Are you absolutely sure to import ?</DialogTitle>
+                    <DialogDescription>
                         This action cannot be undone.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogFooter>
                     {
                         !loading
-                            ? (<Button onClick={() => {
-                                handleClickContinueAction()
-                            }}>Continue</Button>)
+                            ? (<div className={"flex gap-2"}>
+                                <Button variant={"outline"} onClick={() => {
+                                    handleCancelClick()
+                                }}>Cancel</Button>
+                                <Button onClick={() => {
+                                    handleClickContinueAction()
+                                }}>Continue</Button>
+                            </div>)
                             : (<Button disabled>
                                 <Loader2 className="animate-spin"/>
                                 Please wait
                             </Button>)
                     }
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }
 
@@ -127,7 +127,7 @@ export default function Page() {
     const [header, setHeader] = useState<string[] | null>(null);
     const [review, setReview] = useState<string>("1")
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [open, setOpen] = React.useState<boolean>(false);
+    const [open, setOpen] = useState<boolean>(false);
     const [currentSemester, setCurrentSemester] = useState<Semester | null>(null);
     const postFileXLSX = async () => {
         if (currentSemester) {
@@ -222,17 +222,39 @@ export default function Page() {
             <div className={"mb-4"}>
                 <Button onClick={() => handleDownTemplate()}>Tải template tại đây</Button>
             </div>
+
             {
                 (data == null) && (header == null) ? (
                     <div className={"w-full"}>
-                        <InputFile file={file} setFile={setFile}/>
+                        <div className={"flex flex-row gap-2 w-full justify-center items-center mb-8"}>
+                            <Label className={"font-bold text-xl"}>Chọn giai đoạn: </Label>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger className="flex items-center gap-1">
+                                    <div className={"text-red-500 text-lg"}>Review {review}</div>
+                                    <ChevronDown className="h-4 w-4"/>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                    <DropdownMenuLabel>Select review number</DropdownMenuLabel>
+                                    <DropdownMenuRadioGroup value={review} onValueChange={setReview}>
+                                        <DropdownMenuRadioItem value="1">Review 1</DropdownMenuRadioItem>
+                                        <DropdownMenuRadioItem value="2">Review 2</DropdownMenuRadioItem>
+                                        <DropdownMenuRadioItem value="3">Review 3</DropdownMenuRadioItem>
+                                    </DropdownMenuRadioGroup>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                        <div className={"w-full"}>
+                            <InputFile file={file} setFile={setFile}/>
+                        </div>
                     </div>
                 ) : (
                     <div className="w-full">
+                        <div className={"flex flex-row gap-2 w-full justify-center items-center mb-8"}>
+                            <Label className={"font-bold text-xl"}>Giai đoạn: </Label>
+                            <div className={"text-red-500 text-lg"}>Review {review}</div>
+                        </div>
                         <DataTable data={data!} columns={columnsFileCsv}/>
-                        <div onClick={() => {
-                            setOpen(true)
-                        }}>
+                        <div>
                             <AlertDialogImport
                                 callApiPostXLSXFunction={postFileXLSX}
                                 loading={isLoading}
