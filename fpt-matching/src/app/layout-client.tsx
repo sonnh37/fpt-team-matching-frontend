@@ -50,16 +50,16 @@ export default function LayoutClient({
             </GoogleOAuthProvider>
           </QueryClientProvider>
         </Provider>
+        <Toaster
+          position="top-right"
+          // richColors
+          // icons={{
+          //   success: "🎉",
+          //   error: "🚨",
+          //   warning: "⚠️",
+          // }}
+        />
       </ThemeProvider>
-      <Toaster
-        position="top-right"
-        richColors
-        // icons={{
-        //   success: "🎉",
-        //   error: "🚨",
-        //   warning: "⚠️",
-        // }}
-      />
     </>
   );
 }

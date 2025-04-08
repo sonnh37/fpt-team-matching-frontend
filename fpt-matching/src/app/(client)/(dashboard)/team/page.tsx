@@ -52,15 +52,19 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import UpdateProjectTeam from "../idea/updateidea/page";
+import { useCurrentRole } from "@/hooks/use-current-role";
+import { TeamMember } from "@/types/team-member";
+import { useSelectorUser } from "@/hooks/use-auth";
 
 export default function TeamInfo() {
   const router = useRouter();
   //lay thong tin tu redux luc dang nhap
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelectorUser();
   const [isEditing, setIsEditing] = useState(false);
   const [teamName, setTeamName] = useState("");
   const confirm = useConfirm();
   const queryClient = useQueryClient();
+  const roleCurrent = useCurrentRole();
 
   //goi api bang tanstack
   const {
@@ -550,11 +554,11 @@ export default function TeamInfo() {
                     </Badge>
                   </div>
                   <div className="space-y-3">
-                    {sortedMembers.map((member, index) => {
+                    {sortedMembers.map((member: TeamMember, index) => {
                       const initials = `${
                         member.user?.lastName?.charAt(0).toUpperCase() || ""
                       }`;
-                      const isLeader = member.role === TeamMemberRole.Leader;
+                      const isLeaderInMembers = member.role === TeamMemberRole.Leader;
 
                       return (
                         <div
@@ -583,9 +587,9 @@ export default function TeamInfo() {
                           </div>
 
                           <div className="flex items-center gap-3">
-                            <Badge variant={isLeader ? "default" : "secondary"}>
+                            <Badge variant={isLeaderInMembers ? "default" : "secondary"}>
                               {TeamMemberRole[member.role ?? 0]}
-                              {isLeader && " (Owner)"}
+                              {isLeaderInMembers && " (Owner)"}
                             </Badge>
 
                             <DropdownMenu>
@@ -604,7 +608,7 @@ export default function TeamInfo() {
                                     View Profile
                                   </a>
                                 </DropdownMenuItem>
-                                {!isLeader && (
+                                {isLeader && !isLeaderInMembers && (
                                   <DropdownMenuItem
                                     onClick={() =>
                                       handleDeleteMember(member?.id ?? "")
