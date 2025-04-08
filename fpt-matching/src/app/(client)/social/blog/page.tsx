@@ -73,9 +73,6 @@ export default function Blog() {
   });
   const [filterType, setFilterType] = useState<BlogType | null>(null);
 
-
-  console.log("tét", formData)
-
   // Hàm thay đổi bộ lọc và gọi API lại
   const handleFilterChange = (type: BlogType) => {
     setFilterType(type);

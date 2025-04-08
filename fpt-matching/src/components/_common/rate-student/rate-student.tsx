@@ -19,16 +19,16 @@ const RateStudent = ({ id }: { id: string }) => {
     const [rated1, setRated1] = React.useState(4);
     const [rated2, setRated2] = React.useState(4);
 
-        //gọi thông tin user đã đăng nhập
-        const user = useSelector((state: RootState) => state.user.user)
+    //gọi thông tin user đã đăng nhập
+    const user = useSelector((state: RootState) => state.user.user)
 
-        const { data: result } = useQuery({
-            queryKey: ["getMemberById", id],
-            queryFn: () => teammemberService.fetchById(id),
-            refetchOnWindowFocus: false,
-        });
-        // const userisrated = result?.data?.find(x=>x.userId === id)
-    
+    const { data: result } = useQuery({
+        queryKey: ["getMemberById", id],
+        queryFn: () => teammemberService.fetchById(id),
+        refetchOnWindowFocus: false,
+    });
+    // const userisrated = result?.data?.find(x=>x.userId === id)
+
     // cập nhật giá trị numOfStar vào formData khi rated thay đổi
     React.useEffect(() => {
         setFormData((prev) => ({
@@ -74,11 +74,13 @@ const RateStudent = ({ id }: { id: string }) => {
         const result1 = await rateService.create(query)
         if (result1?.status == 1) {
             toast.success("Bạn đã đánh giá thành công!")
-            setFormData({   
-            rateById: user?.teamMembers.find(x => x.userId === user?.id)?.id ?? "", // hoặc x.id nếu đó là teamMemberId
-            rateForId: id,
-            numbOfStar: 1,
-            content: ""})
+            setFormData({
+                rateById: user?.teamMembers.find(x => x.userId === user?.id)?.id ?? "", // hoặc x.id nếu đó là teamMemberId
+                rateForId: id,
+                numbOfStar: 1,
+                content: ""
+            })
+            window.location.href = `/team/rate`;
         } else {
             toast.error("Đánh giá thất bại!")
         }

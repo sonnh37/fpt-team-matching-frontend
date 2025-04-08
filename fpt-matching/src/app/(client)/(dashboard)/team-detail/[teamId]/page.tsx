@@ -176,7 +176,7 @@ export default function TeamInfoDetail() {
   const requestJoinTeam = async (id: string) => {
     // Kiểm tra size idea có lớn hơn số thành viên hiện tại không
     if (availableSlots <= 0) {
-      toast.error("Team is full. Cannot send request.");
+      toast.error("Nhóm đã đủ thành viên.Bạn không thể xin vào");
       return;
     }
 
