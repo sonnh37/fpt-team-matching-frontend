@@ -1,4 +1,13 @@
 "use client";
+import ErrorSystem from "@/components/_common/errors/error-system";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import { TypographyH3 } from "@/components/_common/typography/typography-h3";
+import { TypographyMuted } from "@/components/_common/typography/typography-muted";
+import { TypographyP } from "@/components/_common/typography/typography-p";
+import { TypographySmall } from "@/components/_common/typography/typography-small";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -6,43 +15,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
-import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
-import { projectService } from "@/services/project-service";
-import { LoadingComponent } from "@/components/_common/loading-page";
-import ErrorSystem from "@/components/_common/errors/error-system";
-import { formatDate } from "@/lib/utils";
-import { TeamMemberRole } from "@/types/enums/team-member";
-import { useParams } from "next/navigation";
-import { teammemberService } from "@/services/team-member-service";
-import { useEffect, useState } from "react";
-import { invitationService } from "@/services/invitation-service";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { StudentInvitationCommand } from "@/types/models/commands/invitation/invitation-student-command";
-import Loader from "@/components/_common/waiting-icon/page";
-import { TypographyH3 } from "@/components/_common/typography/typography-h3";
-import { TypographyMuted } from "@/components/_common/typography/typography-muted";
-import { Button } from "@/components/ui/button";
-import { TbUsersPlus } from "react-icons/tb";
 import {
   Dialog,
   DialogClose,
@@ -54,32 +26,48 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Separator } from "@/components/ui/separator";
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { ideaService } from "@/services/idea-service";
-import { IdeaStatus } from "@/types/enums/idea";
-import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-get-current-by-status";
-import { TypographySmall } from "@/components/_common/typography/typography-small";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useCurrentRole } from "@/hooks/use-current-role";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Info, User as UserIcon } from "lucide-react";
-import { Project } from "@/types/project";
-import { TeamMember } from "@/types/team-member";
-import { TypographyP } from "@/components/_common/typography/typography-p";
+import { formatDate } from "@/lib/utils";
+import { ideaService } from "@/services/idea-service";
+import { invitationService } from "@/services/invitation-service";
+import { projectService } from "@/services/project-service";
+import { IdeaStatus } from "@/types/enums/idea";
+import { TeamMemberRole } from "@/types/enums/team-member";
+import { StudentInvitationCommand } from "@/types/models/commands/invitation/invitation-student-command";
+import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-get-current-by-status";
+import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Info, LoaderCircle, User as UserIcon } from "lucide-react";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+import { TbUsersPlus } from "react-icons/tb";
+import { toast } from "sonner";
 
 export default function TeamInfoDetail() {
   const { teamId } = useParams();
   if (!teamId) return null;
   const user = useSelectorUser();
   const roleCurrent = useCurrentRole();
+  const [isLoading, setIsLoading] = useState(false);
 
   const query: IdeaGetCurrentByStatusQuery = {
     status: IdeaStatus.Pending,
   };
+
+  const queryClient = useQueryClient();
 
   // Query: Idea của user
   const {
@@ -145,38 +133,42 @@ export default function TeamInfoDetail() {
     !teamUserLogin;
 
   const requestJoinTeam = async (id: string) => {
-    if (availableSlots <= 0) {
-      toast.error("Team is full. Cannot send request.");
-      return;
-    }
-
-    const invitation: StudentInvitationCommand = {
-      projectId: id,
-      content: "I would like to join your team",
-    };
+    setIsLoading(true);
 
     try {
-      const result = await invitationService.sendByStudent(invitation);
+      // Kiểm tra size idea có lớn hơn số thành viên hiện tại không
+      if (availableSlots <= 0) {
+        toast.error("Nhóm đã đủ thành viên.Bạn không thể xin vào");
+        return;
+      }
+
+      const ideacreate: StudentInvitationCommand = {
+        projectId: id,
+        content: "Muốn tham gia vào nhóm bạn",
+      };
+      const result = await invitationService.sendByStudent(ideacreate);
+
       if (result?.status === 1) {
         toast.success(result.message);
+        queryClient.refetchQueries({ queryKey: ["checkInvite"] });
       } else {
-        toast.error(result.message);
+        toast.success(result.message);
       }
     } catch (error) {
-      toast.error("Failed to send join request");
+      toast.error("Có lỗi xảy ra trong quá trình gửi yêu cầu tham gia nhóm.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const cancelRequest = async (projectId: string) => {
-    try {
-      const result = await invitationService.cancelInvite(projectId);
-      if (result.status === 1) {
-        toast.success("Request cancelled successfully");
-      } else {
-        toast.error("Failed to cancel request");
-      }
-    } catch (error) {
-      toast.error("An error occurred while cancelling the request");
+  const cancelRequest = async (teamInfoId: string) => {
+    const result = await invitationService.cancelInvite(teamInfoId);
+    if (result.status === 1) {
+      // Hiển thị loading page
+      toast.success("Bạn đã hủy thành công");
+      queryClient.refetchQueries({ queryKey: ["checkInvite"] });
+    } else {
+      toast("Bạn đã hủy không thành công");
     }
   };
 
@@ -186,7 +178,7 @@ export default function TeamInfoDetail() {
   return (
     <div className="container pt-4 max-w-4xl">
       <div className="space-y-3">
-        <div className="flex">
+        <div className="flex gap-3 items-center">
           <TypographyH3>Team Details</TypographyH3>
           {canJoinTeam && (
             <Tooltip>
@@ -255,9 +247,19 @@ export default function TeamInfoDetail() {
                             type="submit"
                             onClick={() => requestJoinTeam(teamInfo?.id || "")}
                             className="gap-2"
+                            disabled={isLoading}
                           >
-                            <TbUsersPlus />
-                            Confirm Join
+                            {isLoading ? (
+                              <>
+                                <LoaderCircle className="animate-spin" />
+                                Đang xử lý...
+                              </>
+                            ) : (
+                              <>
+                                <TbUsersPlus />
+                                Confirm Join
+                              </>
+                            )}
                           </Button>
                         </DialogFooter>
                       </DialogContent>
@@ -292,7 +294,7 @@ export default function TeamInfoDetail() {
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-6">
+          <CardContent className="  space-y-6">
             {/* Team Description */}
             {teamInfo?.description && (
               <div>
@@ -447,7 +449,7 @@ export default function TeamInfoDetail() {
                         Trạng thái
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.status || "-"}
+                        {IdeaStatus[teamInfo.idea.status ?? 0] || "-"}
                       </TypographyP>
                     </div>
 
