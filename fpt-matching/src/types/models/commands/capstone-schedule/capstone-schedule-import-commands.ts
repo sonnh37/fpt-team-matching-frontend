@@ -1,9 +1,9 @@
 
 export interface CapstoneScheduleImportCommands {
-    Date: Date,
-    "Hall Name": string,
+    "Thời gian": Date,
+    "Hội trường": string,
     "Mã đề tài": string,
     STT: number,
-    Time: string,
+    "Ngày": string,
     "Tên đề tài tiếng anh": string,
 }

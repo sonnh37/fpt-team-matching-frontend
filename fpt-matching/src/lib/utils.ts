@@ -1,7 +1,7 @@
 import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-
+import * as XLSX from "xlsx"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
