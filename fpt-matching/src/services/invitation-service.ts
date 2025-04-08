@@ -102,7 +102,7 @@ class InvitationService extends BaseService<Invitation> {
         `${this.endpoint}/sent-by-team`,
         command
       );
-      return response;
+      return response.data;
     } catch (error) {
       this.handleError(error);
       return Promise.reject(error); // Trả về `false` thay vì `Promise.reject(error)`

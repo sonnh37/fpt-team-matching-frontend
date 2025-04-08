@@ -325,7 +325,7 @@ export default function TeamInfo() {
                   <DialogTrigger asChild>
                     <Button
                       variant="ghost"
-                      disabled={isLockProject}
+                      disabled={isLockListInviteRequest}
                       size={"icon"}
                     >
                       <Pencil />

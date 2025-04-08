@@ -65,7 +65,12 @@ export const columns: ColumnDef<Idea>[] = [
       );
     },
   },
-
+  {
+    accessorKey: "maxTeamSize",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Team Size (Required)" />
+    ),
+  },
   {
     accessorKey: "specialty.profession.professionName",
     header: ({ column }) => (
@@ -216,7 +221,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         return;
       }
 
-      toast.success(`Invitation canceled successfully`);
+      toast.success(`Invitation successfully`);
       queryClient.invalidateQueries({ queryKey: ["data"] });
     } catch (error) {
       toast.error(error as string);
