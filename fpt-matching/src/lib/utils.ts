@@ -1,7 +1,8 @@
 import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 import { type ClassValue, clsx } from "clsx";
+import { format } from "date-fns";
 import { twMerge } from "tailwind-merge";
-
+import { vi } from "date-fns/locale";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -13,17 +14,17 @@ export function isMacOs() {
 }
 
 export const getFileNameFromUrl = (url: string) => {
-  const parts = url.split('/');
+  const parts = url.split("/");
   const lastPart = parts[parts.length - 1];
 
-  const fileName = lastPart.split('?')[0];
+  const fileName = lastPart.split("?")[0];
 
-  return fileName.split('#')[0];
+  return fileName.split("#")[0];
 };
 
 export const getPreviewUrl = (fileUrl: string) => {
-  if (fileUrl.includes('cloudinary.com')) {
-    return fileUrl.replace('/raw/', '/image/');
+  if (fileUrl.includes("cloudinary.com")) {
+    return fileUrl.replace("/raw/", "/image/");
   }
   return fileUrl;
 };
@@ -33,18 +34,15 @@ export const sheet2arr = (sheet) => {
   let row;
   let rowNum;
   let colNum;
-  const range = XLSX.utils.decode_range(sheet['!ref']);
-  for(rowNum = range.s.r; rowNum <= range.e.r; rowNum++){
+  const range = XLSX.utils.decode_range(sheet["!ref"]);
+  for (rowNum = range.s.r; rowNum <= range.e.r; rowNum++) {
     row = [];
-    for(colNum=range.s.c; colNum<=range.e.c; colNum++){
-      const nextCell = sheet[
-          XLSX.utils.encode_cell({r: rowNum, c: colNum})
-          ];
-      if( typeof nextCell === 'undefined' || nextCell == "" ){
-
+    for (colNum = range.s.c; colNum <= range.e.c; colNum++) {
+      const nextCell = sheet[XLSX.utils.encode_cell({ r: rowNum, c: colNum })];
+      if (typeof nextCell === "undefined" || nextCell == "") {
       } else row.push(nextCell.w);
     }
-    if(row.length > 0){
+    if (row.length > 0) {
       result.push(row);
     }
   }
@@ -93,9 +91,9 @@ export const formatCurrency = (value: number | undefined): string => {
 
 // export function getEnumOptions(enumObject: any) {
 //   return Object.keys(enumObject)
-//     .filter((key) => isNaN(Number(key))) 
+//     .filter((key) => isNaN(Number(key)))
 //     .map((key) => ({
-//       label: key, 
+//       label: key,
 //       value: key,
 //     }));
 // }
@@ -108,7 +106,6 @@ export function getEnumOptions(enumObject: any) {
       value: enumObject[key], // Sử dụng giá trị thực của enum làm value
     }));
 }
-
 
 type EnumType = { [key: string]: string | number };
 
@@ -125,29 +122,16 @@ export function getEnumLabel<T extends EnumType>(
 
 export const formatDate = (
   date: Date | string | undefined | null,
-  isShowTime: boolean = true
+  isShowTime: boolean = false
 ) => {
-  if (!date) return "Không có ngày"; // Xử lý khi giá trị không tồn tại
+  if (!date) return "Không có ngày";
+  // 0:00
   const validDate = typeof date === "string" ? new Date(date) : date;
-  if (isNaN(validDate.getTime())) return "Ngày không hợp lệ"; // Xử lý ngày không hợp lệ
+  // 7:00
+  if (isNaN(validDate.getTime())) return "Ngày không hợp lệ";
 
-  const options: Intl.DateTimeFormatOptions = isShowTime
-    ? {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        hour12: true,
-      }
-    : {
-        month: "2-digit",
-        day: "2-digit",
-        year: "numeric",
-      };
-
-  return new Intl.DateTimeFormat("en-US", options).format(validDate);
+  const formatString = isShowTime ? "dd/MM/yyyy HH:mm:ss" : "dd/MM/yyyy";
+  return format(validDate, formatString);
 };
 
 export const formatPrice = (price: number) => {
