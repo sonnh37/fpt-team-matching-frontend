@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { RootState } from "@/lib/redux/store";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { ideaRequestService } from "@/services/idea-request-service";
 import { stageideaService } from "@/services/stage-idea-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
@@ -200,13 +200,9 @@ export function IdeaRequestPendingByCouncilTable() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium">
                         Timeline:{" "}
-                        {stageIdea.startDate
-                          ? new Date(stageIdea.startDate).toLocaleDateString()
-                          : "N/A"}{" "}
-                        -{" "}
-                        {stageIdea.endDate
-                          ? new Date(stageIdea.endDate).toLocaleDateString()
-                          : "N/A"}
+                        {formatDate(stageIdea.startDate)}
+                        {" "}-{" "}
+                        {formatDate(stageIdea.endDate)}
                       </p>
                     </div>
                   </div>
@@ -215,9 +211,7 @@ export function IdeaRequestPendingByCouncilTable() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium">
                         Date of results:{" "}
-                        {stageIdea.resultDate
-                          ? new Date(stageIdea.resultDate).toLocaleDateString()
-                          : "N/A"}
+                        {formatDate(stageIdea.resultDate)}
                       </p>
                     </div>
                   </div>

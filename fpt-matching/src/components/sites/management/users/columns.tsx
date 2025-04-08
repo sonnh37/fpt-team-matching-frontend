@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { formatDate } from "@/lib/utils";
 import { Department } from "@/types/enums/user";
 import { User } from "@/types/user";
 import { UserXRole } from "@/types/user-x-role";
@@ -85,7 +86,7 @@ export const columns: ColumnDef<User>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("dob"));
-      return date.toLocaleDateString();
+      return formatDate(date)
     },
   },
   {

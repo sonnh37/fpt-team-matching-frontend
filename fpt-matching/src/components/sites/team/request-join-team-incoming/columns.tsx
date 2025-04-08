@@ -54,7 +54,7 @@ export const columns: ColumnDef<Invitation>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return <p>{date.toLocaleString()}</p>;
+      return formatDate(date)
     },
   },
   {

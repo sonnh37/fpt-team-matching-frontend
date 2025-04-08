@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { formatDate } from "@/lib/utils";
 import { StageIdea } from "@/types/stage-idea";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -36,7 +37,7 @@ export const columns: ColumnDef<StageIdea>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("startDate"));
-      return <p>{date.toLocaleDateString()}</p>;
+      return formatDate(date)
     },
   },
   {
@@ -46,7 +47,7 @@ export const columns: ColumnDef<StageIdea>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("endDate"));
-      return <p>{date.toLocaleDateString()}</p>;
+      return formatDate(date)
     },
   },
 
@@ -57,7 +58,7 @@ export const columns: ColumnDef<StageIdea>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("resultDate"));
-      return <p>{date.toLocaleDateString()}</p>;
+      return formatDate(date)
     },
   },
 
