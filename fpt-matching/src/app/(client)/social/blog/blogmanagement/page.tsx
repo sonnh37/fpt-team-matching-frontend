@@ -499,7 +499,7 @@ export default function Blogmanagement() {
                                 result?.data?.results?.map((post) => (
                                     // Cho blog detail
 
-                                    <div key={post.id} className='bg-white max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md   '>
+                                    <div key={post.id} className='bg-white min-w-[680px] max-w-3xl mx-3 my-8 p-6 pb-3 rounded-xl shadow-md   '>
                                         <div>
                                             {/* Post Header with Avatar, Username, and Date */}
                                             <div className="flex items-center space-x-4">
