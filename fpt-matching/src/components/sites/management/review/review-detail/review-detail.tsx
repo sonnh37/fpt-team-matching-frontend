@@ -168,7 +168,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                             <div className={"w-full flex items-center"}>
                                                 <span className={"min-w-24"}>Review date: </span>
                                                 {reviewDetails.reviewDate != null
-                                                    ? (<span>{reviewDetails.reviewDate}</span>)
+                                                    ? (<span>{new Date(reviewDetails.reviewDate).toLocaleDateString("en-GB")}</span>)
                                                     : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
                                                 {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
                                                     <Button className={"ml-2"}>Update information</Button>

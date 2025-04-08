@@ -67,7 +67,7 @@ export const ReviewColumns: ColumnDef<Review>[] = [
         cell: ({row}) => {
             const reviewDate = row.getValue<Date | null>("reviewDate");
 
-            return reviewDate ? reviewDate : <div className={"text-gray-500"}>Not yet</div>
+            return reviewDate ? new Date(reviewDate).toLocaleDateString("en-GB") : <div className={"text-gray-500"}>Not yet</div>
         }
     },
     {

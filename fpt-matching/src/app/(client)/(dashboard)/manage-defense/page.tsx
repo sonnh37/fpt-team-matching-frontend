@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {ChevronDown} from "lucide-react";
 import { Button } from '@/components/ui/button';
+import {sheet2arr} from "@/lib/utils";
 
 function DropdownSemester({semesters, currentSemester, setCurrentSemester}: {semesters: Semester[], currentSemester: Semester, setCurrentSemester: Dispatch<SetStateAction<Semester | undefined>>}) {
     const dictionary: Record<string, Semester> = semesters.reduce(
@@ -151,11 +152,14 @@ const Page = () => {
 
             const sheetName = workbook.SheetNames[0]; // Get first sheet
             const worksheet = workbook.Sheets[sheetName];
+            const filterValue = sheet2arr(worksheet)
 
             const rows:string[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
 
             const headers:string[] = rows[1]
-            const value = rows.slice(2)
+            console.log(headers)
+            const value = filterValue.slice(2)
+            console.log(value)
             const formattedData: CapstoneScheduleImportCommands[] = value.map((row) => {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-expect-error
@@ -167,6 +171,7 @@ const Page = () => {
                 });
                 return obj;
             });
+            console.log(formattedData)
             // const data = rows
             setCapstoneScheduleData(formattedData)
         }
