@@ -27,6 +27,8 @@ import { ColumnDef, Row } from "@tanstack/react-table";
 import {useEffect, useState} from "react";
 import { toast } from "sonner";
 import {IdeaDetailForm} from "@/components/sites/idea/detail";
+import { formatDate } from "@/lib/utils";
+
 import {
   Card,
   CardContent,
@@ -67,12 +69,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return date.toLocaleDateString("en-US", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+      return formatDate(date)
     },
   },
   {
@@ -179,7 +176,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: row.original.id,
         content: feedback,
       };
-      const res = await ideaRequestService.updateStatus(command);
+      const res = await ideaRequestService.updateStatusByLecturer(command);
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
@@ -202,7 +199,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: row.original.id,
         content: feedback,
       };
-      const res = await ideaRequestService.updateStatus(command);
+      const res = await ideaRequestService.updateStatusByLecturer(command);
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");

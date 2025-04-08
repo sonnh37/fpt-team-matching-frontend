@@ -133,9 +133,9 @@ export function StageIdeaFormDialog({
               decimalScale={0}
               min={1}
             />
-            <FormInputDate form={form} name="startDate" label="Start Date" />
-            <FormInputDate form={form} name="endDate" label="End Date" />
-            <FormInputDate form={form} name="resultDate" label="Result Date" />
+            <FormInputDateTimePicker form={form} name="startDate" label="Start Date" />
+            <FormInputDateTimePicker form={form} name="endDate" label="End Date" />
+            <FormInputDateTimePicker form={form} name="resultDate" label="Result Date" />
             <Button type="submit" className="w-full">
               {stageIdea ? "Update" : "Create"}
             </Button>

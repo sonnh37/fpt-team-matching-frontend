@@ -43,7 +43,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
-import { format } from "date-fns";
+import { addDays, format } from "date-fns";
+import { vi } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { ReactElement, useRef, useState } from "react";
@@ -645,9 +646,7 @@ export const FormInputDate = <TFieldValues extends FieldValues>({
               min={min}
               max={max}
               value={
-                field.value
-                  ? new Date(field.value).toISOString().split("T")[0]
-                  : ""
+                field.value ? format(new Date(field.value), "dd/MM/yyyy") : ""
               }
               onChange={(e) => {
                 const date = e.target.value ? new Date(e.target.value) : null;
@@ -666,7 +665,7 @@ export const FormInputDateRangePicker = <TFieldValues extends FieldValues>({
   label,
   name,
   form,
-  placeholder,
+  placeholder = "dd/MM/yyyy",
   disabled = false,
 }: BaseProps<TFieldValues>) => {
   return (
@@ -737,7 +736,7 @@ export const FormInputDateTimePicker = <TFieldValues extends FieldValues>({
       control={form.control}
       name={name}
       render={({ field }) => {
-        const [time, setTime] = useState<string>("05:00");
+        const [time, setTime] = useState<string>("07:00");
         const [date, setDate] = useState<Date | null>(null);
 
         return (
@@ -770,7 +769,7 @@ export const FormInputDateTimePicker = <TFieldValues extends FieldValues>({
               >
                 <Calendar
                   mode="single"
-                  showOutsideDays={false}
+                  showOutsideDays={true}
                   captionLayout="dropdown-buttons"
                   selected={date || field.value}
                   onSelect={(selectedDate) => {
@@ -785,7 +784,34 @@ export const FormInputDateTimePicker = <TFieldValues extends FieldValues>({
                     field.onChange(selectedDate);
                   }}
                   fromYear={1900}
-                  toYear={new Date().getFullYear()}
+                  toYear={new Date().getFullYear() + 10}
+                  defaultMonth={field.value}
+                  footer={
+                    <>
+                      <Select
+                        onValueChange={(value) => {
+                          const selectedDate = addDays(
+                            new Date(),
+                            parseInt(value)
+                          );
+                          setDate(selectedDate!);
+                          field.onChange(selectedDate);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent position="popper">
+                          <SelectItem value="0">Today</SelectItem>
+                          <SelectItem value="1">Tomorrow</SelectItem>
+                          <SelectItem value="3">In 3 days</SelectItem>
+                          <SelectItem value="7">In a week</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </>
+                  }
+                  locale={vi}
+                  fixedWeeks={true}
                 />
                 {isShowTimePicker && (
                   <Select

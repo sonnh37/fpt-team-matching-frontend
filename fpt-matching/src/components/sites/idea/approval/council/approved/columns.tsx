@@ -42,6 +42,7 @@ import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import {IdeaDetailForm} from "@/components/sites/idea/detail";
+import { formatDate } from "@/lib/utils";
 
 export const columns: ColumnDef<IdeaRequest>[] = [
   {
@@ -69,12 +70,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return date.toLocaleDateString("en-US", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+      return formatDate(date)
     },
   },
   {

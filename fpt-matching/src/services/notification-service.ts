@@ -29,6 +29,20 @@ class NotificationService extends BaseService<Notification> {
         return this.handleError(error); // Xử lý lỗi
       });
   };
+
+  public markAsRead = (id: string): Promise<BusinessResult<null>> => {
+    return axiosInstance
+      .put<BusinessResult<null>>(`${this.endpoint}/${id}/mark-as-read`)
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public markAllAsRead = (): Promise<BusinessResult<null>> => {
+    return axiosInstance
+      .put<BusinessResult<null>>(`${this.endpoint}/mark-all-as-read`)
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
 }
 
 export const notificationService = new NotificationService();

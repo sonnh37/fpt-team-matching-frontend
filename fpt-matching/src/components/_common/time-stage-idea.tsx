@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { StageIdea } from "@/types/stage-idea";
 interface StageIdeaProps {
   stageIdea?: StageIdea | undefined;
@@ -27,13 +27,9 @@ const TimeStageIdea = ({ stageIdea }: StageIdeaProps) => {
                   <div className="space-y-1">
                     <p className="text-sm font-medium">
                       Timeline:{" "}
-                      {stageIdea.startDate
-                        ? new Date(stageIdea.startDate).toLocaleDateString()
-                        : "N/A"}{" "}
-                      -{" "}
-                      {stageIdea.endDate
-                        ? new Date(stageIdea.endDate).toLocaleDateString()
-                        : "N/A"}
+                      {formatDate(stageIdea.startDate)}
+                      {" "}-{" "}
+                      {formatDate(stageIdea.endDate)}
                     </p>
                   </div>
                 </div>
@@ -42,9 +38,7 @@ const TimeStageIdea = ({ stageIdea }: StageIdeaProps) => {
                   <div className="space-y-1">
                     <p className="text-sm font-medium">
                       Date of results:{" "}
-                      {stageIdea.resultDate
-                        ? new Date(stageIdea.resultDate).toLocaleDateString()
-                        : "N/A"}
+                      {formatDate(stageIdea.resultDate)}
                     </p>
                   </div>
                 </div>

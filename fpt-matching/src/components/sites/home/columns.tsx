@@ -37,6 +37,7 @@ import { TypographyH3 } from "@/components/_common/typography/typography-h3";
 import { TypographyLead } from "@/components/_common/typography/typography-lead";
 import { Idea } from "@/types/idea";
 import { User } from "@/types/user";
+import { TypographyH4 } from "@/components/_common/typography/typography-h4";
 export const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "englishName",
@@ -69,7 +70,7 @@ export const columns: ColumnDef<Project>[] = [
                 <Tooltip>
                   <TooltipTrigger>
                     <Link href={`/team-detail/${id}`}>
-                      <TypographyH3>{englishName}</TypographyH3>
+                      <TypographyH4 className="text-muted-foreground hover:text-foreground">{englishName}</TypographyH4>
                     </Link>
                   </TooltipTrigger>
                   <TooltipContent>

@@ -29,7 +29,8 @@ import { ColumnDef, Row } from "@tanstack/react-table";
 import {useEffect, useState} from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import {IdeaDetailForm} from "@/components/sites/idea/detail";
+import { IdeaDetailForm } from "@/components/sites/idea/detail";
+import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button"
 import {Brain, FileText} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
@@ -59,7 +60,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("processDate"));
-      return <p>{date.toLocaleString()}</p>;
+      return formatDate(date, true);
     },
   },
   {
@@ -69,7 +70,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return <p>{date.toLocaleString()}</p>;
+      return formatDate(date);
     },
   },
   {
@@ -103,11 +104,11 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     },
   },
   {
-      accessorKey: "idea.stageIdea.stageNumber",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Stage" />
-      ),
-    },
+    accessorKey: "idea.stageIdea.stageNumber",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Stage" />
+    ),
+  },
   {
     accessorKey: "actions",
     header: "Actions",
@@ -186,9 +187,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
-  
+
       queryClient.refetchQueries({ queryKey: ["data_idearequest_pending"] });
-     
+
       setOpen(false);
     } catch (error: any) {
       toast.error(error);

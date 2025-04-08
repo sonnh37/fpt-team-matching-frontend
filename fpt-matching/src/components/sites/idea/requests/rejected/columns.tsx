@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { RootState } from "@/lib/redux/store";
+import { formatDate } from "@/lib/utils";
 import { IdeaStatus } from "@/types/enums/idea";
 import { Idea } from "@/types/idea";
 import { useQueryClient } from "@tanstack/react-query";
@@ -41,7 +42,7 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return <p>{date.toLocaleString()}</p>;
+      return formatDate(date)
     },
   },
   {

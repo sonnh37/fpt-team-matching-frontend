@@ -12,7 +12,7 @@ import {
 import { Check, Search } from "lucide-react";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { RootState } from "@/lib/redux/store";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { ideaRequestService } from "@/services/idea-request-service";
 import { stageideaService } from "@/services/stage-idea-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
@@ -202,14 +202,8 @@ export function IdeaRequestPendingByMentorTable() {
                     <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
                     <div className="space-y-1">
                       <p className="text-sm font-medium">
-                        Timeline:{" "}
-                        {stageIdea.startDate
-                          ? new Date(stageIdea.startDate).toLocaleDateString()
-                          : "N/A"}{" "}
-                        -{" "}
-                        {stageIdea.endDate
-                          ? new Date(stageIdea.endDate).toLocaleDateString()
-                          : "N/A"}
+                        Timeline: {formatDate(stageIdea.startDate)} {" "}-{" "}
+                        {formatDate(stageIdea.endDate)}
                       </p>
                     </div>
                   </div>
@@ -218,9 +212,7 @@ export function IdeaRequestPendingByMentorTable() {
                     <div className="space-y-1">
                       <p className="text-sm font-medium">
                         Date of results:{" "}
-                        {stageIdea.resultDate
-                          ? new Date(stageIdea.resultDate).toLocaleDateString()
-                          : "N/A"}
+                        {formatDate(stageIdea.resultDate)}
                       </p>
                     </div>
                   </div>
