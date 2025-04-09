@@ -1,165 +1,179 @@
 import {
-    Calendar,
-    Globe,
-    Home,
-    Lightbulb,
-    MessageCircleQuestion,
-    Pencil,
-    Send,
-    ShieldHalf,
-    SquareUserRound,
-    Users,
-    UsersRound,
+  Calendar,
+  Globe,
+  Home,
+  Lightbulb,
+  MessageCircleQuestion,
+  Pencil,
+  Send,
+  ShieldHalf,
+  SquareUserRound,
+  Users,
+  UsersRound,
 } from "lucide-react";
-import {GiWideArrowDunk} from "react-icons/gi";
+import { GiWideArrowDunk } from "react-icons/gi";
 import {
-    MdOutlineRateReview,
-    MdOutlineSupervisorAccount,
+  MdOutlineRateReview,
+  MdOutlineSupervisorAccount,
 } from "react-icons/md";
-import {PiUserList} from "react-icons/pi";
-import {RiTimeLine} from "react-icons/ri";
+import { PiUserList } from "react-icons/pi";
+import { RiTimeLine } from "react-icons/ri";
 
 export const NAV_CONFIG = {
-    main: [
+  main: [
+    {
+      title: "Home",
+      url: "/",
+      icon: Home,
+      roles: ["*"],
+    },
+    {
+      title: "Social",
+      url: "/social/blog",
+      icon: Globe,
+      roles: ["*"],
+    },
+    {
+      title: "Invitations",
+      url: "/invitations",
+      icon: Send,
+      roles: ["*"],
+    },
+    {
+      title: "Team",
+      url: "/team",
+      icon: UsersRound,
+      roles: ["Student", "Reviewer", "Council"],
+      items: [
         {
-            title: "Home",
-            url: "/",
-            icon: Home,
-            roles: ["*"],
+          title: "My Team",
+          icon: Pencil,
+          url: "/team",
+          roles: ["Student"],
         },
         {
-            title: "Social",
-            url: "/social/blog",
-            icon: Globe,
-            roles: ["*"],
+          title: "Manage review",
+          icon: Pencil,
+          url: "/team/manage-review",
+          roles: ["Student"],
         },
-        {
-            title: "Invitations",
-            url: "/invitations",
-            icon: Send,
-            roles: ["*"],
-        },
-        {
-            title: "Team",
-            url: "/team",
-            icon: UsersRound,
-            roles: ["Student", "Reviewer", "Council"],
-            items: [
-                {
-                    title: "My Team",
-                    icon: Pencil,
-                    url: "/team",
-                    roles: ["Student"],
-                },
-                {
-                    title: "Manage review",
-                    icon: Pencil,
-                    url: "/team/manage-review",
-                    roles: ["Student"],
-                },
-            ],
-        },
+      ],
+    },
 
+    {
+      title: "Idea",
+      url: "/idea",
+      icon: Lightbulb,
+      roles: ["*"],
+      items: [
         {
-            title: "Idea",
-            url: "/idea",
-            icon: Lightbulb,
-            roles: ["*"],
-            items: [
-                {
-                    title: "Create Idea",
-                    icon: Pencil,
-                    url: "/idea/create",
-                    roles: ["Student", "Lecturer"],
-                },
-                // {
-                //     title: "Manage review",
-                //     icon: Pencil,
-                //     url: "/team/manage-review",
-                //     roles: ["Student", "Lecturer"],
-                // },
-                {
-                    title: "Request Idea",
-                    icon: GiWideArrowDunk,
-                    url: "/idea/request",
-                    roles: ["Student", "Lecturer"],
-                },
-                {
-                    title: "Ideas of Supervisor",
-                    icon: PiUserList,
-                    url: "/idea/supervisors",
-                    roles: ["*"],
-                },
-                {
-                    title: "Approve Idea",
-                    icon: Lightbulb,
-                    url: "/idea/approve-idea",
-                    roles: ["Lecturer", "Council"],
-                },
-                {
-                    title: "Review Idea",
-                    icon: MdOutlineRateReview,
-                    url: "/idea/review-idea",
-                    roles: ["Reviewer"],
-                },
-            ],
+          title: "Create Idea",
+          icon: Pencil,
+          url: "/idea/create",
+          roles: ["Student", "Lecturer"],
+        },
+        // {
+        //     title: "Manage review",
+        //     icon: Pencil,
+        //     url: "/team/manage-review",
+        //     roles: ["Student", "Lecturer"],
+        // },
+        {
+          title: "Request Idea",
+          icon: GiWideArrowDunk,
+          url: "/idea/request",
+          roles: ["Student", "Lecturer"],
         },
         {
-            title: "List supervisors",
-            url: "/supervisors",
-            icon: MdOutlineSupervisorAccount,
-            roles: ["*"],
+          title: "Ideas of Supervisor",
+          icon: PiUserList,
+          url: "/idea/supervisors",
+          roles: ["*"],
         },
         {
-            title: "Support",
-            url: "/#",
-            icon: MessageCircleQuestion,
-            roles: ["*"],
+          title: "Approve Idea",
+          icon: Lightbulb,
+          url: "/idea/approve-idea",
+          roles: ["Lecturer", "Council"],
         },
-    ],
+        {
+          title: "Review Idea",
+          icon: MdOutlineRateReview,
+          url: "/idea/review-idea",
+          roles: ["Reviewer"],
+        },
+      ],
+    },
+    {
+      title: "List supervisors",
+      url: "/supervisors",
+      icon: MdOutlineSupervisorAccount,
+      roles: ["*"],
+    },
+    {
+      title: "Support",
+      url: "/#",
+      icon: MessageCircleQuestion,
+      roles: ["*"],
+    },
+  ],
 
-    management: [
+  management: [
+    {
+      title: "Manage review",
+      url: "/manage-review",
+      icon: SquareUserRound,
+      roles: ["Reviewer", "Manager"],
+    },
+    {
+      title: "Manage semester",
+      url: "/management/semesters",
+      icon: ShieldHalf,
+      roles: ["Manager"],
+    },
+    {
+      title: "Manage projects",
+      url: "/management/projects",
+      icon: RiTimeLine,
+      roles: ["Lecturer"],
+    },
+    {
+      title: "Manage defense",
+      url: "/manage-defense",
+      icon: ShieldHalf,
+      roles: ["Manager"],
+    },
+    {
+      title: "Manage users",
+      url: "/management/users",
+      icon: Users,
+      roles: ["Manager"],
+      items: [
         {
-            title: "Manage review",
-            url: "/manage-review",
-            icon: SquareUserRound,
-            roles: ["Reviewer", "Manager"],
+          title: "List",
+          url: "/management/users",
+          icon: Users,
+          roles: ["Manager"],
         },
         {
-            title: "Manage semester",
-            url: "/management/semesters",
-            icon: ShieldHalf,
-            roles: ["Manager"],
+          title: "Council's Idea Request Pending",
+          url: "/management/users/councils/pending-requests",
+          icon: Users,
+          roles: ["Manager"],
         },
-        {
-            title: "Manage projects",
-            url: "/management/projects",
-            icon: RiTimeLine,
-            roles: ["Lecturer"],
-        },
-        {
-            title: "Manage defense",
-            url: "/manage-defense",
-            icon: ShieldHalf,
-            roles: ["Manager"],
-        },
-        {
-            title: "Manage users",
-            url: "/management/users",
-            icon: Users,
-            roles: ["Manager"],
-        },
-    ],
+      ],
+    },
+  ],
 };
 
 export const filterNavItemsByRole = (items: any[], role: string): any[] => {
-    return items
-        .filter(
-            (item) =>
-                !item.roles || item.roles.includes("*") || item.roles.includes(role)
-        )
-        .map((item) => ({
-            ...item,
-            items: item.items ? filterNavItemsByRole(item.items, role) : undefined,
-        }));
+  return items
+    .filter(
+      (item) =>
+        !item.roles || item.roles.includes("*") || item.roles.includes(role)
+    )
+    .map((item) => ({
+      ...item,
+      items: item.items ? filterNavItemsByRole(item.items, role) : undefined,
+    }));
 };
