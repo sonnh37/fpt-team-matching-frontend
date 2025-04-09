@@ -22,8 +22,8 @@ const formSchema = z.object({
     .min(2, { message: "Tên đề tài Tiếng Anh bắt buộc có 2 ký tự." }),
   teamSize: z
     .number({ invalid_type_error: "Thành viên nhóm bắt buộc nhập số." })
-    .gte(4, { message: "Thành viên nhóm phải từ 4 thành viên." })
-    .default(4),
+    .gte(1, { message: "Thành viên nhóm phải từ 1 thành viên." })
+    .default(1),
 });
 
 export const TeamForm = () => {

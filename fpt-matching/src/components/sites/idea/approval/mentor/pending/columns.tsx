@@ -290,7 +290,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                         ) :
                         (
                             <div className={"w-full max-h-screen flex flex-col gap-4 overflow-auto"}>
-                              {samilaritiesProject.map((project, index) => {
+                              {samilaritiesProject && samilaritiesProject.length > 0 ? <>
+                                {samilaritiesProject.map((project, index) => {
                                 return (
                                     <Card key={index} className="w-full">
                                       <CardHeader>
@@ -319,6 +320,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                                     </Card>
                                 )
                               })}
+                              </> : null}
                             </div>
                         )
                     }

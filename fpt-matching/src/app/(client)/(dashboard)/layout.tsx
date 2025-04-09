@@ -35,7 +35,7 @@ export default function DashboardLayout({
             <DynamicBreadcrumbs />
           </div>
 
-          <div className="flex items-center gap-1 px-4">
+          <div className="flex items-center gap-2 px-4">
             <ModeToggle />
             <NotificationPopover />
             <AuthDropdown user={user} />
