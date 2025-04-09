@@ -284,35 +284,37 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                         ) :
                         (
                             <div className={"w-full max-h-screen flex flex-col gap-4 overflow-auto"}>
-                              {samilaritiesProject.map((project, index) => {
+                              {samilaritiesProject && samilaritiesProject.length > 0 ? <>
+                                {samilaritiesProject.map((project, index) => {
                                 return (
                                     <Card key={index} className="w-full">
                                       <CardHeader>
                                         <CardTitle>Similar project</CardTitle>
                                       </CardHeader>
                                       <CardContent>
-                                        <div className="grid w-full items-center gap-4">
-                                          <div className="flex flex-row gap-2">
-                                            <h2 className={"text-sm font-bold text-nowrap"} >Project name: </h2>
-                                            <p className={"text-sm"}>{project.name}</p>
+                                          <div className="grid w-full items-center gap-4">
+                                            <div className="flex flex-row gap-2">
+                                              <h2 className={"text-sm font-bold text-nowrap"} >Project name: </h2>
+                                              <p className={"text-sm"}>{project.name}</p>
+                                            </div>
+                                            <div className="flex flex-row gap-2">
+                                              <h2 className={"text-sm font-bold text-nowrap"} >Project code: </h2>
+                                              <p className={"text-sm"}>{project.project_code}</p>
+                                            </div>
+                                            <div className="flex flex-row gap-2">
+                                              <h2 className={"text-sm font-bold text-nowrap"} >Context: </h2>
+                                              <p className={"text-sm"}>{project.context}</p>
+                                            </div>
+                                            <div className="flex flex-row gap-2">
+                                              <h2 className={"text-sm font-bold text-nowrap"} >Similarities percent: </h2>
+                                              <p className={"text-sm"}>{project.similarity.toFixed(2)! * 100}%</p>
+                                            </div>
                                           </div>
-                                          <div className="flex flex-row gap-2">
-                                            <h2 className={"text-sm font-bold text-nowrap"} >Project code: </h2>
-                                            <p className={"text-sm"}>{project.project_code}</p>
-                                          </div>
-                                          <div className="flex flex-row gap-2">
-                                            <h2 className={"text-sm font-bold text-nowrap"} >Context: </h2>
-                                            <p className={"text-sm"}>{project.context}</p>
-                                          </div>
-                                          <div className="flex flex-row gap-2">
-                                            <h2 className={"text-sm font-bold text-nowrap"} >Similarities percent: </h2>
-                                            <p className={"text-sm"}>{project.similarity.toFixed(2)! * 100}%</p>
-                                          </div>
-                                        </div>
                                       </CardContent>
                                     </Card>
                                 )
                               })}
+                              </> : null}
                             </div>
                         )
                     }

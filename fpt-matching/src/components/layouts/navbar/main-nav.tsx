@@ -44,7 +44,7 @@ export function MainNav({ user = null }: MainNavProps) {
             <Search />
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <ModeToggle />
             <ChatPopover />
             <NotificationPopover />
