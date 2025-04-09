@@ -69,6 +69,7 @@ import { profilestudentService } from "@/services/profile-student-service";
 import { ProfileStudent } from "@/types/profile-student";
 import { apiHubsService } from "@/services/api-hubs-service";
 import { BlogRecommendations } from "@/types/blog-recommend-model";
+import BlogRecommend from '@/components/blogforuser/blog-recommend';
 
 
 export default function Blog() {
@@ -934,13 +935,23 @@ export default function Blog() {
                   </div>
                 </div>
                 {
-                  recommendBlogs.map((blog) => {
+                  recommendBlogs.slice(0, 4).map((blog) => {
                     return (
                       <div key={blog.blog_id}
-                        className='w-full h-auto border-b-2 border-gray-200 px-5 py-2'>
-                        <div className=''>
+                        className='w-full flex justify-center items-center h-auto border-b-2 border-gray-200 px-2 pt-2'>
+                        <div className='recommend flex'>
                           <h2 className="font-bold  text-gray-700 mb-2 ">
-                            {blog.job}
+                            <Modal>
+                              <ModalTrigger>
+                                <div className='w-full text-left'>
+                                  {blog.job}
+                                </div>
+                                <span className='font-normal mt-1'>Tỉ lệ tương đồng: {blog.similarity.toFixed(2) * 100}%</span>
+
+                              </ModalTrigger>
+                              <BlogRecommend id={blog.blog_id} />
+                            </Modal>
+
                           </h2>
                           {/*<p className='text-xm text-gray-500'>{postNt.comments.length ?? 0} comments</p>*/}
                         </div>
