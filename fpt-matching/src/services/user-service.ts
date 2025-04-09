@@ -4,6 +4,8 @@ import { BusinessResult } from "@/types/models/responses/business-result";
 import { User } from "@/types/user";
 import { BaseService } from "./_base/base-service";
 import { UserUpdatePasswordCommand } from "@/types/models/commands/users/user-update-password-command";
+import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
+import { cleanQueryParams } from "@/lib/utils";
 
 class UserService extends BaseService<User> {
   constructor() {
@@ -18,6 +20,23 @@ class UserService extends BaseService<User> {
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
+
+   public fetchPaginatedByCouncilWithIdeaRequestPending = (
+      query?: UserGetAllQuery
+    ): Promise<BusinessResult<PaginatedResult<User>>> => {
+      const cleanedQuery = cleanQueryParams(query ?? {});
+  
+      return axiosInstance
+        .get<BusinessResult<PaginatedResult<User>>>(
+          `${this.endpoint}/council/pending-ideas?${cleanedQuery}&isPagination=true`
+        )
+        .then((response) => {
+          return response.data;
+        })
+        .catch((error) => {
+          return this.handleError(error);
+        });
+    };
 
   public fetchUserByUsernameOrEmail = async (
     keyword: string
