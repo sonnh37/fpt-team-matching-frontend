@@ -269,6 +269,8 @@ export default function Blogmanagement() {
                     </div>
                 </div>
             </div>
+            <div className='w-[80%] h-6 bg-gray-200'> 
+            </div>
             {/* Form tạo blog */}
             <div className='w-full flex items-center justify-center  '>
                 <div className='form-create-blog bg-white rounded-xl min-w-[680px] max-w-3xl p-3 mx-2 mt-3 shadow-md'>

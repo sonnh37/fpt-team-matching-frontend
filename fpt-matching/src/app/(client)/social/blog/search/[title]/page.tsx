@@ -55,8 +55,6 @@ import { BackgroundLines } from "@/components/ui/background-lines";
 
 export default function Search() {
   const { title } = useParams<{ title: string }>(); // Lấy giá trị từ params
-
-  console.log("search du lieu ra", title)
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [projectUser, setProject] = useState<Project>();
