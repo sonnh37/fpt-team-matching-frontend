@@ -52,11 +52,12 @@ export default function LayoutClient({
         </Provider>
         <Toaster
           position="top-right"
-          // richColors
+           richColors
           // icons={{
-          //   success: "🎉",
-          //   error: "🚨",
-          //   warning: "⚠️",
+          //   success: <SuccessIcon />,
+          //   error: <ErrorIcon />,
+          //   warning: <WarningIcon />,
+          //   // Thêm các icon khác nếu cần
           // }}
         />
       </ThemeProvider>

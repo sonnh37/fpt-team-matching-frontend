@@ -1,7 +1,8 @@
 export enum InvitationStatus {
     Pending,
     Rejected,
-    Accepted
+    Accepted,
+    Cancel
 }
 
 export enum InvitationType {
