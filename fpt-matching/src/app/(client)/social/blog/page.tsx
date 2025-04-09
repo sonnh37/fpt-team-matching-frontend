@@ -92,7 +92,7 @@ export default function Blog() {
   const [studentProfile, setStudentProfile] = useState<ProfileStudent | null>(null);
   const [recommendBlogs, setRecommendBlogs] = useState<BlogRecommendations[]>([]);
 
-  console.log("tét", formData)
+
 
   // Hàm thay đổi bộ lọc và gọi API lại
   const handleFilterChange = (type: BlogType) => {
@@ -160,6 +160,7 @@ export default function Blog() {
         }
         if (checkPrj.status === 1) {
           setProject(checkPrj.data)
+
         }
       } catch (error) {
         console.error("Error fetching project info:", error);
@@ -510,7 +511,7 @@ export default function Blog() {
                               <div className="w-3/5">
                                 <Select
                                   name="projectId"
-                                  value={projectUser?.id}
+                                  value={formData.projectId}
                                   defaultValue={undefined}
                                   onValueChange={(e) => {
                                     setFormData((prev) => ({
@@ -532,7 +533,7 @@ export default function Blog() {
                                   </SelectContent>
                                 </Select>
                                 <h4 className="text-red-400 text-sm mt-2">*Không bắt buộc</h4>
-                                <h4 className="text-red-400 text-sm">*{messageUser}</h4>
+                                <h4 className="text-red-400 text-sm">{messageUser}</h4>
                               </div>
                             </div>
                           </div>
@@ -705,9 +706,10 @@ export default function Blog() {
                                   {post.title}
                                 </span></div>
 
-                              <p className="text-left text-base font-medium line-clamp-2 overflow-hidden relative after:content-['...Xem_thêm'] after:text-blue-500 after:absolute after:bottom-0 after:right-0 after:bg-white after:cursor-pointer after:hover:underline">
+                              <p className="text-left text-base font-medium line-clamp-2 overflow-hidden break-all max-w-[680px] relative after:content-['...Xem_thêm'] after:text-blue-500 after:absolute after:bottom-0 after:right-0 after:bg-white after:hover:underline">
                                 {post?.content}
                               </p>
+
 
                             </ModalTrigger>
                             <ModalBody>
@@ -768,7 +770,7 @@ export default function Blog() {
                                     {post?.type === BlogType.Recruit && (
                                       <div>🔥🔎</div>)} {post?.title}
                                   </h1>
-                                  <p className="mt-2 font-normal text-base md:text-lg text-gray-700 px-4 ">
+                                  <p className="mt-2 font-normal text-base md:text-lg text-gray-700 px-4 break-words whitespace-normal">
                                     {post?.content}
                                   </p>
 
