@@ -25,6 +25,15 @@ import TeamMemberUpdateMentorConclusion
     from "@/types/models/commands/team-members/team-member-update-mentor-conclusion";
 import {toast} from "sonner";
 import {mentorFeedbackService} from "@/services/mentor-feedback-service";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
 const TableOfSinhVien = ({sinhViens} : {sinhViens: TeamMember[]}) => {
     return (
         <Table>
@@ -80,6 +89,7 @@ const Page = () => {
     }, [projectId]);
     console.log(mentorFeedback)
     const handleSaveChange = async () => {
+        console.log(project);
         if (sinhViens.some(x => x.id == null)) {
             toast.error("Có lỗi khi cập nhật")
             return;
@@ -90,7 +100,7 @@ const Page = () => {
         }
         const teamMemberConclusion : TeamMemberUpdateMentorConclusion[] = [] as TeamMemberUpdateMentorConclusion[];
         sinhViens.forEach((sinhVien) => {
-            return teamMemberConclusion.push({id: sinhVien.id!, mentorConclusion: sinhVien.mentorConclusion!, attitude: sinhVien.attitude!});
+            return teamMemberConclusion.push({id: sinhVien.id!, mentorConclusion: sinhVien.mentorConclusion!, attitude: sinhVien.attitude!, note: sinhVien.note!});
         })
         if (!mentorFeedback || !mentorFeedback.limitation || !mentorFeedback.thesisContent || !mentorFeedback.thesisForm || !mentorFeedback.achievementLevel) {
             toast.error("Vui lòng điền tất cả các field")
@@ -104,7 +114,6 @@ const Page = () => {
             toast.error(teamMemberResponse.status != 1 ? teamMemberResponse.message : mentorFeedbackResponse.message)
         }
     }
-    console.log(mentorFeedback);
     return (
         <div className={"p-8"}>
             {/*Start 1*/}
@@ -151,7 +160,7 @@ const Page = () => {
                             return prev
                             })
                         }}
-                        value={mentorFeedback && mentorFeedback.thesisContent ? mentorFeedback.thesisContent : undefined} className={"w-1/2"}/>
+                        defaultValue={mentorFeedback && mentorFeedback.thesisContent ? mentorFeedback.thesisContent : undefined} className={"w-1/2"}/>
                 </div>
 
                 {/*2.2*/}
@@ -169,7 +178,7 @@ const Page = () => {
                                 return prev
                             })
                         }}
-                        value={mentorFeedback && mentorFeedback.thesisForm ? mentorFeedback.thesisForm : undefined} className={"w-1/2"}/>
+                        defaultValue={mentorFeedback && mentorFeedback.thesisForm ? mentorFeedback.thesisForm : undefined} className={"w-1/2"}/>
                 </div>
 
 
@@ -195,7 +204,7 @@ const Page = () => {
                                     return prev
                                 })
                             }}
-                            value={mentorFeedback && mentorFeedback.achievementLevel ? mentorFeedback.achievementLevel : undefined} className={"w-2/3"}/>
+                            defaultValue={mentorFeedback && mentorFeedback.achievementLevel ? mentorFeedback.achievementLevel : undefined} className={"w-2/3"}/>
                     </div>
 
                     {/*3.2*/}
@@ -212,7 +221,7 @@ const Page = () => {
                                     return prev
                                 })
                             }}
-                            value={mentorFeedback && mentorFeedback.limitation ? mentorFeedback.limitation : undefined} className={"w-2/3"}/>
+                            defaultValue={mentorFeedback && mentorFeedback.limitation ? mentorFeedback.limitation : undefined} className={"w-2/3"}/>
                     </div>
                 </div>
             </div>
@@ -227,13 +236,40 @@ const Page = () => {
                 <div>
                     {(project && project.teamMembers?.length > 0) &&  <SupervisorComment setSinhViens={setSinhViens} sinhViens={sinhViens} />}
                 </div>
-                <div className={"mt-6"}>
-                    <Button onClick={()=>{
-                        handleSaveChange()
-                    }} variant={"default"} >Save change</Button>
+            </div>
+            <div className={"mt-4"}>
+                <Label className={"text-sm mb-8 mt-2 ml-4 font-bold items-center gap-2"}>
+                    <p>4.4 - Kết luận cuối cùng | Final conclusion</p>
+                    {/*<p className={"ml-8"}></p>*/}
+                </Label>
+                <div className={"mt-4"}>
+                    <Select defaultValue={project?.defenseStage ? project.defenseStage.toString() : undefined} onValueChange={(e) => {
+                        setProject((prev) => {
+                            if (!prev)
+                                return null;
+                            prev.defenseStage = parseInt(e)
+                            return prev
+                        })
+                    }}>
+                        <SelectTrigger className="w-[40%]">
+                            <SelectValue placeholder="Quyết định giao đoạn ra hội đồng" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>Chọn giai đoạn</SelectLabel>
+                                <SelectItem value="1">Lần 1</SelectItem>
+                                <SelectItem value="2">Lần 2</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
             {/*End 4*/}
+            <div className={"mt-6"}>
+                <Button onClick={()=>{
+                    handleSaveChange()
+                }} variant={"default"} >Save change</Button>
+            </div>
         </div>
     );
 };
