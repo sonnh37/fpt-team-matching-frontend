@@ -96,14 +96,14 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
       <PopoverTrigger asChild>
         <Button variant="ghost" size="icon" className="relative size-10">
           {unreadCount > 0 ? (
-            <BellDot className="size-5 text-foreground" strokeWidth={1.5} />
+            <BellDot className="!size-4 text-foreground" strokeWidth={1.5} />
           ) : (
-            <Bell className="size-5 text-foreground/80" strokeWidth={1.5} />
+            <Bell className="!size-4 text-foreground/80" strokeWidth={1.5} />
           )}
           {unreadCount > 0 && (
             <Badge
               variant="destructive"
-              className="absolute -right-1 -top-1 size-5 flex items-center justify-center p-0"
+              className="absolute -right-1 -top-1 w-6 h-4  text-[10px] flex items-center justify-center p-0"
             >
               {unreadCount > 9 ? "9+" : unreadCount}
             </Badge>
