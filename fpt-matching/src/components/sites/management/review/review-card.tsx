@@ -28,6 +28,7 @@ function BadgeSuccess() {
 export function ReviewCard({review} : {review: Review}) {
     const pathName = usePathname()
     const router = useRouter()
+    console.log(review)
     return (
         <Card className="w-[350px]">
             <CardHeader className={"flex flex-row justify-between items-center"}>
@@ -38,20 +39,20 @@ export function ReviewCard({review} : {review: Review}) {
             </CardHeader>
             <CardContent className={"flex flex-col gap-2"}>
                 <div className={"flex"}>
-                    <div className={"pr-2 min-w-16"}>Date: </div>
-                    {review.reviewDate ? <span>{review.reviewDate}</span> : <BadgeDestructive />}
+                    <div className={"pr-2 min-w-16 font-bold"}>Date: </div>
+                    {review.reviewDate ? <span className={"font-medium"}>{new Date(review.reviewDate).toLocaleDateString("en-GB")}</span> : <BadgeDestructive />}
                 </div>
                 <div className={"flex"}>
-                    <div className={"pr-2 min-w-16"}>Room: </div>
-                    {review.room ? <span>{review.room}</span> : <BadgeDestructive />}
+                    <div className={"pr-2 min-w-16 font-bold"}>Room: </div>
+                    {review.room ? <span className={"font-medium"}>{review.room}</span> : <BadgeDestructive />}
                 </div>
                 <div className={"flex"}>
-                    <div className={"pr-2 min-w-16"}>Reviewer 1: </div>
-                    {review.reviewer1 ? <span>{review.reviewer1.username}</span> : <BadgeDestructive />}
+                    <div className={"pr-2 min-w-16 font-bold"}>Reviewer 1: </div>
+                    {review.reviewer1?.code ? <span className={"font-medium"}>{review.reviewer1.code}</span> : <BadgeDestructive />}
                 </div>
                 <div className={"flex"}>
-                    <div className={"pr-2 min-w-16"}>Reviewer 2: </div>
-                    {review.reviewer2 ? <span>{review.reviewer2.username}</span> : <BadgeDestructive />}
+                    <div className={"pr-2 min-w-16 font-bold"}>Reviewer 2: </div>
+                    {review.reviewer2?.code ? <span className={"font-medium"}>{review.reviewer2.code}</span> : <BadgeDestructive />}
                 </div>
             </CardContent>
             <CardFooter className="flex justify-between">

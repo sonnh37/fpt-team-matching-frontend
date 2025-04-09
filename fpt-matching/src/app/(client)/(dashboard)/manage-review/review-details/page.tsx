@@ -90,7 +90,7 @@ const Page = () => {
                                     <Accordion type="single" collapsible className="w-full">
                                         <AccordionItem value="item-1">
                                             <AccordionTrigger className={"font-bold text-lg"}>
-                                                Project information
+                                                Thông tin nhóm
                                             </AccordionTrigger>
                                             <AccordionContent>
                                                 <div className={"flex flex-col gap-1.5 font-bold"}>
@@ -102,7 +102,7 @@ const Page = () => {
                                         </AccordionItem>
                                         <AccordionItem value="item-2">
                                             <AccordionTrigger className={"font-bold text-lg"}>
-                                                Idea information
+                                                Thông tin đề tài
                                             </AccordionTrigger>
                                             <AccordionContent>
                                                 <div className={"flex flex-col gap-1.5 font-bold"}>
@@ -123,8 +123,8 @@ const Page = () => {
                                 </CardContent>
                                 <CardFooter className={"w-full"} >
                                     <div className={"w-full"}>
-                                        <div className={"w-full flex flex-row gap-8"}>
-                                            <div className={"font-bold text-lg mb-2"}>Review information</div>
+                                        <div className={"w-full flex flex-row gap-8 mb-8"}>
+                                            <div className={"font-bold text-lg mb-2"}>Thông tin review</div>
                                             {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
                                                 // <Button className={"ml-2"}>Cập nhật thông tin của review</Button>
                                                 <DialogUpdateReview review={reviewDetails} />

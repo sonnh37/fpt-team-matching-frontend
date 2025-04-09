@@ -81,9 +81,8 @@ export default function SheetFileUpload({file, setFile}: {file: File | null, set
                     <SheetTitle>Review file</SheetTitle>
                     <SheetDescription className={"flex flex-col"}>
                         <span>Quick look about review file.</span>
-                        <span className={"text-red-500 font-medium"}>*Đặt tên file theo template abc.xlsx</span>
+                        <span className={"text-red-500 font-medium"}>*Đặt tên file theo template Checklist_CapstoneProjectReview_(Mã nhóm).xlsx</span>
                         <span className={"text-red-500 font-medium"}>*Dùng file có đuôi xlsx</span>
-                        <span className={"text-red-500 font-medium"}>*Đặt tên file theo template abc.xlsx</span>
                     </SheetDescription>
                 </SheetHeader>
                 <div className="grid gap-4 py-4">

@@ -54,7 +54,7 @@ export const NAV_CONFIG = {
                     title: "Manage review",
                     icon: Pencil,
                     url: "/team/manage-review",
-                    roles: ["Reviewer", "Council"],
+                    roles: ["Student"],
                 },
             ],
         },
@@ -71,12 +71,12 @@ export const NAV_CONFIG = {
                     url: "/idea/create",
                     roles: ["Student", "Lecturer"],
                 },
-                {
-                    title: "Manage review",
-                    icon: Pencil,
-                    url: "/team/manage-review",
-                    roles: ["Student", "Lecturer"],
-                },
+                // {
+                //     title: "Manage review",
+                //     icon: Pencil,
+                //     url: "/team/manage-review",
+                //     roles: ["Student", "Lecturer"],
+                // },
                 {
                     title: "Request Idea",
                     icon: GiWideArrowDunk,
