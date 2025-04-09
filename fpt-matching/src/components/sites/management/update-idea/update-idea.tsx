@@ -3,7 +3,7 @@ import {IdeaHistory} from "@/types/idea-history";
 import {IdeaHistoryStatus} from "@/types/enums/idea-history";
 import {ideaHistoryService} from "@/services/idea-history-service";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {TabsContent, TabsList, TabsPriroot, TabsTrigger} from "@/components/ui/tabs";
+import {TabsContent, TabsList, Tabs, TabsTrigger} from "@/components/ui/tabs";
 import CollapsibleIdeaHistory from "@/components/sites/management/update-idea/collapsile-idea-history";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
@@ -54,13 +54,13 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
     return selectedIdeaHistory && (
         <div className={"w-full flex flex-row  justify-between"}>
             <div className={"w-1/5 h-[85vh] "}>
-                <Card className="w-[18vw] ml-8 mt-12 h-[80vh]">
+                <Card className="w-[18vw] ml-8 mt-12 h-[80vh] overflow-auto">
                     <CardHeader>
                         <CardTitle>Đánh giá chỉnh sửa</CardTitle>
                         <CardDescription>Vui lòng để lại nhận xét và cập nhật chỉnh sửa cho sinh viên</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <TabsPriroot defaultValue="fileInfo" className="w-full]">
+                        <Tabs defaultValue="fileInfo" className="w-full]">
                             <TabsList className="grid w-full grid-cols-2">
                                 <TabsTrigger value="fileInfo">Thông tin file</TabsTrigger>
                                 <TabsTrigger value="action">Đánh giá chỉnh sửa</TabsTrigger>
@@ -90,6 +90,10 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                             variant={"default"}
                                             className={`ml-2 p-1 ${selectedIdeaHistory.status == IdeaHistoryStatus.Pending ? "bg-amber-600" : selectedIdeaHistory.status == IdeaHistoryStatus.Approved ? "bg-green-500" : "bg-red-500"}`}
                                         >{IdeaHistoryStatus[selectedIdeaHistory.status!]}</Badge>
+                                    </div>
+                                    <div className={"w-full flex flex-rows items-center"}>
+                                        <Label className={"pl-2 font-bold mr-2"}>Note: </Label>
+                                        <Textarea value={selectedIdeaHistory.note} />
                                     </div>
                                 </div>
                             </TabsContent>
@@ -124,23 +128,10 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                                                   setDecision={setDecision}/>
                                             )
                                         }
-                                        {/*{status*/}
-                                        {/*    ? (<Badge*/}
-                                        {/*        variant={"default"}*/}
-                                        {/*        className={`text-center py-4 flex justify-center items-center ${status == IdeaHistoryStatus.Approved ? "bg-green-500" : "bg-red-500"}`}*/}
-                                        {/*    >{IdeaHistoryStatus[status]}</Badge>)*/}
-                                        {/*    : selectedIdeaHistory && (*/}
-                                        {/*    <UpdateIdeaDialog isOpen={isOpen} setIsOpen={setIsOpen} comment={comment}*/}
-                                        {/*                      decision={decision}*/}
-                                        {/*                      setStatus={setStatus}*/}
-                                        {/*                      ideaHistoryId={selectedIdeaHistory.id!}*/}
-                                        {/*                      setDecision={setDecision}/>*/}
-                                        {/*)*/}
-                                        {/*}*/}
                                     </div>
                                 </div>
                             </TabsContent>
-                        </TabsPriroot>
+                        </Tabs>
                     </CardContent>
                 </Card>
             </div>

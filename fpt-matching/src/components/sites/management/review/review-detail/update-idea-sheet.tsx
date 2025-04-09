@@ -21,6 +21,8 @@ import Link from "next/link";
 import {IdeaHistoryStatus} from "@/types/enums/idea-history";
 import { Badge } from "@/components/ui/badge";
 import {EditIdeaDialog} from "@/components/sites/management/review/review-detail/edit-idea-dialog";
+import {Label} from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 function CollapsibleFile({ideaHis}:{ideaHis:IdeaHistory[]}) {
     const [isOpen, setIsOpen] = React.useState(false)
@@ -87,7 +89,7 @@ function CollapsibleFile({ideaHis}:{ideaHis:IdeaHistory[]}) {
 export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHistory[], ideaId: string, reviewStage: number}) {
     const [fileChange, setFileChange] = React.useState<File | null>(null)
     const [isOpen, setIsOpen] = useState<boolean>(false);
-
+    const [note, setNote] = React.useState<string | null>(null);
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files !== null && e.target.files.length > 0) {
             const file = e.target.files[0];
@@ -142,8 +144,12 @@ export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHi
                             </div>
 
                         ) : (
-                            <div>
-                                <div className={"flex gap-2 mt-4"}><Paperclip />{fileChange!.name}</div>
+                            <div className={"w-full"}>
+                                <div className={"flex gap-2 my-8"}><Paperclip />{fileChange!.name}</div>
+                                <Label className={"font-bold text-sm mb-8"}>Nhập khái quát những chỉnh sửa của bạn tại đây.</Label>
+                                <Textarea defaultValue={note || undefined} onChange={(e) => {
+                                    setNote(e.target.value)
+                                }} className={"w-1/2 border-2 border-gray-300"} placeholder="Thông tin đã được chỉnh sửa." />
                             </div>
                         )}
 
@@ -160,7 +166,7 @@ export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHi
                             <Button type="submit">Close</Button>
                         </SheetClose>
                         {fileChange && (
-                            <EditIdeaDialog  isOpen={isOpen} setIsOpen={setIsOpen} file={fileChange} ideaId={ideaId} reviewNumber={reviewStage}  />
+                            <EditIdeaDialog note={note} isOpen={isOpen} setIsOpen={setIsOpen} file={fileChange} ideaId={ideaId} reviewNumber={reviewStage}  />
                         )}
                     </SheetFooter>
 

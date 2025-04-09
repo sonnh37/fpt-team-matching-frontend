@@ -23,6 +23,11 @@ class CapstoneScheduleService extends BaseService<CapstoneSchedule>{
         const res = await axiosInstance.post(`${this.endpoint}/import-excel`, formData)
         return res.data;
     }
+
+    public async getByProjectId({projectId} :{projectId: string}) :Promise<BusinessResult<CapstoneSchedule[]>> {
+        const response = await axiosInstance.get<BusinessResult<CapstoneSchedule[]>>(`/${this.endpoint}/get-by-project-id/${projectId}`);
+        return response.data;
+    }
 }
 
 export const capstoneService = new CapstoneScheduleService();
