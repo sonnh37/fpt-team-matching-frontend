@@ -1,6 +1,7 @@
 import { Project } from "./project";
 
 export interface CapstoneSchedule {
+    id: string
     projectId?: string;
     time?: string;
     date?: string; 

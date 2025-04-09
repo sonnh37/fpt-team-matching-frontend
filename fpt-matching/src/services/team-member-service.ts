@@ -6,6 +6,9 @@ import axiosInstance from "@/lib/interceptors/axios-instance";
 import { TeamMember } from "@/types/team-member";
 import TeamMemberUpdateMentorConclusion
     from "@/types/models/commands/team-members/team-member-update-mentor-conclusion";
+import {
+    TeamMemberUpdateDefenseCommand
+} from "@/types/models/commands/team-members/team-member-update-defense";
 
 class TeamMemberSerivce extends BaseService<TeamMember> {
   constructor() {
@@ -30,6 +33,14 @@ class TeamMemberSerivce extends BaseService<TeamMember> {
           .put(`${this.endpoint}/update-by-mentor`, [
               ...teamMembersConclusion,
           ])
+  }
+
+  public async updateDefenseByManager ({teamMemberUpdate, stage}:{teamMemberUpdate: TeamMemberUpdateDefenseCommand[], stage: number}) : Promise<BusinessResult<void>> {
+     const response = await axiosInstance.put<BusinessResult<void>>(`${this.endpoint}/update-by-manager`, {
+         defenseNumber: stage,
+         updateList: teamMemberUpdate
+     })
+      return response.data
   }
 }
 

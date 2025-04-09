@@ -28,9 +28,8 @@ function BadgeSuccess() {
 export function ReviewCard({review} : {review: Review}) {
     const pathName = usePathname()
     const router = useRouter()
-    console.log(review)
     return (
-        <Card className="w-[350px]">
+        <Card className="w-[25vw]">
             <CardHeader className={"flex flex-row justify-between items-center"}>
                 <CardTitle>Review {review.number}</CardTitle>
                 <div>
@@ -45,6 +44,10 @@ export function ReviewCard({review} : {review: Review}) {
                 <div className={"flex"}>
                     <div className={"pr-2 min-w-16 font-bold"}>Room: </div>
                     {review.room ? <span className={"font-medium"}>{review.room}</span> : <BadgeDestructive />}
+                </div>
+                <div className={"flex"}>
+                    <div className={"pr-2 min-w-16 font-bold"}>Slot: </div>
+                    {review.slot ? <span className={"font-medium"}>{review.slot}</span> : <BadgeDestructive />}
                 </div>
                 <div className={"flex"}>
                     <div className={"pr-2 min-w-16 font-bold"}>Reviewer 1: </div>

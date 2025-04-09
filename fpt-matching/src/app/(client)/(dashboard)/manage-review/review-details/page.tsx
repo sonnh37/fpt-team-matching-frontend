@@ -182,7 +182,7 @@ const Page = () => {
                                                 {/*)}*/}
                                                 <div></div>
                                             </div>
-                                            <div>File upload: <SheetFileUpload file={fileUpload} setFile={setFileupload} /></div>
+                                            <div>File upload: <SheetFileUpload fileUrl={reviewDetails.fileUpload} file={fileUpload} setFile={setFileupload} /></div>
                                         </div>
                                     </div>
                                 </CardFooter>
