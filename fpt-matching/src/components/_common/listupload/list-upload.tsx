@@ -25,6 +25,8 @@ import { blogCvService } from "@/services/blogcv-service";
 import { BlogCvGetAllQuery } from "@/types/models/queries/blogcv/blogcv-get-all-query";
 import { toast } from "sonner";
 import { useConfirm } from "../formdelete/confirm-context";
+import { faPaperclip } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const ListUploadCv = ({ blogId }: { blogId: string }) => {
 
@@ -75,7 +77,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
             <DialogTrigger asChild>
                 <span className="flex items-center mr-3">
                     <i className="fas fa-image text-red-500"></i>
-                    <span className="ml-2">{post?.data?.length ?? 0} Nộp CV </span>
+                    <span className="ml-2 text-lg">{post?.data?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip}/> </span>
                 </span>
             </DialogTrigger>
             <DialogContent className="max-w-max min-w-[450px]">

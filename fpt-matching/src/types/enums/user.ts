@@ -13,5 +13,6 @@ export enum Department {
     CanTho,
     HoChiMinh,
     DaNang,
-    QuyNhon
+    QuyNhon,
+    ChuaBiet
 }
