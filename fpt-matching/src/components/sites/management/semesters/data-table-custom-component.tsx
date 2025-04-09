@@ -38,7 +38,7 @@ import { TypographyP } from "@/components/_common/typography/typography-p";
 import { Semester } from "@/types/semester";
 import { TypographyList } from "@/components/_common/typography/typography-list";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
-import { cn } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import {
   ChevronDown,
   MoreHorizontal,
@@ -89,12 +89,11 @@ export function DataTableSemesterComponent<TData>({
   const handleRestore = async (model: any) => {
     if (restore) {
       try {
-        const command: UpdateCommand = { id: model.id }; // Define your command structure
+        const command: UpdateCommand = { id: model.id };
         const result = await restore(command);
         if (result.status == 1) {
           queryClient.refetchQueries({ queryKey: ["data"] });
-          toast.success(`Row with id ${model.id} restored successfully.`);
-          // Optionally, restore the local state or refetch data
+          toast.success(result.message);
         } else {
           toast.error(`Failed to restore row with id ${model.id}:`);
         }
@@ -110,8 +109,7 @@ export function DataTableSemesterComponent<TData>({
         const result = await deletePermanent(id);
         if (result.status == 1) {
           queryClient.refetchQueries({ queryKey: ["data"] });
-          toast.success(`Row with id ${id} deleted permanently.`);
-          // Optionally, restore the local state or refetch data
+          toast.success(result.message);
         } else {
           toast.error(`Failed to delete row with id ${id}:`);
         }
@@ -139,7 +137,7 @@ export function DataTableSemesterComponent<TData>({
                   pointerEvents: isDeleted ? "none" : "auto",
                 }}
                 className={cn(
-                  "w-[300px] sm:w-[350px]",
+                  "w-[250px] sm:w-[280px]",
                   isDeleted ? "hover:opacity-100" : ""
                 )}
               >
@@ -176,32 +174,28 @@ export function DataTableSemesterComponent<TData>({
                     </div>
                   </CardTitle>
                   <CardDescription>
-                    {model.startDate
-                      ? new Date(model.startDate).toLocaleDateString()
-                      : "N/A"}{" "}
-                    -{" "}
-                    {model.endDate
-                      ? new Date(model.endDate).toLocaleDateString()
-                      : "N/A"}
+                    {formatDate(model.startDate)}
+                    {" "}-{" "}
+                    {formatDate(model.endDate)}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid w-full items-center gap-4">
                     <TypographyList className="py-0 my-0">
                       <li className="">
-                        <TypographyP className="flex items-center gap-1">
+                        <TypographyP className="flex text-sm items-center gap-1">
                           Code:
-                          <TypographyMuted className="text-base">
+                          <TypographyP className="italic">
                             {model.semesterCode}
-                          </TypographyMuted>
+                          </TypographyP>
                         </TypographyP>
                       </li>
                       <li className="">
-                        <TypographyP className="flex items-center gap-1">
+                        <TypographyP className="flex text-sm items-center gap-1">
                           Prefix:
-                          <TypographyMuted className="text-base">
+                          <TypographyP className="italic">
                             {model.semesterPrefixName}
-                          </TypographyMuted>
+                          </TypographyP>
                         </TypographyP>
                       </li>
                     </TypographyList>

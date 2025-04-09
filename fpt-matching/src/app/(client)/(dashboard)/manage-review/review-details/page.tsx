@@ -19,6 +19,7 @@ import BreadcrumbReviewDetails from './breadcrum-review-details';
 import SheetFileUpload from './file-upload_review_details';
 import {reviewDetailsRBAC} from "@/app/(client)/(dashboard)/manage-review/review-details/mange-role";
 import { useCurrentRole } from '@/hooks/use-current-role';
+import {DialogUpdateReview} from "@/app/(client)/(dashboard)/manage-review/review-details/update-review-assign";
 
 
 const Page = () => {
@@ -79,9 +80,9 @@ const Page = () => {
                              <div>
                                  {reviewDetails.project?.idea?.englishName}
                              </div>
-                            <div>
-                                <Button variant={"default"}>Chỉnh sửa đề tài</Button>
-                            </div>
+                            {/*<div>*/}
+                            {/*    <Button variant={"default"}>Chỉnh sửa đề tài</Button>*/}
+                            {/*</div>*/}
                         </div>
                         <div className={"w-full"}>
                             <Card className="w-full mt-4">
@@ -89,7 +90,7 @@ const Page = () => {
                                     <Accordion type="single" collapsible className="w-full">
                                         <AccordionItem value="item-1">
                                             <AccordionTrigger className={"font-bold text-lg"}>
-                                                Project information
+                                                Thông tin nhóm
                                             </AccordionTrigger>
                                             <AccordionContent>
                                                 <div className={"flex flex-col gap-1.5 font-bold"}>
@@ -101,7 +102,7 @@ const Page = () => {
                                         </AccordionItem>
                                         <AccordionItem value="item-2">
                                             <AccordionTrigger className={"font-bold text-lg"}>
-                                                Idea information
+                                                Thông tin đề tài
                                             </AccordionTrigger>
                                             <AccordionContent>
                                                 <div className={"flex flex-col gap-1.5 font-bold"}>
@@ -122,52 +123,64 @@ const Page = () => {
                                 </CardContent>
                                 <CardFooter className={"w-full"} >
                                     <div className={"w-full"}>
-                                        <div className={"font-bold text-lg mb-2"}>Review information</div>
+                                        <div className={"w-full flex flex-row gap-8 mb-8"}>
+                                            <div className={"font-bold text-lg mb-2"}>Thông tin review</div>
+                                            {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
+                                                // <Button className={"ml-2"}>Cập nhật thông tin của review</Button>
+                                                <DialogUpdateReview review={reviewDetails} />
+                                            )
+                                            }
+                                        </div>
                                         <div className={"flex gap-4 flex-col font-bold text-sm"}>
                                             <div className={"w-full flex items-center"}>
-                                                <span className={"min-w-24"}>Reviewer 1: </span>
-                                                {reviewDetails.reviewer1?.username != null
-                                                ? (<span>{reviewDetails.reviewer1?.username}</span>)
+                                                <span className={"min-w-24 text-sm"}>Reviewer 1: </span>
+                                                {reviewDetails.reviewer1?.code != null
+                                                ? (<span className={"font-medium"}>{reviewDetails.reviewer1?.code}</span>)
                                                 : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
-                                                {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
-                                                    <Button className={"ml-2"}>Update information</Button>
-                                                )}
+                                                <div></div>
+                                                {/*{reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (*/}
+                                                {/*    <Button className={"ml-2"}>Update information</Button>*/}
+                                                {/*)}*/}
                                             </div>
-                                            <div className={"w-full flex items-center"}>
+                                            <div className={"w-full flex items-center font-bold text-sm"}>
                                                 <span className={"min-w-24"}>Reviewer 2: </span>
-                                                {reviewDetails.reviewer2?.username != null
-                                                ? <span>{reviewDetails.reviewer2?.username}</span>
+                                                {reviewDetails.reviewer2?.code != null
+                                                ? <span className={" font-medium"}>{reviewDetails.reviewer2?.code}</span>
                                                 : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
-                                                {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
-                                                    <Button className={"ml-2"}>Update information</Button>
-                                                )}
+                                                {/*{reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (*/}
+                                                {/*    <Button className={"ml-2"}>Update information</Button>*/}
+                                                {/*)}*/}
+                                                <div></div>
                                             </div>
-                                            <div className={"w-full flex items-center"}>
+                                            <div className={"w-full flex items-center font-bold text-sm"}>
                                                 <span className={"min-w-24"}>Review date: </span>
                                                 {reviewDetails.reviewDate != null
-                                                ? (<span>{reviewDetails.reviewDate}</span>)
+                                                ? (<span className={" font-medium"}>{new Date(reviewDetails.reviewDate).toLocaleDateString("en-GB")}</span>)
                                                 : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
-                                                {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
-                                                    <Button className={"ml-2"}>Update information</Button>
-                                                )}
+                                                {/*{reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (*/}
+                                                {/*    <Button className={"ml-2"}>Update information</Button>*/}
+                                                {/*)}*/}
+                                                <div></div>
                                             </div>
-                                            <div className={"w-full flex items-center"}>
+                                            <div className={"w-full flex items-center font-bold text-sm"}>
                                                 <span className={"min-w-24"}>Room: </span>
                                                 {reviewDetails.room != null
-                                                ? <span>{reviewDetails.room}</span>
+                                                ? <span className={" font-medium"}>{reviewDetails.room}</span>
                                                 : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
-                                                {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
-                                                    <Button className={"ml-2"}>Update information</Button>
-                                                )}
+                                                {/*{reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (*/}
+                                                {/*    <Button className={"ml-2"}>Update information</Button>*/}
+                                                {/*)}*/}
+                                                <div></div>
                                             </div>
-                                            <div className={"w-full flex items-center"}>
+                                            <div className={"w-full flex items-center font-bold text-sm"}>
                                                 <span className={"min-w-24"}>Slot: </span>
                                                 {reviewDetails.slot != null
-                                                ? <span>{reviewDetails.slot}</span>
+                                                ? <span className={" font-medium"}>{reviewDetails.slot}</span>
                                                 : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
-                                                {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
-                                                    <Button className={"ml-2"}>Update information</Button>
-                                                )}
+                                                {/*{reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (*/}
+                                                {/*    <Button className={"ml-2"}>Update information</Button>*/}
+                                                {/*)}*/}
+                                                <div></div>
                                             </div>
                                             <div>File upload: <SheetFileUpload file={fileUpload} setFile={setFileupload} /></div>
                                         </div>

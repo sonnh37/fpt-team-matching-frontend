@@ -233,6 +233,7 @@ export function DataTableToolbar<TData>({
                       column={column}
                       title={filter.title}
                       options={filter.options}
+                      type={filter.type}
                     />
                   );
                 }

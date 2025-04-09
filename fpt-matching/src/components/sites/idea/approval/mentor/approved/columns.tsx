@@ -41,7 +41,8 @@ import { useState } from "react";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import {IdeaDetailForm} from "@/components/sites/idea/detail";
+import { IdeaDetailForm } from "@/components/sites/idea/detail";
+import { formatDate } from "@/lib/utils";
 
 export const columns: ColumnDef<IdeaRequest>[] = [
   {
@@ -69,12 +70,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return date.toLocaleDateString("en-US", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+      return formatDate(date);
     },
   },
   {
@@ -182,7 +178,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         <div className="flex gap-2">
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-               <Button
+              <Button
                 size="sm"
                 variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 // disabled={hasCouncilRequests}
@@ -196,7 +192,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 <DialogDescription></DialogDescription>
               </DialogHeader>
               <div className="grid p-4 space-y-24">
-                <IdeaDetailForm idea={idea}/>
+                <IdeaDetailForm idea={idea} />
               </div>
               <DialogFooter>
                 <Button

@@ -6,24 +6,25 @@ import { TypographyH3 } from "@/components/_common/typography/typography-h3";
 import { TypographyH4 } from "@/components/_common/typography/typography-h4";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
 import { TypographyP } from "@/components/_common/typography/typography-p";
+import { TypographySmall } from "@/components/_common/typography/typography-small";
 import { NoTeam } from "@/components/sites/team/no-team";
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalTrigger,
-} from "@/components/ui/animated-modal";
+import InvitationsInComingToLeaderTable from "@/components/sites/team/request-join-team-incoming";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -32,42 +33,38 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { RootState } from "@/lib/redux/store";
+import { formatDate } from "@/lib/utils";
 import { projectService } from "@/services/project-service";
 import { teammemberService } from "@/services/team-member-service";
+import { IdeaStatus } from "@/types/enums/idea";
+import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import { TeamMemberRole } from "@/types/enums/team-member";
+import { ProjectUpdateCommand } from "@/types/models/commands/projects/project-update-command";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { EllipsisVertical, Pencil, Save, Trash, Users, X } from "lucide-react";
+import { Pencil, Save, Trash, Users, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import UpdateProjectTeam from "../idea/updateidea/page";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import PageContainer from "@/components/layouts/page-container";
-import { useEffect, useState } from "react";
-import { ProjectCreateCommand } from "@/types/models/commands/projects/project-create-command";
-import { ProjectUpdateCommand } from "@/types/models/commands/projects/project-update-command";
 import { useCurrentRole } from "@/hooks/use-current-role";
-import { Badge } from "@/components/ui/badge";
-import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
-import InvitationsInComingToLeaderTable from "@/components/sites/team/request-join-team-incoming";
-import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/invitation-get-by-status-query";
-import { invitationService } from "@/services/invitation-service";
+import { TeamMember } from "@/types/team-member";
+import { useSelectorUser } from "@/hooks/use-auth";
 
 export default function TeamInfo() {
   const router = useRouter();
   //lay thong tin tu redux luc dang nhap
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelectorUser();
   const [isEditing, setIsEditing] = useState(false);
   const [teamName, setTeamName] = useState("");
   const confirm = useConfirm();
   const queryClient = useQueryClient();
-
-
+  const roleCurrent = useCurrentRole();
 
   //goi api bang tanstack
   const {
@@ -81,7 +78,6 @@ export default function TeamInfo() {
     queryFn: projectService.getProjectInfo,
     refetchOnWindowFocus: false,
   });
-
 
   useEffect(() => {
     if (result?.data?.teamName) {
@@ -156,15 +152,13 @@ export default function TeamInfo() {
   if (!IsExistedIdea) {
     availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
   } else {
-    availableSlots = (project?.idea?.maxTeamSize ?? 0) - (project?.teamMembers.length ?? 0);
-    }
+    availableSlots =
+      (project?.idea?.maxTeamSize ?? 0) - (project?.teamMembers.length ?? 0);
+  }
 
   const isLockListInviteRequest = availableSlots === 0;
-  //Đây là form delete trả về true false tái sử dụng được
+  //Đây là form delete trả về true fa lse tái sử dụng được
   async function handleDelete() {
-    if (isLockProject) {
-      toast.warning("This project is locked and cannot be deleted.");
-    }
     // Gọi confirm để mở dialog
     const confirmed = await confirm({
       title: "Delete Item",
@@ -188,6 +182,7 @@ export default function TeamInfo() {
   async function handleLeaveTeam() {
     if (isLockProject) {
       toast.warning("This project is locked and cannot be leave.");
+      return;
     }
     // Gọi confirm để mở dialog
     const confirmed = await confirm({
@@ -209,9 +204,9 @@ export default function TeamInfo() {
   }
 
   async function handleDeleteMember(id: string) {
-    if (isLockProject) {
-      toast.warning("This project is locked and cannot be deleted member.");
-    }
+    // if (isLockProject) {
+    //   toast.warning("This project is locked and cannot be deleted member.");
+    // }
     if (!id) {
       toast("Invalid member ID!");
       return;
@@ -245,164 +240,392 @@ export default function TeamInfo() {
   return (
     <div className="grid grid-cols-4 p-4 gap-4">
       <div className="col-span-3 space-y-2">
-        <div className="flex w-full justify-between items-center">
-          <div className="flex items-center gap-2">
-            {isEditing ? (
-              <div className="flex items-center gap-2">
-                <Input
-                  value={teamName}
-                  onChange={(e) => setTeamName(e.target.value)}
-                  className="w-64"
-                />
-                <Button
-                  size="sm"
-                  onClick={handleSave}
-                  disabled={!teamName.trim()}
-                >
-                  <Save className="h-4 w-4 mr-1" />
-                  Lưu
-                </Button>
-                <Button size="sm" variant="ghost" onClick={handleCancel}>
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              <>
-                <TypographyH3>{project.teamName ?? "No name"}</TypographyH3>
-                {isLeader ? (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    disabled={isLockProject}
-                    onClick={() => setIsEditing(true)}
-                    className="h-8 w-8"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                ) : (
-                  <></>
-                )}
-              </>
-            )}
-          </div>
-          {infoMember && infoMember?.role === TeamMemberRole.Leader ? (
-            <>
-              <div className="flex items-center">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                       disabled={isLockListInviteRequest}
-                      size="icon"
-                      className="relative"
-                    >
-                      <Users />
-                      {invitationFromPersonalize.length > 0 && (
-                        <Badge
-                          variant="destructive"
-                          className="absolute right-1 top-1 h-4 w-4 translate-x-1/2 -translate-y-1/2 p-0 flex items-center justify-center"
-                        >
-                          {invitationFromPersonalize.length}
-                        </Badge>
-                      )}
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-fit">
-                    <DialogHeader>
-                      <DialogTitle>Request incoming</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      {project.id != undefined && (
-                        <InvitationsInComingToLeaderTable
-                          projectId={project.id}
-                        />
-                      )}
-                    </div>
-                  </DialogContent>
-                </Dialog>
-
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      disabled={isLockProject}
-                      size={"icon"}
-                    >
-                      <Pencil />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:min-w-[60%] pt-12 sm:max-w-fit h-[90vh] max-h-[90vh]">
-                    <div className="h-full overflow-y-auto">
-                      <UpdateProjectTeam />
-                    </div>
-                  </DialogContent>
-                </Dialog>
-
-                <Button
-                  variant="ghost"
-                  disabled={isLockProject}
-                  size={"icon"}
-                  onClick={handleDelete}
-                >
-                  <Trash />
-                </Button>
-              </div>
-            </>
-          ) : (
-            <Button
-              variant="destructive"
-              disabled={isLockProject}
-              onClick={handleLeaveTeam}
-            >
-              Rời nhóm
-            </Button>
-          )}
-        </div>
         <Card>
-          <CardContent className="mt-4 space-y-4">
+          <CardHeader>
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-2xl">
+                  {isEditing ? (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={teamName}
+                        onChange={(e) => setTeamName(e.target.value)}
+                        className="w-64"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={handleSave}
+                        disabled={!teamName.trim()}
+                      >
+                        <Save className="h-4 w-4 mr-1" />
+                        Lưu
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={handleCancel}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-1">
+                      <TypographyH3>
+                        {project.teamName ?? "Unknown"}
+                      </TypographyH3>
+                      {isLeader ? (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          disabled={isLockProject}
+                          onClick={() => setIsEditing(true)}
+                          className="h-8 w-8"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <></>
+                      )}
+                    </div>
+                  )}
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  Created on {formatDate(project?.createdDate)}
+                </CardDescription>
+              </div>
+
+              <div className="flex gap-3 items-center">
+                {infoMember && infoMember?.role === TeamMemberRole.Leader ? (
+                  <>
+                    <div className="flex items-center">
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            disabled={isLockListInviteRequest}
+                            size="icon"
+                            className="relative"
+                          >
+                            <Users />
+                            {invitationFromPersonalize.length > 0 && (
+                              <Badge
+                                variant="destructive"
+                                className="absolute right-1 top-1 h-4 w-4 translate-x-1/2 -translate-y-1/2 p-0 flex items-center justify-center"
+                              >
+                                {invitationFromPersonalize.length}
+                              </Badge>
+                            )}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-fit">
+                          <DialogHeader>
+                            <DialogTitle>Request incoming</DialogTitle>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            {project.id != undefined && (
+                              <InvitationsInComingToLeaderTable
+                                projectId={project.id}
+                              />
+                            )}
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            disabled={isLockListInviteRequest}
+                            size={"icon"}
+                          >
+                            <Pencil />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:min-w-[60%] pt-12 sm:max-w-fit h-[90vh] max-h-[90vh]">
+                          <div className="h-full overflow-y-auto">
+                            <UpdateProjectTeam />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Button
+                        variant="ghost"
+                        disabled={isLockProject}
+                        size={"icon"}
+                        onClick={handleDelete}
+                      >
+                        <Trash />
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <Button
+                    variant="destructive"
+                    disabled={isLockProject}
+                    onClick={handleLeaveTeam}
+                  >
+                    Rời nhóm
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
             {project.ideaId != null ? (
-              <>
-                {/* Abbreviation & Vietnamese Title */}
-                <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-6">
+                {/* Team Description */}
+                {project?.description && (
                   <div>
-                    <p className="text-gray-500">Abbreviations</p>
-                    <p className="font-semibold italic">
-                      {result?.data?.idea?.abbreviations}
-                    </p>
+                    <h4 className="text-sm font-medium text-gray-500 mb-2">
+                      Description
+                    </h4>
+                    <p className="text-gray-700">{project.description}</p>
                   </div>
-                  <div>
-                    <p className="text-gray-500">Vietnamese Title</p>
-                    <p className="font-semibold italic">
-                      {result?.data?.idea?.vietNamName}
-                    </p>
-                  </div>
-                </div>
+                )}
 
-                {/* Profession & Specialty */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-gray-500">Profession</p>
-                    <p className="font-semibold italic">
-                      {
-                        result?.data?.idea?.specialty?.profession
-                          ?.professionName
-                      }
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-gray-500">Specialty</p>
-                    <p className="font-semibold italic">
-                      {result?.data?.idea?.specialty?.specialtyName}
-                    </p>
-                  </div>
-                </div>
+                {/* Idea Information */}
+                {project?.idea && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h4 className="text-lg font-semibold mb-4">
+                        Project Idea
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Abbreviations */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Viết tắt
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.abbreviations || "-"}
+                          </TypographyP>
+                        </div>
 
-                {/* Description */}
+                        {/* Vietnamese Name */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Tiếng Việt
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.vietNamName || "-"}
+                          </TypographyP>
+                        </div>
+
+                        {/* English Name */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Tiếng Anh
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.englishName || "-"}
+                          </TypographyP>
+                        </div>
+
+                        {/* Idea Code */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Mã đề tài
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.ideaCode || "-"}
+                          </TypographyP>
+                        </div>
+
+                        {/* Ngành */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Ngành
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.specialty?.profession
+                              ?.professionName || "-"}
+                          </TypographyP>
+                        </div>
+
+                        {/* Chuyên ngành */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Chuyên ngành
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.specialty?.specialtyName || "-"}
+                          </TypographyP>
+                        </div>
+
+                        {/* Mô tả */}
+                        <div className="space-y-1 md:col-span-2">
+                          <TypographySmall className="text-muted-foreground">
+                            Mô tả
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.description || "-"}
+                          </TypographyP>
+                        </div>
+
+                        {/* File */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Tệp đính kèm
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.file ? (
+                              <a
+                                href={project.idea.file}
+                                className="text-blue-500 underline"
+                                target="_blank"
+                              >
+                                Xem file
+                              </a>
+                            ) : (
+                              "-"
+                            )}
+                          </TypographyP>
+                        </div>
+
+                        {/* Enterprise */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Đề tài doanh nghiệp
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.isEnterpriseTopic ? "Có" : "Không"}
+                          </TypographyP>
+                        </div>
+
+                        {project.idea.isEnterpriseTopic && (
+                          <div className="space-y-1">
+                            <TypographySmall className="text-muted-foreground">
+                              Tên doanh nghiệp
+                            </TypographySmall>
+                            <TypographyP className="p-0">
+                              {project.idea.enterpriseName || "-"}
+                            </TypographyP>
+                          </div>
+                        )}
+
+                        {/* Mentor & SubMentor */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Mentor
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.mentor?.email || "-"}
+                          </TypographyP>
+                        </div>
+
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Mentor phụ
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.subMentor?.email || "-"}
+                          </TypographyP>
+                        </div>
+
+                        {/* Trạng thái */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Trạng thái
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {IdeaStatus[project.idea.status ?? 0] || "-"}
+                          </TypographyP>
+                        </div>
+
+                        {/* Số lượng thành viên tối đa */}
+                        <div className="space-y-1">
+                          <TypographySmall className="text-muted-foreground">
+                            Số lượng thành viên tối đa
+                          </TypographySmall>
+                          <TypographyP className="p-0">
+                            {project.idea.maxTeamSize || "-"}
+                          </TypographyP>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Team Members */}
+                <Separator />
                 <div>
-                  <p className="text-gray-500">Description</p>
-                  <p className="italic">{result?.data?.idea?.description}</p>
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="text-lg font-semibold">Team Members</h4>
+                    <Badge variant="outline" className="text-sm">
+                      {availableSlots} slot{availableSlots !== 1 ? "s" : ""}{" "}
+                      available
+                    </Badge>
+                  </div>
+                  <div className="space-y-3">
+                    {sortedMembers.map((member: TeamMember, index) => {
+                      const initials = `${
+                        member.user?.lastName?.charAt(0).toUpperCase() || ""
+                      }`;
+                      const isLeaderInMembers = member.role === TeamMemberRole.Leader;
+
+                      return (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10 rounded-lg">
+                              <AvatarImage
+                                src={member.user?.avatar}
+                                alt={member.user?.email}
+                              />
+                              <AvatarFallback className="rounded-lg">
+                                {initials}
+                              </AvatarFallback>
+                            </Avatar>
+
+                            <div>
+                              <p className="font-medium">
+                                {member.user?.firstName} {member.user?.lastName}
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                {member.user?.email}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            <Badge variant={isLeaderInMembers ? "default" : "secondary"}>
+                              {TeamMemberRole[member.role ?? 0]}
+                              {isLeaderInMembers && " (Owner)"}
+                            </Badge>
+
+                            <DropdownMenu>
+                              <DropdownMenuTrigger className="hover:bg-gray-100 p-1 rounded">
+                                <FontAwesomeIcon
+                                  className="size-4 text-gray-500"
+                                  icon={faEllipsisVertical}
+                                />
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <a
+                                    href={`/profile-detail/${member.user?.id}`}
+                                    className="w-full"
+                                  >
+                                    View Profile
+                                  </a>
+                                </DropdownMenuItem>
+                                {isLeader && !isLeaderInMembers && (
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleDeleteMember(member?.id ?? "")
+                                    }
+                                  >
+                                    Xóa thành viên
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </>
+              </div>
             ) : (
               <>
                 <TypographyP className="text-red-600">
@@ -418,176 +641,6 @@ export default function TeamInfo() {
                 </TypographyP>
               </>
             )}
-            {/* Members */}
-            <div>
-              <div className="flex justify-between">
-                <TypographyMuted>Members</TypographyMuted>
-                <TypographyMuted>
-                  Available Slot: {availableSlots}
-                </TypographyMuted>
-              </div>
-
-              {
-                // user?.email == member.user?.email &&
-                isLeader ? (
-                  <div className="space-y-3 mt-2">
-                    {sortedMembers?.map((member, index) => {
-                      const initials = `${
-                        member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                      }`;
-
-                      return (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-2 border rounded-lg"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <Avatar className="h-10">
-                              <AvatarImage
-                                src={member.user?.avatar!}
-                                alt={member.user?.email!}
-                              />
-                              <AvatarFallback className="">
-                                {initials}
-                              </AvatarFallback>
-                            </Avatar>
-
-                            <div>
-                              <TypographyP>{member.user?.email}</TypographyP>
-                              <TypographyMuted>
-                                {member.user?.firstName}
-                              </TypographyMuted>
-                            </div>
-                          </div>
-                          <div className="flex items-center">
-                            {member.role === TeamMemberRole.Leader ? (
-                              <TypographyMuted>
-                                {TeamMemberRole[member.role ?? 0]} | Owner
-                              </TypographyMuted>
-                            ) : (
-                              <TypographyMuted>
-                                {TeamMemberRole[member.role ?? 0]}
-                              </TypographyMuted>
-                            )}
-                            <div className="relative ml-3">
-                              {user?.email == member.user?.email ? (
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant={"ghost"}
-                                      className="focus-visible:ring-0"
-                                      size={"icon"}
-                                    >
-                                      <EllipsisVertical />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem>
-                                      <a
-                                        href={`/social/blog/profile-social/${member.user?.id}`}
-                                      >
-                                        Xem profile
-                                      </a>
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              ) : (
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger>
-                                    <EllipsisVertical />
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent>
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        handleDeleteMember(member?.id ?? "")
-                                      }
-                                    >
-                                      Xóa thành viên
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                      {" "}
-                                      <a
-                                        href={`/social/blog/profile-social/${member.user?.id}`}
-                                      >
-                                        Xem profile
-                                      </a>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                      Phân chức leader
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <div className="space-y-3 mt-2">
-                    {sortedMembers.map((member, index) => {
-                      const initials = `${
-                        member.user?.lastName?.charAt(0).toUpperCase() ?? ""
-                      }`;
-                      return (
-                        <div
-                          key={index}
-                          className="flex items-center justify-between p-2 border rounded-lg"
-                        >
-                          <div className="flex items-center space-x-3">
-                            <Avatar className="h-10 rounded-lg">
-                              <AvatarImage
-                                src={member.user?.avatar!}
-                                alt={member.user?.email!}
-                              />
-                              <AvatarFallback className="rounded-lg">
-                                {initials}
-                              </AvatarFallback>
-                            </Avatar>
-
-                            <div>
-                              <p className="font-semibold">
-                                {member.user?.email}
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                {member.user?.firstName}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex">
-                            {member.role === TeamMemberRole.Leader ? (
-                              <p className="text-sm text-gray-500">
-                                {TeamMemberRole[member.role ?? 0]} | Owner
-                              </p>
-                            ) : (
-                              <p className="text-sm text-gray-500">
-                                {TeamMemberRole[member.role ?? 0]}
-                              </p>
-                            )}
-                            <div className="relative ml-3">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger>
-                                  <FontAwesomeIcon
-                                    className="size-4"
-                                    icon={faEllipsisVertical}
-                                  />
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent>
-                                  <DropdownMenuItem>
-                                    View profile
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )
-              }
-            </div>
           </CardContent>
         </Card>
       </div>

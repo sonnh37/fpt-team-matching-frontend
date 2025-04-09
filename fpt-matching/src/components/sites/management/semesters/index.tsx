@@ -48,6 +48,7 @@ import { DataTableSemesterComponent } from "./data-table-custom-component";
 import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { isDeleted_options } from "@/lib/filter-options";
+import { LoadingComponent } from "@/components/_common/loading-page";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -186,15 +187,7 @@ export default function SemesterTable() {
               // formFilterAdvanceds={formFilterAdvanceds}
             />
             {isFetching && !isTyping ? (
-              <DataTableSkeleton
-                columnCount={1}
-                showViewOptions={false}
-                withPagination={false}
-                rowCount={pagination.pageSize}
-                searchableColumnCount={0}
-                filterableColumnCount={0}
-                shrinkZero
-              />
+              <LoadingComponent />
             ) : (
               <DataTableSemesterComponent
                 table={table}

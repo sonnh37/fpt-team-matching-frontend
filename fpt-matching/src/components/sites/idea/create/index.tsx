@@ -304,6 +304,8 @@ export const CreateProjectForm = () => {
                     setShowPageIsIdea(true);
                     return;
                 }
+                toast.error(res.message);
+                return;
             }
 
             if (isLecturer) {
@@ -319,7 +321,9 @@ export const CreateProjectForm = () => {
                     await new Promise((resolve) => setTimeout(resolve, 2000));
                     setShowPageIsIdea(true);
                     return;
-                }
+                } 
+                toast.error(res.message);
+                return;
 
             }
 

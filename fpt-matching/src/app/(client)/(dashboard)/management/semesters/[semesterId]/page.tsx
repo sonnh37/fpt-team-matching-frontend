@@ -7,7 +7,7 @@ import ErrorSystem from "@/components/_common/errors/error-system";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { LoadingComponent } from "@/components/_common/loading-page";
-import { SemesterForm } from "@/components/sites/management/semester/create-or-update";
+import { SemesterForm } from "@/components/sites/management/semesters/create-or-update";
 
 export default function Page() {
   const params = useParams();

@@ -50,16 +50,17 @@ export default function LayoutClient({
             </GoogleOAuthProvider>
           </QueryClientProvider>
         </Provider>
+        <Toaster
+          position="top-right"
+           richColors
+          // icons={{
+          //   success: <SuccessIcon />,
+          //   error: <ErrorIcon />,
+          //   warning: <WarningIcon />,
+          //   // Thêm các icon khác nếu cần
+          // }}
+        />
       </ThemeProvider>
-      <Toaster
-        position="top-right"
-        richColors
-        // icons={{
-        //   success: "🎉",
-        //   error: "🚨",
-        //   warning: "⚠️",
-        // }}
-      />
     </>
   );
 }

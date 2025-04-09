@@ -25,6 +25,7 @@ import { User } from "@/types/user";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { formatDate } from "@/lib/utils";
 
 export const columns: ColumnDef<IdeaRequest>[] = [
   {
@@ -67,12 +68,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return date.toLocaleDateString("en-US", {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
+      return formatDate(date)
     },
   },
   {

@@ -20,6 +20,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
+import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
+import { LoadingComponent } from "@/components/_common/loading-page";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -32,8 +34,6 @@ interface InvitationsInComingToLeaderTableProps {
 export default function InvitationsInComingToLeaderTable({
   projectId,
 }: InvitationsInComingToLeaderTableProps) {
-  console.log("check_project___", projectId)
-
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -49,7 +49,7 @@ export default function InvitationsInComingToLeaderTable({
     React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 1000,
+    pageSize: 5,
   });
   const [isTyping, setIsTyping] = useState(false);
   //#endregion
@@ -88,14 +88,12 @@ export default function InvitationsInComingToLeaderTable({
       }));
     }
   }, [columnFilters, inputFields]);
-  const { data, isFetching, error, refetch } = useQuery({
+  const { data, isFetching, isLoading, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: () => invitationService.getLeaderInvitationsByType(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
-
-  if (error) return <div>Error loading data</div>;
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
@@ -114,11 +112,16 @@ export default function InvitationsInComingToLeaderTable({
 
   //#endregion
 
+  if (error) return <div>Error loading data</div>;
+  if (isLoading) return <LoadingComponent />;
+  
+
   return (
     <>
       <div className="space-y-8">
-        <div className="">
+        <div className="space-y-3">
           <DataTableComponent table={table} />
+          <DataTablePagination table={table} />
         </div>
       </div>
     </>
