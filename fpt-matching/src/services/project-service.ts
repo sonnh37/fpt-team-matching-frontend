@@ -80,6 +80,14 @@ class ProjectSerivce extends BaseService<Project> {
       .then((response) => response.data)
       .catch((error) => this.handleError(error));
   };
+
+  public async updateDefenseStage ({projectId, defenseStage}:{projectId:string, defenseStage: number}) {
+    const response = await axiosInstance.put<BusinessResult<void>>(`${this.endpoint}/update-defense-stage`, {
+      id: projectId,
+      defenseStage: defenseStage,
+    })
+    return response.data
+  }
 }
 
 export const projectService = new ProjectSerivce();

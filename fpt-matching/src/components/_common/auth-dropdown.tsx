@@ -50,7 +50,7 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className={cn("size-10 focus-visible:ring-0")}>
+        <Button variant="secondary" className={cn("size-10 focus-visible:ring-0")}>
           <Avatar className="size-10 p-0 m-0">
             <AvatarImage
               src={

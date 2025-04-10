@@ -192,7 +192,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                                     <Button className={"ml-2"}>Update information</Button>
                                                 )}
                                             </div>
-                                            <div>File upload: <SheetFileUpload file={fileUpload} setFile={setFileupload} /></div>
+                                            <div>File upload: <SheetFileUpload reviewNumber={reviewDetails.number} fileUrl={reviewDetails.fileUpload} file={fileUpload} setFile={setFileupload} /></div>
                                         </div>
                                     </div>
                                 </CardFooter>

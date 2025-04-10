@@ -22,7 +22,7 @@ export function ChatPopover({ user = null }: ChatPopoverProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size={"icon"} className={cn("size-10")}>
+        <Button variant="secondary" size={"icon"} className={cn("size-10")}>
           <MessageCircleCode strokeWidth={1.5} className="!size-5 text-foreground/80" />
         </Button>
       </PopoverTrigger>

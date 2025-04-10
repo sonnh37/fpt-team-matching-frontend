@@ -9,8 +9,8 @@ import {ideaHistoryService} from "@/services/idea-history-service";
 
 
 export function EditIdeaDialog(
-    {file, reviewNumber, ideaId ,isOpen, setIsOpen} :
-    {file: File, reviewNumber: number, ideaId:string ,isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>}
+    {file, reviewNumber, ideaId, note ,isOpen, setIsOpen} :
+    {file: File, reviewNumber: number, ideaId:string ,isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, note: string | null}
 ) {
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -31,7 +31,7 @@ export function EditIdeaDialog(
             //     }
             // }
             if (result) {
-                const response = await ideaHistoryService.studentUpdateIdea({ideaId, fileUpdate: result, reviewStage: reviewNumber})
+                const response = await ideaHistoryService.studentUpdateIdea({ideaId, fileUpdate: result, reviewStage: reviewNumber, note})
                     if (response.status == 1) {
                         toast.success("Successfully uploaded");
                     } else {

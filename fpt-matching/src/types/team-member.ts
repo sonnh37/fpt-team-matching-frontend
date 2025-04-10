@@ -17,4 +17,6 @@ export interface TeamMember extends BaseEntity {
     user?: User;
     rateBys: Rate[];
     rateFors: Rate[];
+    commentDefense1?: string
+    commentDefense2?: string
 }

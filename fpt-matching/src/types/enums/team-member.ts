@@ -7,9 +7,12 @@ export enum TeamMemberRole {
 
 export enum TeamMemberStatus
 {
-    InProgress,  
-    Passed,     
-    Failed     
+    Pending,
+    InProgress,
+    Pass1,
+    Pass2,
+    Fail1,
+    Fail2,
 }
 
 export enum MentorConclusionOptions {

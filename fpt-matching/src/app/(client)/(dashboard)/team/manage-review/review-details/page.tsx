@@ -2,9 +2,6 @@
 
 import { useSearchParams } from "next/navigation";
 import {ReviewDetail} from "@/components/sites/management/review/review-detail/review-detail";
-
-
-
 const Page = () => {
     const searchParams = useSearchParams();
     const reviewId = searchParams.get('reviewId');
