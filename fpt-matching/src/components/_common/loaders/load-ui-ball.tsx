@@ -11,10 +11,9 @@ const LoadUIBall = () => {
   const color = theme === "dark" ? "#ffffff" : "#000000";
 
   return (
-    <div
-    >
+    <>
       <DotPulse size="80" speed="0.7" color={color} />
-    </div>
+    </>
   );
 };
 

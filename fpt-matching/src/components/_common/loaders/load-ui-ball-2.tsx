@@ -12,9 +12,8 @@ export const LoadUIBall2 = () => {
   const color = theme === "dark" ? "#ffffff" : "#000000";
 
   return (
-    <div
-    >
+    <>
       <Zoomies size="100" stroke="5" bgOpacity="0.1" speed="0.7" color={color} />
-    </div>
+    </>
   );
 };
