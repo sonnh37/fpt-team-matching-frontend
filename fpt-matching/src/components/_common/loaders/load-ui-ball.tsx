@@ -1,5 +1,4 @@
 "use client";
-
 import { DotPulse } from "ldrs/react";
 import "ldrs/react/DotPulse.css";
 import { useTheme } from "next-themes";

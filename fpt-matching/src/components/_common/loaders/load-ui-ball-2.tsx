@@ -1,4 +1,4 @@
-
+"use client";
 import { Zoomies } from "ldrs/react";
 import "ldrs/react/Zoomies.css";
 import { useTheme } from "next-themes";
