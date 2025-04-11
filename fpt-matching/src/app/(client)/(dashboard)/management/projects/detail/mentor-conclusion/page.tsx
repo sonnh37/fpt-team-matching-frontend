@@ -106,13 +106,15 @@ const Page = () => {
             toast.error("Vui lòng điền tất cả các field")
             return;
         }
+        const projectResponse = await projectService.updateDefenseStage({projectId: project!.id!, defenseStage: project!.defenseStage!})
         const teamMemberResponse = await  teammemberService.updateByMentor({teamMembersConclusion: teamMemberConclusion})
         const mentorFeedbackResponse = await mentorFeedbackService.postFeedback(mentorFeedback);
-        if (mentorFeedbackResponse.status == 1 || teamMemberResponse.status == 1) {
+        if (mentorFeedbackResponse.status == 1 || teamMemberResponse.status == 1 || projectResponse.status==1) {
             toast.success("Save success")
         } else {
             toast.error(teamMemberResponse.status != 1 ? teamMemberResponse.message : mentorFeedbackResponse.message)
         }
+
     }
     return (
         <div className={"p-8"}>

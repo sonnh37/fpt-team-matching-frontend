@@ -179,7 +179,7 @@ const Page = () => {
 
     const handleSaveChange = async () => {
         if (file) {
-            const result = await capstoneService.importExcelFile({file, stage: 1})
+            const result = await capstoneService.importExcelFile({file, stage: stage})
             if (result.status == 1) {
                 toast.success("Import successfully imported!");
             } else {
