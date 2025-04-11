@@ -32,7 +32,8 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
 
 
     let query: BlogCvGetAllQuery = {
-        blogId: blogId
+        blogId: blogId,
+        isPagination: false,
     }
     const {
         data: post,

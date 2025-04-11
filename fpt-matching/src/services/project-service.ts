@@ -23,13 +23,13 @@ class ProjectSerivce extends BaseService<Project> {
     }
   };
 
-  public fetchPaginatedForMentor = (
+  public fetchAllForMentor = (
       query?: ProjectGetListForMentorQuery
-    ): Promise<BusinessResult<PaginatedResult<Project>>> => {
+    ): Promise<BusinessResult<QueryResult<Project>>> => {
       const cleanedQuery = cleanQueryParams(query ?? {});
   
       return axiosInstance
-        .get<BusinessResult<PaginatedResult<Project>>>(
+        .get<BusinessResult<QueryResult<Project>>>(
           `${this.endpoint}/me/mentor-projects?${cleanedQuery}&isPagination=true`
         )
         .then((response) => {

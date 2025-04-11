@@ -178,7 +178,7 @@ export default function StageIdeaTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => stageideaService.fetchPaginated(queryParams),
+    queryFn: () => stageideaService.fetchAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -202,15 +202,14 @@ export default function StageIdeaTable() {
   ];
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns: columns_,
-    rowCount: data?.data?.totalRecords ?? 0,
+    columns,
+    rowCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
     debugTable: true,
   });

@@ -129,15 +129,14 @@ export function IdeaRequestPendingByCouncilTable() {
   // Table Configuration
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns: columns,
-    rowCount: data?.data?.totalRecords ?? 0,
+    columns,
+    rowCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
     debugTable: true,
   });
@@ -199,9 +198,7 @@ export function IdeaRequestPendingByCouncilTable() {
                     <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
                     <div className="space-y-1">
                       <p className="text-sm font-medium">
-                        Timeline:{" "}
-                        {formatDate(stageIdea.startDate)}
-                        {" "}-{" "}
+                        Timeline: {formatDate(stageIdea.startDate)} -{" "}
                         {formatDate(stageIdea.endDate)}
                       </p>
                     </div>
@@ -210,8 +207,7 @@ export function IdeaRequestPendingByCouncilTable() {
                     <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
                     <div className="space-y-1">
                       <p className="text-sm font-medium">
-                        Date of results:{" "}
-                        {formatDate(stageIdea.resultDate)}
+                        Date of results: {formatDate(stageIdea.resultDate)}
                       </p>
                     </div>
                   </div>

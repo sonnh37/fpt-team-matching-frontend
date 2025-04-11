@@ -190,7 +190,8 @@ export default function Blog() {
 
   const query: BlogGetAllQuery = {
     pageNumber: currentPage,
-    isDeleted: false
+    isDeleted: false,
+    isPagination: true,
   };
   // NẾU NGƯỜI DÙNG BẤM FILTER THÌ MỚI HIỆN RA
   if (filterType) {
@@ -204,7 +205,7 @@ export default function Blog() {
     isLoading
   } = useQuery({
     queryKey: ["getBlogAll", query],
-    queryFn: () => blogService.fetchPaginated(query),
+    queryFn: () => blogService.fetchAll(query),
     refetchOnWindowFocus: false,
   });
   useEffect(() => {

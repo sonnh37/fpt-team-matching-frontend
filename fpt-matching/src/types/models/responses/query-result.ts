@@ -1,12 +1,12 @@
-interface PaginatedResult<TResult> {
+interface QueryResult<TResult> {
     results?: TResult[];
     totalPages?: number;
-    totalRecordsPerPage?: number;
     totalRecords?: number;
     pageNumber?: number;
     pageSize?: number;
     sortField?: string;
     sortOrder?: SortOrder;
+    isPagination: boolean;
 }
 
 enum SortOrder {

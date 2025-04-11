@@ -37,6 +37,7 @@ export const useQueryParams = (
     sortOrder: sorting[0]?.desc ? -1 : 1,
     fromDate: formValues?.date?.from?.toISOString() || null,
     toDate: formValues?.date?.to?.toISOString() || null,
+    isPagination: true,
     ...filterParams,
   };
 };

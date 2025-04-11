@@ -39,6 +39,8 @@ import { toast } from "sonner";
 import { notificationService } from "@/services/notification-service";
 import { Notification } from "@/types/notification";
 import { NotificationType } from "@/types/enums/notification";
+import useNotification from "@/hooks/use-notification";
+import { NotificationGetAllByCurrentUserQuery } from "@/types/models/queries/notifications/notifications-get-all-by-current-user-query";
 
 interface NotificationPopoverProps
   extends React.ComponentPropsWithRef<typeof PopoverTrigger>,
@@ -50,18 +52,16 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
+  const query: NotificationGetAllByCurrentUserQuery = {
+    pageNumber: 1,
+    pageSize: 10,
+    isPagination: true,
+  }
   // Fetch notifications
-  const { data: businessResult, isLoading } = useQuery({
-    queryKey: ["notifications"],
-    queryFn: () =>
-      notificationService.fetchPaginatedByCurrentUser({
-        pageSize: 20,
-        // isRead: false,
-      }),
-  });
-
-  const notifications = businessResult?.data?.results || [];
-  const unreadCount = businessResult?.data?.totalRecords || 0;
+  const res = useNotification(query);
+  // if(!res.isConnected) return null;
+  const notifications = res.notifications || [];
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   // Mark as read mutation
   const markAsReadMutation = useMutation({
@@ -140,13 +140,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
             </TabsList>
 
             <ScrollArea className="h-[400px] w-full">
-              {isLoading ? (
-                <div className="p-4 space-y-4">
-                  {[...Array(5)].map((_, i) => (
-                    <Skeleton key={i} className="h-16 w-full rounded" />
-                  ))}
-                </div>
-              ) : notifications.length === 0 ? (
+              {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center p-8 text-center">
                   <Bell className="size-8 text-muted-foreground mb-2" />
                   <TypographySmall className="text-muted-foreground">

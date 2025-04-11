@@ -126,12 +126,14 @@ export const CreateProjectForm = () => {
     const router = useRouter();
     const query: UserGetAllQuery = {
         role: "Lecturer",
+        isPagination: false,
     };
 
     const query_invitations: InvitationGetByStatudQuery = {
         status: InvitationStatus.Pending,
         pageNumber: 1,
         pageSize: 100,
+        isPagination: true,
     };
 
     const form = useForm<z.infer<typeof formSchema>>({
