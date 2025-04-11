@@ -83,7 +83,8 @@ export default function ProjectSearchList() {
     const fetchData = async () => {
       try {
         const res = await professionService.fetchAll();
-        setProfessions(res.data ?? []);
+        console.log("check_profession", res.data);
+        setProfessions(res.data?.results ?? []);
       } catch (error) {
         console.error(error);
       }
@@ -124,7 +125,7 @@ export default function ProjectSearchList() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => projectService.fetchPaginated(queryParams),
+    queryFn: () => projectService.fetchAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -134,14 +135,13 @@ export default function ProjectSearchList() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalRecords ?? 0,
+    rowCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
     debugTable: true,
   });
@@ -207,7 +207,7 @@ export default function ProjectSearchList() {
                           <SelectValue placeholder="Select Profession" />
                         </SelectTrigger>
                         <SelectContent>
-                          {professions.map((p) => (
+                          {professions && professions.map((p) => (
                             <SelectItem key={p.id} value={p.id!}>
                               {p.professionName}
                             </SelectItem>

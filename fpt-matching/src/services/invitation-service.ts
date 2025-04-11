@@ -19,10 +19,10 @@ class InvitationService extends BaseService<Invitation> {
   }
   public getUserInvitationsByType = (
     query?: InvitationGetByTypeQuery
-  ): Promise<BusinessResult<PaginatedResult<Invitation>>> => {
+  ): Promise<BusinessResult<QueryResult<Invitation>>> => {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
-      .get<BusinessResult<PaginatedResult<Invitation>>>(
+      .get<BusinessResult<QueryResult<Invitation>>>(
         `${this.endpoint}/me/by-type?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {
@@ -35,10 +35,10 @@ class InvitationService extends BaseService<Invitation> {
 
   public getUserInvitationsStatus = (
     query?: InvitationGetByTypeQuery
-  ): Promise<BusinessResult<PaginatedResult<Invitation>>> => {
+  ): Promise<BusinessResult<QueryResult<Invitation>>> => {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
-      .get<BusinessResult<PaginatedResult<Invitation>>>(
+      .get<BusinessResult<QueryResult<Invitation>>>(
         `${this.endpoint}/me/by-status?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {
@@ -51,10 +51,10 @@ class InvitationService extends BaseService<Invitation> {
 
   public getLeaderInvitationsByType = (
     query?: InvitationGetByTypeQuery
-  ): Promise<BusinessResult<PaginatedResult<Invitation>>> => {
+  ): Promise<BusinessResult<QueryResult<Invitation>>> => {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
-      .get<BusinessResult<PaginatedResult<Invitation>>>(
+      .get<BusinessResult<QueryResult<Invitation>>>(
         `${this.endpoint}/me/by-type-with-role-leader?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {

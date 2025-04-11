@@ -9,6 +9,7 @@ export interface BaseQueryableQuery {
   createdBy?: string | null | undefined;
   updatedBy?: string | null | undefined;
   isDeleted?: boolean | null | undefined;
+  isPagination: boolean;
 }
 
 export enum SortOrder {

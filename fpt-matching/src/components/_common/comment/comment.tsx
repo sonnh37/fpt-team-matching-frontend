@@ -43,7 +43,8 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
 
     const query: CommentGetAllQuery = {
         blogId: postId, 
-        isDeleted: false
+        isDeleted: false,
+        isPagination: false,
     };
     const {
         data: result,
@@ -74,9 +75,10 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
             pageNumber: nextPage,
             blogId: postId,
             isDeleted: false,
+            isPagination: true,
         };
 
-        const result = await commentService.fetchPaginated(query);
+        const result = await commentService.fetchAll(query);
 
         if ((result?.data?.results?.length ?? 0) > 0) {
             setAllData(prev => [...prev, ...(result?.data?.results || [])]);

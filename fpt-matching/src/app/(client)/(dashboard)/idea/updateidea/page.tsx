@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,22 @@ import { TeamInvitationCommand } from "@/types/models/commands/invitation/invita
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { userService } from "@/services/user-service";
 import { Badge } from "@/components/ui/badge";
+import { useDebounce } from "@/hooks/use-debounce";
+import { BusinessResult } from "@/types/models/responses/business-result";
+import { User } from "@/types/user";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandInput,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 const formSchema = z.object({
   englishTitle: z
@@ -46,11 +62,18 @@ const formSchema = z.object({
 });
 
 const UpdateProjectTeam = () => {
-  const user = useSelector((state: RootState) => state.user.user);
   const [email, setEmailInvite] = useState<string>("");
   const [MessageInvite, setMessage] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const [open, setOpen] = useState(false);
+  const query: UserGetAllQuery = {
+    email: debouncedSearchQuery,
+    pageSize: 5,
+    pageNumber: 1,
+    isPagination: true,
+  };
 
-  console.log(email, "check email");
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -60,6 +83,26 @@ const UpdateProjectTeam = () => {
       description: "",
     },
   });
+
+  const { data: matchingUsers = [], isLoading: isSearching } = useQuery({
+    queryKey: ["searchUsers", debouncedSearchQuery],
+    queryFn: async () => {
+      if (!debouncedSearchQuery) return [];
+
+      try {
+        const response = await userService.fetchAll(query);
+        // Kiểm tra nhiều cấp độ để đảm bảo không bị lỗi
+        return response?.status === 1 ? response.data?.results ?? [] : [];
+      } catch (error) {
+        console.error("Search error:", error);
+        return [];
+      }
+    },
+    enabled: debouncedSearchQuery.length > 0,
+  });
+
+  console.log("checking", matchingUsers);
+
   //goi api bang tanstack
   const { data: result, refetch } = useQuery({
     queryKey: ["getTeamInfo"],
@@ -116,50 +159,49 @@ const UpdateProjectTeam = () => {
   }
 
   // Team mời thành viên
-  const handleInvite = async () => {
-    if (!email) {
-      toast.error("Vui lòng nhập email người dùng để mời");
-      return;
-    }
-    if (availableSlots === 0) {
-      toast.error("Hiện tại nhóm đã đủ thành viên");
-      return;
-    }
-    const query1: UserGetAllQuery = {
-      email: email,
-    };
-    // check email người dùng
-    const receiver = await userService.fetchAll(query1);
-    console.log("checkUser1", receiver);
-    if (receiver.status === 1 && receiver.data) {
-      const idReceiver = receiver.data[0].id;
-      // check project coi leader nó team không
-      const prj = await projectService.getProjectInfo();
-
-      // if (prj.status !== 200) {
-      //   toast("Người dùng đã có project hoặc trong team khác")
-      //   return
-      // }
-
-      const query: TeamInvitationCommand = {
-        receiverId: idReceiver ?? "",
-        projectId: prj.data?.id ?? "",
-        content: "Muốn mời bạn vào nhóm!",
-      };
-      console.log(query, "checkUser2");
-      const result = await invitationService.sendByTeam(query);
-      if (result.status == 1) {
-        toast.success("Chúc mừng bạn đã gửi lời mời thành công");
-        setEmailInvite(""); // Reset email lại để mời tiếp
-      } else {
-        toast.error(result.message || "Gửi lời mời thất bại");
-        setEmailInvite(""); // Reset email dù có lỗi
-        setMessage(result?.message ?? "");
+  const handleInvite = useCallback(
+    async (emailToInvite: string) => {
+      if (!emailToInvite) {
+        toast.error("Please enter a user email to invite");
+        return;
       }
-    } else {
-      toast("Nguời dùng không tồn tại");
-    }
-  };
+      if (availableSlots === 0) {
+        toast.error("The team currently has enough members");
+        return;
+      }
+
+      try {
+        const receiver = await userService.fetchByEmail(emailToInvite);
+
+        if (receiver.status === 1 && receiver.data) {
+          const idReceiver = receiver.data.id;
+          const prj = await projectService.getProjectInfo();
+
+          const invitation: TeamInvitationCommand = {
+            receiverId: idReceiver,
+            projectId: prj.data?.id ?? "",
+            content: "Muốn mời bạn vào nhóm!",
+          };
+
+          const result = await invitationService.sendByTeam(invitation);
+          if (result.status == 1) {
+            toast.success("Chúc mừng bạn đã gửi lời mời thành công");
+            setEmailInvite("");
+            setMessage("");
+          } else {
+            toast.error(result.message || "Failed to send invitation");
+            setMessage(result?.message ?? "");
+          }
+        } else {
+          toast("Nguời dùng không tồn tại");
+        }
+      } catch (error) {
+        toast.error("An error occurred while sending the invitation");
+        console.error("Invitation error:", error);
+      }
+    },
+    [availableSlots]
+  );
 
   return (
     <Form {...form}>
@@ -286,24 +328,87 @@ const UpdateProjectTeam = () => {
             <FormItem>
               <label className="text-sm font-medium">Invite Email</label>
               <p className="text-gray-500 text-xs mb-2">
-                You can only invite students whose specialties are allowed to
-                work on the same thesis topic as yours in this term.
+                Start typing to search for matching users. You can only invite
+                students whose specialties are allowed to work on the same
+                thesis topic.
               </p>
               <FormControl>
-                <div className="flex space-x-2">
-                  <Input
-                    placeholder="Example@fpt.edu.vn"
-                    value={email} // Gán giá trị từ state
-                    onChange={(e) => setEmailInvite(e.target.value)} // Cập nhật state khi nhập
-                  />
-                  <Button type="button" onClick={handleInvite}>
-                    Invite
-                  </Button>
+                <div className="flex flex-col space-y-2">
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <div className="flex space-x-2">
+                        <Input
+                          placeholder="example@fpt.edu.vn"
+                          value={email}
+                          onChange={(e) => {
+                            setEmailInvite(e.target.value);
+                            setSearchQuery(e.target.value); // Đồng bộ giá trị tìm kiếm
+                            if (e.target.value.length > 0) setOpen(true);
+                          }}
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          onClick={() => handleInvite(email)}
+                          disabled={isSearching}
+                        >
+                          Invite
+                        </Button>
+                      </div>
+                    </PopoverTrigger>
+                    <PopoverContent
+                      className="w-[--radix-popover-trigger-width] p-0 py-2"
+                      // align="start" // Căn chỉnh theo cạnh trigger
+                      side="top" // Luôn hiển thị phía trên
+                      sideOffset={8} // Khoảng cách với trigger
+                      avoidCollisions={true} // Tránh va chạm với các phần tử khác
+                      collisionPadding={0}
+                    >
+                      <Command shouldFilter={false}>
+                        {" "}
+                        {/* Tắt filter mặc định */}
+                        <CommandInput
+                          className="focus-visible:ring-0"
+                          value={searchQuery}
+                          onValueChange={setSearchQuery}
+                          placeholder="Search users..."
+                        />
+                        <CommandList>
+                          <CommandEmpty>No users found</CommandEmpty>
+                          <CommandGroup>
+                            {matchingUsers?.length > 0 ? (
+                              matchingUsers.map((user) => (
+                                <CommandItem
+                                  key={user.id}
+                                  value={user.email}
+                                  onSelect={() => {
+                                    setEmailInvite(user.email ?? "");
+                                    setOpen(false);
+                                  }}
+                                >
+                                  {user.email}
+                                </CommandItem>
+                              ))
+                            ) : (
+                              <CommandItem disabled>
+                                Start typing to search
+                              </CommandItem>
+                            )}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
                 </div>
               </FormControl>
-              <h3>{MessageInvite}</h3>
+              {MessageInvite && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  {MessageInvite}
+                </p>
+              )}
             </FormItem>
           </div>
+
           {/* Submit Button */}
           <Button type="submit" className="mt-8 text-center">
             Update Idea

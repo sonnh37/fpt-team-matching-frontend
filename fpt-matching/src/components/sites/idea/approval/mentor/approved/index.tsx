@@ -85,7 +85,7 @@ export default function IdeaRequestApprovedByMentorTable() {
         useQueryParams(inputFields, columnFilters, pagination, sorting);
 
       params.status = IdeaRequestStatus.Approved;
-      
+
       params.roles = ["Mentor"];
 
       return { ...params };
@@ -113,14 +113,13 @@ export default function IdeaRequestApprovedByMentorTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalRecords ?? 0,
+    rowCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
     debugTable: true,
   });

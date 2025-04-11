@@ -99,7 +99,8 @@ export default function Search() {
   let query: BlogGetAllQuery = {
     pageNumber: currentPage,
     title: title,
-    isDeleted: false
+    isDeleted: false,
+    isPagination: true,
   };
 
   // NẾU NGƯỜI DÙNG BẤM FILTER THÌ MỚI HIỆN RA
@@ -114,7 +115,7 @@ export default function Search() {
     isLoading
   } = useQuery({
     queryKey: ["getBlogAllSearch", query],
-    queryFn: () => blogService.fetchPaginated(query),
+    queryFn: () => blogService.fetchAll(query),
     refetchOnWindowFocus: false,
   });
   useEffect(() => {
@@ -130,7 +131,8 @@ export default function Search() {
 
   let query1: BlogGetAllQuery = {
     pageNumber: currentPage,
-    isDeleted: false
+    isDeleted: false,
+    isPagination: false,
   };
   const {
     data: resultall

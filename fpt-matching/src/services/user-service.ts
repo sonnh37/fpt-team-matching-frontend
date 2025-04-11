@@ -21,22 +21,22 @@ class UserService extends BaseService<User> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-   public fetchPaginatedByCouncilWithIdeaRequestPending = (
-      query?: UserGetAllQuery
-    ): Promise<BusinessResult<PaginatedResult<User>>> => {
-      const cleanedQuery = cleanQueryParams(query ?? {});
-  
-      return axiosInstance
-        .get<BusinessResult<PaginatedResult<User>>>(
-          `${this.endpoint}/council/pending-ideas?${cleanedQuery}&isPagination=true`
-        )
-        .then((response) => {
-          return response.data;
-        })
-        .catch((error) => {
-          return this.handleError(error);
-        });
-    };
+  public fetchAllByCouncilWithIdeaRequestPending = (
+    query?: UserGetAllQuery
+  ): Promise<BusinessResult<QueryResult<User>>> => {
+    const cleanedQuery = cleanQueryParams(query ?? {});
+
+    return axiosInstance
+      .get<BusinessResult<QueryResult<User>>>(
+        `${this.endpoint}/council/pending-ideas?${cleanedQuery}&isPagination=true`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
 
   public fetchUserByUsernameOrEmail = async (
     keyword: string
@@ -113,10 +113,25 @@ class UserService extends BaseService<User> {
     }
   };
 
-  public getAllReviewer = async () : Promise<BusinessResult<User[]>> => {
-      const response = await axiosInstance.get<BusinessResult<User[]>>(`${this.endpoint}/role/reviewer`);
+  public getAllReviewer = async (): Promise<BusinessResult<User[]>> => {
+    const response = await axiosInstance.get<BusinessResult<User[]>>(
+      `${this.endpoint}/role/reviewer`
+    );
+    return response.data;
+  };
+
+  public fetchByEmail = async (
+    email: string
+  ): Promise<BusinessResult<User>> => {
+    try {
+      const response = await axiosInstance.get<BusinessResult<User>>(
+        `${this.endpoint}/email/${email}`
+      );
       return response.data;
-  }
+    } catch (error) {
+      return this.handleError(error);
+    }
+  };
 }
 
 export const userService = new UserService();

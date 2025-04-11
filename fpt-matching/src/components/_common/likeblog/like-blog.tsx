@@ -18,7 +18,7 @@ const LikeBlog: React.FC<LikeButtonProps> = ({ postId }) =>{
     const [likes, setLikes] = useState<string[]>([]); // Danh sách user đã like
 
     // Fetch danh sách like từ API
-    const queryall: LikeGetAllQuery = { blogId: postId };
+    const queryall: LikeGetAllQuery = { blogId: postId, isPagination: false, };
     const { data: result, refetch } = useQuery({
         queryKey: ["getLikeAllBlog", postId],
         queryFn: async () => {

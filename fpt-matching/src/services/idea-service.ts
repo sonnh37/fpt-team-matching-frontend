@@ -67,13 +67,13 @@ class IdeaService extends BaseService<Idea> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-  public fetchPaginatedIdeasOfSupervisors = (
+  public fetchAllIdeasOfSupervisors = (
     query?: IdeaGetListOfSupervisorsQuery
-  ): Promise<BusinessResult<PaginatedResult<Idea>>> => {
+  ): Promise<BusinessResult<QueryResult<Idea>>> => {
     const cleanedQuery = cleanQueryParams(query ?? {});
 
     return axiosInstance
-      .get<BusinessResult<PaginatedResult<Idea>>>(
+      .get<BusinessResult<QueryResult<Idea>>>(
         `${this.endpoint}/supervisors?${cleanedQuery}&isPagination=true`
       )
       .then((response) => {
