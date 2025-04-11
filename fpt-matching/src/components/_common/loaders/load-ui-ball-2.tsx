@@ -7,8 +7,16 @@ import { useEffect, useState } from "react";
 // Default values shown
 
 export const LoadUIBall2 = () => {
+  const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
   const color = theme === "dark" ? "#ffffff" : "#000000";
 
   return (

@@ -29,6 +29,7 @@ import { useCurrentRole } from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { TypographyList } from "@/components/_common/typography/typography-list";
 import { TypographyP } from "@/components/_common/typography/typography-p";
+import { describe } from "node:test";
 
 export function RoleSwitcher() {
   const { isMobile } = useSidebar();
@@ -42,12 +43,12 @@ export function RoleSwitcher() {
   // lọc ra user hiện tại có bao nhiêu role
   const userRoles = user.userXRoles.map((m) => m.role?.roleName);
   const roles = [
-    { name: "Role", logo: UserRoundCog, plan: "Student" },
-    { name: "Role", logo: UserRoundCog, plan: "Lecturer" },
-    { name: "Role", logo: UserRoundCog, plan: "Council" },
-    { name: "Role", logo: UserRoundCog, plan: "Reviewer" },
-    { name: "Role", logo: UserRoundCog, plan: "Manager" },
-    { name: "Role", logo: UserRoundCog, plan: "Admin" },
+    { name: "Role", logo: UserRoundCog, plan: "Student", describe: "Sinh viên" },
+    { name: "Role", logo: UserRoundCog, plan: "Lecturer", describe: "Giảng viên" },
+    { name: "Role", logo: UserRoundCog, plan: "Council", describe: "Hội đồng" },
+    { name: "Role", logo: UserRoundCog, plan: "Reviewer", describe: "Người đánh giá" },
+    { name: "Role", logo: UserRoundCog, plan: "Manager", describe: "Quản lý" },
+    { name: "Role", logo: UserRoundCog, plan: "Admin", describe: "Quản trị viên" },
   ].filter((role) => userRoles.includes(role.plan));
 
   // role đang đc chọn từ db , nếu ko có auto student
@@ -67,7 +68,7 @@ export function RoleSwitcher() {
                 <UserRoundCog className=" dark:text-white text-black" />
               </div>
               <div className="flex flex-row items-center gap-2 text-sm leading-tight">
-                <TypographyP className="truncate">Role: {activeRole.plan}</TypographyP>
+                <TypographyP className="truncate">Vai trò: {activeRole.describe}</TypographyP>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
@@ -79,7 +80,7 @@ export function RoleSwitcher() {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Roles
+              Những vai trò
             </DropdownMenuLabel>
             {roles.map((role, index) => (
               <DropdownMenuItem
@@ -93,7 +94,7 @@ export function RoleSwitcher() {
                 <div className="flex size-6 items-center justify-center rounded-sm border">
                   <role.logo className="size-4 shrink-0" />
                 </div>
-                {role.plan}
+                {role.describe}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}

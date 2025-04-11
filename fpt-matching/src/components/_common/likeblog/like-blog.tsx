@@ -23,7 +23,7 @@ const LikeBlog: React.FC<LikeButtonProps> = ({ postId }) =>{
         queryKey: ["getLikeAllBlog", postId],
         queryFn: async () => {
             const response = await likeService.fetchAll(queryall);
-            return response?.data ?? [];
+            return response?.data?.results ?? [];
         },
         refetchOnWindowFocus: false,
     });

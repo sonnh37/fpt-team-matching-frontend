@@ -56,28 +56,27 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
     pageNumber: 1,
     pageSize: 10,
     isPagination: true,
-  }
-  // Fetch notifications
+  };
+  // Lấy thông báo
   const res = useNotification(query);
-  // if(!res.isConnected) return null;
   const notifications = res.notifications || [];
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-  // Mark as read mutation
+  // Đánh dấu đã đọc
   const markAsReadMutation = useMutation({
     mutationFn: (id: string) => notificationService.markAsRead(id),
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ["notifications"] });
-      toast.success("Notification marked as read");
+      toast.success("Đã đánh dấu thông báo là đã đọc");
     },
   });
 
-  // Delete mutation
+  // Xóa thông báo
   const deleteMutation = useMutation({
     mutationFn: (id: string) => notificationService.delete(id),
     onSuccess: async () => {
       await queryClient.refetchQueries({ queryKey: ["notifications"] });
-      toast.success("Notification deleted");
+      toast.success("Đã xóa thông báo");
     },
   });
 
@@ -85,9 +84,9 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
     try {
       await notificationService.markAllAsRead();
       await queryClient.refetchQueries({ queryKey: ["notifications"] });
-      toast.success("All notifications marked as read");
+      toast.success("Đã đánh dấu tất cả thông báo là đã đọc");
     } catch (error) {
-      toast.error("Failed to mark all as read");
+      toast.error("Không thể đánh dấu tất cả là đã đọc");
     }
   };
 
@@ -115,7 +114,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
           <div className="flex items-center justify-between p-4">
             <TypographyH3 className="flex items-center gap-2">
               <BellDot className="size-5" />
-              Notifications
+              Thông báo
             </TypographyH3>
             <div className="flex gap-2">
               <Button
@@ -124,7 +123,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
                 onClick={handleMarkAllAsRead}
                 disabled={unreadCount === 0}
               >
-                Mark all as read
+                Đánh dấu tất cả là đã đọc
               </Button>
             </div>
           </div>
@@ -133,10 +132,10 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
 
           <Tabs defaultValue="all" className="w-full">
             <TabsList className="grid w-full grid-cols-4 h-12 rounded-none">
-              <TabsTrigger value="all">All</TabsTrigger>
-              <TabsTrigger value="system">System</TabsTrigger>
-              <TabsTrigger value="team">Team</TabsTrigger>
-              <TabsTrigger value="unread">Unread</TabsTrigger>
+              <TabsTrigger value="all">Tất cả</TabsTrigger>
+              <TabsTrigger value="system">Hệ thống</TabsTrigger>
+              <TabsTrigger value="team">Nhóm</TabsTrigger>
+              <TabsTrigger value="unread">Chưa đọc</TabsTrigger>
             </TabsList>
 
             <ScrollArea className="h-[400px] w-full">
@@ -144,7 +143,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
                 <div className="flex flex-col items-center justify-center p-8 text-center">
                   <Bell className="size-8 text-muted-foreground mb-2" />
                   <TypographySmall className="text-muted-foreground">
-                    No notifications yet
+                    Chưa có thông báo nào
                   </TypographySmall>
                 </div>
               ) : (
@@ -224,7 +223,7 @@ export function NotificationPopover({ user = null }: NotificationPopoverProps) {
               className="w-full"
               onClick={() => router.push("/notifications")}
             >
-              View all notifications
+              Xem tất cả thông báo
             </Button>
           </div>
         </div>

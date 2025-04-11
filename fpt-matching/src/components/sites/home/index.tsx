@@ -45,6 +45,10 @@ import { columns } from "./columns";
 import { ProjectStatus } from "@/types/enums/project";
 import { ProjectGetAllQuery } from "@/types/models/queries/projects/project-get-all-query";
 import { LoadingComponent } from "@/components/_common/loading-page";
+import { TypographyH1 } from "@/components/_common/typography/typography-h1";
+import { is } from "date-fns/locale";
+import { FaSpinner } from "react-icons/fa6";
+import { PiSpinner } from "react-icons/pi";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -56,6 +60,7 @@ const defaultSchema = z.object({
 //#endregion
 export default function ProjectSearchList() {
   const searchParams = useSearchParams();
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
     {
@@ -155,106 +160,114 @@ export default function ProjectSearchList() {
     <>
       <div className="space-x-4 mx-auto space-y-8">
         <div className="w-fit mx-auto space-y-4">
-          <TypographyH2 className="text-center tracking-wide">
-            Capstone Project / Thesis Proposal
-          </TypographyH2>
+          <TypographyH1 className="text-center tracking-wider">
+            Capstone Project{" "}
+          </TypographyH1>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="englishName"
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>Input Topic Name or Tags to search:</FormLabel>
-                      <div className="flex items-center gap-2">
-                        <FormControl>
-                          <Input
-                            placeholder=""
-                            className="focus-visible:ring-none"
-                            type="text"
-                            {...field}
-                          />
-                        </FormControl>
-                        <Button type="submit" variant="default" size="icon">
-                          <Search />
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
-              />
+              <div className="space-y-2">
+                <div>
+                  <FormField
+                    control={form.control}
+                    name="englishName"
+                    render={({ field }) => {
+                      return (
+                        <FormItem>
+                          <div className="flex items-center gap-2">
+                            <FormControl>
+                              <Input
+                                placeholder="Nhập tên dự án..."
+                                className="focus-visible:ring-none"
+                                type="text"
+                                {...field}
+                              />
+                            </FormControl>
+                          </div>
+                          <FormMessage />
+                        </FormItem>
+                      );
+                    }}
+                  />
+                </div>
 
-              <div className="flex gap-2">
-                <FormField
-                  control={form.control}
-                  name="professionId"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Profession</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          const selected = professions.find(
-                            (cat) => cat.id === value
-                          );
-                          setSelectedProfession(selected ?? null);
-                          field.onChange(value);
-                        }}
-                        value={field.value ?? undefined}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Profession" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {professions && professions.map((p) => (
-                            <SelectItem key={p.id} value={p.id!}>
-                              {p.professionName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="specialtyId"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel>Specialty</FormLabel>
-                      <FormControl>
+                <div className="flex gap-2">
+                  <FormField
+                    control={form.control}
+                    name="professionId"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
                         <Select
-                          onValueChange={(value) => field.onChange(value)}
-                          value={field.value ?? undefined} // Ensure the value is set correctly
+                          onValueChange={(value) => {
+                            const selected = professions.find(
+                              (cat) => cat.id === value
+                            );
+                            setSelectedProfession(selected ?? null);
+                            field.onChange(value);
+                          }}
+                          value={field.value ?? undefined}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Select Specialty" />
+                            <SelectValue placeholder="Chọn ngành" />
                           </SelectTrigger>
                           <SelectContent>
-                            {selectedProfession ? (
-                              <>
-                                {selectedProfession?.specialties ? (
-                                  selectedProfession.specialties.map((spec) => (
-                                    <SelectItem key={spec.id} value={spec.id!}>
-                                      {spec.specialtyName}
-                                    </SelectItem>
-                                  ))
-                                ) : (
-                                  <></>
-                                )}
-                              </>
-                            ) : (
-                              <></>
-                            )}
+                            {professions &&
+                              professions.map((p) => (
+                                <SelectItem key={p.id} value={p.id!}>
+                                  {p.professionName}
+                                </SelectItem>
+                              ))}
                           </SelectContent>
                         </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="specialtyId"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <Select
+                            onValueChange={(value) => field.onChange(value)}
+                            value={field.value ?? undefined} // Ensure the value is set correctly
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Chọn chuyên ngành" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {selectedProfession ? (
+                                <>
+                                  {selectedProfession?.specialties ? (
+                                    selectedProfession.specialties.map(
+                                      (spec) => (
+                                        <SelectItem
+                                          key={spec.id}
+                                          value={spec.id!}
+                                        >
+                                          {spec.specialtyName}
+                                        </SelectItem>
+                                      )
+                                    )
+                                  ) : (
+                                    <></>
+                                  )}
+                                </>
+                              ) : (
+                                <></>
+                              )}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
+
+              <Button disabled={isFetching} type="submit" variant="default" className="w-full">
+                {isFetching ? <><PiSpinner className="animate-spin"/></> : <Search />}
+              </Button>
             </form>
           </Form>
         </div>
