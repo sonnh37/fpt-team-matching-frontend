@@ -1,5 +1,4 @@
 "use client";
-"use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -8,7 +7,6 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -42,11 +40,9 @@ import { FormInput, FormInputTextArea } from "@/lib/form-custom-shadcn";
 import { apiHubsService } from "@/services/api-hubs-service";
 import { professionService } from "@/services/profession-service";
 import { profilestudentService } from "@/services/profile-student-service";
-import { semesterService } from "@/services/semester-service";
 import { Profession } from "@/types/profession";
-import { Semester } from "@/types/semester";
 import { User } from "@/types/user";
-import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { CloudUpload, Paperclip } from "lucide-react";
 import { useEffect, useState } from "react";
 import { DropzoneOptions } from "react-dropzone";
@@ -75,8 +71,7 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileStudentForm({ user }: { user?: User }) {
   const queryClient = useQueryClient();
-  const [selectedProfession, setSelectedProfession] =
-    useState<Profession | null>(null);
+  const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null);
   const [profile, setProfile] = useState<ProfileStudent | null>(null);
   const [professions, setProfessions] = useState<Profession[]>([]);
   const [files, setFiles] = useState<File[] | null>(null);
@@ -87,8 +82,11 @@ export function ProfileStudentForm({ user }: { user?: User }) {
 
   const dropZoneConfig: DropzoneOptions = {
     maxFiles: 1,
-    maxSize: 1024 * 1024 * 4,
+    maxSize: 1024 * 1024 * 4, // 4MB
     multiple: false,
+    accept: {
+      'application/pdf': ['.pdf']
+    }
   };
 
   const form = useForm<ProfileFormValues>({
@@ -100,19 +98,19 @@ export function ProfileStudentForm({ user }: { user?: User }) {
       try {
         const [profileRes, professionsRes] = await Promise.all([
           profilestudentService.fetchProfileByCurrentUser(),
-          professionService.fetchAll(),
+          (await professionService.fetchAll()).data,
         ]);
 
         setProfile(profileRes.data ?? null);
-        setProfessions(professionsRes.data ?? []);
+        setProfessions(professionsRes?.results ?? []);
         form.reset(profileRes.data);
 
-        const profess = professionsRes.data?.find(
+        const profess = professionsRes?.results?.find(
           (m) => m.id === profileRes.data?.specialty?.professionId
         );
         setSelectedProfession(profess ?? null);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Lỗi khi tải dữ liệu:", error);
         setIsError(true);
       } finally {
         setIsLoading(false);
@@ -129,52 +127,53 @@ export function ProfileStudentForm({ user }: { user?: User }) {
     let fileCv = data.fileCv;
 
     if (files && files.length > 0) {
-      // if (profile?.fileCv) {
-      //   const isDeleted = await cloudinaryService.deleteFile(profile.fileCv);
-      //   if (!isDeleted) return;
-      // }
-      if (profile?.fileCv) {
-        // const isDeleted = await cloudinaryService.deleteFile(profile.fileCv);
-        // if (!isDeleted) {
-        //     toast.error("Xóa file cũ thất bại!");
-        //     return;
-        // }
+      setIsLoadingUpload(true);
+      try {
+        if (profile?.fileCv) {
+          // await cloudinaryService.(profile.fileCv);
+        }
+        
+        fileCv = await cloudinaryService.uploadFile(files[0]);
+      } catch (error) {
+        toast.error("Lỗi khi tải lên CV");
+        console.error(error);
+        setIsLoadingUpload(false);
+        return;
+      } finally {
+        setIsLoadingUpload(false);
       }
-       // Bắt đầu upload
-
-      fileCv = await cloudinaryService.uploadFile(files[0]);
-
     }
 
-    if (profile == undefined || !profile.id) {
-      const profileStudentCommand: ProfileStudentCreateCommand = {
-        ...data,
-        fileCv: fileCv,
-      };
-      const response = await profilestudentService.create(
-        profileStudentCommand
-      );
-      if (response.status !== 1) throw new Error(response.message);
-    } else {
-      const profileStudentCommand: ProfileStudentUpdateCommand = {
-        ...data,
-        fileCv: fileCv,
-      };
+    try {
+      if (!profile?.id) {
+        const profileStudentCommand: ProfileStudentCreateCommand = {
+          ...data,
+          fileCv: fileCv,
+        };
+        const response = await profilestudentService.create(profileStudentCommand);
+        if (response.status !== 1) throw new Error(response.message);
+        toast.success("Tạo hồ sơ thành công!");
+      } else {
+        const profileStudentCommand: ProfileStudentUpdateCommand = {
+          ...data,
+          fileCv: fileCv,
+        };
+        const response = await profilestudentService.update(profileStudentCommand);
+        if (response.status !== 1) throw new Error(response.message);
+        toast.success("Cập nhật hồ sơ thành công!");
+      }
 
-      const response = await profilestudentService.update(
-        profileStudentCommand
-      );
-      if (response.status !== 1) throw new Error(response.message);
+      queryClient.refetchQueries({ queryKey: ["getUserInfo"] });
+      setOpen(false);
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi lưu hồ sơ");
+      console.error(error);
     }
-
-    toast.success("Thay đổi của bạn đã lưu.");
-    queryClient.refetchQueries({ queryKey: ["getUserInfo"] });
-    setOpen(false);
   }
 
   async function handleScanCv(newFiles: File[] | null) {
     if (!newFiles || newFiles.length === 0) {
-      toast.error("Vui lòng chọn một file CV.");
+      toast.error("Vui lòng chọn file CV");
       return;
     }
 
@@ -184,14 +183,13 @@ export function ProfileStudentForm({ user }: { user?: User }) {
       if (response) {
         form.setValue("fullSkill", response.skill?.toString());
         form.setValue("json", JSON.stringify(response));
-        toast.success("Scan CV thành công!");
+        toast.success("Quét CV thành công!");
       }
-      setIsLoadingUpload(false);
     } catch (error) {
-      toast.error("Có lỗi xảy ra khi scan CV.");
+      toast.error("Lỗi khi quét CV");
       console.error(error);
+    } finally {
       setIsLoadingUpload(false);
-
     }
   }
 
@@ -202,229 +200,221 @@ export function ProfileStudentForm({ user }: { user?: User }) {
     }
   };
 
-  // if (!selectedProfession) return null;
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Edit cv profile</Button>
+        <Button variant="outline">
+          Chỉnh sửa hồ sơ
+        </Button>
       </DialogTrigger>
-      <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
+      <DialogContent className="sm:min-w-[60%] sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit cv profile</DialogTitle>
-          <DialogDescription></DialogDescription>
+          <DialogTitle className="text-xl font-bold ">Hồ sơ sinh viên</DialogTitle>
+          <DialogDescription className="">
+            Cập nhật thông tin hồ sơ cá nhân của bạn
+          </DialogDescription>
         </DialogHeader>
-        <div>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="">
-              <div className="">
-                <div className="flex flex-col justify-between gap-4">
-                  <div>
-                    <FormField
-                      control={form.control}
-                      name="fileCv"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Scan cv</FormLabel>
-                          <FormControl>
-                            <FileUploader
-                              value={files}
-                              onValueChange={onValueChange}
-                              dropzoneOptions={dropZoneConfig}
-                              className="relative bg-background rounded-lg p-2"
-                            >
-                              <FileInput
-                                id="fileInput"
-                                className="outline-dashed outline-1 outline-slate-500"
-                              >
-                                <div className="flex items-center justify-center flex-col p-2 w-full ">
-                                  <CloudUpload className="text-gray-500 w-10 h-10" />
-                                  <p className="mb-1 text-sm text-gray-500 dark:text-gray-400">
-                                    <span className="font-semibold">
-                                      Click to upload
-                                    </span>
-                                    &nbsp; or drag and drop
-                                  </p>
-                                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                                    PDF
-                                  </p>
-                                </div>
-                              </FileInput>
-                              <FileUploaderContent>
-                                {files && files.length > 0 ? (
-                                  files.map((file, i) => (
-                                    <FileUploaderItem key={i} index={i}>
-                                      <Paperclip className="h-4 w-4 stroke-current" />
-                                      <span>{file.name}</span>
-                                    </FileUploaderItem>
-                                  ))
-                                ) : profile?.fileCv ? (
-                                  <div className="flex items-center space-x-2 p-2 bg-gray-100 rounded-lg">
-                                    <Paperclip className="h-4 w-4 stroke-current" />
-                                    <a
-                                      href={profile.fileCv}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-blue-600 hover:underline"
-                                    >
-                                      {decodeURIComponent(
-                                        profile.fileCv.split("/").pop() ??
-                                          "CV File"
-                                      )}
-                                    </a>
-                                  </div>
-                                ) : null}
-                              </FileUploaderContent>
-                            </FileUploader>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div>
-                    <Separator />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {/* Cột 1 */}
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-4">
+              {/* Phần upload CV */}
+              <div className="p-4 rounded-lg">
+                <FormField
+                  control={form.control}
+                  name="fileCv"
+                  render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Profession</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          const selectedProfession = professions?.find(
-                            (cat) => cat.id === value
-                          );
-                          setSelectedProfession(selectedProfession ?? null);
-                        }}
-                        value={
-                          selectedProfession ? selectedProfession.id : undefined
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select profession" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {professions?.map((pro) => (
-                            <SelectItem key={pro.id} value={pro.id!}>
-                              {pro.professionName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormLabel className="block text-sm font-medium mb-2">
+                        Tải lên CV (PDF)
+                      </FormLabel>
+                      <FormControl>
+                        <FileUploader
+                          value={files}
+                          onValueChange={onValueChange}
+                          dropzoneOptions={dropZoneConfig}
+                          className="relative  border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-zinc-500 transition-colors"
+                        >
+                          <FileInput className="outline-none">
+                            <div className="flex flex-col items-center justify-center p-4 w-full">
+                              <CloudUpload className="w-10 h-10 mb-2" />
+                              <p className="mb-1 text-sm ">
+                                <span className="font-semibold ">Nhấn để tải lên</span>
+                                &nbsp;hoặc kéo thả file vào đây
+                              </p>
+                              <p className="text-xs ">
+                                Chỉ chấp nhận file PDF (tối đa 4MB)
+                              </p>
+                            </div>
+                          </FileInput>
+                          <FileUploaderContent>
+                            {files && files.length > 0 ? (
+                              files.map((file, i) => (
+                                <FileUploaderItem 
+                                  key={i} 
+                                  index={i}
+                                  className="border border-zin-100 rounded-md p-2"
+                                >
+                                  <Paperclip className="h-4 w-4 " />
+                                  <span className="ml-2 text-sm">{file.name}</span>
+                                </FileUploaderItem>
+                              ))
+                            ) : profile?.fileCv ? (
+                              <div className="flex items-center space-x-2 p-2 rounded-md border border-zinc-100">
+                                <Paperclip className="h-4 w-4 " />
+                                <a
+                                  href={profile.fileCv}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="hover:underline text-sm"
+                                >
+                                  {decodeURIComponent(
+                                    profile.fileCv.split("/").pop() ?? "CV hiện tại"
+                                  )}
+                                </a>
+                              </div>
+                            ) : null}
+                          </FileUploaderContent>
+                        </FileUploader>
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
+                  )}
+                />
+              </div>
 
-                    <FormField
-                      control={form.control}
-                      name="specialtyId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Specialty</FormLabel>
-                          <FormControl>
-                            <Select
-                              onValueChange={(value) => {
-                                if (value) {
-                                  field.onChange(value);
-                                }
-                              }}
-                              value={
-                                field.value ??
-                                form.watch("specialtyId") ??
-                                undefined
-                              }
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select specialty" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {selectedProfession ? (
-                                  <>
-                                    {selectedProfession?.specialties!.map(
-                                      (spec) => (
-                                        <SelectItem
-                                          key={spec.id}
-                                          value={spec.id!}
-                                        >
-                                          {spec.specialtyName}
-                                        </SelectItem>
-                                      )
-                                    )}
-                                  </>
-                                ) : null}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+              <Separator className="my-6" />
 
-                    {/* <FormField
-                control={form.control}
-                name="semesterId"
-                render={({ field }) => (
+              {/* Thông tin cá nhân */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Cột 1 */}
+                <div className="space-y-4">
                   <FormItem>
-                    <FormLabel>Semester</FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={(value) => field.onChange(value)}
-                        value={field.value ?? undefined}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select semester" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {semesters ? (
-                            <>
-                              {semesters.map((semes) => (
-                                <SelectItem key={semes.id} value={semes.id!}>
-                                  {semes.semesterName}
+                    <FormLabel className="block text-sm font-medium">
+                      Ngành học
+                    </FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        const selectedProfession = professions?.find(
+                          (cat) => cat.id === value
+                        );
+                        setSelectedProfession(selectedProfession ?? null);
+                      }}
+                      value={selectedProfession ? selectedProfession.id : undefined}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Chọn ngành học" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {professions?.map((pro) => (
+                          <SelectItem key={pro.id} value={pro.id!}>
+                            {pro.professionName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+
+                  <FormField
+                    control={form.control}
+                    name="specialtyId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="block text-sm font-medium ">
+                          Chuyên ngành
+                        </FormLabel>
+                        <FormControl>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value ?? undefined}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Chọn chuyên ngành" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {selectedProfession?.specialties?.map((spec) => (
+                                <SelectItem key={spec.id} value={spec.id!}>
+                                  {spec.specialtyName}
                                 </SelectItem>
                               ))}
-                            </>
-                          ) : null}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage className="text-xs" />
+                      </FormItem>
+                    )}
+                  />
 
-                    {/* Cột 2 */}
-                    <FormInput label="Code" name="code" form={form} />
-                    <FormInput label="Bio" name="bio" form={form} />
+                  <FormInput 
+                    label="Mã sinh viên" 
+                    name="code" 
+                    form={form} 
+                    placeholder="Nhập mã sinh viên"
+                  />
+                </div>
 
-                    {/* Cột 3 */}
+                {/* Cột 2 */}
+                <div className="space-y-4">
+                  <FormInput 
+                    label="Giới thiệu bản thân" 
+                    name="bio" 
+                    form={form} 
+                    placeholder="Mô tả ngắn về bản thân"
+                  />
 
-                    <FormInput
-                      label="Achievement"
-                      name="achievement"
-                      form={form}
-                    />
-                    <FormInput label="Interest" name="interest" form={form} />
+                  <FormInput
+                    label="Sở thích"
+                    name="interest"
+                    form={form}
+                    placeholder="Nhập sở thích cá nhân"
+                  />
 
-                    {/* Experience Project (Chiếm 2 cột) */}
-                    <div className="col-start-1 md:col-span-2">
-                      <FormInputTextArea
-                        label="Experience Project"
-                        name="experienceProject"
-                        form={form}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Separator />
-                  </div>
-                  <div>
-                    <Button disabled={isLoadingUpload} type="submit">
-                      Submit
-                    </Button>
-                  </div>
+                  <FormInput
+                    label="Thành tích"
+                    name="achievement"
+                    form={form}
+                    placeholder="Nhập các thành tích đạt được"
+                  />
                 </div>
               </div>
-            </form>
-          </Form>
-        </div>
+
+              {/* Kinh nghiệm dự án */}
+              <div className="space-y-4">
+                <FormInputTextArea
+                  label="Kinh nghiệm dự án"
+                  name="experienceProject"
+                  form={form}
+                  placeholder="Mô tả các dự án đã tham gia, vai trò và kinh nghiệm đạt được"
+                  rows={4}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-4 pt-4">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setOpen(false)}
+              >
+                Hủy bỏ
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={isLoadingUpload}
+              >
+                {isLoadingUpload ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Đang xử lý...
+                  </span>
+                ) : profile?.id ? "Cập nhật hồ sơ" : "Tạo hồ sơ"}
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

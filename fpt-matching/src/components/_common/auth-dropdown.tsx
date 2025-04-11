@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 
 import { DashboardIcon, ExitIcon, GearIcon } from "@radix-ui/react-icons";
@@ -46,22 +47,25 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
       }
     });
   };
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="secondary" className={cn("size-10 focus-visible:ring-0")}>
+        <Button
+          variant="ghost"
+          className={cn("size-10 p-0 focus-visible:ring-0")}
+        >
           <Avatar className="size-10 p-0 m-0">
             <AvatarImage
-              src={
-                user.avatar && user.avatar.trim() !== ""
-                  ? user.avatar
-                  : undefined
-              }
-              alt={user.username ?? ""}
-              onError={(e) => (e.currentTarget.style.display = "none")}
+              src={user.avatar?.trim() || undefined}
+              className={cn("w-full h-full object-cover")}
+              alt={user.username || "User avatar"}
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                e.currentTarget.src = "";
+              }}
             />
-            <AvatarFallback className="rounded-md">
+            <AvatarFallback className="rounded-md" delayMs={600}>
               {initials}
             </AvatarFallback>
           </Avatar>
@@ -94,7 +98,7 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
         <DropdownMenuItem asChild>
           <div onClick={handleLogout}>
             <ExitIcon className="mr-2 size-4" aria-hidden="true" />
-            Log out
+            Đăng xuất
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </div>
         </DropdownMenuItem>
@@ -115,14 +119,14 @@ function AuthDropdownGroup({ user }: AuthDropdownGroupProps) {
           <DropdownMenuItem asChild>
             <Link href={"/"}>
               <DashboardIcon className="mr-2 size-4" aria-hidden="true" />
-              Dashboard
+              Trang chủ
               <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem asChild>
             <Link href="/settings">
               <GearIcon className="mr-2 size-4" aria-hidden="true" />
-              Settings
+              Cài đặt
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>
@@ -132,7 +136,7 @@ function AuthDropdownGroup({ user }: AuthDropdownGroupProps) {
           <DropdownMenuItem asChild>
             <Link href="/settings">
               <GearIcon className="mr-2 size-4" aria-hidden="true" />
-              Settings
+              Cài đặt
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </Link>
           </DropdownMenuItem>

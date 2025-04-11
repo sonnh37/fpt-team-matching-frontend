@@ -82,12 +82,12 @@ export const columns: ColumnDef<Project>[] = [
             <div>
               <div>
                 <TypographyMuted>
-                  Created By: {createdBy ?? "Unknown"}
+                  Tạo bởi: {createdBy ?? "Unknown"}
                 </TypographyMuted>
               </div>
               <div>
                 <TypographyMuted>
-                  Created Date: {formatDate(createdDate)}
+                  Ngày tạo: {formatDate(createdDate)}
                 </TypographyMuted>
               </div>
             </div>

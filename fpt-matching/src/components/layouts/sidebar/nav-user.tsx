@@ -117,7 +117,7 @@ export function NavUser({ user }: { user: User }) {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={() => handleLogout()}>
               <LogOut />
-              Log out
+              Đăng xuất
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

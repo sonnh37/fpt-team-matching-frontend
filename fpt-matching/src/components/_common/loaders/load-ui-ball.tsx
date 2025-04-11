@@ -5,8 +5,16 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 const LoadUIBall = () => {
+  const [mounted, setMounted] = useState(false);
   const { theme } = useTheme();
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
   const color = theme === "dark" ? "#ffffff" : "#000000";
 
   return (
