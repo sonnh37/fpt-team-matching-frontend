@@ -88,6 +88,7 @@ export default function Blogmanagement() {
         pageNumber: currentPage,
         userId: user?.id,
         isDeleted: false,
+        isPagination: true,
         ...(filterType !== null && { type: filterType }), // Thêm type nếu filterType khác null
     };
 
@@ -99,7 +100,7 @@ export default function Blogmanagement() {
         isLoading
     } = useQuery({
         queryKey: ["getBlogAllById", query],
-        queryFn: () => blogService.fetchPaginated(query),
+        queryFn: () => blogService.fetchAll(query),
         refetchOnWindowFocus: false,
     });
 

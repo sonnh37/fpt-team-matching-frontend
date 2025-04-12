@@ -87,28 +87,25 @@ export default function InvitationReceiveByTeamTable() {
   });
 
   if (error) return <div>Error loading data</div>;
-
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalRecords ?? 0,
+    rowCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
     debugTable: true,
   });
-
   //#endregion
 
   return (
     <>
       <div className="space-y-8">
-          <DataTableComponent isEnableHeader={false} table={table} />
+        <DataTableComponent isEnableHeader={false} table={table} />
       </div>
     </>
   );

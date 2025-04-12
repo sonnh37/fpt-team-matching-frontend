@@ -30,7 +30,7 @@ export function ModeToggle() {
           }}
         >
           <SunIcon className="mr-2 size-4" />
-          <span>Light</span>
+          <span>Sáng</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
@@ -38,7 +38,7 @@ export function ModeToggle() {
           }}
         >
           <MoonIcon className="mr-2 size-4" />
-          <span>Dark</span>
+          <span>Tối</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => {
@@ -46,7 +46,7 @@ export function ModeToggle() {
           }}
         >
           <LaptopIcon className="mr-2 size-4" />
-          <span>System</span>
+          <span>Hệ thống</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

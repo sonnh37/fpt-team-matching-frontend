@@ -22,37 +22,37 @@ import { RiTimeLine } from "react-icons/ri";
 export const NAV_CONFIG = {
   main: [
     {
-      title: "Home",
+      title: "Trang chủ",
       url: "/",
       icon: Home,
       roles: ["*"],
     },
     {
-      title: "Social",
+      title: "Mạng xã hội",
       url: "/social/blog",
       icon: Globe,
       roles: ["*"],
     },
     {
-      title: "Invitations",
+      title: "Lời mời",
       url: "/invitations",
       icon: Send,
       roles: ["*"],
     },
     {
-      title: "Team",
+      title: "Đội nhóm",
       url: "/team",
       icon: UsersRound,
       roles: ["Student", "Reviewer", "Council"],
       items: [
         {
-          title: "My Team",
+          title: "Đội của tôi",
           icon: Pencil,
           url: "/team",
           roles: ["Student"],
         },
         {
-          title: "Manage review",
+          title: "Quản lý đánh giá",
           icon: Pencil,
           url: "/team/manage-review",
           roles: ["Student"],
@@ -61,43 +61,37 @@ export const NAV_CONFIG = {
     },
 
     {
-      title: "Idea",
+      title: "Ý tưởng",
       url: "/idea",
       icon: Lightbulb,
       roles: ["*"],
       items: [
         {
-          title: "Create Idea",
+          title: "Tạo ý tưởng",
           icon: Pencil,
           url: "/idea/create",
           roles: ["Student", "Lecturer"],
         },
-        // {
-        //     title: "Manage review",
-        //     icon: Pencil,
-        //     url: "/team/manage-review",
-        //     roles: ["Student", "Lecturer"],
-        // },
         {
-          title: "Request Idea",
+          title: "Yêu cầu ý tưởng",
           icon: GiWideArrowDunk,
           url: "/idea/request",
           roles: ["Student", "Lecturer"],
         },
         {
-          title: "Ideas of Supervisor",
+          title: "Ý tưởng của giảng viên",
           icon: PiUserList,
           url: "/idea/supervisors",
           roles: ["*"],
         },
         {
-          title: "Approve Idea",
+          title: "Duyệt ý tưởng",
           icon: Lightbulb,
           url: "/idea/approve-idea",
           roles: ["Lecturer", "Council"],
         },
         {
-          title: "Review Idea",
+          title: "Đánh giá ý tưởng",
           icon: MdOutlineRateReview,
           url: "/idea/review-idea",
           roles: ["Reviewer"],
@@ -105,13 +99,13 @@ export const NAV_CONFIG = {
       ],
     },
     {
-      title: "List supervisors",
+      title: "Danh sách giảng viên",
       url: "/supervisors",
       icon: MdOutlineSupervisorAccount,
       roles: ["*"],
     },
     {
-      title: "Support",
+      title: "Hỗ trợ",
       url: "/#",
       icon: MessageCircleQuestion,
       roles: ["*"],
@@ -120,43 +114,43 @@ export const NAV_CONFIG = {
 
   management: [
     {
-      title: "Manage review",
+      title: "Quản lý đánh giá",
       url: "/manage-review",
       icon: SquareUserRound,
       roles: ["Reviewer", "Manager"],
     },
     {
-      title: "Manage semester",
+      title: "Quản lý học kỳ",
       url: "/management/semesters",
       icon: ShieldHalf,
       roles: ["Manager"],
     },
     {
-      title: "Manage projects",
+      title: "Quản lý dự án",
       url: "/management/projects",
       icon: RiTimeLine,
       roles: ["Lecturer"],
     },
     {
-      title: "Manage defense",
+      title: "Quản lý bảo vệ",
       url: "/manage-defense",
       icon: ShieldHalf,
       roles: ["Manager"],
     },
     {
-      title: "Manage users",
+      title: "Quản lý người dùng",
       url: "/management/users",
       icon: Users,
       roles: ["Manager"],
       items: [
         {
-          title: "List",
+          title: "Danh sách",
           url: "/management/users",
           icon: Users,
           roles: ["Manager"],
         },
         {
-          title: "Council's Idea Request Pending",
+          title: "Yêu cầu chờ của hội đồng",
           url: "/management/users/councils/pending-requests",
           icon: Users,
           roles: ["Manager"],

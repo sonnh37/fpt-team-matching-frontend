@@ -103,17 +103,17 @@ export default function IdeaRequestApprovedByCouncilTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalRecords ?? 0,
+    rowCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
     debugTable: true,
   });
+
   //#endregion
 
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {

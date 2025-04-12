@@ -14,82 +14,87 @@ export class BaseService<T> {
     this.endpoint = endpoint;
   }
 
-  // tất cả dữ liệu có thể truy vấn (không phân trang)
-  public fetchAll = (
+  public fetchAll = async (
     query?: BaseQueryableQuery
-  ): Promise<BusinessResult<T[]>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
-
-    return axiosInstance
-      .get<BusinessResult<T[]>>(`${this.endpoint}?${cleanedQuery}`)
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        return this.handleError(error);
-      });
+  ): Promise<BusinessResult<QueryResult<T>>> => {
+    try {
+      const cleanedQuery = cleanQueryParams(query ?? {} as BaseQueryableQuery);
+      const response = await axiosInstance.get<BusinessResult<QueryResult<T>>>(
+        `${this.endpoint}?${cleanedQuery}`
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
   };
 
-  // lấy dữ liệu phân trang
-  public fetchPaginated = (
-    query?: BaseQueryableQuery
-  ): Promise<BusinessResult<PaginatedResult<T>>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
-
-    return axiosInstance
-      .get<BusinessResult<PaginatedResult<T>>>(
-        `${this.endpoint}?${cleanedQuery}&isPagination=true`
-      )
-      .then((response) => {
-        return response.data;
-      })
-      .catch((error) => {
-        return this.handleError(error);
-      });
+  public fetchById = async (id: string): Promise<BusinessResult<T>> => {
+    try {
+      const response = await axiosInstance.get<BusinessResult<T>>(
+        `${this.endpoint}/${id}`
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
   };
 
-  public fetchById = (id: string): Promise<BusinessResult<T>> => {
-    return axiosInstance
-      .get<BusinessResult<T>>(`${this.endpoint}/${id}`)
-      .then((response) => response.data)
-      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  public create = async (command: CreateCommand): Promise<BusinessResult<T>> => {
+    try {
+      const response = await axiosInstance.post<BusinessResult<T>>(
+        this.endpoint,
+        command
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
   };
 
-  public create = (command: CreateCommand): Promise<BusinessResult<T>> => {
-    return axiosInstance
-      .post<BusinessResult<T>>(this.endpoint, command)
-      .then((response) => response.data)
-      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  public update = async (command: UpdateCommand): Promise<BusinessResult<T>> => {
+    try {
+      const response = await axiosInstance.put<BusinessResult<T>>(
+        this.endpoint,
+        command
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
   };
 
-  public update = (command: UpdateCommand): Promise<BusinessResult<T>> => {
-    return axiosInstance
-      .put<BusinessResult<T>>(this.endpoint, command)
-      .then((response) => response.data)
-      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  public restore = async (command: UpdateCommand): Promise<BusinessResult<T>> => {
+    try {
+      const response = await axiosInstance.put<BusinessResult<T>>(
+        `${this.endpoint}/restore`,
+        command
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
   };
 
-  public restore = (command: UpdateCommand): Promise<BusinessResult<T>> => {
-    return axiosInstance
-      .put<BusinessResult<T>>(`${this.endpoint}/restore`, command)
-      .then((response) => response.data)
-      .catch((error) => this.handleError(error));
+  public delete = async (id: string): Promise<BusinessResult<null>> => {
+    try {
+      const response = await axiosInstance.delete<BusinessResult<null>>(
+        `${this.endpoint}?id=${id}&isPermanent=false`
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
   };
 
-  public delete = (id: string): Promise<BusinessResult<null>> => {
-    return axiosInstance
-      .delete<BusinessResult<null>>(`${this.endpoint}?id=${id}&isPermanent=false`)
-      .then((response) => response.data)
-      .catch((error) => this.handleError(error)); // Xử lý lỗi
-  };
-
-  public deletePermanent = (id: string): Promise<BusinessResult<null>> => {
-    return axiosInstance
-      .delete<BusinessResult<null>>(
+  public deletePermanent = async (id: string): Promise<BusinessResult<null>> => {
+    try {
+      const response = await axiosInstance.delete<BusinessResult<null>>(
         `${this.endpoint}?id=${id}&isPermanent=true`
-      )
-      .then((response) => response.data)
-      .catch((error) => this.handleError(error)); // Xử lý lỗi
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
   };
 
   protected handleError(error: any) {

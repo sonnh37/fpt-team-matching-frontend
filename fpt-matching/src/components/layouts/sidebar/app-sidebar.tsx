@@ -87,7 +87,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
           <div>
             <TypographyP className="truncate">
-              Semester: 
+              Học kì: 
               {` ` + semesterData?.data?.semesterName + ""}
             </TypographyP>
           </div>

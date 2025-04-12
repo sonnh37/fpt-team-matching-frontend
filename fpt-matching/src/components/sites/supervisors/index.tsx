@@ -105,7 +105,7 @@ export default function SupervisorsTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => userService.fetchPaginated(queryParams),
+    queryFn: () => userService.fetchAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -115,7 +115,7 @@ export default function SupervisorsTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalRecords ?? 0,
+    pageCount: data?.data?.totalPages ?? -1,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,

@@ -18,10 +18,10 @@ class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
   }
   public getUserMentorIdeaRequests = (
     query?: MentorIdeaRequestGetAllQuery
-  ): Promise<BusinessResult<PaginatedResult<MentorIdeaRequest>>> => {
+  ): Promise<BusinessResult<QueryResult<MentorIdeaRequest>>> => {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
-      .get<BusinessResult<PaginatedResult<MentorIdeaRequest>>>(
+      .get<BusinessResult<QueryResult<MentorIdeaRequest>>>(
         `${this.endpoint}/get-user-mentor-idea-requests?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {
@@ -34,10 +34,10 @@ class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
 
   public getMentorMentorIdeaRequests = (
     query?: MentorIdeaRequestGetAllQuery
-  ): Promise<BusinessResult<PaginatedResult<MentorIdeaRequest>>> => {
+  ): Promise<BusinessResult<QueryResult<MentorIdeaRequest>>> => {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
-      .get<BusinessResult<PaginatedResult<MentorIdeaRequest>>>(
+      .get<BusinessResult<QueryResult<MentorIdeaRequest>>>(
         `${this.endpoint}/get-mentor-mentor-idea-requests?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {

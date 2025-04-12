@@ -84,6 +84,7 @@ export default function ProfileSocial() {
         pageNumber: currentPage,
         userId: userId.toString() ?? "",
         isDeleted: false,
+        isPagination: true,
         ...(filterType !== null && { type: filterType }), // Thêm type nếu filterType khác null
     };
     // NẾU NGƯỜI DÙNG BẤM FILTER THÌ MỚI HIỆN RA
@@ -95,7 +96,7 @@ export default function ProfileSocial() {
         isLoading
     } = useQuery({
         queryKey: ["getBlogAllById", query],
-        queryFn: () => blogService.fetchPaginated(query),
+        queryFn: () => blogService.fetchAll(query),
         refetchOnWindowFocus: false,
     });
 

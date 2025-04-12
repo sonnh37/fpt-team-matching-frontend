@@ -13,13 +13,13 @@ class NotificationService extends BaseService<Notification> {
     super(Const.NOTIFICATION);
   }
 
-  public fetchPaginatedByCurrentUser = (
+  public fetchAllByCurrentUser = (
     query?: NotificationGetAllByCurrentUserQuery
-  ): Promise<BusinessResult<PaginatedResult<Notification>>> => {
+  ): Promise<BusinessResult<QueryResult<Notification>>> => {
     const queryString = qs.stringify(query, { skipNulls: true });
     // queryString = cleanQueryParams(query!);
     return axiosInstance
-      .get<BusinessResult<PaginatedResult<Notification>>>(
+      .get<BusinessResult<QueryResult<Notification>>>(
         `${this.endpoint}/me?isPagination=true&${queryString}`
       )
       .then((response) => {

@@ -111,7 +111,8 @@ export default function CouncilIdeaRequestPendingTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => userService.fetchPaginatedByCouncilWithIdeaRequestPending(queryParams),
+    queryFn: () =>
+      userService.fetchAllByCouncilWithIdeaRequestPending(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -121,7 +122,7 @@ export default function CouncilIdeaRequestPendingTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalRecords ?? 0,
+    rowCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,

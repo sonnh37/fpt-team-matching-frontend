@@ -113,7 +113,7 @@ export default function UserTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => userService.fetchPaginated(queryParams),
+    queryFn: () => userService.fetchAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -123,7 +123,7 @@ export default function UserTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalRecords ?? 0,
+    rowCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
