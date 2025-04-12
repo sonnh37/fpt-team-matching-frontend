@@ -3,13 +3,14 @@ import store from "@/lib/redux/store";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import { Provider } from "react-redux";
-import { Toaster } from "sonner";
 import { AuthProvider } from "@/components/_common/auth-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./globals.css";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ConfirmProvider } from "@/components/_common/formdelete/confirm-context";
+import { CircleCheck } from "lucide-react";
+import { Toaster } from "@/components/_common/toast";
 
 export default function LayoutClient({
   children,
@@ -50,16 +51,7 @@ export default function LayoutClient({
             </GoogleOAuthProvider>
           </QueryClientProvider>
         </Provider>
-        <Toaster
-          position="top-right"
-           richColors
-          // icons={{
-          //   success: <SuccessIcon />,
-          //   error: <ErrorIcon />,
-          //   warning: <WarningIcon />,
-          //   // Thêm các icon khác nếu cần
-          // }}
-        />
+        <Toaster/>
       </ThemeProvider>
     </>
   );

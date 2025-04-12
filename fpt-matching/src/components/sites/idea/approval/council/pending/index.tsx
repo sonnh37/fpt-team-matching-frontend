@@ -160,37 +160,6 @@ export function IdeaRequestPendingByCouncilTable() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="stageNumber"
-                render={({ field }) => (
-                  <FormItem className="w-[200px]">
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value?.toString()}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Chọn giai đoạn" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {[1, 2, 3, 4].map((num) => (
-                          <SelectItem key={num} value={num.toString()}>
-                            Giai đoạn {num}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
-
           {stageIdea ? (
             <div className="space-y-3">
               <div className="flex items-start gap-3">
