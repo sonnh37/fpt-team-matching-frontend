@@ -339,306 +339,329 @@ export const CreateProjectForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-4 p-4 flex justify-center"
+        className="space-y-8 p-1 md:p-6 flex justify-center"
       >
-        <Card className="max-w-3xl  w-full">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Create New Idea</CardTitle>
-            <CardDescription>
-              Fill out the form below to create a new idea for your project.
-              Ensure all required fields are completed accurately.
+        <Card className="w-full max-w-4xl">
+          <CardHeader className="text-center space-y-2">
+            <CardTitle className="text-3xl font-bold tracking-tight">
+              Tạo Ý Tưởng Mới
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Điền đầy đủ thông tin bên dưới để đăng ký ý tưởng dự án. Tất cả
+              các trường đều bắt buộc trừ khi có ghi chú khác.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* isEnterPrise */}
-              {!isStudent && (
+
+          <CardContent className="space-y-6">
+            {/* Enterprise Toggle */}
+            {!isStudent && (
+              <div className="space-y-4 rounded-lg border p-4">
                 <FormSwitch
                   form={form}
                   name="isEnterpriseTopic"
-                  description="Switch to enterprise idea"
-                  label="How Would You Classify This Project?"
+                  label="Dự án do Doanh nghiệp tài trợ"
+                  description="Chọn nếu dự án của bạn được tài trợ bởi doanh nghiệp"
                 />
-              )}
+              </div>
+            )}
 
-              <div className="grid grid-cols-2 gap-4">
-                {isNotUpdateSettingYet ? (
-                  <div className="col-span-2">
-                    <Label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      Profession
-                    </Label>
-                    <TypographyP className="text-red-600 !mt-0">
-                      * Update your{" "}
-                      <Button
-                        className="p-0 m-0 text-base font-bold"
-                        variant={"link"}
-                        asChild
-                      >
-                        <Link className=" text-red-600 " href={"/settings"}>
-                          setting
-                        </Link>
-                      </Button>{" "}
-                      with profession and specialty
-                    </TypographyP>
-                  </div>
-                ) : (
-                  <>
-                    <FormItem>
-                      <FormLabel>Profession</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          const selectedProfession = professions?.find(
-                            (cat) => cat.id === value
-                          );
-                          setSelectedProfession(selectedProfession ?? null);
-                        }}
-                        value={
-                          selectedProfession ? selectedProfession.id : undefined
-                        }
-                        disabled={true}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select profession" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {professions &&
-                            professions?.map((pro) => (
-                              <SelectItem key={pro.id} value={pro.id!}>
-                                {pro.professionName}
+            {/* Profession & Specialty Section */}
+            <div className="space-y-4 rounded-lg border p-4">
+              <h3 className="text-lg font-medium">Thông tin Học thuật</h3>
+
+              {isNotUpdateSettingYet ? (
+                <div className="space-y-2 rounded-md bg-destructive/10 p-4">
+                  <Label className="text-sm font-medium">
+                    Yêu cầu cập nhật Ngành và Chuyên ngành
+                  </Label>
+                  <p className="text-sm text-destructive">
+                    * Vui lòng cập nhật{" "}
+                    <Button
+                      variant="link"
+                      className="p-0 text-sm text-destructive hover:text-destructive h-auto"
+                      asChild
+                    >
+                      <Link href="/settings">cài đặt</Link>
+                    </Button>{" "}
+                    với thông tin Ngành và Chuyên ngành của bạn trước khi tiếp
+                    tục.
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormItem>
+                    <FormLabel>Ngành học</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        const selectedProfession = professions?.find(
+                          (cat) => cat.id === value
+                        );
+                        setSelectedProfession(selectedProfession ?? null);
+                      }}
+                      value={
+                        selectedProfession ? selectedProfession.id : undefined
+                      }
+                      disabled={true}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Chọn ngành học" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {professions?.map((pro) => (
+                          <SelectItem key={pro.id} value={pro.id!}>
+                            {pro.professionName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+
+                  <FormField
+                    control={form.control}
+                    name="specialtyId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Chuyên ngành</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={true}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Chọn chuyên ngành" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {selectedProfession?.specialties?.map((spec) => (
+                              <SelectItem key={spec.id} value={spec.id!}>
+                                {spec.specialtyName}
                               </SelectItem>
                             ))}
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+            </div>
 
-                    <FormField
-                      control={form.control}
-                      name="specialtyId"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Specialty</FormLabel>
-                          <FormControl>
-                            <Select
-                              onValueChange={(value) => {
-                                if (value) {
-                                  field.onChange(value);
-                                }
-                              }}
-                              value={
-                                field.value ??
-                                form.watch("specialtyId") ??
-                                undefined
-                              }
-                              disabled={true}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select specialty" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {selectedProfession ? (
-                                  <>
-                                    {selectedProfession?.specialties!.map(
-                                      (spec) => (
-                                        <SelectItem
-                                          key={spec.id}
-                                          value={spec.id!}
-                                        >
-                                          {spec.specialtyName}
-                                        </SelectItem>
-                                      )
-                                    )}
-                                  </>
-                                ) : null}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </>
-                )}
+            {/* Enterprise Name (conditionally shown) */}
+            {isEnterpriseIdea && (
+              <div className="space-y-4 rounded-lg border p-4">
+                <FormInput
+                  form={form}
+                  name="enterpriseName"
+                  label="Tên Doanh nghiệp"
+                  placeholder="Nhập tên doanh nghiệp tài trợ"
+                  description="Tên công ty tài trợ cho dự án này"
+                />
+              </div>
+            )}
+
+            {/* Idea Details Section */}
+            <div className="space-y-4 rounded-lg border p-4">
+              <h3 className="text-lg font-medium">Chi tiết Ý tưởng</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="englishName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tên tiếng Anh</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Tên dự án bằng tiếng Anh"
+                          {...field}
+                          className="dark:bg-muted/50"
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Tên chính thức của dự án
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="vietNamName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tên tiếng Việt</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Tên dự án bằng tiếng Việt"
+                          {...field}
+                          className="dark:bg-muted/50"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              {isEnterpriseIdea ? (
-                <>
-                  <FormInput
-                    form={form}
-                    name="enterpriseName"
-                    placeholder="What your idea enterprise?"
-                    label="Enterprise title"
-                  />
-                </>
-              ) : null}
-
-              {/* English Title */}
-              <FormField
-                control={form.control}
-                name="englishName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>English Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder="What's your idea?" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Abbreviation */}
               <FormField
                 control={form.control}
                 name="abbreviations"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Abbreviation</FormLabel>
+                    <FormLabel>Viết tắt</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Enter the abbreviations for your title"
+                        placeholder="Tên viết tắt của dự án"
                         {...field}
+                        className="dark:bg-muted/50"
                       />
                     </FormControl>
+                    <FormDescription>Tối đa 20 ký tự</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Vietnamese Title */}
-              <FormField
-                control={form.control}
-                name="vietNamName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Vietnamese Title</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="What's your idea in Vietnamese"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Description */}
               <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel>Mô tả</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Describe your project"
+                        placeholder="Mô tả chi tiết về dự án của bạn..."
                         {...field}
+                        className="min-h-[120px] dark:bg-muted/50"
                       />
                     </FormControl>
+                    <FormDescription>Tối thiểu 10 ký tự</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              {/* File */}
-              <FormField
-                control={form.control}
-                name="fileschema"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>File Upload</FormLabel>
-                    <FormDescription>
-                      {"*file < 10Mb"} with {ALLOWED_EXTENSIONS.toString()}
-                    </FormDescription>
-                    <FormControl>
-                      <Input
-                        type="file"
-                        onChange={(e) => {
-                          if (e.target.files?.[0]) {
-                            field.onChange(e.target.files[0]);
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            </div>
 
-              {/* TeamMember */}
-              <FormField
-                control={form.control}
-                name="maxTeamSize"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Team size</FormLabel>
-                    <FormControl>
+            {/* Team & File Section */}
+            <div className="space-y-4 rounded-lg border p-4">
+              <h3 className="text-lg font-medium">Nhóm & Tài liệu</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="maxTeamSize"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Số lượng thành viên</FormLabel>
                       <Select
                         onValueChange={(value) => {
                           field.onChange(Number(value));
                         }}
                         value={field.value?.toString()}
                       >
-                        <SelectTrigger>
-                          <SelectValue placeholder={"Select team size"} />
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Chọn số lượng thành viên" />
                         </SelectTrigger>
                         <SelectContent>
                           {[4, 5, 6].map((option) => (
                             <SelectItem key={option} value={option.toString()}>
-                              {option}
+                              {option} thành viên
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                      <FormDescription>
+                        Bao gồm cả bạn với vai trò trưởng nhóm
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <div>
                 {isStudent && (
                   <FormItem>
-                    <FormLabel>Mentor</FormLabel>
+                    <FormLabel>Giảng viên hướng dẫn</FormLabel>
                     <Select
-                      onValueChange={(value) => {
-                        const selectedUser = users?.find(
-                          (cat) => cat.id === value
-                        );
-                        setSelectedUserId(selectedUser?.id ?? null);
-                      }}
-                      value={selectedUserId ? selectedUserId : undefined}
+                      onValueChange={(value) => setSelectedUserId(value)}
+                      value={selectedUserId ?? undefined}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select mentor" />
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Chọn giảng viên hướng dẫn" />
                       </SelectTrigger>
                       <SelectContent>
-                        {users?.map((pro) => (
-                          <SelectItem key={pro.id} value={pro.id!}>
-                            {pro.lastName} {pro.firstName} {", "} {pro.email}
+                        {users?.map((user) => (
+                          <SelectItem key={user.id} value={user.id!}>
+                            <div className="flex items-center gap-2">
+                              <span>
+                                {user.lastName} {user.firstName}
+                              </span>
+                              <span className="text-muted-foreground text-xs">
+                                {user.email}
+                              </span>
+                            </div>
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormDescription>
+                      Chọn giảng viên sẽ hướng dẫn dự án của bạn
+                    </FormDescription>
                   </FormItem>
                 )}
               </div>
 
-              {/* Team Members */}
-              <div className="mb-4">
-                <p className="text-sm font-medium">Team Members</p>
-                <p className="text-gray-500 text-sm">Existed Members</p>
+              <FormField
+                control={form.control}
+                name="fileschema"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tài liệu Dự án</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="file"
+                          onChange={(e) => field.onChange(e.target.files?.[0])}
+                          className="dark:bg-muted/50"
+                        />
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Định dạng chấp nhận: {ALLOWED_EXTENSIONS.join(", ")} (tối
+                      đa 10MB)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-                <div className="flex items-center justify-between bg-gray-100 dark:bg-neutral-500 p-2 rounded-md mt-2">
-                  <span className="text-sm">{user?.email}</span>
-                  <span className="text-xs text-gray-500">Owner</span>
+            {/* Current User Info */}
+            <div className="rounded-lg border p-4 space-y-2">
+              <h3 className="text-lg font-medium">Thành viên Nhóm</h3>
+              <p className="text-sm text-muted-foreground">
+                Bạn sẽ là trưởng nhóm của dự án này
+              </p>
+              <div className="flex items-center justify-between p-3 rounded-md bg-muted/50">
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col">
+                    <span className="font-medium">{user?.email}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {user?.lastName} {user?.firstName}
+                    </span>
+                  </div>
                 </div>
+                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                  Trưởng nhóm
+                </span>
               </div>
-
-              {/* Submit Button */}
             </div>
           </CardContent>
-          <CardFooter>
-            <Button className="w-full">Create</Button>
+
+          <CardFooter className="flex justify-end">
+            <Button type="submit" className="w-full md:w-auto">
+              Gửi Ý tưởng
+            </Button>
           </CardFooter>
         </Card>
       </form>
