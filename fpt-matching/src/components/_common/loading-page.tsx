@@ -17,10 +17,10 @@ export function LoadingPage() {
 
 export function LoadingComponent() {
   return (
-    <div className="absolute inset-0 flex justify-center items-center">
-      <div role="status" className="flex items-center justify-center gap-2">
-          <LoadUIBall2 />
-        </div>
+    <div className="flex justify-center items-center p-4">
+      <div className="w-16 h-auto">
+        <LoadUIBall2 />
+      </div>
     </div>
   );
 }
