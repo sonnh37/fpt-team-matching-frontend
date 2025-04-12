@@ -26,11 +26,11 @@ class ProjectSerivce extends BaseService<Project> {
   public fetchAllForMentor = (
       query?: ProjectGetListForMentorQuery
     ): Promise<BusinessResult<QueryResult<Project>>> => {
-      const cleanedQuery = cleanQueryParams(query ?? {});
+      const cleanedQuery = cleanQueryParams(query);
   
       return axiosInstance
         .get<BusinessResult<QueryResult<Project>>>(
-          `${this.endpoint}/me/mentor-projects?${cleanedQuery}&isPagination=true`
+          `${this.endpoint}/me/mentor-projects?${cleanedQuery}`
         )
         .then((response) => {
           return response.data;

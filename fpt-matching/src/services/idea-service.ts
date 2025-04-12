@@ -48,11 +48,11 @@ class IdeaService extends BaseService<Idea> {
   public getCurrentIdeaOfMeByStatus = (
     query: IdeaGetCurrentByStatusQuery
   ): Promise<BusinessResult<Idea[]>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
+    const cleanedQuery = cleanQueryParams(query);
 
     return axiosInstance
       .get<BusinessResult<Idea[]>>(
-        `${this.endpoint}/me/by-status?${cleanedQuery}&isPagination=true`
+        `${this.endpoint}/me/by-status?${cleanedQuery}`
       )
       .then((response) => response.data)
       .catch((error) => this.handleError(error));
@@ -70,11 +70,11 @@ class IdeaService extends BaseService<Idea> {
   public fetchAllIdeasOfSupervisors = (
     query?: IdeaGetListOfSupervisorsQuery
   ): Promise<BusinessResult<QueryResult<Idea>>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
+    const cleanedQuery = cleanQueryParams(query);
 
     return axiosInstance
       .get<BusinessResult<QueryResult<Idea>>>(
-        `${this.endpoint}/supervisors?${cleanedQuery}&isPagination=true`
+        `${this.endpoint}/supervisors?${cleanedQuery}`
       )
       .then((response) => {
         return response.data;
