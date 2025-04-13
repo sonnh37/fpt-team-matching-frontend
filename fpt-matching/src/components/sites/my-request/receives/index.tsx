@@ -7,29 +7,45 @@ import {
 } from "@/components/ui/tabs-shadcn";
 import InvitationReceiveByTeamTable from "./by-team";
 import InvitationReceiveToGetIdeaByStudentTable from "./request-idea-by-student";
-import { useSelectorUser } from "@/hooks/use-auth";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export function InivitationReceive() {
-  const roleCurrent = useCurrentRole();
-
-  const tab_1 = "Join team";
-  const tab_2 = "Student Requests";
+  const tabs = {
+    joinTeam: "Tham gia nhóm",
+    studentRequests: "Yêu cầu từ SV"
+  };
 
   return (
-    <>
-      <Tabs defaultValue={tab_1} className="w-full mx-auto">
-        <TabsList>
-          <TabsTrigger value={tab_1}>{tab_1}</TabsTrigger>
-          <TabsTrigger value={tab_2}>{tab_2}</TabsTrigger>
-        </TabsList>
-        <TabsContent value={tab_1}>
-          <InvitationReceiveByTeamTable />
-        </TabsContent>
-        <TabsContent value={tab_2}>
-          <InvitationReceiveToGetIdeaByStudentTable />
-        </TabsContent>
-      </Tabs>
-    </>
+    <Card>
+      <CardHeader>
+        <CardTitle>Yêu cầu nhận được</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue={tabs.joinTeam}>
+          <TabsList className="grid grid-cols-2 w-full max-w-md mb-6">
+            <TabsTrigger 
+              value={tabs.joinTeam}
+              className="data-[state=active]:bg-primary data-[state=active]:text-white"
+            >
+              {tabs.joinTeam}
+            </TabsTrigger>
+            <TabsTrigger 
+              value={tabs.studentRequests}
+              className="data-[state=active]:bg-primary data-[state=active]:text-white"
+            >
+              {tabs.studentRequests}
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value={tabs.joinTeam}>
+            <InvitationReceiveByTeamTable />
+          </TabsContent>
+          
+          <TabsContent value={tabs.studentRequests}>
+            <InvitationReceiveToGetIdeaByStudentTable />
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 }

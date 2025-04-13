@@ -71,7 +71,8 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 export function ProfileStudentForm({ user }: { user?: User }) {
   const queryClient = useQueryClient();
-  const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null);
+  const [selectedProfession, setSelectedProfession] =
+    useState<Profession | null>(null);
   const [profile, setProfile] = useState<ProfileStudent | null>(null);
   const [professions, setProfessions] = useState<Profession[]>([]);
   const [files, setFiles] = useState<File[] | null>(null);
@@ -85,8 +86,8 @@ export function ProfileStudentForm({ user }: { user?: User }) {
     maxSize: 1024 * 1024 * 4, // 4MB
     multiple: false,
     accept: {
-      'application/pdf': ['.pdf']
-    }
+      "application/pdf": [".pdf"],
+    },
   };
 
   const form = useForm<ProfileFormValues>({
@@ -132,7 +133,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
         if (profile?.fileCv) {
           // await cloudinaryService.(profile.fileCv);
         }
-        
+
         fileCv = await cloudinaryService.uploadFile(files[0]);
       } catch (error) {
         toast.error("Lỗi khi tải lên CV");
@@ -150,7 +151,9 @@ export function ProfileStudentForm({ user }: { user?: User }) {
           ...data,
           fileCv: fileCv,
         };
-        const response = await profilestudentService.create(profileStudentCommand);
+        const response = await profilestudentService.create(
+          profileStudentCommand
+        );
         if (response.status !== 1) throw new Error(response.message);
         toast.success("Tạo hồ sơ thành công!");
       } else {
@@ -158,7 +161,9 @@ export function ProfileStudentForm({ user }: { user?: User }) {
           ...data,
           fileCv: fileCv,
         };
-        const response = await profilestudentService.update(profileStudentCommand);
+        const response = await profilestudentService.update(
+          profileStudentCommand
+        );
         if (response.status !== 1) throw new Error(response.message);
         toast.success("Cập nhật hồ sơ thành công!");
       }
@@ -203,18 +208,18 @@ export function ProfileStudentForm({ user }: { user?: User }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          Chỉnh sửa hồ sơ
-        </Button>
+        <Button variant="outline">Chỉnh sửa hồ sơ</Button>
       </DialogTrigger>
       <DialogContent className="sm:min-w-[60%] sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-bold ">Hồ sơ sinh viên</DialogTitle>
+          <DialogTitle className="text-xl font-bold ">
+            Hồ sơ sinh viên
+          </DialogTitle>
           <DialogDescription className="">
             Cập nhật thông tin hồ sơ cá nhân của bạn
           </DialogDescription>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-4">
@@ -239,7 +244,9 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                             <div className="flex flex-col items-center justify-center p-4 w-full">
                               <CloudUpload className="w-10 h-10 mb-2" />
                               <p className="mb-1 text-sm ">
-                                <span className="font-semibold ">Nhấn để tải lên</span>
+                                <span className="font-semibold ">
+                                  Nhấn để tải lên
+                                </span>
                                 &nbsp;hoặc kéo thả file vào đây
                               </p>
                               <p className="text-xs ">
@@ -250,13 +257,15 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                           <FileUploaderContent>
                             {files && files.length > 0 ? (
                               files.map((file, i) => (
-                                <FileUploaderItem 
-                                  key={i} 
+                                <FileUploaderItem
+                                  key={i}
                                   index={i}
                                   className="border border-zin-100 rounded-md p-2"
                                 >
                                   <Paperclip className="h-4 w-4 " />
-                                  <span className="ml-2 text-sm">{file.name}</span>
+                                  <span className="ml-2 text-sm">
+                                    {file.name}
+                                  </span>
                                 </FileUploaderItem>
                               ))
                             ) : profile?.fileCv ? (
@@ -269,7 +278,8 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                                   className="hover:underline text-sm"
                                 >
                                   {decodeURIComponent(
-                                    profile.fileCv.split("/").pop() ?? "CV hiện tại"
+                                    profile.fileCv.split("/").pop() ??
+                                      "CV hiện tại"
                                   )}
                                 </a>
                               </div>
@@ -300,17 +310,20 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                         );
                         setSelectedProfession(selectedProfession ?? null);
                       }}
-                      value={selectedProfession ? selectedProfession.id : undefined}
+                      value={
+                        selectedProfession ? selectedProfession.id : undefined
+                      }
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Chọn ngành học" />
                       </SelectTrigger>
                       <SelectContent>
-                        {professions?.map((pro) => (
-                          <SelectItem key={pro.id} value={pro.id!}>
-                            {pro.professionName}
-                          </SelectItem>
-                        ))}
+                        {professions &&
+                          professions?.map((pro) => (
+                            <SelectItem key={pro.id} value={pro.id!}>
+                              {pro.professionName}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </FormItem>
@@ -345,20 +358,20 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                     )}
                   />
 
-                  <FormInput 
-                    label="Mã sinh viên" 
-                    name="code" 
-                    form={form} 
+                  <FormInput
+                    label="Mã sinh viên"
+                    name="code"
+                    form={form}
                     placeholder="Nhập mã sinh viên"
                   />
                 </div>
 
                 {/* Cột 2 */}
                 <div className="space-y-4">
-                  <FormInput 
-                    label="Giới thiệu bản thân" 
-                    name="bio" 
-                    form={form} 
+                  <FormInput
+                    label="Giới thiệu bản thân"
+                    name="bio"
+                    form={form}
                     placeholder="Mô tả ngắn về bản thân"
                   />
 
@@ -391,26 +404,43 @@ export function ProfileStudentForm({ user }: { user?: User }) {
             </div>
 
             <div className="flex justify-end gap-4 pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => setOpen(false)}
               >
                 Hủy bỏ
               </Button>
-              <Button 
-                type="submit" 
-                disabled={isLoadingUpload}
-              >
+              <Button type="submit" disabled={isLoadingUpload}>
                 {isLoadingUpload ? (
                   <span className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 " xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <svg
+                      className="animate-spin -ml-1 mr-2 h-4 w-4 "
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
                     </svg>
                     Đang xử lý...
                   </span>
-                ) : profile?.id ? "Cập nhật hồ sơ" : "Tạo hồ sơ"}
+                ) : profile?.id ? (
+                  "Cập nhật hồ sơ"
+                ) : (
+                  "Tạo hồ sơ"
+                )}
               </Button>
             </div>
           </form>

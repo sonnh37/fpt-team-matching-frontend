@@ -7,28 +7,45 @@ import {
 } from "@/components/ui/tabs-shadcn";
 import InvitationSentByStudentTable from "./by-me";
 import InvitationSentForIdeaTable from "./for-idea";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export function InivitationSent() {
-  const roleCurrent = useCurrentRole();
-  if (roleCurrent == null) return;
-  const tab_1 = "Join team";
-  const tab_2 = "Supervisor's Idea";
+  const tabs = {
+    joinTeam: "Tham gia nhóm",
+    supervisorIdea: "Ý tưởng GVHD"
+  };
 
   return (
-    <>
-      <Tabs defaultValue={tab_1} className="w-full">
-        <TabsList>
-          <TabsTrigger value={tab_1}>{tab_1}</TabsTrigger>
-          <TabsTrigger value={tab_2}>{tab_2}</TabsTrigger>
-        </TabsList>
-        <TabsContent value={tab_1}>
-          <InvitationSentByStudentTable />
-        </TabsContent>
-        <TabsContent value={tab_2}>
-          <InvitationSentForIdeaTable />
-        </TabsContent>
-      </Tabs>
-    </>
+    <Card>
+      <CardHeader>
+        <CardTitle>Yêu cầu đã gửi</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue={tabs.joinTeam}>
+          <TabsList className="grid grid-cols-2 w-full max-w-md mb-6">
+            <TabsTrigger 
+              value={tabs.joinTeam}
+              className="data-[state=active]:bg-primary data-[state=active]:text-white"
+            >
+              {tabs.joinTeam}
+            </TabsTrigger>
+            <TabsTrigger 
+              value={tabs.supervisorIdea}
+              className="data-[state=active]:bg-primary data-[state=active]:text-white"
+            >
+              {tabs.supervisorIdea}
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value={tabs.joinTeam}>
+            <InvitationSentByStudentTable />
+          </TabsContent>
+          
+          <TabsContent value={tabs.supervisorIdea}>
+            <InvitationSentForIdeaTable />
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 }

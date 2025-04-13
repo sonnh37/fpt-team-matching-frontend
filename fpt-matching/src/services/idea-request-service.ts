@@ -17,11 +17,11 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
   public GetIdeaRequestsCurrentByStatusAndRoles = (
     query?: IdeaRequestGetAllCurrentByStatusAndRolesQuery
   ): Promise<BusinessResult<QueryResult<IdeaRequest>>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
+    const cleanedQuery = cleanQueryParams(query);
 
     return axiosInstance
       .get<BusinessResult<QueryResult<IdeaRequest>>>(
-        `${this.endpoint}/me/by-status-and-roles?${cleanedQuery}&isPagination=true`
+        `${this.endpoint}/me/by-status-and-roles?${cleanedQuery}`
       )
       .then((response) => {
         return response.data;
@@ -34,11 +34,11 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
   public fetchAllWithoutReviewer = (
     query?: BaseQueryableQuery
   ): Promise<BusinessResult<QueryResult<IdeaRequest>>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
+    const cleanedQuery = cleanQueryParams(query);
 
     return axiosInstance
       .get<BusinessResult<QueryResult<IdeaRequest>>>(
-        `${this.endpoint}/without-reviewer?${cleanedQuery}&isPagination=true`
+        `${this.endpoint}/without-reviewer?${cleanedQuery}`
       )
       .then((response) => {
         return response.data;

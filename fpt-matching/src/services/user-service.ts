@@ -24,11 +24,11 @@ class UserService extends BaseService<User> {
   public fetchAllByCouncilWithIdeaRequestPending = (
     query?: UserGetAllQuery
   ): Promise<BusinessResult<QueryResult<User>>> => {
-    const cleanedQuery = cleanQueryParams(query ?? {});
+    const cleanedQuery = cleanQueryParams(query);
 
     return axiosInstance
       .get<BusinessResult<QueryResult<User>>>(
-        `${this.endpoint}/council/pending-ideas?${cleanedQuery}&isPagination=true`
+        `${this.endpoint}/council/pending-ideas?${cleanedQuery}`
       )
       .then((response) => {
         return response.data;
