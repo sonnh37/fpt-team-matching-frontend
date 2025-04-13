@@ -2,14 +2,13 @@
 import {configureStore} from '@reduxjs/toolkit';
 import userSlice from "@/lib/redux/slices/userSlice";
 import ideaRequestSlice from './slices/ideaRequestSlice';
-import roleReducer from "./slices/roleSlice";
+import cacheReducer from "./slices/cacheSlice";
 
 const store = configureStore({
     reducer: {
         user: userSlice,
         ideaRequest: ideaRequestSlice,
-        role: roleReducer,
-
+        cache: cacheReducer,
     },
 });
 
