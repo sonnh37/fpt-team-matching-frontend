@@ -76,7 +76,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </Link>
         </SidebarMenuButton>
 
-        <RoleSwitcher />
+        <RoleSwitcher currentSemester={semesterData?.data} />
 
         <SidebarMenuButton
           className="flex items-center data-[state=open]:bg-sidebar-accent hover:cursor-default hover:bg-transparent data-[state=open]:text-sidebar-accent-foreground"
