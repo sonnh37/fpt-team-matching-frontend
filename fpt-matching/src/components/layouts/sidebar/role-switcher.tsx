@@ -80,6 +80,17 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
     return null;
   }
 
+ React.useEffect(() => {
+  const shouldUpdate = activeRole?.role?.roleName && 
+                     activeRole.role.roleName !== activeRolePlan;
+  
+  if (shouldUpdate) {
+    const newRole = activeRole.role?.roleName;
+    dispatch(updateLocalCache({ role: newRole }));
+    dispatch(updateUserCache({ role: newRole }));
+  }
+}, [activeRole?.role?.roleName, activeRolePlan, dispatch]);
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
