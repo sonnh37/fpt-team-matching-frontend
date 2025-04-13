@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/sidebar";
 import { filterNavItemsByRole, NAV_CONFIG } from "@/configs/nav-config";
 import { useCurrentRole } from "@/hooks/use-current-role";
-import { initializeRole, updateUserCache } from "@/lib/redux/slices/roleSlice";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import { semesterService } from "@/services/semester-service";
 import { useQuery } from "@tanstack/react-query";
@@ -22,14 +21,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { NavMain } from "./nav-main";
 import { NavManagement } from "./nav-management";
 import { RoleSwitcher } from "./role-switcher";
-import { TypographyMuted } from "@/components/_common/typography/typography-muted";
 import { TypographyP } from "@/components/_common/typography/typography-p";
+import { initializeCache, updateUserCache } from "@/lib/redux/slices/cacheSlice";
+import { useTheme } from "next-themes";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user.user);
   const role = useCurrentRole();
-
+  const currentCache = useSelector((state: RootState) => state.cache.cache); // Lấy toàn bộ cache
+  const {setTheme} = useTheme();
   const { data: semesterData } = useQuery({
     queryKey: ["getSemesterLatest_AppSidebar"],
     queryFn: () => semesterService.fetchLatest(),
@@ -39,11 +40,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   React.useEffect(() => {
     if (!user) return;
 
+    // Khởi tạo cache khi có user
     if (user.cache) {
-      dispatch(initializeRole(user.cache));
+      dispatch(initializeCache(user.cache));
+      
     } else {
-      const firstRole = user.userXRoles[0]?.role?.roleName;
-      dispatch(updateUserCache({ newCache: { role: firstRole } }));
+      // Nếu không có cache, khởi tạo với role đầu tiên
+      const primaryRole = user.userXRoles.find(role => role.isPrimary)?.role?.roleName;
+      if (primaryRole) {
+        setTheme("light");
+        dispatch(updateUserCache({ role: primaryRole, theme: "light" }));
+      }
     }
   }, [user, dispatch]);
 

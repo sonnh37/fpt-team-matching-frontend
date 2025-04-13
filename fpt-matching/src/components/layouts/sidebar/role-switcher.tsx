@@ -2,9 +2,25 @@
 
 import * as React from "react";
 import { ChevronsUpDown, UserRoundCog, Star } from "lucide-react";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuShortcut, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar";
-import { initializeRole, setRole, updateUserCache } from "@/lib/redux/slices/roleSlice";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@/components/ui/sidebar";
+import {
+  updateLocalCache,
+  updateUserCache,
+} from "@/lib/redux/slices/cacheSlice";
 import { AppDispatch } from "@/lib/redux/store";
 import { useDispatch } from "react-redux";
 import { useCurrentRole } from "@/hooks/use-current-role";
@@ -29,8 +45,8 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
 
   // Lọc và map roles
   const filteredRoles = user.userXRoles
-    .filter((userRole) => 
-      currentSemesterId 
+    .filter((userRole) =>
+      currentSemesterId
         ? userRole.semesterId === currentSemesterId || userRole.isPrimary
         : true
     )
@@ -56,8 +72,9 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
 
   // Active role logic
   const activeRolePlan = useCurrentRole();
-  const activeRole = sortedRoles.find((role) => role.role?.roleName === activeRolePlan) || 
-                    sortedRoles.find((role) => role.isPrimary);
+  const activeRole =
+    sortedRoles.find((role) => role.role?.roleName === activeRolePlan) ||
+    sortedRoles.find((role) => role.isPrimary);
 
   if (!activeRole) {
     return null;
@@ -95,17 +112,16 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
               {currentSemesterId ? "Vai trò trong kỳ này" : "Vai trò hệ thống"}
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            
+
             {sortedRoles.map((role, index) => (
               <DropdownMenuItem
                 key={`${role.roleId}-${role.semesterId}`}
                 onClick={() => {
-                  dispatch(setRole(role.role?.roleName || ""));
-                  dispatch(updateUserCache({ 
-                    newCache: { 
-                      role: role.role?.roleName,
-                    } 
-                  }));
+                  const payload = {
+                    role: role.role?.roleName,
+                  };
+                  dispatch(updateLocalCache(payload));
+                  dispatch(updateUserCache(payload));
                 }}
                 className="gap-2 p-2"
               >
