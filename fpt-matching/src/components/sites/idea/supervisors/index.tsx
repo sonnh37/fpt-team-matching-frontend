@@ -50,10 +50,7 @@ export default function IdeasOfSupervisorsTableTable() {
     {
       columnId: "isExistedTeam",
       title: "Loại ý tưởng",
-      options: isExistedTeam_options.map(opt => ({
-        ...opt,
-        label: opt.label === "Existed Team" ? "Có nhóm" : "Chưa có nhóm"
-      })),
+      options: isExistedTeam_options,
     },
   ];
 
