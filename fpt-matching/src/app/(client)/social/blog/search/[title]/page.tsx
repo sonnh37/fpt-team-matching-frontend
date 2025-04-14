@@ -142,7 +142,7 @@ export default function Search() {
     refetchOnWindowFocus: false,
   });
   // day la sort blog notification
-  const notification = resultall?.data ?? [];
+  const notification = resultall?.data?.results ?? [];
   const sortedNotification = [...notification].sort((a, b) => {
     return (b.comments?.length || 0) - (a.comments?.length || 0);
   });
