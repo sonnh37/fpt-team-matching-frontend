@@ -160,60 +160,78 @@ export function toLocalISOString(date: Date) {
   return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16);
 }
 
-export const cleanQueryParams = (query: BaseQueryableQuery) => {
-  const cleanedQuery: Record<string, any> = {};
+export const cleanQueryParams = (query?: BaseQueryableQuery | null): string => {
+  if (!query) return '';
+
+  const params = new URLSearchParams();
+  const booleanFields: Record<string, Set<string>> = {};
 
   for (const key in query) {
+    if (!Object.prototype.hasOwnProperty.call(query, key)) continue;
+    
     const value = query[key as keyof BaseQueryableQuery];
 
-    // Xử lý trường hợp các giá trị boolean
-    if (key.startsWith("is")) {
+    // Bỏ qua giá trị null hoặc undefined
+    if (value === null || value === undefined) continue;
+
+    // Xử lý trường hợp các giá trị boolean (bắt đầu bằng 'is')
+    if (key.startsWith('is')) {
       if (Array.isArray(value)) {
-        // Nếu chứa cả true và false, đặt là undefined
-        if (value.includes(true) && value.includes(false)) {
-          // cleanedQuery[key] = null;
-        } else {
-          cleanedQuery[key] = value
-            .filter((item) => item !== null)
-            .map((item) => item.toString());
+        // Lọc bỏ các giá trị null/undefined trong mảng
+        const filteredValues = value.filter(item => item !== null && item !== undefined);
+        
+        // Theo dõi các giá trị boolean cho từng key
+        if (!booleanFields[key]) {
+          booleanFields[key] = new Set();
         }
-      } else if (value !== undefined && value !== null) {
-        cleanedQuery[key] = value.toString();
-      }
-    }
-    // Xử lý giá trị array thông thường
-    else if (Array.isArray(value)) {
-      const filteredArray = value.filter((item) => item !== null);
-      if (filteredArray.length > 0) {
-        filteredArray.forEach((item, index) => {
-          cleanedQuery[`${key}[${index}]`] = item;
+        
+        filteredValues.forEach(val => {
+          booleanFields[key].add(val.toString());
         });
+      } else {
+        if (!booleanFields[key]) {
+          booleanFields[key] = new Set();
+        }
+        booleanFields[key].add(value.toString());
       }
+      continue;
     }
-    // Xử lý đối tượng: chuyển thành chuỗi JSON
-    else if (typeof value === "object" && value !== null) {
-      // Convert object to JSON string
-      cleanedQuery[key] = JSON.stringify(value); // Convert object to string
-    }
-    // Xử lý giá trị không phải array hay object
-    else if (value !== undefined && value !== null) {
-      cleanedQuery[key] = value;
-    }
-  }
 
-  // Convert object cleanedQuery to query string
-  const params = new URLSearchParams();
-
-  for (const key in cleanedQuery) {
-    const value = cleanedQuery[key];
+    // Xử lý mảng
     if (Array.isArray(value)) {
-      value.forEach((val) => {
-        params.append(key, val);
+      const filteredArray = value.filter(item => item !== null && item !== undefined);
+      filteredArray.forEach((item, index) => {
+        params.append(`${key}[${index}]`, item.toString());
       });
-    } else {
-      params.append(key, value.toString());
+      continue;
+    }
+
+    // Xử lý object
+    if (typeof value === 'object') {
+      try {
+        params.append(key, JSON.stringify(value));
+      } catch {
+        // Bỏ qua nếu không thể stringify
+      }
+      continue;
+    }
+
+    // Xử lý các giá trị nguyên thủy
+    params.append(key, value.toString());
+  }
+
+  // Xử lý các trường boolean sau khi thu thập đầy đủ
+  for (const [key, values] of Object.entries(booleanFields)) {
+    // Nếu có cả true và false thì bỏ qua (coi như undefined)
+    if (values.has('true') && values.has('false')) {
+      continue;
+    }
+    
+    // Thêm các giá trị boolean hợp lệ vào params
+    for (const val of Array.from(values)) {
+      params.append(key, val);
     }
   }
 
-  return params.toString(); // Return as query string
+  return params.toString();
 };

@@ -40,71 +40,49 @@ import { z } from "zod";
 import { columns } from "./columns";
 import { IdeaGetListOfSupervisorsQuery } from "@/types/models/queries/ideas/idea-get-list-of-supervisor-query";
 
-//#region INPUT
 const defaultSchema = z.object({
   englishName: z.string().optional(),
 });
-//#endregion
+
 export default function IdeasOfSupervisorsTableTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
       columnId: "isExistedTeam",
-      title: "Slot idea",
+      title: "Loại ý tưởng",
       options: isExistedTeam_options,
     },
   ];
-  //#region DEFAULT
+
+  // Table states
   const [sorting, setSorting] = React.useState<SortingState>([
-    {
-      id: "createdDate",
-      desc: true,
-    },
+    { id: "createdDate", desc: true },
   ]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
-  //#endregion
 
-  //#region CREATE TABLE
   const form = useForm<z.infer<typeof defaultSchema>>({
     resolver: zodResolver(defaultSchema),
   });
 
-  // input field
-  const [inputFields, setInputFields] =
-    useState<z.infer<typeof defaultSchema>>();
+  const [inputFields, setInputFields] = useState<z.infer<typeof defaultSchema>>();
 
-  // default field in table
   const queryParams: IdeaGetListOfSupervisorsQuery = useMemo(() => {
-    const baseParams = useQueryParams(
-      inputFields,
-      columnFilters,
-      pagination,
-      sorting
-    );
-
-    const params: IdeaGetListOfSupervisorsQuery = {
+    const baseParams = useQueryParams(inputFields, columnFilters, pagination, sorting);
+    return {
       ...baseParams,
       types: [IdeaType.Lecturer, IdeaType.Enterprise],
       status: IdeaStatus.Approved,
     };
-
-    return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex: 0,
-      }));
+      setPagination(prev => ({ ...prev, pageIndex: 0 }));
     }
   }, [columnFilters, inputFields]);
 
@@ -114,8 +92,6 @@ export default function IdeasOfSupervisorsTableTable() {
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
-
-  if (error) return <div>Error loading data</div>;
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
@@ -128,79 +104,99 @@ export default function IdeasOfSupervisorsTableTable() {
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    debugTable: true,
   });
-  //#endregion
 
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {
     setInputFields(values);
   };
 
+  if (error) return (
+    <div className="container mx-auto p-4">
+      <Card className="p-6 text-center">
+        <TypographyH2 className="text-destructive">Lỗi tải dữ liệu</TypographyH2>
+        <p className="mt-2 text-muted-foreground">
+          Đã xảy ra lỗi khi tải danh sách ý tưởng. Vui lòng thử lại sau.
+        </p>
+        <Button 
+          variant="outline" 
+          className="mt-4"
+          onClick={() => refetch()}
+        >
+          Thử lại
+        </Button>
+      </Card>
+    </div>
+  );
+
   return (
-    <>
-      <div className="container mx-auto space-y-8">
-        <div className="w-fit mx-auto space-y-4">
-          <TypographyH2 className="text-center tracking-wide">
-            The list of Supervisor's Ideas
-          </TypographyH2>
+    <div className="container mx-auto py-8 space-y-8">
+      {/* Header Section */}
+      <div className="text-center space-y-4">
+        <TypographyH2 className="text-primary">
+          Danh sách Ý tưởng từ Giảng viên
+        </TypographyH2>
+        
+        <Card className="max-w-md mx-auto p-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
                 name="englishName"
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>English name:</FormLabel>
-                      <div className="flex items-center gap-2">
-                        <FormControl>
-                          <Input
-                            placeholder=""
-                            className="focus-visible:ring-none"
-                            type="text"
-                            {...field}
-                          />
-                        </FormControl>
-                        <Button type="submit" variant="default" size="icon">
-                          <Search />
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tìm kiếm ý tưởng:</FormLabel>
+                    <div className="flex gap-2">
+                      <FormControl>
+                        <Input
+                          placeholder="Nhập tên ý tưởng..."
+                          className="focus-visible:ring-1"
+                          {...field}
+                        />
+                      </FormControl>
+                      <Button type="submit" size="icon">
+                        <Search className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </form>
           </Form>
-        </div>
-
-        <div className="">
-          <Card className="space-y-4 p-4 ">
-            <DataTableToolbar
-              form={form}
-              table={table}
-              filterEnums={filterEnums}
-              isCreateButton={false}
-              isSelectColumns={false}
-              isSortColumns={false}
-            />
-            {isFetching ? (
-              <DataTableSkeleton
-                columnCount={1}
-                showViewOptions={false}
-                withPagination={false}
-                rowCount={pagination.pageSize}
-                searchableColumnCount={0}
-                filterableColumnCount={0}
-                shrinkZero
-              />
-            ) : (
-              <DataTableComponent table={table} />
-            )}
-            <DataTablePagination table={table} />
-          </Card>
-        </div>
+        </Card>
       </div>
-    </>
+
+      {/* Data Table Section */}
+      <Card className="p-4 md:p-6 space-y-2">
+        <DataTableToolbar
+          form={form}
+          table={table}
+          filterEnums={filterEnums}
+          isCreateButton={false}
+          isSelectColumns={false}
+          isSortColumns={false}
+        />
+        
+        {isFetching ? (
+          <DataTableSkeleton
+            columnCount={columns.length}
+            rowCount={pagination.pageSize}
+            showViewOptions={false}
+            withPagination={true}
+            searchableColumnCount={1}
+            filterableColumnCount={1}
+          />
+        ) : (
+          <>
+            <DataTableComponent 
+              table={table} 
+            />
+            <DataTablePagination 
+              table={table} 
+            />
+          </>
+        )}
+      </Card>
+    </div>
   );
 }

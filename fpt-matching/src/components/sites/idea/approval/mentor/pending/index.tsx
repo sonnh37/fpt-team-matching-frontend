@@ -1,25 +1,38 @@
+"use client";
+import { useQuery } from "@tanstack/react-query";
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardHeader,
   CardContent,
-  CardFooter,
-  CardTitle,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
-import { Check, Search } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { RootState } from "@/lib/redux/store";
 import { cn, formatDate } from "@/lib/utils";
 import { ideaRequestService } from "@/services/idea-request-service";
 import { stageideaService } from "@/services/stage-idea-service";
 import { IdeaRequestStatus } from "@/types/enums/idea-request";
-import { FilterEnum } from "@/types/models/filter-enum";
 import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
+import { StageIdea } from "@/types/stage-idea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { keepPreviousData } from "@tanstack/react-query";
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -30,34 +43,18 @@ import {
   VisibilityState,
 } from "@tanstack/react-table";
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
 import { z } from "zod";
 import { columns } from "./columns";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { StageIdea } from "@/types/stage-idea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
-//#region INPUT
 const defaultSchema = z.object({
   stageNumber: z.number().default(1).optional(),
 });
-//#endregion
 
 export function IdeaRequestPendingByMentorTable() {
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -76,7 +73,7 @@ export function IdeaRequestPendingByMentorTable() {
   const form = useForm<z.infer<typeof defaultSchema>>({
     resolver: zodResolver(defaultSchema),
     defaultValues: {
-      stageNumber: 1, // Set giá trị mặc định là 0
+      stageNumber: 1,
     },
   });
 
@@ -87,7 +84,6 @@ export function IdeaRequestPendingByMentorTable() {
 
   if (!user) return null;
 
-  // Query Params
   const queryParams: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
     useMemo(() => {
       const params: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
@@ -103,7 +99,6 @@ export function IdeaRequestPendingByMentorTable() {
     }
   }, [columnFilters, formValues]);
 
-  // Fetch Idea Requests
   const { data, isFetching, error } = useQuery({
     queryKey: ["data_idearequest_pending", formValues],
     queryFn: () =>
@@ -112,24 +107,28 @@ export function IdeaRequestPendingByMentorTable() {
     refetchOnWindowFocus: false,
   });
 
-  // Fetch StageIdea
   const {
     data: res_stageIdea,
     isFetching: isFetchingStage,
     refetch: refetch_stage,
   } = useQuery({
-    queryKey: ["stage_idea", formValues.stageNumber],
+    queryKey: ["stage_idea_latest"],
     queryFn: () =>
-      stageideaService.fetchByStageNumber(formValues?.stageNumber ?? 0),
+      stageideaService.fetchLatest(),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
   const stageIdea = res_stageIdea?.data ?? ({} as StageIdea);
 
-  if (error) return <div>Error loading data</div>;
+  if (error) return (
+    <Alert variant="destructive" className="my-4">
+      <Info className="h-4 w-4" />
+      <AlertTitle>Lỗi</AlertTitle>
+      <AlertDescription>Không thể tải dữ liệu. Vui lòng thử lại sau.</AlertDescription>
+    </Alert>
+  );
 
-  // Table Configuration
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
@@ -149,86 +148,81 @@ export function IdeaRequestPendingByMentorTable() {
   };
 
   return (
-    <div className="space-y-8 py-2">
-      {/* Notification */}
-
-      {/* Table */}
-      <div className="space-y-4">
-        <Card className={cn("w-[380px]")}>
-          <CardHeader>
-            <CardTitle>Notification Stage Ideas</CardTitle>
-            <CardDescription>You have new review stages.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-            {stageIdea ? (
-              <div className="space-y-4">
-                <Form {...form}>
-                  <form
-                    onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-8"
-                  >
-                    <FormField
-                      control={form.control}
-                      name="stageNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value?.toString()}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Chọn stage" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {[1, 2, 3, 4].map((num) => (
-                                <SelectItem key={num} value={num.toString()}>
-                                  Stage {num}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </form>
-                </Form>
-
-                <div className="space-y-1">
-                  <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-                    <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">
-                        Timeline: {formatDate(stageIdea.startDate)} -{" "}
-                        {formatDate(stageIdea.endDate)}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-                    <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-                    <div className="space-y-1">
-                      <p className="text-sm font-medium">
-                        Date of results: {formatDate(stageIdea.resultDate)}
-                      </p>
-                    </div>
-                  </div>
+    <div className="space-y-6 py-4">
+      {/* Thông báo giai đoạn */}
+      <Card className="w-full max-w-2xl">
+        <CardHeader>
+          <CardTitle className="text-xl font-semibold">
+            Thông tin Giai đoạn Đánh giá
+          </CardTitle>
+          <CardDescription>
+            Các yêu cầu ý tưởng đang chờ phê duyệt
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {stageIdea ? (
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="flex flex-col items-center pt-1">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
+                  <div className="h-full w-px bg-border" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">
+                    Thời gian đánh giá:{" "}
+                    <Badge variant="outline" className="ml-2">
+                      {formatDate(stageIdea.startDate)} - {formatDate(stageIdea.endDate)}
+                    </Badge>
+                  </p>
                 </div>
               </div>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                Không có thông báo mới.
-              </p>
-            )}
+              
+              <div className="flex items-start gap-3">
+                <div className="flex flex-col items-center pt-1">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">
+                    Ngày công bố kết quả:{" "}
+                    <Badge variant="outline" className="ml-2">
+                      {formatDate(stageIdea.resultDate)}
+                    </Badge>
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertTitle>Không có thông tin</AlertTitle>
+              <AlertDescription>
+                Hiện không có giai đoạn đánh giá nào đang diễn ra.
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Bảng dữ liệu */}
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-xl font-semibold">
+              Danh sách Yêu cầu
+            </CardTitle>
+            <CardDescription>
+              Các yêu cầu ý tưởng đang chờ xét duyệt
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DataTableComponent
+              table={table}
+              restore={ideaRequestService.restore}
+              deletePermanent={ideaRequestService.deletePermanent}
+            />
+            <DataTablePagination table={table} />
           </CardContent>
         </Card>
-        <DataTableComponent
-          table={table}
-          restore={ideaRequestService.restore}
-          deletePermanent={ideaRequestService.deletePermanent}
-        />
-        <DataTablePagination table={table} />
       </div>
     </div>
   );

@@ -20,6 +20,10 @@ import { cn } from "@/lib/utils";
 import { authService } from "@/services/auth-service";
 import { User } from "@/types/user";
 import { Suspense } from "react";
+import { useTheme } from "next-themes";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/lib/redux/store";
+import { resetCache } from "@/lib/redux/slices/cacheSlice";
 
 interface AuthDropdownProps
   extends React.ComponentPropsWithRef<typeof DropdownMenuTrigger>,
@@ -28,6 +32,9 @@ interface AuthDropdownProps
 }
 
 export function AuthDropdown({ user = null }: AuthDropdownProps) {
+  const { setTheme } = useTheme();
+  const dispatch = useDispatch<AppDispatch>();
+
   if (user == null) {
     return (
       <Link href="/login" className="uppercase text-xs">
@@ -43,6 +50,8 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
   const handleLogout = () => {
     authService.logout().then((res) => {
       if (res.status == 1) {
+        setTheme("light");
+        dispatch(resetCache());
         window.location.reload();
       }
     });

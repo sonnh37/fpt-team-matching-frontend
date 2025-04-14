@@ -1,8 +1,6 @@
 "use client";
 import { InivitationReceive } from "@/components/sites/my-request/receives";
-import InvitationSendByTeamTable from "@/components/sites/my-request/receives/by-team";
 import { InivitationSent } from "@/components/sites/my-request/sends";
-import InvitationSentByStudentTable from "@/components/sites/my-request/sends/by-me";
 import {
   Tabs,
   TabsContent,
@@ -10,29 +8,43 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs-shadcn";
 import { useCurrentRole } from "@/hooks/use-current-role";
+import { Card } from "@/components/ui/card";
 
 export default function Page() {
   const roleCurrent = useCurrentRole();
-  if (roleCurrent == null) return;
-  const tab_1 = "Send request";
-  const tab_2 = "Receive request";
-  const defaultTab = roleCurrent == "Lecturer" ? tab_2 : tab_1;
+  if (!roleCurrent) return null;
 
-  console.log("check_defaulttabv", defaultTab);
+  const tabs = {
+    sent: "Yêu cầu đã gửi",
+    received: "Yêu cầu nhận được"
+  };
+
+  const defaultTab = roleCurrent === "Lecturer" ? tabs.received : tabs.sent;
+
   return (
-    <>
-      <Tabs defaultValue={defaultTab} className="w-full p-4">
-        <TabsList>
-          <TabsTrigger value={tab_1}>{tab_1}</TabsTrigger>
-          <TabsTrigger value={tab_2}>{tab_2}</TabsTrigger>
-        </TabsList>
-        <TabsContent value={tab_1}>
-          <InivitationSent />
-        </TabsContent>
-        <TabsContent value={tab_2}>
-          <InivitationReceive />
-        </TabsContent>
-      </Tabs>
-    </>
+    <div className="container mx-auto px-4 py-6">
+      <Card className="p-2 md:p-6">
+        <h1 className="text-2xl font-bold mb-6 text-center">Quản lý Yêu cầu</h1>
+        
+        <Tabs defaultValue={defaultTab} className="w-full">
+          <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto mb-6">
+            <TabsTrigger value={tabs.sent} className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              {tabs.sent}
+            </TabsTrigger>
+            <TabsTrigger value={tabs.received} className="data-[state=active]:bg-primary data-[state=active]:text-white">
+              {tabs.received}
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value={tabs.sent}>
+            <InivitationSent />
+          </TabsContent>
+          
+          <TabsContent value={tabs.received}>
+            <InivitationReceive />
+          </TabsContent>
+        </Tabs>
+      </Card>
+    </div>
   );
 }

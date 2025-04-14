@@ -18,7 +18,7 @@ export class BaseService<T> {
     query?: BaseQueryableQuery
   ): Promise<BusinessResult<QueryResult<T>>> => {
     try {
-      const cleanedQuery = cleanQueryParams(query ?? {} as BaseQueryableQuery);
+      const cleanedQuery = cleanQueryParams(query);
       const response = await axiosInstance.get<BusinessResult<QueryResult<T>>>(
         `${this.endpoint}?${cleanedQuery}`
       );
