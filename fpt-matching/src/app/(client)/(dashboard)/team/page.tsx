@@ -286,7 +286,7 @@ export default function TeamInfo() {
                   )}
                 </CardTitle>
                 <CardDescription className="mt-1">
-                  Created on {formatDate(project?.createdDate)}
+                  Ngày tạo {formatDate(project?.createdDate)}
                 </CardDescription>
               </div>
 
@@ -386,7 +386,7 @@ export default function TeamInfo() {
                       <Separator />
                       <div>
                         <h4 className="text-lg font-semibold mb-4">
-                          Project Idea
+                          Đề tài của nhóm
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           {/* Abbreviations */}

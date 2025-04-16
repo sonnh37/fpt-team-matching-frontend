@@ -126,6 +126,12 @@ export const NAV_CONFIG = {
       roles: ["Manager"],
     },
     {
+      title: "Quản lý các tiêu chí",
+      url: "/",
+      icon: ShieldHalf,
+      roles: ["Manager"],
+    },
+    {
       title: "Quản lý dự án",
       url: "/management/projects",
       icon: RiTimeLine,

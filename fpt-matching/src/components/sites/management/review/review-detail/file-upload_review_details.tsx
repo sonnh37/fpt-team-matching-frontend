@@ -166,7 +166,7 @@ export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber}: 
                 </div>
                 <SheetFooter>
                     <SheetClose asChild>
-                        <Button>Close</Button>
+                        <Button className={""}>Close</Button>
                     </SheetClose>
                     {
                         fileChange &&
