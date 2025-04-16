@@ -111,8 +111,8 @@ const Page = () => {
         const fetchData = async () => {
             const fetch_current_semester = await semesterService.getCurrentSemester();
             const fetch_all_semester = await semesterService.fetchAll();
-            if (fetch_all_semester.data) {
-                setSemesters(fetch_all_semester.data)
+            if (fetch_all_semester.data && fetch_all_semester.data.results) {
+                setSemesters(fetch_all_semester.data.results)
             }
             setCurrentSemester(fetch_current_semester.data)
             setSemesterPresent(fetch_current_semester.data)
@@ -187,6 +187,7 @@ const Page = () => {
             }
         }
     }
+
     return !loading ? (
         <div>
             {currentSemester && capstoneSchedule.length == 0 ? (
@@ -198,7 +199,7 @@ const Page = () => {
                                 {/*<span className={"text-red-600 px-0.5"}> {currentSemester.semesterCode} - {currentSemester.semesterName} </span>*/}
                                 {/*vẫn chưa được thêm lịch bảo vệ.*/}
                             </div>
-                            <DropdownSemester currentSemester={currentSemester} setCurrentSemester={setCurrentSemester} semesters={semesters} />
+                            {semesters.length >0 && currentSemester &&  <DropdownSemester currentSemester={currentSemester} setCurrentSemester={setCurrentSemester} semesters={semesters} />}
                             <div>vẫn chưa được thêm lịch bảo vệ.</div>
                         </div>
                         <div className={"pb-4"}>
