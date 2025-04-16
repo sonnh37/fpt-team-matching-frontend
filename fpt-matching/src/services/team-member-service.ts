@@ -12,7 +12,7 @@ import {
 
 class TeamMemberSerivce extends BaseService<TeamMember> {
   constructor() {
-    super(Const.TEAMMEMBER);
+    super(Const.TEAM_MEMBERS);
   }
     public leaveTeam = (): Promise<BusinessResult<TeamMember>> => {
       return axiosInstance

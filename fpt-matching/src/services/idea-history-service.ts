@@ -6,7 +6,7 @@ import axiosInstance from "@/lib/interceptors/axios-instance";
 import {IdeaHistoryStatus} from "@/types/enums/idea-history";
 class IdeaHistoryService extends BaseService<IdeaHistory> {
     constructor() {
-        super(Const.IDEA_HISTORY);
+        super(Const.IDEA_HISTORIES);
     }
 
     public async studentUpdateIdea ({ideaId, fileUpdate, reviewStage, note} : {ideaId: string, fileUpdate: string, reviewStage: number, note: string | null}) : Promise<BusinessResult<void>> {

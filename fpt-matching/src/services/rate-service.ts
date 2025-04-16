@@ -4,7 +4,7 @@ import { Const } from "@/lib/constants/const";
 
 class RateService extends BaseService<Rate>{
     constructor() {
-        super(Const.RATE);
+        super(Const.RATES);
       }
 
 

@@ -12,7 +12,7 @@ import { IdeaGetListOfSupervisorsQuery } from "@/types/models/queries/ideas/idea
 
 class IdeaService extends BaseService<Idea> {
   constructor() {
-    super(Const.IDEA);
+    super(Const.IDEAS);
   }
   public createIdeaByStudent = (
     command: IdeaCreateCommand

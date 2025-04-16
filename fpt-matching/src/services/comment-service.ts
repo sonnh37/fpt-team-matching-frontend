@@ -6,7 +6,7 @@ import { Comment } from '@/types/comment';
 
 class CommentService extends BaseService<Comment> {
     constructor() {
-      super(Const.COMMENT);
+      super(Const.COMMENTS);
     }
 }
 

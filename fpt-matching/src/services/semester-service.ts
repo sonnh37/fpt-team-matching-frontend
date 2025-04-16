@@ -7,7 +7,7 @@ import axiosInstance from "@/lib/interceptors/axios-instance";
 
 class SemesterService extends BaseService<Semester> {
   constructor() {
-    super(Const.SEMESTER);
+    super(Const.SEMESTERS);
   }
   public async getCurrentSemester(): Promise<BusinessResult<Semester>> {
     try {

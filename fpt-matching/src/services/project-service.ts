@@ -9,7 +9,7 @@ import { cleanQueryParams } from "@/lib/utils";
 
 class ProjectSerivce extends BaseService<Project> {
   constructor() {
-    super(Const.PROJECT);
+    super(Const.PROJECTS);
   }
   public getProjectInfo = async (): Promise<BusinessResult<Project>> => {
     try {

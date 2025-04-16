@@ -7,7 +7,7 @@ import { StageIdea } from "@/types/stage-idea";
 
 class StageIdeaSerivce extends BaseService<StageIdea> {
   constructor() {
-    super(Const.STAGE_IDEA);
+    super(Const.STAGE_IDEAS);
   }
 
   public getByStageNumber = (

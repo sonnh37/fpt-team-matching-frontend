@@ -11,7 +11,7 @@ import { IdeaRequestUpdateStatusCommand } from "@/types/models/commands/idea-req
 
 class IdeaRequestService extends BaseService<IdeaRequest> {
   constructor() {
-    super(Const.IDEA_REQUEST);
+    super(Const.IDEA_REQUESTS);
   }
 
   public GetIdeaRequestsCurrentByStatusAndRoles = (
@@ -66,7 +66,7 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
 
       const { data: resIdea } = await axiosInstance.delete<
         BusinessResult<null>
-      >(`${Const.IDEA}?id=${idea_id}&isPermanent=true`);
+      >(`${Const.IDEAS}?id=${idea_id}&isPermanent=true`);
 
       return resIdea;
     } catch (error) {

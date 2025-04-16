@@ -10,7 +10,7 @@ import qs from "qs";
 
 class NotificationService extends BaseService<Notification> {
   constructor() {
-    super(Const.NOTIFICATION);
+    super(Const.NOTIFICATIONS);
   }
 
   public getAllByCurrentUser = (

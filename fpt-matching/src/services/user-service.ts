@@ -9,7 +9,7 @@ import { cleanQueryParams } from "@/lib/utils";
 
 class UserService extends BaseService<User> {
   constructor() {
-    super(Const.USER);
+    super(Const.USERS);
   }
 
   public updatePassword = async (
