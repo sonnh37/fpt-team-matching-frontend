@@ -5,13 +5,13 @@ import { BusinessResult } from '@/types/models/responses/business-result';
 import axiosInstance from '@/lib/interceptors/axios-instance';
 import { CriteriaForm } from '@/types/criteria-form';
 
-class CriteriaFormService extends BaseService<CriteriaForm> {
+class CriteriaXCriteriaFormService extends BaseService<CriteriaXCriteriaFormService> {
   constructor() {
-    super(Const.CRITERIAFORM);
+    super(Const.CRITERIAXFORM);
   }
 
 
 
 }
 
-export const criteriaFormService = new CriteriaFormService();
+export const criteriaXCriteriaFormService = new CriteriaXCriteriaFormService();
