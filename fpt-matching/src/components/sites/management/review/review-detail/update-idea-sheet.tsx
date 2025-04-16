@@ -163,13 +163,12 @@ export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHi
                     </div>
                     <SheetFooter className={"h-[15vh] justify-self-end items-end"}>
                         <SheetClose asChild>
-                            <Button type="submit">Close</Button>
+                            <Button className={"mb-8"} type="submit">Close</Button>
                         </SheetClose>
                         {fileChange && (
                             <EditIdeaDialog note={note} isOpen={isOpen} setIsOpen={setIsOpen} file={fileChange} ideaId={ideaId} reviewNumber={reviewStage}  />
                         )}
                     </SheetFooter>
-
                 </SheetContent>
             </Sheet>
         </div>
