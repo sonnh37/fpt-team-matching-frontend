@@ -66,6 +66,7 @@ import {
 import { StageIdea } from "@/types/stage-idea";
 import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
 import { StageIdeaFormDialog } from "./create-or-update-dialog";
+import { LoadingComponent } from "@/components/_common/loading-page";
 //#region INPUT
 const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
@@ -203,7 +204,7 @@ export default function StageIdeaTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalPages ?? 0,
+    pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
@@ -241,23 +242,14 @@ export default function StageIdeaTable() {
             <Button type="button" onClick={handleCreateClick} variant="default">
               Create New
             </Button>
-            {isFetching && !isTyping ? (
-              <DataTableSkeleton
-                columnCount={1}
-                showViewOptions={false}
-                withPagination={false}
-                rowCount={pagination.pageSize}
-                searchableColumnCount={0}
-                filterableColumnCount={0}
-                shrinkZero
-              />
-            ) : (
-              <DataTableComponent
-                table={table}
-                restore={stageideaService.restore}
-                deletePermanent={stageideaService.deletePermanent}
-              />
-            )}
+
+            <DataTableComponent
+              isLoading={isFetching && !isTyping}
+              table={table}
+              restore={stageideaService.restore}
+              deletePermanent={stageideaService.deletePermanent}
+            />
+
             <DataTablePagination table={table} />
           </div>
         </div>

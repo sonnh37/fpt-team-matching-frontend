@@ -123,7 +123,7 @@ export default function UserTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalPages ?? 0,
+    pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
@@ -187,15 +187,13 @@ export default function UserTable() {
               // handleSheetChange={handleSheetChange}
               // formFilterAdvanceds={formFilterAdvanceds}
             />
-            {isFetching && !isTyping ? (
-              <LoadingComponent />
-            ) : (
-              <DataTableComponent
-                table={table}
-                restore={userService.restore}
-                deletePermanent={userService.deletePermanent}
-              />
-            )}
+            <DataTableComponent
+              isLoading={isFetching && !isTyping}
+              table={table}
+              restore={userService.restore}
+              deletePermanent={userService.deletePermanent}
+            />
+
             <DataTablePagination table={table} />
           </div>
         </div>

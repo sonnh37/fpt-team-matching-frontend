@@ -107,7 +107,7 @@
 //   const table = useReactTable({
 //     data: data?.data?.results ?? [],
 //     columns,
-//     rowCount: data?.data?.totalRecords ?? 0,
+//     pageCount: data?.data?.totalRecords ?? 0,
 //     state: { pagination, sorting, columnFilters, columnVisibility },
 //     onPaginationChange: setPagination,
 //     onSortingChange: setSorting,
