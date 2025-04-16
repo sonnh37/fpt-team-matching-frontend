@@ -6,6 +6,7 @@ import { BaseService } from "./_base/base-service";
 import { UserUpdatePasswordCommand } from "@/types/models/commands/users/user-update-password-command";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { cleanQueryParams } from "@/lib/utils";
+import UserCreateByManagerCommand from "@/types/models/commands/users/user-create-by-manager-command";
 
 class UserService extends BaseService<User> {
   constructor() {
@@ -119,6 +120,33 @@ class UserService extends BaseService<User> {
       return this.handleError(error);
     }
   };
+
+  public createOneByManager = async (command : UserCreateByManagerCommand) : Promise<BusinessResult<User | null>> => {
+    const response = await axiosInstance.post<BusinessResult<User | null>>(
+        `${this.endpoint}/import/students/one`,
+        {
+          ...command
+        }
+    )
+    return response.data
+  }
+
+  public createManyByManager = async (file: File) : Promise<BusinessResult<void>> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await axiosInstance.post<BusinessResult<void>>(
+        `${this.endpoint}/import/students/many`, formData
+    )
+
+    return response.data
+  }
+
+  public updateExistedUser = async ({users} : {users: User[]}) => {
+    const response = await axiosInstance.put<BusinessResult<void>>(`${this.endpoint}/import/students/update-existed`, [
+        ...users,
+    ]);
+    return response.data;
+  }
 }
 
 export const userService = new UserService();

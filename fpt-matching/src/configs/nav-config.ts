@@ -156,6 +156,12 @@ export const NAV_CONFIG = {
           roles: ["Manager"],
         },
         {
+          title: "Thêm sinh viên",
+          url: "/management/users/import-students",
+          icon: Users,
+          roles: ["Manager"],
+        },
+        {
           title: "Yêu cầu chờ của hội đồng",
           url: "/management/users/councils/pending-requests",
           icon: Users,
