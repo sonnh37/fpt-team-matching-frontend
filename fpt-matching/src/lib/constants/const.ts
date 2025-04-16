@@ -11,6 +11,10 @@ export class Const {
     static readonly BASE_URL = `${process.env.NEXT_PUBLIC_SITE_URL}`;
     //#endregion
     static readonly FILE_UPLOAD = "file-upload";
+    static readonly ANSWERCRITERIA = "answer-criterias";
+    static readonly CRITERIA = "criterias";
+    static readonly CRITERIAFORM = "criteria-forms";
+    static readonly CRITERIAXFORM = "criteria-x-criteria-forms";
     static readonly BLOG = "blogs";
     static readonly RATE = "rates";
     static readonly BLOGCV = "blog-cvs";
