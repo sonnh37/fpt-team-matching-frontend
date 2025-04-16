@@ -142,7 +142,7 @@ export default function Search() {
     refetchOnWindowFocus: false,
   });
   // day la sort blog notification
-  const notification = resultall?.data ?? [];
+  const notification = resultall?.data?.results ?? [];
   const sortedNotification = [...notification].sort((a, b) => {
     return (b.comments?.length || 0) - (a.comments?.length || 0);
   });
@@ -362,7 +362,7 @@ export default function Search() {
                   {
                     result?.data?.results?.map((post) => (
                       // Cho blog detail
-                      <div key={post.id} className='bg-white max-w-3xl mx-3 my-5 p-6 pb-3 rounded-xl shadow-md min-w-[650px] '>
+                      <div key={post.id} className='bg-white max-w-3xl mx-3 my-5 p-6 pb-3 rounded-xl shadow-md min-w-[760px] '>
                         <div>
                           {/* Post Header with Avatar, Username, and Date */}
                           <div className="flex items-center space-x-4">
