@@ -39,7 +39,7 @@ const BlogDetail: React.FC<BlogProps> = ({ id }) =>{
         refetch
     } = useQuery({
         queryKey: ["getProjectById"],
-        queryFn: () => blogService.fetchById(id),
+        queryFn: () => blogService.getById(id),
         refetchOnWindowFocus: false,
     });
     useEffect(() => {

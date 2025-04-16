@@ -13,7 +13,7 @@ class NotificationService extends BaseService<Notification> {
     super(Const.NOTIFICATION);
   }
 
-  public fetchAllByCurrentUser = (
+  public getAllByCurrentUser = (
     query?: NotificationGetAllByCurrentUserQuery
   ): Promise<BusinessResult<QueryResult<Notification>>> => {
     const queryString = qs.stringify(query, { skipNulls: true });

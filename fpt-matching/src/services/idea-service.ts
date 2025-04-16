@@ -67,7 +67,7 @@ class IdeaService extends BaseService<Idea> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-  public fetchAllIdeasOfSupervisors = (
+  public getAllIdeasOfSupervisors = (
     query?: IdeaGetListOfSupervisorsQuery
   ): Promise<BusinessResult<QueryResult<Idea>>> => {
     const cleanedQuery = cleanQueryParams(query);

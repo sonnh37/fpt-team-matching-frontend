@@ -111,7 +111,7 @@ export default function SemesterTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => semesterService.fetchAll(queryParams),
+    queryFn: () => semesterService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

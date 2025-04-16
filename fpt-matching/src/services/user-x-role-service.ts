@@ -10,10 +10,8 @@ class SemesterService extends BaseService<Semester> {
     super(Const.SEMESTER);
   }
   public async getCurrentSemester(): Promise<BusinessResult<Semester>> {
-    try {
-      const response = await axiosInstance.get<BusinessResult<Semester>>(
-        `${this.endpoint}/current`
-      );
+    try{
+      const response = await axiosInstance.get(`${this.endpoint}/current`);
       return response.data;
     } catch (error) {
       return this.handleError(error);

@@ -8,7 +8,7 @@ class ProfileStudentService extends BaseService<ProfileStudent> {
   constructor() {
     super(Const.PROFILE_STUDENT);
   }
-  public fetchProfileByCurrentUser = async (): Promise<
+  public getProfileByCurrentUser = async (): Promise<
     BusinessResult<ProfileStudent>
   > => {
     try {

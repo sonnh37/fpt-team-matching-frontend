@@ -23,7 +23,7 @@ class ProjectSerivce extends BaseService<Project> {
     }
   };
 
-  public fetchAllForMentor = (
+  public getAllForMentor = (
       query?: ProjectGetListForMentorQuery
     ): Promise<BusinessResult<QueryResult<Project>>> => {
       const cleanedQuery = cleanQueryParams(query);

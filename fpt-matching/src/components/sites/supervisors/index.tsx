@@ -107,7 +107,7 @@ export default function SupervisorsTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => userService.fetchAll(queryParams),
+    queryFn: () => userService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

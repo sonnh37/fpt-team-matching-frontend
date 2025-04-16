@@ -18,7 +18,7 @@ const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: str
     useEffect(() => {
         if (capstoneScheduleId) {
             const fetchCapstoneSchedule = async () => {
-                const response = await capstoneService.fetchById(capstoneScheduleId);
+                const response = await capstoneService.getById(capstoneScheduleId);
                 if (response && response.data) {
                     setCapstoneSchedule(response.data);
                 }

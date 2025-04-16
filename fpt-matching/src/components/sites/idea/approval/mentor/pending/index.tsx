@@ -114,7 +114,7 @@ export function IdeaRequestPendingByMentorTable() {
   } = useQuery({
     queryKey: ["stage_idea_latest"],
     queryFn: () =>
-      stageideaService.fetchLatest(),
+      stageideaService.getCurrentStageIdea(),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -218,7 +218,7 @@ export function IdeaRequestPendingByMentorTable() {
             <DataTableComponent
               table={table}
               restore={ideaRequestService.restore}
-              deletePermanent={ideaRequestService.deletePermanent}
+              // deletePermanent={ideaRequestService.deletePermanent}
             />
             <DataTablePagination table={table} />
           </CardContent>

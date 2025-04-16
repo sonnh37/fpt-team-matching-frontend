@@ -88,7 +88,7 @@ export default function ProjectSearchList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await professionService.fetchAll();
+        const res = await professionService.getAll();
         console.log("check_profession", res.data);
         setProfessions(res.data?.results ?? []);
       } catch (error) {
@@ -131,7 +131,7 @@ export default function ProjectSearchList() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => projectService.fetchAll(queryParams),
+    queryFn: () => projectService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

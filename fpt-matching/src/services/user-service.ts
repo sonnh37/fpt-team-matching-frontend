@@ -21,7 +21,7 @@ class UserService extends BaseService<User> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-  public fetchAllByCouncilWithIdeaRequestPending = (
+  public getAllByCouncilWithIdeaRequestPending = (
     query?: UserGetAllQuery
   ): Promise<BusinessResult<QueryResult<User>>> => {
     const cleanedQuery = cleanQueryParams(query);
@@ -38,7 +38,7 @@ class UserService extends BaseService<User> {
       });
   };
 
-  public fetchUserByUsernameOrEmail = async (
+  public getUserByUsernameOrEmail = async (
     keyword: string
   ): Promise<BusinessResult<User>> => {
     try {
@@ -53,7 +53,7 @@ class UserService extends BaseService<User> {
     }
   };
 
-  public fetchUserByUsername = async (
+  public getUserByUsername = async (
     username: string
   ): Promise<BusinessResult<User>> => {
     try {
@@ -84,19 +84,6 @@ class UserService extends BaseService<User> {
     }
   };
 
-  // public fetchUserByRole= async (
-  //   role: string
-  // ): Promise<BusinessResult<User>> => {
-  //   try {
-  //     const response = await axiosInstance.get<BusinessResult<User>>(
-  //       `${this.endpoint}/Role=${role}&IsPagination=false`
-  //     );
-  //     return response.data;
-  //   } catch (error) {
-  //     this.handleError(error);
-  //     return Promise.reject(error);
-  //   }
-  // };
 
   public findAccountRegisteredByGoogle = async (
     token: string
@@ -120,7 +107,7 @@ class UserService extends BaseService<User> {
     return response.data;
   };
 
-  public fetchByEmail = async (
+  public getByEmail = async (
     email: string
   ): Promise<BusinessResult<User>> => {
     try {

@@ -100,7 +100,7 @@ export default function Blogmanagement() {
         isLoading
     } = useQuery({
         queryKey: ["getBlogAllById", query],
-        queryFn: () => blogService.fetchAll(query),
+        queryFn: () => blogService.getAll(query),
         refetchOnWindowFocus: false,
     });
 

@@ -111,7 +111,7 @@ export default function ProjectTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => projectService.fetchAllForMentor(queryParams),
+    queryFn: () => projectService.getAllForMentor(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

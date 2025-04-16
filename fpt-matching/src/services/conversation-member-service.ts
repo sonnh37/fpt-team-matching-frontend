@@ -9,7 +9,7 @@ class ConversationMemberService extends BaseService<ConversationMember>{
         super("conversation-members");
     }
 
-    public fetchConversationPartner = async (
+    public getConversationPartner = async (
         userId: string
     ): Promise<BusinessResult<ConversationMemberInfo[]>> => {
         try {

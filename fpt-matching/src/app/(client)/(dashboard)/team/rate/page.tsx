@@ -45,7 +45,7 @@ export default function Page() {
 
     const { data: ratingData } = useQuery({
         queryKey: ["getAllRates"],
-        queryFn: () => rateService.fetchAll(), // API trả về danh sách các đánh giá
+        queryFn: () => rateService.getAll(), // API trả về danh sách các đánh giá
         refetchOnWindowFocus: false,
     });
 

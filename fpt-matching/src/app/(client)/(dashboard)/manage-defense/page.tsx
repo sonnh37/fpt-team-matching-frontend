@@ -111,7 +111,7 @@ const Page = () => {
     useEffect(() => {
         const fetchData = async () => {
             const fetch_current_semester = await semesterService.getCurrentSemester();
-            const fetch_all_semester = await semesterService.fetchAll();
+            const fetch_all_semester = await semesterService.getAll();
             if (fetch_all_semester.data?.results) {
                 setSemesters(fetch_all_semester.data.results)
             }

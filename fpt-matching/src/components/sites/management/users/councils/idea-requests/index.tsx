@@ -112,7 +112,7 @@ export default function CouncilIdeaRequestPendingTable() {
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: () =>
-      userService.fetchAllByCouncilWithIdeaRequestPending(queryParams),
+      userService.getAllByCouncilWithIdeaRequestPending(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

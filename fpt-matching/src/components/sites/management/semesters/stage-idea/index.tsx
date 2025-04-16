@@ -179,7 +179,7 @@ export default function StageIdeaTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => stageideaService.fetchAll(queryParams),
+    queryFn: () => stageideaService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
