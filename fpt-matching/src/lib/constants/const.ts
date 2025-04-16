@@ -2,7 +2,7 @@ export class Const {
   // information
 
   //#region Environment Variables
-  static readonly CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID_GOOGLE;
+  static readonly CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   static readonly API_BASE = `${process.env.NEXT_PUBLIC_API_BASE}`;
   static readonly BASE_URL = `${process.env.NEXT_PUBLIC_SITE_URL}`;
   //#endregion
@@ -34,4 +34,5 @@ export class Const {
   static readonly CAPSTONE_SCHEDULES = "capstone-schedules";
   static readonly MENTOR_FEEDBACKS = "mentor-feedbacks";
   static readonly USER_X_ROLES = "user-x-roles";
+  static readonly ROLES = "roles";
 }
