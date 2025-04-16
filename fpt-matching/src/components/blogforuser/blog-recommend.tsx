@@ -45,7 +45,7 @@ const BlogRecommend: React.FC<BlogProps> = ({ id }) => {
     isLoading
   } = useQuery({
     queryKey: ["getBlogRecommend", id],
-    queryFn: () => blogService.fetchById(id),
+    queryFn: () => blogService.getById(id),
     refetchOnWindowFocus: false,
   });
 

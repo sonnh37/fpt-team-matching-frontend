@@ -14,7 +14,7 @@ export class BaseService<T> {
     this.endpoint = endpoint;
   }
 
-  public fetchAll = async (
+  public getAll = async (
     query?: BaseQueryableQuery
   ): Promise<BusinessResult<QueryResult<T>>> => {
     try {
@@ -28,7 +28,7 @@ export class BaseService<T> {
     }
   };
 
-  public fetchById = async (id: string): Promise<BusinessResult<T>> => {
+  public getById = async (id: string): Promise<BusinessResult<T>> => {
     try {
       const response = await axiosInstance.get<BusinessResult<T>>(
         `${this.endpoint}/${id}`

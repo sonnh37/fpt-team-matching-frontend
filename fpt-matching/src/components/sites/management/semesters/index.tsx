@@ -111,7 +111,7 @@ export default function SemesterTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => semesterService.fetchAll(queryParams),
+    queryFn: () => semesterService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -121,7 +121,7 @@ export default function SemesterTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalPages ?? 0,
+    pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
@@ -185,15 +185,14 @@ export default function SemesterTable() {
               // handleSheetChange={handleSheetChange}
               // formFilterAdvanceds={formFilterAdvanceds}
             />
-            {isFetching && !isTyping ? (
-              <LoadingComponent />
-            ) : (
-              <DataTableSemesterComponent
-                table={table}
-                restore={semesterService.restore}
-                deletePermanent={semesterService.deletePermanent}
-              />
-            )}
+
+            <DataTableSemesterComponent
+              // isLoading={isFetching && !isTyping}
+              table={table}
+              restore={semesterService.restore}
+              deletePermanent={semesterService.deletePermanent}
+            />
+
             <DataTablePagination table={table} />
           </div>
         </div>

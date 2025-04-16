@@ -19,7 +19,7 @@ export default function Page() {
   } = useQuery({
     queryKey: ["fetchSemesterById", params.semesterId],
     queryFn: async () => {
-      const response = await semesterService.fetchById(
+      const response = await semesterService.getById(
         params.semesterId as string
       );
       return response.data;

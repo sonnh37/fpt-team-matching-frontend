@@ -114,7 +114,7 @@ export function IdeaRequestPendingByCouncilTable() {
   } = useQuery({
     queryKey: ["stage_idea_latest"],
     queryFn: () =>
-      stageideaService.fetchLatest(),
+      stageideaService.getCurrentStageIdea(),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -132,7 +132,7 @@ export function IdeaRequestPendingByCouncilTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalPages ?? 0,
+    pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
@@ -218,7 +218,7 @@ export function IdeaRequestPendingByCouncilTable() {
             <DataTableComponent
               table={table}
               restore={ideaRequestService.restore}
-              deletePermanent={ideaRequestService.deletePermanent}
+              // deletePermanent={ideaRequestService.deletePermanent}
             />
             <DataTablePagination table={table} />
           </CardContent>

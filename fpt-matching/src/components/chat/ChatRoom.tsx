@@ -17,10 +17,10 @@ const ChatRoom = ({conn, messages, setMessages, chatRoom} : { conn: HubConnectio
 
     const getMessageInDay = async () => {
         if(chatRoom){
-            const result = await messageService.fetchMessageInDay(chatRoom.conversationId)
+            const result = await messageService.getMessageInDay(chatRoom.conversationId)
             setMessages(result.data)
             if (result.data == null || result.data.length < 10) {
-                const messageConversation = await messageService.fetchMessageByConversationId(chatRoom.conversationId, 15, pageNumber)
+                const messageConversation = await messageService.getMessageByConversationId(chatRoom.conversationId, 15, pageNumber)
                 setMessages((messages: MessageModel[]) => [...messageConversation.data!, ...messages]);
             }
         }
@@ -28,7 +28,7 @@ const ChatRoom = ({conn, messages, setMessages, chatRoom} : { conn: HubConnectio
 
     const fetchMessage = async () => {
         if(chatRoom){
-            const messageConversation = await messageService.fetchMessageByConversationId(chatRoom.conversationId, 15, pageNumber)
+            const messageConversation = await messageService.getMessageByConversationId(chatRoom.conversationId, 15, pageNumber)
             if (messageConversation.data?.length == 0) {
                 setHasMore(false);
                 return;

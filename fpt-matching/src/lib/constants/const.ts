@@ -1,68 +1,38 @@
 export class Const {
-    // information
-    static readonly TELEPHONE = "";
-    static readonly GMAIL = "";
-    static readonly SOCIAL_FACEBOOK = "";
-    static readonly SOCIAL_INSTAGRAM = "";
-    static readonly SOCIAL_TIKTOK = "";
-    //#region Environment Variables
-    static readonly CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID_GOOGLE;
-    static readonly API_BASE = `${process.env.NEXT_PUBLIC_API_BASE}`;
-    static readonly BASE_URL = `${process.env.NEXT_PUBLIC_SITE_URL}`;
-    //#endregion
-    static readonly FILE_UPLOAD = "file-upload";
-    static readonly ANSWERCRITERIA = "answer-criterias";
-    static readonly CRITERIA = "criterias";
-    static readonly CRITERIAFORM = "criteria-forms";
-    static readonly CRITERIAXFORM = "criteria-x-criteria-forms";
-    static readonly BLOG = "blogs";
-    static readonly RATE = "rates";
-    static readonly BLOGCV = "blog-cvs";
-    static readonly TEAMMEMBER = "team-members";
-    static readonly LIKE = "likes";
-    static readonly COMMENT = "comments";
-    static readonly PROJECT = "projects";
-    static readonly USER = "users";
-    static readonly SEMESTER = "semesters";
-    static readonly IDEA = "ideas";
-    static readonly IDEA_REQUEST = "idea-requests";
-    static readonly INVITATION = "invitations";
-    static readonly SPECIALTY = "specialties";
-    static readonly PROFESSION = "professions";
-    static readonly NOTIFICATION = "notifications";
-    static readonly PROFILE_STUDENT = "profile-students";
-    static readonly STAGE_IDEA = "stage-ideas";
-    static readonly AUTH = "auth";
-    static readonly MENTOR_IDEA_REQUESTS = "mentor-idea-requests";
-    static readonly IDEA_HISTORY = "idea-histories";
-    static readonly CAPSTONE_SCHEDULE = "capstone-schedules";
-    static readonly MENTOR_FEEDBACKS = "mentor-feedbacks";
+  // information
 
-    static readonly DASHBOARD = "dashboard";
-    static readonly DASHBOARD_URL = "/dashboard";
-    static readonly NEW = "new";
-    static readonly DASHBOARD_BLOG_URL = `/${Const.DASHBOARD}/${Const.BLOG}`;
-    static readonly DASHBOARD_BLOG_NEW_URL = `${Const.DASHBOARD_BLOG_URL}/${Const.NEW}`;
-
-    static readonly DASHBOARD_USER_URL = `/${Const.DASHBOARD}/${Const.USER}`;
-    static readonly DASHBOARD_USER_NEW_URL = `${Const.DASHBOARD_USER_URL}/${Const.NEW}`;
-
-
-    static readonly FADE_BOTTOM_ANIMATION_VARIANTS = {
-        hidden: {opacity: 0, y: -10},
-        show: {opacity: 1, y: 0, transition: {type: "spring", duration: 0.5}}, // Thêm duration
-    };
-    static readonly FADE_TOP_ANIMATION_VARIANTS = {
-        hidden: {opacity: 0, y: 10},
-        show: {opacity: 1, y: 0, transition: {type: "spring", duration: 0.5}}, // Thêm duration
-    };
-    static readonly FADE_RIGHT_ANIMATION_VARIANTS = {
-        hidden: {opacity: 0, x: -10},
-        show: {opacity: 1, x: 0, transition: {type: "spring", duration: 0.5}}, // Thêm duration
-    };
-    static readonly FADE_LEFT_ANIMATION_VARIANTS = {
-        hidden: {opacity: 0, x: 10},
-        show: {opacity: 1, x: 0, transition: {type: "spring", duration: 0.5}}, // Thêm duration
-    };
+  //#region Environment Variables
+  static readonly CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  static readonly API_BASE = `${process.env.NEXT_PUBLIC_API_BASE}`;
+  static readonly BASE_URL = `${process.env.NEXT_PUBLIC_SITE_URL}`;
+  //#endregion
+  static readonly FILE_UPLOAD = "file-upload";
+  static readonly ANSWERCRITERIA = "answer-criterias";
+  static readonly CRITERIA = "criterias";
+  static readonly CRITERIAFORM = "criteria-forms";
+  static readonly CRITERIAXFORM = "criteria-x-criteria-forms";
+  static readonly BLOGS = "blogs";
+  static readonly RATES = "rates";
+  static readonly BLOG_CVS = "blog-cvs";
+  static readonly TEAM_MEMBERS = "team-members";
+  static readonly LIKES = "likes";
+  static readonly COMMENTS = "comments";
+  static readonly PROJECTS = "projects";
+  static readonly USERS = "users";
+  static readonly SEMESTERS = "semesters";
+  static readonly IDEAS = "ideas";
+  static readonly IDEA_REQUESTS = "idea-requests";
+  static readonly INVITATIONS = "invitations";
+  static readonly SPECIALTIES = "specialties";
+  static readonly PROFESSIONS = "professions";
+  static readonly NOTIFICATIONS = "notifications";
+  static readonly PROFILE_STUDENTS = "profile-students";
+  static readonly STAGE_IDEAS = "stage-ideas";
+  static readonly AUTH = "auth";
+  static readonly MENTOR_IDEA_REQUESTS = "mentor-idea-requests";
+  static readonly IDEA_HISTORIES = "idea-histories";
+  static readonly CAPSTONE_SCHEDULES = "capstone-schedules";
+  static readonly MENTOR_FEEDBACKS = "mentor-feedbacks";
+  static readonly USER_X_ROLES = "user-x-roles";
+  static readonly ROLES = "roles";
 }
-

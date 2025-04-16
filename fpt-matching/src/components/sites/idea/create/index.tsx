@@ -175,7 +175,7 @@ export const CreateProjectForm = () => {
 
   const { data: result } = useQuery({
     queryKey: ["getUsersByRole", query],
-    queryFn: () => userService.fetchAll(query),
+    queryFn: () => userService.getAll(query),
     refetchOnWindowFocus: false,
   });
 
@@ -191,8 +191,8 @@ export const CreateProjectForm = () => {
     async function checkIdea() {
       try {
         const [profileRes, professionsRes] = await Promise.all([
-          profilestudentService.fetchProfileByCurrentUser(),
-          professionService.fetchAll(),
+          profilestudentService.getProfileByCurrentUser(),
+          professionService.getAll(),
         ]);
         setProfessions(professionsRes.data?.results ?? []);
 

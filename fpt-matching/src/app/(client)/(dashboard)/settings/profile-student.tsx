@@ -98,8 +98,8 @@ export function ProfileStudentForm({ user }: { user?: User }) {
     async function fetchData() {
       try {
         const [profileRes, professionsRes] = await Promise.all([
-          profilestudentService.fetchProfileByCurrentUser(),
-          (await professionService.fetchAll()).data,
+          profilestudentService.getProfileByCurrentUser(),
+          (await professionService.getAll()).data,
         ]);
 
         setProfile(profileRes.data ?? null);

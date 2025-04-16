@@ -11,7 +11,7 @@ import { IdeaRequestUpdateStatusCommand } from "@/types/models/commands/idea-req
 
 class IdeaRequestService extends BaseService<IdeaRequest> {
   constructor() {
-    super(Const.IDEA_REQUEST);
+    super(Const.IDEA_REQUESTS);
   }
 
   public GetIdeaRequestsCurrentByStatusAndRoles = (
@@ -31,7 +31,7 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
       });
   };
 
-  public fetchAllWithoutReviewer = (
+  public getAllWithoutReviewer = (
     query?: BaseQueryableQuery
   ): Promise<BusinessResult<QueryResult<IdeaRequest>>> => {
     const cleanedQuery = cleanQueryParams(query);
@@ -52,7 +52,7 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
     id: string
   ): Promise<BusinessResult<null>> => {
     try {
-      const res_ = await this.fetchById(id);
+      const res_ = await this.getById(id);
       if (res_.status !== 1) throw new Error(res_.message);
 
       const idea_id = res_.data?.ideaId;
@@ -66,7 +66,7 @@ class IdeaRequestService extends BaseService<IdeaRequest> {
 
       const { data: resIdea } = await axiosInstance.delete<
         BusinessResult<null>
-      >(`${Const.IDEA}?id=${idea_id}&isPermanent=true`);
+      >(`${Const.IDEAS}?id=${idea_id}&isPermanent=true`);
 
       return resIdea;
     } catch (error) {

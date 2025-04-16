@@ -44,6 +44,8 @@ import { z } from "zod";
 import { columns } from "./columns";
 import { userService } from "@/services/user-service";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import PageContainer from "@/components/layouts/page-container";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -105,7 +107,7 @@ export default function SupervisorsTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => userService.fetchAll(queryParams),
+    queryFn: () => userService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -134,7 +136,6 @@ export default function SupervisorsTable() {
   };
 
   return (
-    <>
       <div className="container mx-auto space-y-8">
         <div className="w-fit mx-auto space-y-4">
           <TypographyH2 className="text-center tracking-wide">
@@ -172,22 +173,12 @@ export default function SupervisorsTable() {
         </div>
 
         <div className="">
-            {isFetching && !isTyping ? (
-              <DataTableSkeleton
-                columnCount={1}
-                showViewOptions={false}
-                withPagination={false}
-                rowCount={pagination.pageSize}
-                searchableColumnCount={0}
-                filterableColumnCount={0}
-                shrinkZero
-              />
-            ) : (
-              <DataTableComponent table={table} />
-            )}
-            <DataTablePagination table={table} />
+          <DataTableComponent
+            isLoading={isFetching && !isTyping}
+            table={table}
+          />
+          <DataTablePagination table={table} />
         </div>
       </div>
-    </>
   );
 }

@@ -27,7 +27,7 @@ class ReviewService extends BaseService<Review>{
         }
     };
 
-    public fetchReviewBySemesterAndReviewNumber = async (
+    public getReviewBySemesterAndReviewNumber = async (
         {
             semesterId,
             reviewNumber,

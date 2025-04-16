@@ -76,7 +76,7 @@ export default function ProfileSocial() {
 
     } = useQuery({
         queryKey: ["getUserlById", userId],
-        queryFn: () => userService.fetchById(userId.toString()),
+        queryFn: () => userService.getById(userId.toString()),
         refetchOnWindowFocus: false,
     });
 
@@ -96,7 +96,7 @@ export default function ProfileSocial() {
         isLoading
     } = useQuery({
         queryKey: ["getBlogAllById", query],
-        queryFn: () => blogService.fetchAll(query),
+        queryFn: () => blogService.getAll(query),
         refetchOnWindowFocus: false,
     });
 

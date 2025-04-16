@@ -83,7 +83,7 @@ export default function Page ()  {
         const fetchDataReview = async () => {
             if (currentSemester) {
                 setLoading(true)
-                const result = await reviewService.fetchReviewBySemesterAndReviewNumber({semesterId: currentSemester.id!, reviewNumber: parseInt(reviewNumber)})
+                const result = await reviewService.getReviewBySemesterAndReviewNumber({semesterId: currentSemester.id!, reviewNumber: parseInt(reviewNumber)})
                 if (result.data) {
                     setReviews(result.data)
                     setLoading(false)

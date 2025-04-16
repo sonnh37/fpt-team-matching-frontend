@@ -7,7 +7,7 @@ import axiosInstance from '@/lib/interceptors/axios-instance';
 
 class LikeService extends BaseService<Like> {
   constructor() {
-    super(Const.LIKE);
+    super(Const.LIKES);
   }
 
 

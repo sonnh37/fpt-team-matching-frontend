@@ -39,6 +39,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
 import { IdeaGetListOfSupervisorsQuery } from "@/types/models/queries/ideas/idea-get-list-of-supervisor-query";
+import { LoadingComponent } from "@/components/_common/loading-page";
 
 const defaultSchema = z.object({
   englishName: z.string().optional(),
@@ -58,8 +59,11 @@ export default function IdeasOfSupervisorsTableTable() {
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "createdDate", desc: true },
   ]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -69,10 +73,16 @@ export default function IdeasOfSupervisorsTableTable() {
     resolver: zodResolver(defaultSchema),
   });
 
-  const [inputFields, setInputFields] = useState<z.infer<typeof defaultSchema>>();
+  const [inputFields, setInputFields] =
+    useState<z.infer<typeof defaultSchema>>();
 
   const queryParams: IdeaGetListOfSupervisorsQuery = useMemo(() => {
-    const baseParams = useQueryParams(inputFields, columnFilters, pagination, sorting);
+    const baseParams = useQueryParams(
+      inputFields,
+      columnFilters,
+      pagination,
+      sorting
+    );
     return {
       ...baseParams,
       types: [IdeaType.Lecturer, IdeaType.Enterprise],
@@ -82,13 +92,13 @@ export default function IdeasOfSupervisorsTableTable() {
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
-      setPagination(prev => ({ ...prev, pageIndex: 0 }));
+      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     }
   }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => ideaService.fetchAllIdeasOfSupervisors(queryParams),
+    queryFn: () => ideaService.getAllIdeasOfSupervisors(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -96,7 +106,7 @@ export default function IdeasOfSupervisorsTableTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalPages ?? 0,
+    pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
@@ -110,23 +120,22 @@ export default function IdeasOfSupervisorsTableTable() {
     setInputFields(values);
   };
 
-  if (error) return (
-    <div className="container mx-auto p-4">
-      <Card className="p-6 text-center">
-        <TypographyH2 className="text-destructive">Lỗi tải dữ liệu</TypographyH2>
-        <p className="mt-2 text-muted-foreground">
-          Đã xảy ra lỗi khi tải danh sách ý tưởng. Vui lòng thử lại sau.
-        </p>
-        <Button 
-          variant="outline" 
-          className="mt-4"
-          onClick={() => refetch()}
-        >
-          Thử lại
-        </Button>
-      </Card>
-    </div>
-  );
+  if (error)
+    return (
+      <div className="container mx-auto p-4">
+        <Card className="p-6 text-center">
+          <TypographyH2 className="text-destructive">
+            Lỗi tải dữ liệu
+          </TypographyH2>
+          <p className="mt-2 text-muted-foreground">
+            Đã xảy ra lỗi khi tải danh sách ý tưởng. Vui lòng thử lại sau.
+          </p>
+          <Button variant="outline" className="mt-4" onClick={() => refetch()}>
+            Thử lại
+          </Button>
+        </Card>
+      </div>
+    );
 
   return (
     <div className="container mx-auto py-8 space-y-8">
@@ -135,7 +144,7 @@ export default function IdeasOfSupervisorsTableTable() {
         <TypographyH2 className="text-primary">
           Danh sách Ý tưởng từ Giảng viên
         </TypographyH2>
-        
+
         <Card className="max-w-md mx-auto p-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -176,26 +185,11 @@ export default function IdeasOfSupervisorsTableTable() {
           isSelectColumns={false}
           isSortColumns={false}
         />
-        
-        {isFetching ? (
-          <DataTableSkeleton
-            columnCount={columns.length}
-            rowCount={pagination.pageSize}
-            showViewOptions={false}
-            withPagination={true}
-            searchableColumnCount={1}
-            filterableColumnCount={1}
-          />
-        ) : (
-          <>
-            <DataTableComponent 
-              table={table} 
-            />
-            <DataTablePagination 
-              table={table} 
-            />
-          </>
-        )}
+
+        <>
+          <DataTableComponent isLoading={isFetching} table={table} />
+          <DataTablePagination table={table} />
+        </>
       </Card>
     </div>
   );

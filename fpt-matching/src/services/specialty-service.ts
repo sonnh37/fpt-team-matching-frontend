@@ -4,7 +4,7 @@ import { BaseService } from "./_base/base-service";
 
 class SpecialtyService extends BaseService<Specialty> {
   constructor() {
-    super(Const.SPECIALTY);
+    super(Const.SPECIALTIES);
   }
  
 }

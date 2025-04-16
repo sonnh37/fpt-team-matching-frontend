@@ -24,7 +24,7 @@ const RateStudent = ({ id }: { id: string }) => {
 
     const { data: result } = useQuery({
         queryKey: ["getMemberById", id],
-        queryFn: () => teammemberService.fetchById(id),
+        queryFn: () => teammemberService.getById(id),
         refetchOnWindowFocus: false,
     });
     // const userisrated = result?.data?.find(x=>x.userId === id)

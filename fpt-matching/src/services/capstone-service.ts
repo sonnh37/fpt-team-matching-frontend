@@ -6,7 +6,7 @@ import {BusinessResult} from "@/types/models/responses/business-result";
 
 class CapstoneScheduleService extends BaseService<CapstoneSchedule>{
     constructor() {
-        super(Const.CAPSTONE_SCHEDULE);
+        super(Const.CAPSTONE_SCHEDULES);
     }
     public async getBySemesterAndStage({semesterId, stage}: {semesterId: string, stage: number}) : Promise<BusinessResult<CapstoneSchedule[]>> {
         const response = await axiosInstance.post(`${this.endpoint}/get-by-semester-id-and-stage`, {

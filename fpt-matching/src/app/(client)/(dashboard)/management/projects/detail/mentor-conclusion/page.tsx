@@ -70,7 +70,7 @@ const Page = () => {
             return;
         }
         const fetchData = async () => {
-            const response = await projectService.fetchById(projectId);
+            const response = await projectService.getById(projectId);
             if (response && response.data) {
                 setProject(response.data)
                 console.log(response.data)

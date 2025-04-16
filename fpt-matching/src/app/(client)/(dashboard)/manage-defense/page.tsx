@@ -40,6 +40,7 @@ import { Button } from '@/components/ui/button';
 import {sheet2arr} from "@/lib/utils";
 
 function DropdownSemester({semesters, currentSemester, setCurrentSemester}: {semesters: Semester[], currentSemester: Semester, setCurrentSemester: Dispatch<SetStateAction<Semester | undefined>>}) {
+    if(!semesters) return;
     const dictionary: Record<string, Semester> = semesters.reduce(
         (acc, item) => {
             acc[item.id!] = item;
@@ -110,7 +111,7 @@ const Page = () => {
     useEffect(() => {
         const fetchData = async () => {
             const fetch_current_semester = await semesterService.getCurrentSemester();
-            const fetch_all_semester = await semesterService.fetchAll();
+            const fetch_all_semester = await semesterService.getAll();
             if (fetch_all_semester.data && fetch_all_semester.data.results) {
                 setSemesters(fetch_all_semester.data.results)
             }

@@ -15,7 +15,7 @@ import { InvitationUpdateCommand } from "@/types/models/commands/invitation/invi
 
 class InvitationService extends BaseService<Invitation> {
   constructor() {
-    super(Const.INVITATION);
+    super(Const.INVITATIONS);
   }
   public getUserInvitationsByType = (
     query?: InvitationGetByTypeQuery

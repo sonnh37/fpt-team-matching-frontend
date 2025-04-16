@@ -11,6 +11,7 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import { ConfirmProvider } from "@/components/_common/formdelete/confirm-context";
 import { CircleCheck } from "lucide-react";
 import { Toaster } from "@/components/_common/toast";
+import { Const } from "@/lib/constants/const";
 
 export default function LayoutClient({
   children,
@@ -41,7 +42,7 @@ export default function LayoutClient({
         <Provider store={store}>
           <QueryClientProvider client={queryClient}>
             <GoogleOAuthProvider
-              clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}
+              clientId={Const.CLIENT_ID ?? ""}
             >
               <TooltipProvider delayDuration={100}>
                 <AuthProvider>
