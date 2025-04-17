@@ -16,7 +16,6 @@ import {
 import {Department} from "@/types/enums/user";
 import {userService} from "@/services/user-service";
 import {toast} from "sonner";
-import UserCreateByManagerCommand from "@/types/models/commands/users/user-create-by-manager-command";
 
 
 function UserConfirmationTable({users} : {users: User[]}) {
@@ -38,7 +37,7 @@ function UserConfirmationTable({users} : {users: User[]}) {
             <TableBody>
                 {users.map((user) => (
                     <TableRow key={user.code}>
-                        <TableCell className="font-medium text-center">{user.code}</TableCell>
+                        <TableCell className="font-bold text-center">{user.code}</TableCell>
                         <TableCell className={"text-center"}>{user.firstName} {user.lastName}</TableCell>
                         <TableCell className={"text-center"}>{user.email}</TableCell>
                         <TableCell className={"text-center"}>{user.phone ?? "Empty"}</TableCell>
@@ -57,7 +56,7 @@ function UserConfirmationTable({users} : {users: User[]}) {
     )
 }
 
-const DialogConfirmUpdate = ({open, setOpen, usersConfirm } : {open: boolean, setOpen: Dispatch<SetStateAction<boolean>>, usersConfirm: User[]}) => {
+const DialogConfirmUpdate = ({open, setOpen, usersConfirm, role} : {open: boolean, setOpen: Dispatch<SetStateAction<boolean>>, usersConfirm: User[], role: string}) => {
     const [loading, setLoading] = useState(false);
     const handleSaveChange = async () => {
         setLoading(true);
@@ -82,9 +81,15 @@ const DialogConfirmUpdate = ({open, setOpen, usersConfirm } : {open: boolean, se
                 <DialogHeader>
                     <DialogTitle>Xác nhận cập nhật</DialogTitle>
                 </DialogHeader>
-                <div className="grid gap-4 pb-4 text-[14px] text-gray-600">
-                    Đây là những tài khoản đã tồn tại. Nếu tiếp tục thì CHỈ sẽ cập nhập lại KỲ của những tài khoản này vào KỲ tiếp theo. <br /> Vui lòng cân nhắc trước khi tiếp tục.
-                </div>
+                {role == "Student" ? (
+                    <div className="grid gap-4 pb-4 text-[14px] text-gray-600">
+                        Đây là những tài khoản đã tồn tại. Nếu tiếp tục thì CHỈ sẽ cập nhập lại KỲ của những tài khoản này vào KỲ tiếp theo. <br /> Vui lòng cân nhắc trước khi tiếp tục.
+                    </div>
+                ) : (
+                    <div className="grid gap-4 pb-4 text-[14px] text-gray-600">
+                        Đây là những tài khoản đã tồn tại.
+                    </div>
+                )}
                 <div className={"w-full"}>
                    <UserConfirmationTable users={usersConfirm} />
                 </div>
@@ -95,9 +100,13 @@ const DialogConfirmUpdate = ({open, setOpen, usersConfirm } : {open: boolean, se
                             Please wait
                         </Button> :
                        <>
-                           <Button
-                               onClick={() => handleSaveChange()}
-                               type="submit">Xác nhận</Button>
+                       {
+                            role == "Student" && (
+                               <Button
+                                   onClick={() => handleSaveChange()}
+                                   type="submit">Xác nhận</Button>
+                           )
+                       }
                            <Button onClick={() => {
                                setOpen(false);
                            }} variant={"outline"} type={"submit"}>Không cập nhật</Button>
