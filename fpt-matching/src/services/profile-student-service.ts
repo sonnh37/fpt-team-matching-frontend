@@ -6,9 +6,9 @@ import axiosInstance from "@/lib/interceptors/axios-instance";
 
 class ProfileStudentService extends BaseService<ProfileStudent> {
   constructor() {
-    super(Const.PROFILE_STUDENT);
+    super(Const.PROFILE_STUDENTS);
   }
-  public fetchProfileByCurrentUser = async (): Promise<
+  public getProfileByCurrentUser = async (): Promise<
     BusinessResult<ProfileStudent>
   > => {
     try {

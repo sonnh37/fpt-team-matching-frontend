@@ -21,7 +21,7 @@ class AuthService {
   ): Promise<BusinessResult<null>> => {
     try {
       const response = await axios.post<BusinessResult<null>>(
-        `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/login`,
+        `${Const.API_BASE}/api/auth/login`,
         { account: account, password: password, department: department },
         {
           withCredentials: true,
@@ -39,7 +39,7 @@ class AuthService {
   ): Promise<BusinessResult<null>> => {
     try {
       const response = await axios.post<BusinessResult<null>>(
-        `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/login-by-google`,
+        `${Const.API_BASE}/api/auth/login-by-google`,
         { token: token, department: department },
         {
           withCredentials: true,
@@ -69,7 +69,7 @@ class AuthService {
       //   `${this.endpoint}/info`
       // );
       const response = await axios.get<BusinessResult<User>>(
-        `${process.env.NEXT_PUBLIC_API_BASE}/api/auth/info`,
+        `${Const.API_BASE}/api/auth/info`,
         { withCredentials: true }
       );
       return response.data;

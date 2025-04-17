@@ -88,7 +88,7 @@ export default function TeamInfoDetail() {
   } = useQuery({
     queryKey: ["project", teamId],
     queryFn: () =>
-      projectService.fetchById(teamId!.toString()).then((res) => res.data),
+      projectService.getById(teamId!.toString()).then((res) => res.data),
     enabled: !!teamId,
   });
 

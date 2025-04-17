@@ -86,7 +86,7 @@ export const columns: ColumnDef<User>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("dob"));
-      return formatDate(date)
+      return formatDate(date);
     },
   },
   {
@@ -128,43 +128,17 @@ export const columns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="Role" />
     ),
     cell: ({ row }) => {
-      // Lấy danh sách roles từ userXRoles
       const roles = row.original.userXRoles?.map(
         (userXRole: UserXRole) => userXRole.role?.roleName
       );
 
-      // Hiển thị role đầu tiên hoặc "N/A" nếu không có
       return <TypographyP>{roles?.join(", ") || "N/A"}</TypographyP>;
     },
   },
   {
     accessorKey: "isDeleted",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Is Deleted" />
-    ),
-    cell: ({ row }) => {
-      const isDeleted = row.getValue("isDeleted") as boolean;
-      if (!isDeleted) {
-        return (
-          <Image
-            src="https://firebasestorage.googleapis.com/v0/b/smart-thrive.appspot.com/o/Blog%2Fcheck.png?alt=media&token=1bdb7751-4bdc-4af1-b6e1-9b758df3a3d5"
-            width={500}
-            height={500}
-            alt="Gallery Icon"
-            className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
-          />
-        );
-      }
-      return (
-        <Image
-          src="https://firebasestorage.googleapis.com/v0/b/smart-thrive.appspot.com/o/Blog%2Funcheck.png?alt=media&token=3b2b94d3-1c59-4a96-b4c6-312033d868b1"
-          width={500}
-          height={500}
-          alt="Gallery Icon"
-          className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
-        />
-      );
-    },
+    header: ({ column }) => null,
+    cell: ({ row }) => null,
   },
 ];
 

@@ -51,7 +51,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
         refetch,
     } = useQuery({
         queryKey: ["getCommentAllByProject", query],
-        queryFn: () => commentService.fetchAll(query),
+        queryFn: () => commentService.getAll(query),
         refetchOnWindowFocus: false,
     });
     // useEffect(() => {
@@ -78,7 +78,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
             isPagination: true,
         };
 
-        const result = await commentService.fetchAll(query);
+        const result = await commentService.getAll(query);
 
         if ((result?.data?.results?.length ?? 0) > 0) {
             setAllData(prev => [...prev, ...(result?.data?.results || [])]);

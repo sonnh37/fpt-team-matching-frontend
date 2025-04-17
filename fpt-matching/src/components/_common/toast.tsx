@@ -25,7 +25,7 @@ export function Toaster() {
           : "light"
       }
       className="flex justify-center"
-      duration={60000000}
+      // duration={60000000}
       expand={true}
       toastOptions={{
         // closeButton: true,

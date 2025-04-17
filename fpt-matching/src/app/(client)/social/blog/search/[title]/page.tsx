@@ -115,7 +115,7 @@ export default function Search() {
     isLoading
   } = useQuery({
     queryKey: ["getBlogAllSearch", query],
-    queryFn: () => blogService.fetchAll(query),
+    queryFn: () => blogService.getAll(query),
     refetchOnWindowFocus: false,
   });
   useEffect(() => {
@@ -138,7 +138,7 @@ export default function Search() {
     data: resultall
   } = useQuery({
     queryKey: ["getBlogAll", query1],
-    queryFn: () => blogService.fetchAll(query1),
+    queryFn: () => blogService.getAll(query1),
     refetchOnWindowFocus: false,
   });
   // day la sort blog notification

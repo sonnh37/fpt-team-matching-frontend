@@ -167,7 +167,7 @@ export default function Blog() {
       }
     };
     const fetchProfileStudent = async () => {
-      const response = await profilestudentService.fetchProfileByCurrentUser();
+      const response = await profilestudentService.getProfileByCurrentUser();
       if (response && response.data) {
         setStudentProfile(response.data);
       }
@@ -205,7 +205,7 @@ export default function Blog() {
     isLoading
   } = useQuery({
     queryKey: ["getBlogAll", query],
-    queryFn: () => blogService.fetchAll(query),
+    queryFn: () => blogService.getAll(query),
     refetchOnWindowFocus: false,
   });
   useEffect(() => {

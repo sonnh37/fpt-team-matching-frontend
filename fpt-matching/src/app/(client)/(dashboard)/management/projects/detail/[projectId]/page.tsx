@@ -45,7 +45,7 @@ export default function ProjectDetail() {
     isError: isError,
   } = useQuery({
     queryKey: ["getProjectDetailById", projectId as string],
-    queryFn: () => projectService.fetchById(projectId as string),
+    queryFn: () => projectService.getById(projectId as string),
     refetchOnWindowFocus: false,
   });
 

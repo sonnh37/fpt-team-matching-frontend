@@ -70,7 +70,7 @@ const Page = () => {
             return;
         }
         const fetchData = async () => {
-            const response = await projectService.fetchById(projectId);
+            const response = await projectService.getById(projectId);
             if (response && response.data) {
                 setProject(response.data)
                 console.log(response.data)
@@ -87,9 +87,7 @@ const Page = () => {
         }
         fetchData()
     }, [projectId]);
-    console.log(mentorFeedback)
     const handleSaveChange = async () => {
-        console.log(project);
         if (sinhViens.some(x => x.id == null)) {
             toast.error("Có lỗi khi cập nhật")
             return;
@@ -116,6 +114,7 @@ const Page = () => {
         }
 
     }
+    console.log(project)
     return (
         <div className={"p-8"}>
             {/*Start 1*/}
@@ -245,25 +244,29 @@ const Page = () => {
                     {/*<p className={"ml-8"}></p>*/}
                 </Label>
                 <div className={"mt-4"}>
-                    <Select defaultValue={project?.defenseStage ? project.defenseStage.toString() : undefined} onValueChange={(e) => {
-                        setProject((prev) => {
-                            if (!prev)
-                                return null;
-                            prev.defenseStage = parseInt(e)
-                            return prev
-                        })
-                    }}>
-                        <SelectTrigger className="w-[40%]">
-                            <SelectValue placeholder="Quyết định giao đoạn ra hội đồng" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectGroup>
-                                <SelectLabel>Chọn giai đoạn</SelectLabel>
-                                <SelectItem value="1">Lần 1</SelectItem>
-                                <SelectItem value="2">Lần 2</SelectItem>
-                            </SelectGroup>
-                        </SelectContent>
-                    </Select>
+                    {
+                        project && (
+                            <Select defaultValue={project.defenseStage ? project.defenseStage.toString() : undefined} onValueChange={(e) => {
+                                setProject((prev) => {
+                                    if (!prev)
+                                        return null;
+                                    prev.defenseStage = parseInt(e)
+                                    return prev
+                                })
+                            }}>
+                                <SelectTrigger className="w-[40%]">
+                                    <SelectValue placeholder="Quyết định giao đoạn ra hội đồng" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectLabel>Chọn giai đoạn</SelectLabel>
+                                        <SelectItem value="1">Lần 1</SelectItem>
+                                        <SelectItem value="2">Lần 2</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                        )
+                    }
                 </div>
             </div>
             {/*End 4*/}

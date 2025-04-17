@@ -33,7 +33,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const {setTheme} = useTheme();
   const { data: semesterData } = useQuery({
     queryKey: ["getSemesterLatest_AppSidebar"],
-    queryFn: () => semesterService.fetchLatest(),
+    queryFn: () => semesterService.getCurrentSemester(),
     refetchOnWindowFocus: false,
   });
 

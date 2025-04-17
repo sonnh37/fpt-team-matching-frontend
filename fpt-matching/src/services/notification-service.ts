@@ -10,10 +10,10 @@ import qs from "qs";
 
 class NotificationService extends BaseService<Notification> {
   constructor() {
-    super(Const.NOTIFICATION);
+    super(Const.NOTIFICATIONS);
   }
 
-  public fetchAllByCurrentUser = (
+  public getAllByCurrentUser = (
     query?: NotificationGetAllByCurrentUserQuery
   ): Promise<BusinessResult<QueryResult<Notification>>> => {
     const queryString = qs.stringify(query, { skipNulls: true });

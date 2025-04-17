@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 const ProjectInfo = ({ id }: { id: string }) => {
     const { data: result } = useQuery({
       queryKey: ["getBlogById", id],
-      queryFn: () => projectService.fetchById(id),
+      queryFn: () => projectService.getById(id),
       refetchOnWindowFocus: false,
     });
   

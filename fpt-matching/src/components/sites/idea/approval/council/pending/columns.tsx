@@ -138,7 +138,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     error,
   } = useQuery({
     queryKey: ["getIdeaDetailWhenClick", ideaId],
-    queryFn: () => ideaService.fetchById(ideaId as string),
+    queryFn: () => ideaService.getById(ideaId as string),
     refetchOnWindowFocus: false,
   });
   useEffect(() => {

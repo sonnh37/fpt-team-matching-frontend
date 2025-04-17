@@ -4,7 +4,7 @@ import { BlogCv } from "@/types/blog-cv";
 
 class BlogCvService extends BaseService<BlogCv>{
     constructor() {
-        super(Const.BLOGCV);
+        super(Const.BLOG_CVS);
       }
 
       

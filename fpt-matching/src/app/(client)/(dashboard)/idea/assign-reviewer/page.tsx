@@ -33,7 +33,7 @@
 //       {
 //         queryKey: ["dataIdeaRequestByCouncilPending"],
 //         queryFn: () =>
-//           ideaRequestService.fetchAll({
+//           ideaRequestService.getAll({
 //             status: IdeaRequestStatus.CouncilPending
 //           } as IdeaRequestGetAllQuery),
 //         refetchOnWindowFocus: false,
@@ -41,7 +41,7 @@
 //       {
 //         queryKey: ["dataWithoutReviewer"],
 //         queryFn: () =>
-//           ideaRequestService.fetchAllWithoutReviewer(),
+//           ideaRequestService.getAllWithoutReviewer(),
 //         refetchOnWindowFocus: false,
 //       },
 //     ],

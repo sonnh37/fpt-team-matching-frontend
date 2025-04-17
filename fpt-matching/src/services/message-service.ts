@@ -7,7 +7,7 @@ class MessageService extends BaseService<MessageModel>{
     constructor() {
         super("message");
     }
-    public fetchMessageInDay = async (
+    public getMessageInDay = async (
         conversationId: string
     ): Promise<BusinessResult<MessageModel[]>> => {
         try {
@@ -21,7 +21,7 @@ class MessageService extends BaseService<MessageModel>{
         }
     };
 
-    public fetchMessageByConversationId = async (
+    public getMessageByConversationId = async (
         conversationId: string,
         pageSize: number,
         pageNumber: number

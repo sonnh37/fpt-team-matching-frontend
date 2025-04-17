@@ -40,7 +40,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
         refetch
     } = useQuery({
         queryKey: ["getBlogCVAllById", query],
-        queryFn: () => blogCvService.fetchAll(query),
+        queryFn: () => blogCvService.getAll(query),
         refetchOnWindowFocus: false,
     });
 

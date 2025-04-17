@@ -13,7 +13,7 @@ export default function useNotification(
   useEffect(() => {
     const fetchAllNotifications = async () => {
       try {
-        const response = await notificationService.fetchAllByCurrentUser(
+        const response = await notificationService.getAllByCurrentUser(
           query
         );
         setNotifications(response.data?.results);

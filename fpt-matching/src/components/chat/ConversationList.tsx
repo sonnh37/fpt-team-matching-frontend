@@ -15,7 +15,7 @@ const ConversationList = ({joinChatRoom, setChatRoom, chatRoom}: { joinChatRoom 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const data = await conversationMemberService.fetchConversationPartner(user.id ? user.id : "");
+                const data = await conversationMemberService.getConversationPartner(user.id ? user.id : "");
                 setConversations(data.data)
             } catch (error) {
                 console.error("Error fetching data:", error);

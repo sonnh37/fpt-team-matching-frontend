@@ -39,7 +39,7 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
         refetch,
     } = useQuery({
         queryKey: ["getBlogtInfo", blogId],
-        queryFn: () => blogService.fetchById(blogId),
+        queryFn: () => blogService.getById(blogId),
         refetchOnWindowFocus: false,
     });
     const userIsExist = result?.data?.user?.id ?? ""

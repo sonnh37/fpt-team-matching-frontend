@@ -45,7 +45,7 @@ export default function ProfilePage() {
     isLoading,
   } = useQuery({
     queryKey: ["getUserInfo", profileId],
-    queryFn: () => userService.fetchById(profileId?.toString()),
+    queryFn: () => userService.getById(profileId?.toString()),
     refetchOnWindowFocus: false,
   });
 

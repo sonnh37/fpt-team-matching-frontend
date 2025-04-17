@@ -7,22 +7,26 @@ import { StageIdea } from "@/types/stage-idea";
 
 class StageIdeaSerivce extends BaseService<StageIdea> {
   constructor() {
-    super(Const.STAGE_IDEA);
+    super(Const.STAGE_IDEAS);
   }
 
-  public fetchByStageNumber = (number: number): Promise<BusinessResult<StageIdea>> => {
+  public getByStageNumber = (
+    number: number
+  ): Promise<BusinessResult<StageIdea>> => {
     return axiosInstance
       .get<BusinessResult<StageIdea>>(`${this.endpoint}/stage-number/${number}`)
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-  public fetchLatest = (): Promise<BusinessResult<StageIdea>> => {
-    return axiosInstance
-      .get<BusinessResult<StageIdea>>(`${this.endpoint}/latest`)
-      .then((response) => response.data)
-      .catch((error) => this.handleError(error)); // Xử lý lỗi
-  };
+  public async getCurrentStageIdea(): Promise<BusinessResult<StageIdea>> {
+    try {
+      const response = await axiosInstance.get(`${this.endpoint}/current`);
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 }
 
 export const stageideaService = new StageIdeaSerivce();

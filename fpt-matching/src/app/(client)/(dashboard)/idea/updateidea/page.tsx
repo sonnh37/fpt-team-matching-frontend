@@ -90,7 +90,7 @@ const UpdateProjectTeam = () => {
       if (!debouncedSearchQuery) return [];
 
       try {
-        const response = await userService.fetchAll(query);
+        const response = await userService.getAll(query);
         // Kiểm tra nhiều cấp độ để đảm bảo không bị lỗi
         return response?.status === 1 ? response.data?.results ?? [] : [];
       } catch (error) {
@@ -171,7 +171,7 @@ const UpdateProjectTeam = () => {
       }
 
       try {
-        const receiver = await userService.fetchByEmail(emailToInvite);
+        const receiver = await userService.getByEmail(emailToInvite);
 
         if (receiver.status === 1 && receiver.data) {
           const idReceiver = receiver.data.id;

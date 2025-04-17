@@ -7,7 +7,7 @@ import { Const } from "@/lib/constants/const";
 
 class BlogService extends BaseService<Blog>{
     constructor() {
-        super(Const.BLOG);
+        super(Const.BLOGS);
       }
 
       

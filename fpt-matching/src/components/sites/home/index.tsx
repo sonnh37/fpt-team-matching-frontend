@@ -88,7 +88,7 @@ export default function ProjectSearchList() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await professionService.fetchAll();
+        const res = await professionService.getAll();
         console.log("check_profession", res.data);
         setProfessions(res.data?.results ?? []);
       } catch (error) {
@@ -131,7 +131,7 @@ export default function ProjectSearchList() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => projectService.fetchAll(queryParams),
+    queryFn: () => projectService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -141,7 +141,7 @@ export default function ProjectSearchList() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalPages ?? 0,
+    pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
@@ -266,24 +266,33 @@ export default function ProjectSearchList() {
                 </div>
               </div>
 
-              <Button disabled={isFetching} type="submit" variant="default" className="w-full">
-                {isFetching ? <><PiSpinner className="animate-spin"/></> : <Search />}
+              <Button
+                disabled={isFetching}
+                type="submit"
+                variant="default"
+                className="w-full"
+              >
+                {isFetching ? (
+                  <>
+                    <PiSpinner className="animate-spin" />
+                  </>
+                ) : (
+                  <Search />
+                )}
               </Button>
             </form>
           </Form>
         </div>
 
         <div className="space-y-4 h-full">
-          {isFetching ? (
-            <LoadingComponent />
-          ) : (
+        
             <DataTableComponent
-              isEnableHeader={false}
+              isLoading={isFetching}
               deletePermanent={projectService.deletePermanent}
               restore={projectService.restore}
               table={table}
             />
-          )}
+        
           <DataTablePagination table={table} />
         </div>
       </div>

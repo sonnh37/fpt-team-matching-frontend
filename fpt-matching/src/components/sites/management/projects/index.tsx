@@ -48,6 +48,7 @@ import { DataTableToolbar } from "@/components/_common/data-table-api/data-table
 import { FilterEnum } from "@/types/models/filter-enum";
 import { isDeleted_options } from "@/lib/filter-options";
 import { ProjectGetListForMentorQuery } from "@/types/models/queries/projects/project-get-list-for-mentor-query";
+import { LoadingComponent } from "@/components/_common/loading-page";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -110,7 +111,7 @@ export default function ProjectTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => projectService.fetchAllForMentor(queryParams),
+    queryFn: () => projectService.getAllForMentor(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -120,7 +121,7 @@ export default function ProjectTable() {
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    rowCount: data?.data?.totalPages ?? 0,
+    pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
@@ -184,23 +185,13 @@ export default function ProjectTable() {
             // handleSheetChange={handleSheetChange}
             // formFilterAdvanceds={formFilterAdvanceds}
           />
-          {isFetching && !isTyping ? (
-            <DataTableSkeleton
-              columnCount={1}
-              showViewOptions={false}
-              withPagination={false}
-              rowCount={pagination.pageSize}
-              searchableColumnCount={0}
-              filterableColumnCount={0}
-              shrinkZero
-            />
-          ) : (
-            <DataTableComponent
-              table={table}
-              restore={projectService.restore}
-              deletePermanent={projectService.deletePermanent}
-            />
-          )}
+
+          <DataTableComponent
+            isLoading={isFetching && !isTyping}
+            table={table}
+            restore={projectService.restore}
+            deletePermanent={projectService.deletePermanent}
+          />
           <DataTablePagination table={table} />
         </Card>
       </div>
