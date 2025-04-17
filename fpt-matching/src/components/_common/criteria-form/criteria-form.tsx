@@ -27,7 +27,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CriteriaFormCreateCommand } from '@/types/models/commands/criteria-form/criteria-forn-create-command';
-
+import { PlusCircle } from 'lucide-react';
+import DetailFormCriteria from '../criteria-form-detail/detail-form';
 
 const CriteriaForm = () => {
 
@@ -58,7 +59,7 @@ const CriteriaForm = () => {
             cancelText: "Không,cảm ơn",
         })
         if (confirmed) {
-            const result = await criteriaFormService.deletePermanent(id)
+            const result = await criteriaFormService.delete(id)
             if (result.status == 1) {
                 toast.success("Xóa thành công lời mời!")
                 refetch();
@@ -95,48 +96,46 @@ const CriteriaForm = () => {
                     />
 
                     {/* Search Buttons */}
-                    <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                        Search
-                    </button>
+                    <Button className=" bg-blue-500 hover:bg-blue-600">
+                        Tìm kiếm
+                    </Button>
 
                 </div>
 
                 {/* Right: Create Form Button */}
                 <div>
-                    <button className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
-                        <Dialog>
-                            <DialogTrigger asChild>
-                                <div>Tạo Đơn</div>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px]">
-                                <DialogHeader>
-                                    <DialogTitle>Form tạo đơn tiêu chí</DialogTitle>
-                                    <DialogDescription>
-                                        Đây là đơn để tạo form tiêu chí đánh giá.
-                                    </DialogDescription>
-                                </DialogHeader>
-                                <div className="grid gap-4 py-4">
-                                    <div className="grid grid-cols-4 items-center gap-4">
-                                        <Label htmlFor="name" className="text-right">
-                                            Tiêu đề:
-                                        </Label>
-                                        <Input
-                                            id="title"
-                                            name="title"
-                                            value={title}
-                                            onChange={handleChange}
-                                            className="col-span-3"
-                                        />
+                    <Dialog>
+                        <DialogTrigger asChild>
+                            <Button className="px-6 py-2  hover:bg-orange-700"> <PlusCircle className=''/>Tạo đơn</Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px]">
+                            <DialogHeader>
+                                <DialogTitle>Form tạo đơn tiêu chí</DialogTitle>
+                                <DialogDescription>
+                                    Đây là đơn để tạo form tiêu chí đánh giá.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor="name" className="text-right">
+                                        Tiêu đề:
+                                    </Label>
+                                    <Input
+                                        id="title"
+                                        name="title"
+                                        value={title}
+                                        onChange={handleChange}
+                                        className="col-span-3"
+                                    />
 
-                                    </div>
                                 </div>
-                                <DialogFooter>
-                                    <Button type="submit" onClick={() => handCreate()} >Lưu đơn</Button>
-                                </DialogFooter>
-                            </DialogContent>
-                        </Dialog>
+                            </div>
+                            <DialogFooter>
+                                <Button type="submit" onClick={() => handCreate()} >Lưu đơn</Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
 
-                    </button>
                 </div>
             </div>
 
@@ -152,7 +151,7 @@ const CriteriaForm = () => {
                             <TableHead>Tên người nộp</TableHead>
                             <TableHead>Tên đơn</TableHead>
                             <TableHead>Trạng thái</TableHead>
-                            <TableHead className="text-center">Action </TableHead>
+                            <TableHead className="text-center">Hành động</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -174,15 +173,15 @@ const CriteriaForm = () => {
                                             Đã xóa
                                         </button>
                                     ) : (
-                                        <button className=" p-2 bg-green-600 rounded-sm">
+                                        <button className=" p-2 bg-green-500 rounded-sm">
                                             Đang sử dụng
                                         </button>
                                     )}
                                 </TableCell>
                                 {/* <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`/social/blog/profile-social/${cv.user?.id}`}>Xem profile</a></button></TableCell> */}
                                 <TableCell className='flex justify-center' >
-                                    <button className="p-2 bg-red-600 ml-3 rounded-sm" onClick={() => handleDelete(cv.id ?? "")}> Xóa CV</button>
-                                    <button className="p-2 bg-orange-400 ml-3 rounded-sm" onClick={() => handleDelete(cv.id ?? "")}>Chi tiết</button>
+                                    <Button variant={"destructive"} onClick={() => handleDelete(cv.id ?? "")}> Xóa đơn</Button>
+                                     <DetailFormCriteria id={cv.id ?? ""}/>
                                 </TableCell>
                             </TableRow>
                         ))}
