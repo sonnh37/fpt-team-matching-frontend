@@ -11,5 +11,5 @@ class CriteriaService extends BaseService<Criteria> {
   
   }
   
-  export const criteriaFormService = new CriteriaService();
+  export const criteriaService = new CriteriaService();
   

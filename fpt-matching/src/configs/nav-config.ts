@@ -127,9 +127,9 @@ export const NAV_CONFIG = {
     },
     {
       title: "Quản lý các tiêu chí",
-      url: "/",
+      url: "/manage-criteria",
       icon: ShieldHalf,
-      roles: ["Manager"],
+      roles: ["*"],
     },
     {
       title: "Quản lý dự án",
