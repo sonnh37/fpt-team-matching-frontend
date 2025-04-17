@@ -133,7 +133,7 @@ export function DataTableComponent<TData>({
     <div ref={tableRef} className="rounded-md border">
       <ScrollArea style={{ height: tableHeight }} className="relative w-full">
         <Table className={cn("w-full", className)}>
-          <TableHeader className="sticky top-0 z-10 bg-background">
+          <TableHeader className="sticky top-0 z-10 bg-background ">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}
