@@ -130,10 +130,11 @@ export function DataTableComponent<TData>({
   };
 
   return (
-    <div ref={tableRef} className="rounded-md border">
-      <ScrollArea style={{ height: tableHeight }} className="relative w-full">
+    <div ref={tableRef} className="rounded-md border overflow-hidden relative">
+      <ScrollArea style={{ height: tableHeight }} className="w-full">
         <Table className={cn("w-full", className)}>
-          <TableHeader className="sticky top-0 z-10 bg-background ">
+          {/* Sticky Header với border hoàn chỉnh */}
+          <TableHeader className="sticky top-0 z-10 bg-background border-b">
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
                 key={headerGroup.id}

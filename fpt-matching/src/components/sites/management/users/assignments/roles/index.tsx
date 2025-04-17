@@ -141,7 +141,7 @@ export default function UserAssignmentRolesTable() {
 
   return (
     <>
-      <div className="container mx-auto space-y-8">
+      <div className="">
         <div className="w-fit mx-auto space-y-4">
           <Form {...form}>
             <form

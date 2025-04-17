@@ -71,7 +71,7 @@ export default function UserXRoleAssignmentTable({userId}: UserXRoleAssignmentTa
   if(!user) return;
   return (
     <>
-      <div className="container mx-auto space-y-8">
+      <div className="mx-auto space-y-8">
         
         <div className="">
           <div className="space-y-4 p-4 mx-auto">
