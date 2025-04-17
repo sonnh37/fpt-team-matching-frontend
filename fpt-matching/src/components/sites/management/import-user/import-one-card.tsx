@@ -59,7 +59,29 @@ export const ImportOneCard = ({role}: {role: string}) => {
         }
         let response;
         if (role == "Student") {
-            response = await userService.createOneByManager(userCreateCommand);
+            response = await userService.createOneStudentByManager(userCreateCommand);
+            if (response.status != 1 && response.status != 2) {
+                setOpen(false);
+                toast.error(response.message)
+                setLoading(false)
+                return;
+            }
+
+            if (response.status == 2) {
+                if (response.data) {
+                    toast.info(response.message)
+                    setUsersConfirm([response.data])
+                    setOpenConfirmDialog(true)
+                    setLoading(false)
+                }
+                return;
+            }
+            setLoading(false)
+            setOpen(false)
+            toast.success(response.message)
+        }
+        if (role == "Lecturers") {
+            response = await userService.createOneLecturerByManager(userCreateCommand);
             if (response.status != 1 && response.status != 2) {
                 setOpen(false);
                 toast.error(response.message)
@@ -83,7 +105,7 @@ export const ImportOneCard = ({role}: {role: string}) => {
     }
     return (
         <>
-            {usersConfirm.length > 0 && <DialogConfirmUpdate  usersConfirm={usersConfirm} open={openConfirmDialog} setOpen={setOpenConfirmDialog} />}
+            {usersConfirm.length > 0 && <DialogConfirmUpdate role={role}  usersConfirm={usersConfirm} open={openConfirmDialog} setOpen={setOpenConfirmDialog} />}
             <Card className={"w-1/2"}>
                 <CardHeader className={"flex justify-center items-center"}>
                     <CardTitle>Thêm 1 tài khoản mới</CardTitle>
