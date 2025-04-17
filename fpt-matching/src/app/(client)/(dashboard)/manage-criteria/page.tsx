@@ -22,6 +22,7 @@ import { criteriaFormService } from "@/services/criteria-form-service";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import CriteriaForm from "@/components/_common/criteria-form/criteria-form";
+import Criteria from "@/components/_common/criteria/criteria";
 
 export default function Page() {
     const roleCurrent = useCurrentRole();
@@ -57,7 +58,7 @@ export default function Page() {
                     </TabsContent>
 
                     <TabsContent value={tabs.criteria}>
-                      
+                      <Criteria/>
                     </TabsContent>
                 </Tabs>
             </Card>

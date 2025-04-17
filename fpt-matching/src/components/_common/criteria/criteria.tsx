@@ -1,5 +1,5 @@
 "use client";
-import React from 'react'
+import React, { useState } from 'react'
 import {
     Table,
     TableBody,
@@ -18,13 +18,26 @@ import { divide } from 'lodash';
 
 
 const Criteria = () => {
+    const [formData, setFormData] = useState({
+        title: "",
+        description: "",
+        category: "",
+      });
+      
+      const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      };
 
     const {
         data: form,
         refetch
     } = useQuery({
         queryKey: ["getCriteria"],
-        queryFn: () => criteriaService.fetchAll(),
+        queryFn: () => criteriaService.getAll(),
         refetchOnWindowFocus: false,
     });
 
@@ -52,8 +65,33 @@ const Criteria = () => {
     }
     return (
         <div>
-            {form?.data?.results ? (<div className='my-4 w-full flex justify-center'>
-              Hiện tại chưa có đơn nào.
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                {/* Left: Search and buttons */}
+                <div className="flex items-center gap-2">
+                    {/* Search Input */}
+                    <input
+                        type="text"
+                        placeholder="Tìm kiếm..."
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300"
+                    />
+
+                    {/* Search Buttons */}
+                    <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                        Search 1
+                    </button>
+                   
+                </div>
+
+                {/* Right: Create Form Button */}
+                <div>
+                    <button className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                        Tạo Form
+                    </button>
+                </div>
+            </div>
+
+            {(form?.data?.results && form.data.results.length < 0) ? (<div className='my-4 w-full flex justify-center'>
+                Hiện tại chưa có đơn nào.
             </div>) : (<Table>
                 <TableCaption>Danh sách các đơn sẵn có.</TableCaption>
                 <TableHeader>
@@ -64,9 +102,6 @@ const Criteria = () => {
                         <TableHead>Tên câu hỏi</TableHead>
                         <TableHead>Miêu tả</TableHead>
                         <TableHead className="max-h-[500px] overflow-x-auto whitespace-nowrap">Thể loại</TableHead>
-                        <TableHead className="text-center">Profile </TableHead>
-                        <TableHead className="text-center">Profile </TableHead>
-                        <TableHead className="text-center">Profile </TableHead>
                         <TableHead className="text-center">Action </TableHead>
                     </TableRow>
                 </TableHeader>
@@ -87,11 +122,11 @@ const Criteria = () => {
                             <TableCell >{cv.valueType}</TableCell>
                             <TableCell>
                                 {cv.isDeleted ? (
-                                    <div className="border-b-2 border-blue-500 text-blue-500">
+                                    <div className=" text-blue-500">
                                         Đã xóa
                                     </div>
                                 ) : (
-                                    <div className="border-b-2 border-blue-500 text-blue-500">
+                                    <div className=" text-blue-500">
                                         Đang sử dụng
                                     </div>
                                 )}
