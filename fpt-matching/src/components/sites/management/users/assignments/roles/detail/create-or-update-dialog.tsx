@@ -19,7 +19,9 @@ import {
 } from "@/lib/form-custom-shadcn";
 import { roleService } from "@/services/role-service";
 import { semesterService } from "@/services/semester-service";
+import { userService } from "@/services/user-service";
 import { userxroleService } from "@/services/user-x-role-service";
+import { User } from "@/types/user";
 import { UserXRole } from "@/types/user-x-role";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -70,11 +72,19 @@ export function UserXRoleFormDialog({
     defaultValues: getDefaultValues(),
   });
 
+  const isPrimary = form.watch("isPrimary");
+
   useEffect(() => {
     if (open) {
       form.reset(getDefaultValues());
     }
   }, [open, userXRole]);
+
+  useEffect(() => {
+    if (isPrimary) {
+      form.setValue("semesterId", null);
+    }
+  }, [isPrimary, form]);
 
   const [
     {
@@ -112,6 +122,45 @@ export function UserXRoleFormDialog({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      // Lấy thông tin user và các role đã gán
+      const res_user = await userService.getById(params.userId.toString());
+      if (res_user.status != 1) {
+        toast.error(res_user.message);
+        return;
+      }
+
+      const user = res_user.data ?? ({} as User);
+      const userXRoles = user.userXRoles ?? [];
+
+      // Kiểm tra nếu đang tạo/chỉnh sửa role primary
+      if (values.isPrimary) {
+        // Kiểm tra user đã có role primary chưa
+        const hasExistingPrimary = userXRoles.some(
+          (item) => item.isPrimary && item.id !== values.id
+        );
+
+        if (hasExistingPrimary) {
+          toast.error("User đã có role primary, không thể tạo thêm");
+          return;
+        }
+      } else {
+        // Nếu không phải primary, kiểm tra user có ít nhất 1 role primary không
+        const hasAnyPrimary = userXRoles.some(
+          (item) => item.isPrimary && item.id !== values.id
+        );
+
+        if (!hasAnyPrimary) {
+          toast.error("User cần có ít nhất 1 role primary");
+          return;
+        }
+
+        if (!values.semesterId) {
+          toast.error("Vui lòng chọn semester");
+          return;
+        }
+      }
+
+      // Thực hiện create/update
       if (userXRole) {
         // Edit mode
         const res = await userxroleService.update(values);
@@ -124,13 +173,15 @@ export function UserXRoleFormDialog({
           toast.success(res.message);
         } else throw Error(res.message);
       }
+
+      // queryClient.refetchQueries({ queryKey: ["data"] });
+
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
       toast.error(error as string);
     }
   };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -158,15 +209,17 @@ export function UserXRoleFormDialog({
             />
             <FormSwitch form={form} name="isPrimary" label="Chức năng" />
 
-            <FormSelectObject
-              form={form}
-              name="semesterId"
-              label="Select semester"
-              options={semesters}
-              selectValue={"id"}
-              selectLabel={"semesterName"}
-              placeholder="Chọn kì"
-            />
+            {!isPrimary && (
+              <FormSelectObject
+                form={form}
+                name="semesterId"
+                label="Select semester"
+                options={semesters}
+                selectValue={"id"}
+                selectLabel={"semesterName"}
+                placeholder="Chọn kì"
+              />
+            )}
 
             <Button type="submit" className="w-full">
               {userXRole ? "Update" : "Create"}

@@ -33,14 +33,38 @@ import { LoadingComponent } from "@/components/_common/loading-page";
 import { userxroleService } from "@/services/user-x-role-service";
 import { UserXRoleUpdateCommand } from "@/types/models/commands/user-x-roles/user-x-role-update-command";
 import { roleService } from "@/services/role-service";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export const columns: ColumnDef<UserXRole>[] = [
+  {
+    accessorKey: "isPrimary",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Is Primary" />
+    ),
+    cell: ({ row }) => {
+      const model = row.original;
+      return (
+        <Checkbox
+          checked={model.isPrimary}
+          disabled
+          className="cursor-default"
+        />
+      );
+    },
+  },
   {
     accessorKey: "selectSemester",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Select Semester" />
     ),
-    cell: ({ row }) => <SelectSemester row={row} />,
+    cell: ({ row }) => {
+      const model = row.original;
+      return model.isPrimary ? (
+        <span className="text-muted-foreground">Not applicable</span>
+      ) : (
+        <SelectSemester row={row} />
+      );
+    },
   },
   {
     accessorKey: "selectRole",
@@ -75,28 +99,22 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const isEditing = row.getIsSelected();
 
   const handleSave = async () => {
-    if (!model.semesterId) {
-      toast.error("Assign semester before saving");
-      return Promise.reject();
-    }
     const command: UserXRoleUpdateCommand = {
       ...model,
-      semesterId: model.semesterId,
     };
 
     const res = await userxroleService.update(command);
     if (res.status == 1) {
       toast.success("Assigned!");
-      model.semesterId = undefined;
-      model.roleId = undefined;
-      // queryClient.refetchQueries({ queryKey: ["dataWithoutSemester"] });
       row.toggleSelected(false);
     }
   };
 
   const handleCancel = () => {
     row.toggleSelected(false);
-    model.semesterId = undefined;
+    if (!model.isPrimary) {
+      model.semesterId = undefined;
+    }
     model.roleId = undefined;
   };
 
@@ -122,8 +140,9 @@ const SelectSemester: React.FC<{ row: Row<UserXRole> }> = ({ row }) => {
   const queryClient = useQueryClient();
   const model = row.original;
   const { data: result, isLoading } = useQuery({
-    queryKey: ["semesters"],
+    queryKey: ["semesters", model],
     queryFn: async () => await semesterService.getAll(),
+    refetchOnWindowFocus: false
   });
 
   if (isLoading) return <LoadingComponent />;
@@ -159,8 +178,9 @@ const SelectRole: React.FC<{ row: Row<UserXRole> }> = ({ row }) => {
   const queryClient = useQueryClient();
   const model = row.original;
   const { data: result, isLoading } = useQuery({
-    queryKey: ["roles"],
+    queryKey: ["roles", model],
     queryFn: async () => await roleService.getAll(),
+    refetchOnWindowFocus: false
   });
 
   if (isLoading) return <LoadingComponent />;
