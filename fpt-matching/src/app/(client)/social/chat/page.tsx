@@ -15,7 +15,7 @@ export default function Page() {
   const joinChatRoom = async (username: string,  partnerId: string , chatroom: string) => {
     try {
       const conn = new HubConnectionBuilder()
-          .withUrl(`http://localhost:8081/Chat`)
+          .withUrl(`${process.env.NEXT_PUBLIC_API_BASE}/Chat`)
           .configureLogging(LogLevel.Information)
           .build();
 
