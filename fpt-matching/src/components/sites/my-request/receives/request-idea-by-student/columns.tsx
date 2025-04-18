@@ -14,10 +14,10 @@ import {
 import { formatDate } from "@/lib/utils";
 import { mentoridearequestService } from "@/services/mentor-idea-request-service";
 import { InvitationStatus } from "@/types/enums/invitation";
-import { MentorIdeaRequestStatus } from "@/types/enums/mentor-idea-request";
+import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Invitation } from "@/types/invitation";
-import { MentorIdeaRequest } from "@/types/mentor-idea-request";
-import { MentorIdeaRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
+import { MentorTopicRequest } from "@/types/mentor-topic-request";
+import { MentorTopicRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
 import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -25,7 +25,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-export const columns: ColumnDef<MentorIdeaRequest>[] = [
+export const columns: ColumnDef<MentorTopicRequest>[] = [
   {
     accessorKey: "project.teamName",
     header: ({ column }) => (
@@ -65,8 +65,8 @@ export const columns: ColumnDef<MentorIdeaRequest>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as MentorIdeaRequestStatus;
-      const statusText = MentorIdeaRequestStatus[status];
+      const status = row.getValue("status") as MentorTopicRequestStatus;
+      const statusText = MentorTopicRequestStatus[status];
 
       let badgeVariant:
         | "secondary"
@@ -76,13 +76,13 @@ export const columns: ColumnDef<MentorIdeaRequest>[] = [
         | null = "default";
 
       switch (status) {
-        case MentorIdeaRequestStatus.Pending:
+        case MentorTopicRequestStatus.Pending:
           badgeVariant = "secondary";
           break;
-        case MentorIdeaRequestStatus.Approved:
+        case MentorTopicRequestStatus.Approved:
           badgeVariant = "default";
           break;
-        case MentorIdeaRequestStatus.Rejected:
+        case MentorTopicRequestStatus.Rejected:
           badgeVariant = "destructive";
           break;
         default:
@@ -108,7 +108,7 @@ export const columns: ColumnDef<MentorIdeaRequest>[] = [
 
       return (
         <>
-          {model.status === MentorIdeaRequestStatus.Pending && (
+          {model.status === MentorTopicRequestStatus.Pending && (
             <Actions row={row} />
           )}
         </>
@@ -118,7 +118,7 @@ export const columns: ColumnDef<MentorIdeaRequest>[] = [
 ];
 
 interface ActionsProps {
-  row: Row<MentorIdeaRequest>;
+  row: Row<MentorTopicRequest>;
 }
 
 const Actions: React.FC<ActionsProps> = ({ row }) => {
@@ -130,9 +130,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const handleCancel = async () => {
     try {
       // Gọi API cancelInvite
-      const command: MentorIdeaRequestUpdateCommand = {
+      const command: MentorTopicRequestUpdateCommand = {
         id: model.id,
-        status: MentorIdeaRequestStatus.Rejected,
+        status: MentorTopicRequestStatus.Rejected,
         projectId: model.projectId,
         ideaId: model.ideaId,
       };
@@ -152,9 +152,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const handleApprove = async () => {
     try {
       // Gọi API approveInvite
-      const command: MentorIdeaRequestUpdateCommand = {
+      const command: MentorTopicRequestUpdateCommand = {
         id: model.id,
-        status: MentorIdeaRequestStatus.Approved,
+        status: MentorTopicRequestStatus.Approved,
         projectId: model.projectId,
         ideaId: model.ideaId,
       };

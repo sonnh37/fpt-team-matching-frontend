@@ -17,6 +17,7 @@ import { Idea } from "@/types/idea";
 import { Box, Button, Typography } from "@mui/material";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useCallback } from "react";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -191,7 +192,13 @@ export default function HorizontalLinearStepper({
 
   // Derived data calculation
   const calculateStepData = useCallback(() => {
-    const ideaRequests = idea.ideaRequests || [];
+    const highestVersion =
+      idea.ideaVersions.length > 0
+        ? idea.ideaVersions.reduce((prev, current) =>
+            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+          )
+        : undefined;
+    const ideaVersionRequests = highestVersion?.ideaVersionRequests || [];
     const isStudent = user.userXRoles?.some(
       (m) => m.role?.roleName === "Student"
     );
@@ -203,18 +210,18 @@ export default function HorizontalLinearStepper({
       : null;
     const isResultDay = resultDate ? resultDate.getTime() <= Date.now() : false;
 
-    const mentorApproval = ideaRequests.find((req) => req.role === "Mentor");
-    const councilApprovals = ideaRequests.filter(
+    const mentorApproval = ideaVersionRequests.find((req) => req.role === "Mentor");
+    const councilApprovals = ideaVersionRequests.filter(
       (req) => req.role === "Council"
     );
 
     const isMentorApproved =
-      mentorApproval?.status === IdeaRequestStatus.Approved;
+      mentorApproval?.status === IdeaVersionRequestStatus.Approved;
     const isMentorRejected =
-      mentorApproval?.status === IdeaRequestStatus.Rejected;
+      mentorApproval?.status === IdeaVersionRequestStatus.Rejected;
 
     const totalCouncilApproved = councilApprovals.filter(
-      (req) => req.status === IdeaRequestStatus.Approved
+      (req) => req.status === IdeaVersionRequestStatus.Approved
     ).length;
 
     const isCouncilApproved = isResultDay && totalCouncilApproved >= 2;

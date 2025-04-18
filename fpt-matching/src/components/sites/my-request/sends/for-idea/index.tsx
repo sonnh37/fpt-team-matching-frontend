@@ -28,7 +28,7 @@ import { z } from "zod";
 import { columns } from "./columns";
 import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
 import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
-import { MentorIdeaRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
+import { MentorTopicRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
 import { mentoridearequestService } from "@/services/mentor-idea-request-service";
 
 //#region INPUT
@@ -66,7 +66,7 @@ export default function InvitationSentForIdeaTable() {
 
   // default field in table
   const queryParams = useMemo(() => {
-    const params: MentorIdeaRequestGetAllQuery = useQueryParams(
+    const params: MentorTopicRequestGetAllQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
@@ -88,7 +88,7 @@ export default function InvitationSentForIdeaTable() {
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: () =>
-      mentoridearequestService.getUserMentorIdeaRequests(queryParams),
+      mentoridearequestService.getUserMentorTopicRequests(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
