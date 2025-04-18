@@ -19,15 +19,17 @@ import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
+  ColumnDef,
   ColumnFiltersState,
   getCoreRowModel,
   getFilteredRowModel,
   PaginationState,
+  Row,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
+import { MoreHorizontal, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -42,11 +44,87 @@ import { User } from "@/types/user";
 import { DataOnlyTable } from "@/components/_common/data-table-client/data-table";
 import { DataOnlyTablePagination } from "@/components/_common/data-table-client/data-table-pagination";
 import { ProfileForm } from "@/app/(client)/(dashboard)/profile-detail/[profileId]/page";
-
+import { UserXRoleFormDialog } from "./create-or-update-dialog";
+import { UserXRole } from "@/types/user-x-role";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
+import { userxroleService } from "@/services/user-x-role-service";
 interface UserXRoleAssignmentTableProps {
-  userId: string
+  userId: string;
 }
-export default function UserXRoleAssignmentTable({userId}: UserXRoleAssignmentTableProps) {
+
+interface ActionsProps {
+  row: Row<UserXRole>;
+  onEdit: (userXRole: UserXRole) => void; // Thêm callback để mở dialog
+}
+
+const Actions: React.FC<ActionsProps> = ({ row, onEdit }) => {
+  const model = row.original;
+  const [showDeleteTaskDialog, setShowDeleteTaskDialog] = useState(false);
+
+  return (
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">Open menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={() => onEdit(model)}>
+            {" "}
+            {/* Mở form Edit */}
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>
+            Delete
+            <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <DeleteBaseEntitysDialog
+        deleteById={userxroleService.delete}
+        open={showDeleteTaskDialog}
+        onOpenChange={setShowDeleteTaskDialog}
+        list={[model]}
+        showTrigger={false}
+        onSuccess={() => row.toggleSelected(false)}
+      />
+    </>
+  );
+};
+//#endr
+export default function UserXRoleAssignmentTable({
+  userId,
+}: UserXRoleAssignmentTableProps) {
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
+  const [currentModel, setCurrentModel] = useState<UserXRole | null>(null);
+  const handleEdit = (userXRole: UserXRole) => {
+    setCurrentModel(userXRole);
+    setIsFormDialogOpen(true);
+  };
+  const columns_: ColumnDef<UserXRole>[] = [
+    ...columns,
+    {
+      accessorKey: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        return <Actions row={row} onEdit={handleEdit} />;
+      },
+    },
+  ];
+
   const {
     data: result,
     error,
@@ -68,16 +146,34 @@ export default function UserXRoleAssignmentTable({userId}: UserXRoleAssignmentTa
   if (!result) return <div>No data</div>;
 
   const user = result.data;
-  if(!user) return;
+  if (!user) return;
+
+  const handleCreateClick = () => {
+    setCurrentModel(null); // Reset để tạo mới
+    setIsFormDialogOpen(true);
+  };
+
+  const handleSuccess = () => {
+    // refetch(); // Gọi lại API để cập nhật dữ liệu
+  };
   return (
     <>
       <div className="mx-auto space-y-8">
-        
         <div className="">
           <div className="space-y-4 p-4 mx-auto">
             <ProfileForm user={user} />
-            <DataOnlyTable columns={columns} data={user.userXRoles}/>
+
+            <Button type="button" onClick={handleCreateClick} variant="default">
+              Create New
+            </Button>
+            <DataOnlyTable columns={columns_} data={user.userXRoles} />
           </div>
+          <UserXRoleFormDialog
+            open={isFormDialogOpen}
+            onOpenChange={setIsFormDialogOpen}
+            userXRole={currentModel}
+            onSuccess={handleSuccess}
+          />
         </div>
       </div>
     </>
