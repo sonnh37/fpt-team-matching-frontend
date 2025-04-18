@@ -1,8 +1,10 @@
-import { notificationService } from "@/services/notification-service";
-import { NotificationGetAllByCurrentUserQuery } from "@/types/models/queries/notifications/notifications-get-all-by-current-user-query";
-import { Notification } from "@/types/notification";
+import {notificationService} from "@/services/notification-service";
+import {
+  NotificationGetAllByCurrentUserQuery
+} from "@/types/models/queries/notifications/notifications-get-all-by-current-user-query";
+import {Notification} from "@/types/notification";
 import * as signalR from "@microsoft/signalr";
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 
 export default function useNotification(
   query: NotificationGetAllByCurrentUserQuery
@@ -24,7 +26,7 @@ export default function useNotification(
 
     fetchAllNotifications();
   }, []);
-
+  console.log(notifications)
   useEffect(() => {
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${process.env.NEXT_PUBLIC_API_BASE}/notification`, {
@@ -40,6 +42,24 @@ export default function useNotification(
         return updatedResults;
       });
     });
+    connection.on("ReceiveSystemNotification", (notifications: Notification) => {
+      setNotifications((prev) => {
+        if (!prev) return [notifications];
+        return [notifications, ...prev];
+      })
+    })
+    connection.on("ReviewRoleNotification", (notifications: Notification) => {
+      setNotifications((prev) => {
+        if (!prev) return [notifications];
+        return [notifications, ...prev];
+      })
+    })
+    connection.on("ReviewTeamNotification", (notifications: Notification) => {
+      setNotifications((prev) => {
+        if (!prev) return [notifications];
+        return [notifications, ...prev];
+      })
+    })
 
     connection
       .start()

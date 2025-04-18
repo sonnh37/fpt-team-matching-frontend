@@ -32,9 +32,9 @@ import {
 } from "@/components/ui/tooltip";
 import { mentoridearequestService } from "@/services/mentor-idea-request-service";
 import { projectService } from "@/services/project-service";
-import { MentorIdeaRequestStatus } from "@/types/enums/mentor-idea-request";
+import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Idea } from "@/types/idea";
-import { MentorIdeaRequestCreateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-create-command";
+import { MentorTopicRequestCreateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-create-command";
 import { Project } from "@/types/project";
 import { User } from "@/types/user";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -209,7 +209,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       //     toast.warning("Please add members to match the size requirement of this idea.");
       //     return;
       // }
-      const command: MentorIdeaRequestCreateCommand = {
+      const command: MentorTopicRequestCreateCommand = {
         projectId: project.id,
         ideaId: model.id,
       };

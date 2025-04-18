@@ -35,6 +35,7 @@ import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -106,10 +107,16 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const role = useCurrentRole();
   const idea = row.original;
-  const hasMentorApproval = idea.ideaRequests.some(
+  const highestVersion =
+      idea.ideaVersions.length > 0
+        ? idea.ideaVersions.reduce((prev, current) =>
+            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+          )
+        : undefined;
+  const hasMentorApproval = highestVersion?.ideaVersionRequests.some(
     (request) =>
-      (request.status === IdeaRequestStatus.Approved ||
-        request.status === IdeaRequestStatus.Rejected) &&
+      (request.status === IdeaVersionRequestStatus.Approved ||
+        request.status === IdeaVersionRequestStatus.Rejected) &&
       request.role === "Mentor"
   );
 

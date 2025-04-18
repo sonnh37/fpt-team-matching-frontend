@@ -162,8 +162,20 @@ export const NAV_CONFIG = {
           roles: ["Manager"],
         },
         {
+          title: "Thêm giảng viên",
+          url: "/management/users/import-lecturers",
+          icon: Users,
+          roles: ["Manager"],
+        },
+        {
           title: "Yêu cầu chờ của hội đồng",
           url: "/management/users/councils/pending-requests",
+          icon: Users,
+          roles: ["Manager"],
+        },
+        {
+          title: "Đăng ký Vai Trò ",
+          url: "/management/users/assignments/roles",
           icon: Users,
           roles: ["Manager"],
         },

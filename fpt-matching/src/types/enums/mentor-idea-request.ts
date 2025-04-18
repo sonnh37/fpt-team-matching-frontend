@@ -1,4 +1,4 @@
-export enum MentorIdeaRequestStatus {
+export enum MentorTopicRequestStatus {
   Pending,
   Approved,
   Rejected,
