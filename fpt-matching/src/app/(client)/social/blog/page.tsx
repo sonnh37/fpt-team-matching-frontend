@@ -219,7 +219,7 @@ export default function Blog() {
   }, [result]);
 
 
-  // day la sort blog notification
+  // day la sort blog notifications
   const notification = result?.data?.results ?? [];
   const sortedNotification = [...notification].sort((a, b) => {
     return (b.comments?.length || 0) - (a.comments?.length || 0);
