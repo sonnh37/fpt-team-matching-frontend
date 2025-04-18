@@ -106,7 +106,7 @@ const CriteriaForm = () => {
                 <div>
                     <Dialog>
                         <DialogTrigger asChild>
-                            <Button className="px-6 py-2  hover:bg-orange-700"> <PlusCircle className=''/>Tạo đơn</Button>
+                            <Button className="px-6 py-2  hover:bg-orange-700"> <PlusCircle className='' />Tạo đơn</Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
@@ -169,19 +169,19 @@ const CriteriaForm = () => {
                                 <TableCell >{cv.title}</TableCell>
                                 <TableCell className=' justify-center'>
                                     {cv.isDeleted ? (
-                                        <button className=" p-2 bg-red-600 rounded-sm">
+                                        <button className="w-[104px] h-9 p-2 bg-red-600 rounded-sm text-white">
                                             Đã xóa
                                         </button>
                                     ) : (
-                                        <button className=" p-2 bg-green-500 rounded-sm">
+                                        <button className=" p-2 bg-green-500 rounded-sm text-white">
                                             Đang sử dụng
                                         </button>
                                     )}
                                 </TableCell>
                                 {/* <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`/social/blog/profile-social/${cv.user?.id}`}>Xem profile</a></button></TableCell> */}
-                                <TableCell className='flex justify-center' >
+                                <TableCell className='flex justify-center items-center' >
                                     <Button variant={"destructive"} onClick={() => handleDelete(cv.id ?? "")}> Xóa đơn</Button>
-                                     <DetailFormCriteria id={cv.id ?? ""}/>
+                                    <DetailFormCriteria id={cv.id ?? ""} />
                                 </TableCell>
                             </TableRow>
                         ))}
