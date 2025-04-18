@@ -43,6 +43,30 @@ class NotificationService extends BaseService<Notification> {
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
+
+  public createSystemNotification = async ({description}:{description: string}) : Promise<BusinessResult<void>> => {
+    const response =  await axiosInstance
+        .post<BusinessResult<void>>(`${this.endpoint}/system`, {
+          description
+        })
+    return response.data;
+  }
+
+  public createRoleBasedNotification = async ({description, role}: {description: string, role: string}) : Promise<BusinessResult<void>> => {
+    const response = await axiosInstance.post<BusinessResult<void>>(`${this.endpoint}/role-based`, {
+      description,
+      role
+    })
+    return response.data
+  }
+
+  public createTeamBasedNotification = async ({description, projectId}:{description: string, projectId: string}) : Promise<BusinessResult<void>> => {
+    const response = await axiosInstance.post<BusinessResult<void>>(`${this.endpoint}/team-based`, {
+      description,
+      projectId
+    })
+    return response.data
+  }
 }
 
 export const notificationService = new NotificationService();
