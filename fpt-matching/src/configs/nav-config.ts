@@ -173,6 +173,12 @@ export const NAV_CONFIG = {
           icon: Users,
           roles: ["Manager"],
         },
+        {
+          title: "Đăng ký Vai Trò ",
+          url: "/management/users/assignments/roles",
+          icon: Users,
+          roles: ["Manager"],
+        },
       ],
     },
   ],

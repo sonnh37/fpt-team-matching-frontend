@@ -1,6 +1,6 @@
 "use client";
-import { Bouncy, DotPulse } from "ldrs/react";
-import 'ldrs/react/Bouncy.css'
+import { Bouncy, DotPulse, Ring } from "ldrs/react";
+import "ldrs/react/Ring.css";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
@@ -19,11 +19,7 @@ const LoadUIBall = () => {
 
   return (
     <>
-<Bouncy
-  size="80"
-  speed="0.7"
-  color={color}
-/>
+      <Ring size={35} bgOpacity={0.05} color={color} />
     </>
   );
 };

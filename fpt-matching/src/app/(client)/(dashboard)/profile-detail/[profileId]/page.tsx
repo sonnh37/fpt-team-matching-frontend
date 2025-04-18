@@ -62,17 +62,23 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left sidebar */}
-        <div className="lg:col-span-1 space-y-4">
-          <ProfileCard user={user} />
-          <ContactCard user={user} />
-        </div>
+      <ProfileForm user={user} />
+    </div>
+  );
+}
 
-        {/* Main content */}
-        <div className="lg:col-span-2">
-          <ProfileTabs user={user} />
-        </div>
+export function ProfileForm({ user }: { user: User }) {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Left sidebar */}
+      <div className="lg:col-span-1 space-y-4">
+        <ProfileCard user={user} />
+        <ContactCard user={user} />
+      </div>
+
+      {/* Main content */}
+      <div className="lg:col-span-2">
+        <ProfileTabs user={user} />
       </div>
     </div>
   );
