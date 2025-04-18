@@ -127,9 +127,9 @@ export const NAV_CONFIG = {
     },
     {
       title: "Quản lý các tiêu chí",
-      url: "/",
+      url: "/manage-criteria",
       icon: ShieldHalf,
-      roles: ["Manager"],
+      roles: ["*"],
     },
     {
       title: "Quản lý dự án",
@@ -158,6 +158,12 @@ export const NAV_CONFIG = {
         {
           title: "Thêm sinh viên",
           url: "/management/users/import-students",
+          icon: Users,
+          roles: ["Manager"],
+        },
+        {
+          title: "Thêm giảng viên",
+          url: "/management/users/import-lecturers",
           icon: Users,
           roles: ["Manager"],
         },

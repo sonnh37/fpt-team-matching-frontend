@@ -121,7 +121,7 @@ class UserService extends BaseService<User> {
     }
   };
 
-  public createOneByManager = async (command : UserCreateByManagerCommand) : Promise<BusinessResult<User | null>> => {
+  public createOneStudentByManager = async (command : UserCreateByManagerCommand) : Promise<BusinessResult<User | null>> => {
     const response = await axiosInstance.post<BusinessResult<User | null>>(
         `${this.endpoint}/import/students/one`,
         {
@@ -131,11 +131,31 @@ class UserService extends BaseService<User> {
     return response.data
   }
 
-  public createManyByManager = async (file: File) : Promise<BusinessResult<void>> => {
+  public createManyStudentByManager = async (file: File) : Promise<BusinessResult<User[]>> => {
     const formData = new FormData();
     formData.append("file", file);
-    const response = await axiosInstance.post<BusinessResult<void>>(
+    const response = await axiosInstance.post<BusinessResult<User[]>>(
         `${this.endpoint}/import/students/many`, formData
+    )
+
+    return response.data
+  }
+
+  public createOneLecturerByManager = async (command : UserCreateByManagerCommand) : Promise<BusinessResult<User | null>> => {
+    const response = await axiosInstance.post<BusinessResult<User | null>>(
+        `${this.endpoint}/import/lecturers/one`,
+        {
+          ...command
+        }
+    )
+    return response.data
+  }
+
+  public createManyLecturersByManager = async (file: File) : Promise<BusinessResult<User[]>> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const response = await axiosInstance.post<BusinessResult<User[]>>(
+        `${this.endpoint}/import/lecturers/many`, formData
     )
 
     return response.data

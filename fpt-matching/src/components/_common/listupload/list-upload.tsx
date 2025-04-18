@@ -78,7 +78,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
             <DialogTrigger asChild>
                 <span className="flex items-center mr-3">
                     <i className="fas fa-image text-red-500"></i>
-                    <span className="ml-2 text-lg">{post?.data?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip}/> </span>
+                    <span className="ml-2 text-lg">{post?.data?.results?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip}/> </span>
                 </span>
             </DialogTrigger>
             <DialogContent className="max-w-max min-w-[450px]">
