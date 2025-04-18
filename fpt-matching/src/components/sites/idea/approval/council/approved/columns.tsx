@@ -146,13 +146,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   }
 
   const idea = result?.data ?? ({} as Idea);
-  const hasCouncilRequests = idea.ideaRequests?.some(
-    (req) => req.role === "Council"
-  );
-
-  const isNotMentorInThisIdea =
-    idea.mentorId !== user.id && idea.subMentorId !== user.id;
-
   const handleSubmit = async () => {
     try {
       if (!ideaId) throw new Error("Idea ID is required");

@@ -150,7 +150,13 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   }
 
   const idea = result?.data ?? ({} as Idea);
-  const hasCouncilRequests = idea.ideaRequests?.some(
+  const highestVersion =
+    idea.ideaVersions.length > 0
+      ? idea.ideaVersions.reduce((prev, current) =>
+          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+        )
+      : undefined;
+  const hasCouncilRequests = highestVersion?.ideaVersionRequests?.some(
     (req) => req.role === "Council"
   );
   const handleSubmit = async () => {

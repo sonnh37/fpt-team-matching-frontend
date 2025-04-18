@@ -4,7 +4,7 @@ import { CapstoneSchedule } from "./capstone-schedule";
 import { ProjectStatus } from "./enums/project";
 import { Idea } from "./idea";
 import { Invitation } from "./invitation";
-import { MentorIdeaRequest } from "./mentor-idea-request";
+import { MentorTopicRequest } from "./mentor-topic-request";
 import { Review } from "./review";
 import { TeamMember } from "./team-member";
 import { User } from "./user";
@@ -24,7 +24,7 @@ export interface Project extends BaseEntity {
   reviews: Review[];
   teamMembers: TeamMember[];
   blogs: Blog[]
-  mentorIdeaRequests: MentorIdeaRequest[];
+  mentorIdeaRequests: MentorTopicRequest[];
   capstoneSchedules: CapstoneSchedule[];
   mentorFeedback: MentorFeedback | null;
   defenseStage?: number

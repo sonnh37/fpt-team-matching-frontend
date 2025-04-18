@@ -6,8 +6,9 @@ import { Project } from "./project";
 import { IdeaRequest } from "./idea-request";
 import { Semester } from "./semester";
 import { IdeaHistory } from "./idea-history";
-import { MentorIdeaRequest } from "./mentor-idea-request";
+import { MentorTopicRequest } from "./mentor-topic-request";
 import { StageIdea } from "./stage-idea";
+import { IdeaVersion } from "./idea-version";
 
 export interface Idea extends BaseEntity {
   ownerId?: string;
@@ -33,7 +34,5 @@ export interface Idea extends BaseEntity {
   specialty?: Specialty;
   project?: Project;
   stageIdea?: StageIdea;
-  ideaRequests: IdeaRequest[];
-  ideaHistories: IdeaHistory[];
-  mentorIdeaRequests: MentorIdeaRequest[];
+  ideaVersions: IdeaVersion[];
 }

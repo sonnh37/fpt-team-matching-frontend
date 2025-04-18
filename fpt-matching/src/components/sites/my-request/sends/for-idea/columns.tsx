@@ -13,15 +13,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/utils";
 import { InvitationStatus } from "@/types/enums/invitation";
-import { MentorIdeaRequestStatus } from "@/types/enums/mentor-idea-request";
+import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Invitation } from "@/types/invitation";
-import { MentorIdeaRequest } from "@/types/mentor-idea-request";
+import { MentorTopicRequest } from "@/types/mentor-topic-request";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
-export const columns: ColumnDef<MentorIdeaRequest>[] = [
+export const columns: ColumnDef<MentorTopicRequest>[] = [
   {
     accessorKey: "project.teamName",
     header: ({ column }) => (
@@ -61,8 +61,8 @@ export const columns: ColumnDef<MentorIdeaRequest>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as MentorIdeaRequestStatus;
-      const statusText = MentorIdeaRequestStatus[status];
+      const status = row.getValue("status") as MentorTopicRequestStatus;
+      const statusText = MentorTopicRequestStatus[status];
 
       let badgeVariant:
         | "secondary"
@@ -72,13 +72,13 @@ export const columns: ColumnDef<MentorIdeaRequest>[] = [
         | null = "default";
 
       switch (status) {
-        case MentorIdeaRequestStatus.Pending:
+        case MentorTopicRequestStatus.Pending:
           badgeVariant = "secondary";
           break;
-        case MentorIdeaRequestStatus.Approved:
+        case MentorTopicRequestStatus.Approved:
           badgeVariant = "default";
           break;
-        case MentorIdeaRequestStatus.Rejected:
+        case MentorTopicRequestStatus.Rejected:
           badgeVariant = "destructive";
           break;
         default:

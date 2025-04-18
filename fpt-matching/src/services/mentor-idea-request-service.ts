@@ -7,21 +7,21 @@ import {
 import { cleanQueryParams } from "@/lib/utils";
 import axiosInstance from "@/lib/interceptors/axios-instance";
 import { BusinessResultWithoutData } from "@/types/models/responses/business-result-without-data";
-import { MentorIdeaRequest } from "@/types/mentor-idea-request";
-import { MentorIdeaRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
-import { MentorIdeaRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
+import { MentorTopicRequest } from "@/types/mentor-topic-request";
+import { MentorTopicRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
+import { MentorTopicRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
 import {CreateCommand} from "@/types/models/commands/_base/base-command";
 
-class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
+class MentorTopicRequestService extends BaseService<MentorTopicRequest> {
   constructor() {
     super(Const.MENTOR_IDEA_REQUESTS);
   }
-  public getUserMentorIdeaRequests = (
-    query?: MentorIdeaRequestGetAllQuery
-  ): Promise<BusinessResult<QueryResult<MentorIdeaRequest>>> => {
+  public getUserMentorTopicRequests = (
+    query?: MentorTopicRequestGetAllQuery
+  ): Promise<BusinessResult<QueryResult<MentorTopicRequest>>> => {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
-      .get<BusinessResult<QueryResult<MentorIdeaRequest>>>(
+      .get<BusinessResult<QueryResult<MentorTopicRequest>>>(
         `${this.endpoint}/get-user-mentor-idea-requests?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {
@@ -32,12 +32,12 @@ class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
       });
   };
 
-  public getMentorMentorIdeaRequests = (
-    query?: MentorIdeaRequestGetAllQuery
-  ): Promise<BusinessResult<QueryResult<MentorIdeaRequest>>> => {
+  public getMentorMentorTopicRequests = (
+    query?: MentorTopicRequestGetAllQuery
+  ): Promise<BusinessResult<QueryResult<MentorTopicRequest>>> => {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
-      .get<BusinessResult<QueryResult<MentorIdeaRequest>>>(
+      .get<BusinessResult<QueryResult<MentorTopicRequest>>>(
         `${this.endpoint}/get-mentor-mentor-idea-requests?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {
@@ -48,9 +48,9 @@ class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
       });
   };
 
-  public update = (command: MentorIdeaRequestUpdateCommand): Promise<BusinessResult<MentorIdeaRequest>> => {
+  public update = (command: MentorTopicRequestUpdateCommand): Promise<BusinessResult<MentorTopicRequest>> => {
       return axiosInstance
-        .put<BusinessResult<MentorIdeaRequest>>(`${this.endpoint}/status`, command)
+        .put<BusinessResult<MentorTopicRequest>>(`${this.endpoint}/status`, command)
         .then((response) => response.data)
         .catch((error) => this.handleError(error));
     };
@@ -64,4 +64,4 @@ class MentorIdeaRequestService extends BaseService<MentorIdeaRequest> {
  
 }
 
-export const mentoridearequestService = new MentorIdeaRequestService();
+export const mentoridearequestService = new MentorTopicRequestService();
