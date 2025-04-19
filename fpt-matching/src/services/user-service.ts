@@ -7,6 +7,7 @@ import { UserUpdatePasswordCommand } from "@/types/models/commands/users/user-up
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { cleanQueryParams } from "@/lib/utils";
 import UserCreateByManagerCommand from "@/types/models/commands/users/user-create-by-manager-command";
+import {UserEmailSuggestions} from "@/types/models/UserEmailSuggestions";
 
 class UserService extends BaseService<User> {
   constructor() {
@@ -166,6 +167,11 @@ class UserService extends BaseService<User> {
         ...users,
     ]);
     return response.data;
+  }
+
+  public getUserEmailSuggestions = async (email: string): Promise<BusinessResult<UserEmailSuggestions[]>> => {
+    const response = await axiosInstance.get<BusinessResult<UserEmailSuggestions[]>>(`${this.endpoint}/get-suggestions-emails?email=${email}`);
+    return response.data
   }
 }
 

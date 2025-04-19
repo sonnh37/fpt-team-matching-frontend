@@ -67,6 +67,14 @@ class NotificationService extends BaseService<Notification> {
     })
     return response.data
   }
+
+  public createIndividualNotification = async ({description, userId} : {description: string, userId: string}) : Promise<BusinessResult<void>> => {
+    const response = await axiosInstance.post<BusinessResult<void>>(`${this.endpoint}/individual`, {
+      description,
+      userId
+    })
+    return response.data
+  }
 }
 
 export const notificationService = new NotificationService();
