@@ -7,7 +7,7 @@ import {toast} from "sonner";
 import {cn, formatDate} from "@/lib/utils";
 import {TypographySmall} from "@/components/_common/typography/typography-small";
 import {TypographyMuted} from "@/components/_common/typography/typography-muted";
-import {Check, Mail, MoreHorizontal, Pin, Trash2} from 'lucide-react';
+import {Bell, Check, MoreHorizontal, Pin, Trash2} from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent, DropdownMenuItem,
@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/select"
 import {notificationService} from "@/services/notification-service";
 
-export function SelectRole({roles, setSelectRole, selectRole}: {roles: Role[], setSelectRole: Dispatch<SetStateAction<string | null>>, selectRole: string | null }) {
+function SelectRole({roles, setSelectRole, selectRole}: {roles: Role[], setSelectRole: Dispatch<SetStateAction<string | null>>, selectRole: string | null }) {
     return (
         <Select value={selectRole ?? undefined} onValueChange={(value)=> {setSelectRole(value)}}>
             <SelectTrigger className="w-[180px]">
@@ -63,7 +63,6 @@ const RoleBasedNotiCard = () => {
         }
         fetchRole()
     }, []);
-    console.log(roles)
     const handleSaveChange = async () => {
         if (!content || !selectRole) {
             toast.error("Nội dung không thể rỗng");
@@ -120,7 +119,7 @@ const RoleBasedNotiCard = () => {
                             )}
                         >
                             <div className="mt-0.5">
-                                <Mail className="size-5 text-blue-500" />
+                                <Bell className="size-5 text-foreground/80" />
                             </div>
 
                             <div className="flex-1 min-w-0">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
@@ -7,7 +7,7 @@ import {toast} from "sonner";
 import {cn, formatDate} from "@/lib/utils";
 import {TypographySmall} from "@/components/_common/typography/typography-small";
 import {TypographyMuted} from "@/components/_common/typography/typography-muted";
-import {Check, Mail, MoreHorizontal, Pin, Trash2} from 'lucide-react';
+import {Check, MoreHorizontal, Pin, Trash2, Users} from 'lucide-react';
 import {
     DropdownMenu,
     DropdownMenuContent, DropdownMenuItem,
@@ -16,14 +16,66 @@ import {
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
+import {Project} from "@/types/project";
+import {projectService} from "@/services/project-service";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue
+} from "@/components/ui/select";
+import {notificationService} from "@/services/notification-service";
 
+function SelectProject({projects, setSelectProject, selectProject}: {projects: Project[], setSelectProject: Dispatch<SetStateAction<string | null>>, selectProject: string | null }) {
+    return (
+        <Select value={selectProject ?? undefined} onValueChange={(value)=> {setSelectProject(value)}}>
+            <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Chọn nhóm" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectGroup>
+                    <SelectLabel>Nhóm</SelectLabel>
+                    {projects.map((project, index) => (
+                        <SelectItem key={index} value={project.id!}>{project.teamName} - {project.teamCode}</SelectItem>
+                    ))}
+                </SelectGroup>
+            </SelectContent>
+        </Select>
+    )
+}
 const TeamBasedNotiCard = () => {
     const [content, setContent] = React.useState<string | null>();
     const [loading, setLoading] = React.useState(false);
     const [open, setOpen] = React.useState(false);
+    const [projects, setProjects] = React.useState<Project[]>([]);
+    const [selectProjectId, setSelectProjectId] = React.useState<string | null>(null);
     const handleSaveChange = async () => {
-        toast.info(content)
+        if (!content || !selectProjectId) {
+            toast.error("Nội dung không thể rỗng");
+            return;
+        }
+        setLoading(true);
+        const response = await notificationService.createTeamBasedNotification({description: content, projectId: selectProjectId});
+        if (response.status != 1) {
+            toast.error(response.message);
+            setLoading(false);
+            return;
+        }
+        setLoading(false);
+        toast.success(response.message);
     }
+
+    React.useEffect(() => {
+        (async function fetchProjects () {
+            const response = await projectService.getAll();
+            if (!response.data || !response.data.results)
+                return;
+            setProjects(response.data?.results)
+        })()
+    }, [])
     return (
         <div className={"w-full flex flex-row gap-4"}>
             <div className={"w-2/3"}>
@@ -36,9 +88,14 @@ const TeamBasedNotiCard = () => {
                     </CardHeader>
                     <CardContent className="space-y-2">
                         <div className="space-y-1">
+                            <Label className={"font-bold"} htmlFor="content">Chọn nhóm</Label>
+                            {projects && <SelectProject projects={projects} selectProject={selectProjectId} setSelectProject={setSelectProjectId} />}
+                        </div>
+                        <div className="space-y-1">
                             <Label className={"font-bold"} htmlFor="content">Nội dung</Label>
                             <Textarea id="content" value={content ?? undefined} onChange={(e) => setContent(e.target.value)} />
                         </div>
+
                     </CardContent>
                     <CardFooter>
                         <NotificationDialog handleSaveChange={handleSaveChange} loading={loading} setOpen={setOpen} open={open} />
@@ -60,7 +117,7 @@ const TeamBasedNotiCard = () => {
                             )}
                         >
                             <div className="mt-0.5">
-                                <Mail className="size-5 text-blue-500" />
+                                <Users className="size-5 text-green-500" />
                             </div>
 
                             <div className="flex-1 min-w-0">
