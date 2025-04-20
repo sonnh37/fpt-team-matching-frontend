@@ -18,7 +18,7 @@ import { useDispatch } from "react-redux";
 
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
-import HorizontalLinearStepper from "@/components/material-ui/stepper";
+import HorizontalLinearStepper from "@/components/_common/material-ui/stepper";
 import { IdeaRequestPendingTable } from "@/components/sites/idea/requests/pending";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";

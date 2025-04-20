@@ -3,7 +3,7 @@
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import TimeStageIdea from "@/components/_common/time-stage-idea";
 import { TypographyP } from "@/components/_common/typography/typography-p";
-import HorizontalLinearStepper from "@/components/material-ui/stepper";
+import HorizontalLinearStepper from "@/components/_common/material-ui/stepper";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
