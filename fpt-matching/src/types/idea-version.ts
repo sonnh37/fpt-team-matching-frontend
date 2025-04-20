@@ -9,6 +9,10 @@ export interface IdeaVersion extends BaseEntity {
   stageIdeaId?: string;
   version?: number;
   idea?: Idea;
+  vietNamName?: string;
+  description?: string;
+  abbreviations?: string;
+  englishName?: string;
   stageIdea?: StageIdea;
   topic?: Topic;
   ideaVersionRequests: IdeaVersionRequest[];

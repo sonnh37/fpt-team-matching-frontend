@@ -8,7 +8,7 @@ export interface Review extends BaseEntity {
     number: number;
     description?: string;
     fileUpload?: string;
-    expirationDate?: string; 
+    // expirationDate?: string;
     reviewDate?: string; 
     room?: string;
     slot?: number;
@@ -17,5 +17,5 @@ export interface Review extends BaseEntity {
     reviewer1?: User | null;
     reviewer2?: User | null;
     project?: Project | null;
-    feedbacks?: Feedback[];
+    // feedbacks?: Feedback[];
 }

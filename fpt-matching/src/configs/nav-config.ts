@@ -186,6 +186,12 @@ export const NAV_CONFIG = {
       url: "/management/notifications",
       icon: ShieldHalf,
       roles: ["Manager"],
+    },
+    {
+      title: "Xem lịch review",
+      url: "/calendar",
+      icon: ShieldHalf,
+      roles: ["Reviewer"],
     }
   ],
 };
