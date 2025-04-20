@@ -1,8 +1,8 @@
+import { CriteriaValueType } from "@/types/enums/criteria";
 import { CreateCommand } from "../_base/base-command";
 
 export interface CriteriaCreateCommand extends CreateCommand{
-    name?: string;
-    description?: string;
-    valueType?: string;
+    question?: string;
+    valueType?: CriteriaValueType;
     
 }

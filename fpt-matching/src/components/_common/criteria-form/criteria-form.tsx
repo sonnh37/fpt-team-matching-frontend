@@ -47,6 +47,8 @@ const CriteriaForm = () => {
         refetchOnWindowFocus: false,
     });
 
+    console.log(form, "testform")
+
     //Đây là form delete trả về true false tái sử dụng được
     const confirm = useConfirm()
     const handleDelete = async (id: string) => {
@@ -139,9 +141,27 @@ const CriteriaForm = () => {
                 </div>
             </div>
 
-            {(form?.data?.results && form.data.results.length < 0) ? (<div className='my-4 w-full flex justify-center'>
-                Hiện tại chưa có đơn nào.
-            </div>) : (
+            {(form?.data?.results && form.data.results.length < 0) ? (
+                <Table>
+                    <TableCaption>Danh sách các đơn sẵn có. <br />
+                        <div className='my-4 w-full flex justify-center items-center text-black'>
+                            Hiện tại chưa có đơn nào.
+                        </div>
+                    </TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[100px]">Số thứ tự</TableHead>
+                            <TableHead>Ngày nộp</TableHead>
+                            <TableHead>Tên người nộp</TableHead>
+                            <TableHead>Tên đơn</TableHead>
+                            <TableHead>Trạng thái</TableHead>
+                            <TableHead className="text-center">Hành động</TableHead>
+                        </TableRow>
+                    </TableHeader>
+
+                </Table>
+
+            ) : (
                 <Table>
                     <TableCaption>Danh sách các đơn sẵn có.</TableCaption>
                     <TableHeader>

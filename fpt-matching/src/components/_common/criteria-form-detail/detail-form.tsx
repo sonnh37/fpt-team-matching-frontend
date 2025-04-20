@@ -38,6 +38,8 @@ import { criteriaXCriteriaFormService } from '@/services/criteria-x-criteria-for
 import { toast } from 'sonner'
 import { CriteriaXCriteriaFormCreateCommand } from '@/types/models/commands/criteria-x-formcriteria/criteria-x-form-create-command'
 import { CriteriaXCriteriaFormGetAllQuery } from '@/types/models/queries/criteriaxcriteriaform/criteria-x-criteria-form-get-all-query'
+import { CriteriaValueType } from '@/types/enums/criteria'
+import { useConfirm } from '../formdelete/confirm-context'
 type DetailFormCriteriaProps = {
     id: string;
 };
@@ -54,6 +56,8 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
         refetchOnWindowFocus: false,
     });
 
+    
+
 
 
     const {
@@ -66,9 +70,29 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
 
     const criteriaIsExist = criteriaAll?.data?.results?.filter(x => x.isDeleted == false);
 
-
+    const confirm = useConfirm()
     const handleDelete = async (id: string) => {
 
+     const check = await criteriaXCriteriaFormService.getById(id)
+     if(check){
+         // Gọi confirm để mở dialog
+         const confirmed = await confirm({
+            title: "Xóa yêu cầu gia nhập",
+            description: "Bạn có muốn xóa đơn này không?",
+            confirmText: "Có,xóa nó đi",
+            cancelText: "Không,cảm ơn",
+        })
+        if(confirmed){
+            const result = await criteriaXCriteriaFormService.delete(id)
+            if(result.status ===1){
+                toast.success("Xóa câu hỏi thành công!")
+                refetch();
+            }else{
+                toast.error("Đã có lỗi xảy ra!")
+            }
+        }
+       
+     }
 
     }
 
@@ -77,16 +101,16 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
             toast.message("Vui lòng chọn một câu hỏi trước khi thêm.");
             return;
         }
-        let check: CriteriaXCriteriaFormGetAllQuery = {
-            isPagination:false,
-            criteriaFormId: id,
-            criteriaId: valueQuestion
-        }
-        const isExist = await criteriaXCriteriaFormService.getAll(check);
-        if(!isExist.data?.results?.length){
-            toast.message("Bạn đã có câu hỏi như vậy trong đơn rồi");
-            return;
-        }
+        // let check: CriteriaXCriteriaFormGetAllQuery = {
+        //     isPagination:false,
+        //     criteriaFormId: id,
+        //     criteriaId: valueQuestion
+        // }
+        // const isExist = await criteriaXCriteriaFormService.getAll(check);
+        // if(!isExist.data?.results?.length){
+        //     toast.message("Bạn đã có câu hỏi như vậy trong đơn rồi");
+        //     return;
+        // }
         try {
             let query: CriteriaXCriteriaFormCreateCommand = {
                 criteriaFormId: id,
@@ -204,7 +228,7 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
                                                     {criteriaIsExist && criteriaIsExist.length > 0 ? (
                                                         criteriaIsExist?.map((criteria, index) => (
                                                             <option key={criteria.id} value={criteria.id}>
-                                                                {index + 1}. {criteria.name}
+                                                                {index + 1}. {criteria.question}
                                                             </option>
                                                         ))
                                                     ) : (
@@ -225,7 +249,6 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
                         </div>
                         {/* CRITERIA - 60% */}
                         <div className="basis-[60%] overflow-auto p-2">
-
                             {(form?.data?.criteriaXCriteriaForms?.length && form?.data?.criteriaXCriteriaForms?.length > 0) ? (
                                 <div className="bg-slate-50 border-2 rounded-sm  p-4 h-full overflow-auto">
                                     <Table className="min-w-full">
@@ -234,14 +257,13 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
                                             <TableRow>
                                                 <TableHead className="w-[100px]">STT</TableHead>
                                                 <TableHead>Ngày thêm</TableHead>
-                                                <TableHead>Tên câu hỏi</TableHead>
-                                                <TableHead>Miêu tả</TableHead>
+                                                <TableHead>Câu hỏi</TableHead>
                                                 <TableHead>Thể loại</TableHead>
                                                 <TableHead className="text-center">Hành động</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {form.data.criteriaXCriteriaForms.map((formXCriteria, index) => (
+                                            {form.data.criteriaXCriteriaForms.filter(x=>x.isDeleted==false).map((formXCriteria, index) => (
                                                 <TableRow key={formXCriteria.id}>
                                                     <TableCell>{index + 1}</TableCell>
                                                     <TableCell>
@@ -254,10 +276,9 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
                                                             })
                                                             : "Không có ngày"}
                                                     </TableCell>
-                                                    <TableCell>{formXCriteria?.criteria?.name}</TableCell>
-                                                    <TableCell>{formXCriteria?.criteria?.description}</TableCell>
+                                                    <TableCell>{formXCriteria?.criteria?.question}</TableCell>
                                                     <TableCell>
-                                                        {formXCriteria?.criteria?.valueType === "bool"
+                                                        {formXCriteria?.criteria?.valueType === CriteriaValueType.Boolean
                                                             ? "Dạng đúng sai"
                                                             : "Dạng điền form"}
                                                     </TableCell>
@@ -286,7 +307,6 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
                                                 <TableHead className="w-[100px]">STT</TableHead>
                                                 <TableHead>Ngày thêm</TableHead>
                                                 <TableHead>Tên câu hỏi</TableHead>
-                                                <TableHead>Miêu tả</TableHead>
                                                 <TableHead>Thể loại</TableHead>
                                                 <TableHead className="text-center">Hành động</TableHead>
                                             </TableRow>

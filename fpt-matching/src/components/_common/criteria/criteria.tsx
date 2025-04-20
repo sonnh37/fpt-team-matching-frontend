@@ -29,31 +29,47 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { CriteriaCreateCommand } from '@/types/models/commands/criteria/criteria-create-command';
 import { PlusCircle } from 'lucide-react';
+import { CriteriaValueType } from '@/types/enums/criteria';
 
 const Criteria = () => {
     const [formData, setFormData] = useState({
-        name: "",
-        description: "",
-        valueType: "",
+        question: "",
+        valueType: CriteriaValueType.Boolean,
     });
+
+    const valueTypeText = (type: number) => {
+        switch (type) {
+          case 0:
+            return "Đúng/Sai";
+          case 1:
+            return "Đánh giá (ý kiến)";
+          case 2:
+            return "Số liệu (nhập số)";
+          default:
+            return "Không xác định";
+        }
+      };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
+
         setFormData((prev) => ({
             ...prev,
-            [name]: value,
+            [name]: name === "valueType" ? Number(value) : value,
         }));
     };
 
     const {
-        data: form,
+        data: criteria,
         refetch
     } = useQuery({
-        queryKey: ["getCriteria"],
+        queryKey: ["getAllCriteria"],
         queryFn: () => criteriaService.getAll(),
         refetchOnWindowFocus: false,
     });
 
+
+   
     //Đây là form delete trả về true false tái sử dụng được
     const confirm = useConfirm()
     const handleDelete = async (id: string) => {
@@ -80,8 +96,7 @@ const Criteria = () => {
     const handCreate = async () => {
 
         let query: CriteriaCreateCommand = {
-            name: formData.name,
-            description: formData.description,
+            question: formData.question,
             valueType: formData.valueType
         }
 
@@ -133,20 +148,8 @@ const Criteria = () => {
                                         Câu hỏi:
                                     </Label>
                                     <Input
-                                        id="name"
-                                        name="name"
-                                        onChange={handleChange}
-                                        className="col-span-3"
-                                    />
-
-                                </div>
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="name" className="text-right">
-                                        Miêu tả:
-                                    </Label>
-                                    <Input
-                                        id="description"
-                                        name="description"
+                                        id="question"
+                                        name="question"
                                         onChange={handleChange}
                                         className="col-span-3"
                                     />
@@ -163,14 +166,14 @@ const Criteria = () => {
                                         className="col-span-3"
                                     >
                                         <option value="">Chọn loại</option>
-                                        <option value="bool">Sai hay đúng</option>
-                                        <option value="feedback">Đóng góp ý kiến</option>
+                                        <option value={CriteriaValueType.Boolean}>Sai hay đúng</option>
+                                        <option value={CriteriaValueType.String}>Đóng góp ý kiến</option>
                                     </select>
 
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button type="submit" onClick={() => handCreate()} >Lưu đơn</Button>
+                                <Button type="submit" onClick={() => handCreate()} >Tạo câu hỏi</Button>
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
@@ -179,60 +182,76 @@ const Criteria = () => {
                 </div>
             </div>
 
-            {(form?.data?.results && form.data.results.length < 0) ? (<div className='my-4 w-full flex justify-center'>
-                Hiện tại chưa có đơn nào.
-            </div>) : (<Table>
-                <TableCaption>Danh sách các đơn sẵn có.</TableCaption>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-[100px]">Số thứ tự</TableHead>
-                        <TableHead>Ngày nộp</TableHead>
-                        <TableHead>Tên người nộp</TableHead>
-                        <TableHead>Tên câu hỏi</TableHead>
-                        <TableHead>Miêu tả</TableHead>
-                        <TableHead className="max-h-[500px] overflow-x-auto whitespace-nowrap">Thể loại</TableHead>
-                        <TableHead className="text-center">Trạng thái </TableHead>
-                        <TableHead className="text-center">Hành động </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {form?.data?.results?.map((cv, index) => (
-                        <TableRow key={cv.id}>
-                            <TableCell className="font-medium">{index}</TableCell>
-                            <TableCell className="font-medium">{cv.createdDate ? new Date(cv.createdDate).toLocaleString("vi-VN", {
-                                day: "2-digit",
-                                month: "2-digit",
-                                year: "numeric",
-                                hour: "2-digit"
-                            })
-                                : "Không có ngày "}</TableCell>
-                            <TableCell>{cv.createdBy}  </TableCell>
-                            <TableCell >{cv.name}</TableCell>
-                            <TableCell >{cv.description}</TableCell>
-                            <TableCell >{cv.valueType}</TableCell>
-                            <TableCell className=' justify-center'>
-                                {cv.isDeleted ? (
-                                    <button className=" p-2 bg-red-600 rounded-sm">
-                                        Đã xóa
-                                    </button>
-                                ) : (
-                                    <button className=" p-2 bg-green-500 rounded-sm">
-                                        Đang sử dụng
-                                    </button>
-                                )}
-                            </TableCell>
-                            {/* <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`/social/blog/profile-social/${cv.user?.id}`}>Xem profile</a></button></TableCell> */}
-                            <TableCell className='flex justify-center' >
-                                <Button variant={"destructive"} onClick={() => handleDelete(cv.id ?? "")}> Xóa đơn</Button>
-                                <Button className="p-2 px-4 bg-blue-500  ml-3 rounded-sm text-white" >Chi tiết</Button>
-                            </TableCell>
+            {(criteria?.data?.results && criteria.data.results.length < 0) ? (
+                <Table className='h-min-[400px] overflow-y-auto'>
+                    <TableCaption>Danh sách các đơn sẵn có. <br />
+                        <div className='my-4 w-full flex justify-center'>
+                            Hiện tại chưa có đơn nào.
+                        </div>
+                    </TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[100px]">Số thứ tự</TableHead>
+                            <TableHead>Ngày nộp</TableHead>
+                            <TableHead>Tên người nộp</TableHead>
+                            <TableHead>Tên câu hỏi</TableHead>
+                            <TableHead className="max-h-[500px] overflow-x-auto whitespace-nowrap">Thể loại</TableHead>
+                            <TableHead className="text-center">Trạng thái </TableHead>
+                            <TableHead className="text-center">Hành động </TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-                <TableFooter>
+                    </TableHeader>
+                </Table>
+            ) : (
+                <Table className='h-min-[400px] overflow-y-auto'>
+                    <TableCaption>Danh sách các đơn sẵn có.</TableCaption>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead className="w-[100px]">Số thứ tự</TableHead>
+                            <TableHead>Ngày nộp</TableHead>
+                            <TableHead>Tên người nộp</TableHead>
+                            <TableHead>Tên câu hỏi</TableHead>
+                            <TableHead className="max-h-[500px] overflow-x-auto whitespace-nowrap">Thể loại</TableHead>
+                            <TableHead className="text-center">Trạng thái </TableHead>
+                            <TableHead className="text-center">Hành động </TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {criteria?.data?.results?.map((cv, index) => (
+                            <TableRow key={cv.id}>
+                                <TableCell className="font-medium">{index}</TableCell>
+                                <TableCell className="font-medium">{cv.createdDate ? new Date(cv.createdDate).toLocaleString("vi-VN", {
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                    hour: "2-digit"
+                                })
+                                    : "Không có ngày "}</TableCell>
+                                <TableCell>{cv.createdBy}  </TableCell>
+                                <TableCell >{cv.question}</TableCell>
+                                <TableCell>{valueTypeText(cv.valueType ?? -1)}</TableCell>
+                                <TableCell className=' justify-center'>
+                                    {cv.isDeleted ? (
+                                        <button className=" p-2 bg-red-600 rounded-sm">
+                                            Đã xóa
+                                        </button>
+                                    ) : (
+                                        <button className=" p-2 bg-green-500 rounded-sm">
+                                            Đang sử dụng
+                                        </button>
+                                    )}
+                                </TableCell>
+                                {/* <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`/social/blog/profile-social/${cv.user?.id}`}>Xem profile</a></button></TableCell> */}
+                                <TableCell className='flex justify-center' >
+                                    <Button variant={"destructive"} onClick={() => handleDelete(cv.id ?? "")}> Xóa đơn</Button>
+                                    <Button className="p-2 px-4 bg-blue-500  ml-3 rounded-sm text-white" >Chi tiết</Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                    <TableFooter>
 
-                </TableFooter>
-            </Table>)
+                    </TableFooter>
+                </Table>)
 
             }
 
