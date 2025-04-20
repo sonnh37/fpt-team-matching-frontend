@@ -181,6 +181,12 @@ export const NAV_CONFIG = {
         },
       ],
     },
+    {
+      title: "Quản lý thông báo",
+      url: "/management/notifications",
+      icon: ShieldHalf,
+      roles: ["Manager"],
+    }
   ],
 };
 

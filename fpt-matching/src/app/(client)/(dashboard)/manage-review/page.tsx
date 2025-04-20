@@ -47,7 +47,7 @@ function SelectReview({setReviewNumber}: {setReviewNumber: Dispatch<SetStateActi
     return (
         <Select defaultValue={"1"} onValueChange={(value)=> {setReviewNumber(value)}}>
             <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a fruit" />
+                <SelectValue placeholder="Chọn review" />
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>
