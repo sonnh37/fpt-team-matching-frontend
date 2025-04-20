@@ -163,8 +163,8 @@ const Criteria = () => {
                                         className="col-span-3"
                                     >
                                         <option value="">Chọn loại</option>
-                                        <option value="Sai hay đúng">Sai hay đúng</option>
-                                        <option value="Đóng góp ý kiến">Đóng góp ý kiến</option>
+                                        <option value="bool">Sai hay đúng</option>
+                                        <option value="feedback">Đóng góp ý kiến</option>
                                     </select>
 
                                 </div>

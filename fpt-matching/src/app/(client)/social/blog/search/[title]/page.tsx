@@ -141,7 +141,7 @@ export default function Search() {
     queryFn: () => blogService.getAll(query1),
     refetchOnWindowFocus: false,
   });
-  // day la sort blog notification
+  // day la sort blog notifications
   const notification = resultall?.data?.results ?? [];
   const sortedNotification = [...notification].sort((a, b) => {
     return (b.comments?.length || 0) - (a.comments?.length || 0);
