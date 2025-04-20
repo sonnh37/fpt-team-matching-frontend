@@ -14,6 +14,7 @@ const defaultSchema = z.object({
 export function IdeaRequestPendingTable() {
   const queryParams: IdeaGetCurrentByStatusQuery = {
     status: IdeaStatus.Pending,
+    isPagination: false,
   };
 
   const { data, isFetching, error, refetch } = useQuery({

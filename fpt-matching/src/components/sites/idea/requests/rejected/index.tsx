@@ -36,6 +36,7 @@ const defaultSchema = z.object({
 export default function IdeaRequestRejectedTable() {
   const queryParams: IdeaGetCurrentByStatusQuery = {
     status: IdeaStatus.Rejected,
+    isPagination: true
   };
 
   const { data, isFetching, error, refetch } = useQuery({

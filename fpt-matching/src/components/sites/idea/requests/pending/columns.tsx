@@ -39,10 +39,71 @@ import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 
 export const columns: ColumnDef<Idea>[] = [
   {
+    accessorKey: "latestVersion",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Latest Version" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if(!idea.ideaVersions) return;
+      const highestVersion = idea.ideaVersions.length > 0
+        ? idea.ideaVersions.reduce((prev, current) =>
+            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+          )
+        : undefined;
+      return highestVersion ? `v${highestVersion.version}` : "-";
+    },
+  },
+  {
     accessorKey: "englishName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Idea name" />
     ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if(!idea.ideaVersions) return;
+      const highestVersion =
+      idea.ideaVersions.length > 0
+        ? idea.ideaVersions.reduce((prev, current) =>
+            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+          )
+        : undefined;
+      return highestVersion?.englishName || "-"
+    },
+  },
+  {
+    accessorKey: "semester",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Semester" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if(!idea.ideaVersions) return;
+      const highestVersion = idea.ideaVersions.length > 0
+        ? idea.ideaVersions.reduce((prev, current) =>
+            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+          )
+        : undefined;
+      
+      return highestVersion?.stageIdea?.semester?.semesterName || "-";
+    },
+  },
+  {
+    accessorKey: "stage",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Current Stage" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if(!idea.ideaVersions) return;
+      const highestVersion = idea.ideaVersions.length > 0
+        ? idea.ideaVersions.reduce((prev, current) =>
+            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+          )
+        : undefined;
+      
+      return highestVersion?.stageIdea?.stageNumber || "-";
+    },
   },
   {
     accessorKey: "createdDate",
@@ -147,6 +208,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       setIsDeleting(false);
     }
   };
+  
 
   return (
     <div className="flex flex-col gap-2">
@@ -161,7 +223,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <DialogTitle>Idea detail</DialogTitle>
           </DialogHeader>
           <div className="flex justify-between p-4 gap-4">
-            <TimeStageIdea stageIdea={idea.stageIdea} />
+            <TimeStageIdea stageIdea={highestVersion?.stageIdea} />
             <HorizontalLinearStepper idea={idea} />
           </div>
           <div className="p-4 gap-4">

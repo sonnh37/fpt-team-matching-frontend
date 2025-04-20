@@ -19,7 +19,7 @@ class IdeaService extends BaseService<Idea> {
   ): Promise<BusinessResult<Idea>> => {
     return axiosInstance
       .post<BusinessResult<Idea>>(
-        `${this.endpoint}/student-create-pending`,
+        `${this.endpoint}/create-pending-by-student`,
         command
       )
       .then((response) => response.data)
@@ -31,7 +31,7 @@ class IdeaService extends BaseService<Idea> {
   ): Promise<BusinessResult<Idea>> => {
     return axiosInstance
       .post<BusinessResult<Idea>>(
-        `${this.endpoint}/lecturer-create-pending`,
+        `${this.endpoint}/create-pending-by-lecturer`,
         command
       )
       .then((response) => response.data)
