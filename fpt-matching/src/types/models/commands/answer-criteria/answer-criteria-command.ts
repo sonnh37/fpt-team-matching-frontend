@@ -3,6 +3,6 @@ import { CreateCommand } from "../_base/base-command";
 
 export interface AnswerCriteriaCreateCommand extends CreateCommand{
     ideaRequestId?: string;
-    criteriaId?: CriteriaValueType;
+    criteriaId?: string;
     value?:string;
 }
