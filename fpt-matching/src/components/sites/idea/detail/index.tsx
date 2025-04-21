@@ -41,7 +41,19 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
         )
       : undefined;
+  const resultDate = highestVersion?.stageIdea?.resultDate
+    ? new Date(highestVersion.stageIdea.resultDate)
+    : null;
+  const ideaVersionRequests = highestVersion?.ideaVersionRequests || [];
 
+  const isResultDay = resultDate ? resultDate.getTime() <= Date.now() : false;
+
+  const mentorApproval = ideaVersionRequests.find(
+    (req) => req.role === "Mentor"
+  );
+  const councilApprovals = ideaVersionRequests.filter(
+    (req) => req.role === "Council"
+  );
   const [selectedVersion, setSelectedVersion] = useState<
     IdeaVersion | undefined
   >(highestVersion);

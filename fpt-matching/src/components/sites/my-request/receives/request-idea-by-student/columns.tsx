@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/utils";
-import { mentoridearequestService } from "@/services/mentor-idea-request-service";
+import { mentortopicrequestService } from "@/services/mentor-idea-request-service";
 import { InvitationStatus } from "@/types/enums/invitation";
 import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Invitation } from "@/types/invitation";
@@ -136,7 +136,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         projectId: model.projectId,
         ideaId: model.ideaId,
       };
-      const res = await mentoridearequestService.update(command);
+      const res = await mentortopicrequestService.update(command);
       if (res.status != 1) {
         toast.error(res.message);
         return;
@@ -158,7 +158,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         projectId: model.projectId,
         ideaId: model.ideaId,
       };
-      const res = await mentoridearequestService.update(command);
+      const res = await mentortopicrequestService.update(command);
       if (res.status != 1) {
         toast.error(res.message);
         return;

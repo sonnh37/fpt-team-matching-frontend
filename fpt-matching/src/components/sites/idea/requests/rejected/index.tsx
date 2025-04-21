@@ -3,9 +3,9 @@ import { DataTablePagination } from "@/components/_common/data-table-api/data-ta
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
 import { ideaService } from "@/services/idea-service";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { FilterEnum } from "@/types/models/filter-enum";
-import { IdeaRequestGetAllCurrentByStatusQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status";
+import { IdeaVersionRequestGetAllCurrentByStatusQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-current-by-status";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -23,7 +23,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
-import { ideaRequestService } from "@/services/idea-request-service";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
 import { IdeaStatus } from "@/types/enums/idea";
 import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-get-current-by-status";
 import { DataOnlyTable } from "@/components/_common/data-table-client/data-table";
@@ -33,7 +33,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaRequestRejectedTable() {
+export default function IdeaVersionRequestRejectedTable() {
   const queryParams: IdeaGetCurrentByStatusQuery = {
     status: IdeaStatus.Rejected,
     isPagination: true

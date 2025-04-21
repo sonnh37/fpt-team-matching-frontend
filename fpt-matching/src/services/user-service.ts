@@ -23,7 +23,7 @@ class UserService extends BaseService<User> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-  public getAllByCouncilWithIdeaRequestPending = (
+  public getAllByCouncilWithIdeaVersionRequestPending = (
     query?: UserGetAllQuery
   ): Promise<BusinessResult<QueryResult<User>>> => {
     const cleanedQuery = cleanQueryParams(query);

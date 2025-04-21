@@ -7,7 +7,7 @@ import { IdeaCreateCommand } from "@/types/models/commands/idea/idea-create-comm
 import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-get-current-by-status";
 import { cleanQueryParams } from "@/lib/utils";
 import { IdeaUpdateStatusCommand } from "@/types/models/commands/idea/idea-update-status-command";
-import { IdeaRequest } from "@/types/idea-request";
+import { IdeaVersionRequest } from "@/types/idea-version-request";
 import { IdeaGetListOfSupervisorsQuery } from "@/types/models/queries/ideas/idea-get-list-of-supervisor-query";
 
 class IdeaService extends BaseService<Idea> {
@@ -60,9 +60,9 @@ class IdeaService extends BaseService<Idea> {
 
   public updateStatus = (
     command: IdeaUpdateStatusCommand
-  ): Promise<BusinessResult<IdeaRequest>> => {
+  ): Promise<BusinessResult<IdeaVersionRequest>> => {
     return axiosInstance
-      .put<BusinessResult<IdeaRequest>>(`${this.endpoint}/status`, command)
+      .put<BusinessResult<IdeaVersionRequest>>(`${this.endpoint}/status`, command)
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };

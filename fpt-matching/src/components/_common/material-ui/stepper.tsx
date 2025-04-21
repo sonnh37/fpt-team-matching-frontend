@@ -12,12 +12,11 @@ import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
 import { StepIconProps } from "@mui/material/StepIcon";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { Idea } from "@/types/idea";
 import { Box, Button, Typography } from "@mui/material";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useCallback } from "react";
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 
 const QontoConnector = styled(StepConnector)(({ theme }) => ({
   [`&.${stepConnectorClasses.alternativeLabel}`]: {

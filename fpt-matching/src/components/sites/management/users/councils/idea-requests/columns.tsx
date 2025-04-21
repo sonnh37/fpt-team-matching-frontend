@@ -84,14 +84,14 @@ export const columns: ColumnDef<User>[] = [
     ),
   },
   {
-    accessorKey: "ideaRequestOfReviewers",
+    accessorKey: "ideaVersionRequestOfReviewers",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Idea Request Pending" />
     ),
     cell: ({ row }) => {
-      const countIdeaRequestOfReviewers = row.original.ideaRequestOfReviewers?.length;
+      const countIdeaVersionRequestOfReviewers = row.original.ideaVersionRequestOfReviewers?.length;
 
-      return <TypographyP>{countIdeaRequestOfReviewers}</TypographyP>;
+      return <TypographyP>{countIdeaVersionRequestOfReviewers}</TypographyP>;
     },
   }
 ];

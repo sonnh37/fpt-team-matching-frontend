@@ -8,12 +8,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { useCurrentRole } from "@/hooks/use-current-role";
-import IdeaRequestApprovedByCouncilTable from "@/components/sites/idea/approval/council/approved";
-import { IdeaRequestPendingByCouncilTable } from "@/components/sites/idea/approval/council/pending";
-import IdeaRequestRejectedByCouncilTable from "@/components/sites/idea/approval/council/rejected";
-import IdeaRequestApprovedByMentorTable from "@/components/sites/idea/approval/mentor/approved";
-import { IdeaRequestPendingByMentorTable } from "@/components/sites/idea/approval/mentor/pending";
-import IdeaRequestRejectedByMentorTable from "@/components/sites/idea/approval/mentor/rejected";
+import IdeaVersionRequestApprovedByCouncilTable from "@/components/sites/idea/approval/council/approved";
+import { IdeaVersionRequestPendingByCouncilTable } from "@/components/sites/idea/approval/council/pending";
+import IdeaVersionRequestRejectedByCouncilTable from "@/components/sites/idea/approval/council/rejected";
+import IdeaVersionRequestApprovedByMentorTable from "@/components/sites/idea/approval/mentor/approved";
+import { IdeaVersionRequestPendingByMentorTable } from "@/components/sites/idea/approval/mentor/pending";
+import IdeaVersionRequestRejectedByMentorTable from "@/components/sites/idea/approval/mentor/rejected";
+import { IdeaVersionRequestConsiderByCouncilTable } from "@/components/sites/idea/requests/consider-by-council";
+import IdeaVersionRequestConsiderByMentorTable from "@/components/sites/idea/approval/mentor/consider";
 
 export default function IdeaApprovalPage() {
   const role = useCurrentRole();
@@ -36,14 +38,15 @@ export default function IdeaApprovalPage() {
 
 function CouncilApprovalTabs() {
   const tabs = [
-    { id: "pending", label: "Chờ duyệt", component: <IdeaRequestPendingByCouncilTable /> },
-    { id: "approved", label: "Đã duyệt", component: <IdeaRequestApprovedByCouncilTable /> },
-    { id: "rejected", label: "Từ chối", component: <IdeaRequestRejectedByCouncilTable /> },
+    { id: "pending", label: "Chờ duyệt", component: <IdeaVersionRequestPendingByCouncilTable /> },
+    { id: "consider", label: "Yêu cầu chỉnh sửa", component: <IdeaVersionRequestConsiderByCouncilTable /> },
+    { id: "approved", label: "Đã duyệt", component: <IdeaVersionRequestApprovedByCouncilTable /> },
+    { id: "rejected", label: "Từ chối", component: <IdeaVersionRequestRejectedByCouncilTable /> },
   ];
 
   return (
     <Tabs defaultValue="pending" className="w-full">
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-4">
         {tabs.map((tab) => (
           <TabsTrigger 
             key={tab.id}
@@ -70,14 +73,15 @@ function CouncilApprovalTabs() {
 
 function MentorApprovalTabs() {
   const tabs = [
-    { id: "pending", label: "Chờ duyệt", component: <IdeaRequestPendingByMentorTable /> },
-    { id: "approved", label: "Đã duyệt", component: <IdeaRequestApprovedByMentorTable /> },
-    { id: "rejected", label: "Từ chối", component: <IdeaRequestRejectedByMentorTable /> },
+    { id: "pending", label: "Chờ duyệt", component: <IdeaVersionRequestPendingByMentorTable /> },
+    { id: "consider", label: "Yêu cầu chỉnh sửa", component: <IdeaVersionRequestConsiderByMentorTable /> },
+    { id: "approved", label: "Đã duyệt", component: <IdeaVersionRequestApprovedByMentorTable /> },
+    { id: "rejected", label: "Từ chối", component: <IdeaVersionRequestRejectedByMentorTable /> },
   ];
 
   return (
     <Tabs defaultValue="pending" className="w-full">
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-4">
         {tabs.map((tab) => (
           <TabsTrigger 
             key={tab.id}

@@ -41,7 +41,7 @@ import { useState } from "react";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import {IdeaDetailForm} from "@/components/sites/idea/detail";
+import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
 
 export const columns: ColumnDef<IdeaVersionRequest>[] = [
@@ -70,7 +70,7 @@ export const columns: ColumnDef<IdeaVersionRequest>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return formatDate(date)
+      return formatDate(date);
     },
   },
   {
@@ -119,7 +119,7 @@ interface ActionsProps {
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
-  const ideaId = row.original.ideaId;
+  const ideaId = row.original.ideaVersion?.ideaId;
   const [open, setOpen] = useState(false);
 
   const user = useSelector((state: RootState) => state.user.user);
@@ -127,6 +127,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   if (!user) {
     return null;
   }
+  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
+  const isLecturer = user.userXRoles.some(
+    (m) => m.role?.roleName === "Lecturer"
+  );
 
   const {
     data: result,
@@ -146,6 +150,15 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   }
 
   const idea = result?.data ?? ({} as Idea);
+  const highestVersion =
+    idea.ideaVersions.length > 0
+      ? idea.ideaVersions.reduce((prev, current) =>
+          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+        )
+      : undefined;
+  const hasCouncilRequests = highestVersion?.ideaVersionRequests?.some(
+    (req) => req.role === "Council"
+  );
   const handleSubmit = async () => {
     try {
       if (!ideaId) throw new Error("Idea ID is required");
@@ -173,10 +186,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <DialogTrigger asChild>
               <Button
                 size="sm"
-                variant={"default"}
+                variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 // disabled={hasCouncilRequests}
               >
-                View
+                View {hasCouncilRequests ? "(Sent)" : ""}
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
@@ -185,8 +198,18 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 <DialogDescription></DialogDescription>
               </DialogHeader>
               <div className="grid p-4 space-y-24">
-                <IdeaDetailForm idea={idea}/>
+                <IdeaDetailForm idea={idea} />
               </div>
+              <DialogFooter>
+                <Button
+                  variant={`${hasCouncilRequests ? "secondary" : "default"}`}
+                  size="sm"
+                  onClick={() => handleSubmit()}
+                  disabled={hasCouncilRequests}
+                >
+                  {hasCouncilRequests ? "Sent" : "Submit to council"}
+                </Button>
+              </DialogFooter>
             </DialogContent>
           </Dialog>
         </div>

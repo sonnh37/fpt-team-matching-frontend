@@ -7,50 +7,69 @@ import {
 } from "@/components/ui/card";
 import { cn, formatDate } from "@/lib/utils";
 import { StageIdea } from "@/types/stage-idea";
+import { Badge } from "../ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Info } from "lucide-react";
 interface StageIdeaProps {
   stageIdea?: StageIdea | undefined;
 }
 const TimeStageIdea = ({ stageIdea }: StageIdeaProps) => {
   return (
     <div>
-      <Card className={cn("w-[380px]")}>
+      <Card className="w-full max-w-2xl">
         <CardHeader>
-          <CardTitle>Stage {stageIdea?.stageNumber} idea</CardTitle>
-          <CardDescription>You have new review stages.</CardDescription>
+          <CardTitle className="text-xl font-semibold">
+            Thông tin Giai đoạn Đánh giá
+          </CardTitle>
+          <CardDescription>
+            Các yêu cầu ý tưởng đang chờ phê duyệt
+          </CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4">
+        <CardContent className="space-y-4">
           {stageIdea ? (
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-                  <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">
-                      Timeline:{" "}
-                      {formatDate(stageIdea.startDate)}
-                      {" "}-{" "}
-                      {formatDate(stageIdea.endDate)}
-                    </p>
-                  </div>
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="flex flex-col items-center pt-1">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
+                  <div className="h-full w-px bg-border" />
                 </div>
-                <div className="grid grid-cols-[25px_1fr] items-start pb-4 last:mb-0 last:pb-0">
-                  <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium">
-                      Date of results:{" "}
+                <div>
+                  <p className="text-sm font-medium">
+                    Thời gian đánh giá:{" "}
+                    <Badge variant="outline" className="ml-2">
+                      {formatDate(stageIdea.startDate)} -{" "}
+                      {formatDate(stageIdea.endDate)}
+                    </Badge>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="flex flex-col items-center pt-1">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">
+                    Ngày công bố kết quả:{" "}
+                    <Badge variant="outline" className="ml-2">
                       {formatDate(stageIdea.resultDate)}
-                    </p>
-                  </div>
+                    </Badge>
+                  </p>
                 </div>
               </div>
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">
-              Không có thông báo mới.
-            </p>
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertTitle>Không có thông tin</AlertTitle>
+              <AlertDescription>
+                Hiện không có giai đoạn đánh giá nào đang diễn ra.
+              </AlertDescription>
+            </Alert>
           )}
         </CardContent>
       </Card>
+   
     </div>
   );
 };
