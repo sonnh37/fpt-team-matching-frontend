@@ -36,5 +36,5 @@ export class Const {
   static readonly USER_X_ROLES = "user-x-roles";
   static readonly ROLES = "roles";
   static readonly TOPIC_VERSIONS = "topic-versions";
-  static readonly TOPIC_VERSIONS_REQUEST = "topic-version-request";
+  static readonly TOPIC_VERSIONS_REQUEST = "topic-version-requests";
 }
