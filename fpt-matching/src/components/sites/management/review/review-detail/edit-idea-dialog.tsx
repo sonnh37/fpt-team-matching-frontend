@@ -48,7 +48,7 @@ export function EditIdeaDialog(
     return (
         <AlertDialog open={isOpen}>
             <AlertDialogTrigger asChild>
-                <Button onClick={() => {setIsOpen(true)}} variant="destructive">Upload file</Button>
+                <Button className={"mb-8"} onClick={() => {setIsOpen(true)}} variant="destructive">Upload file</Button>
             </AlertDialogTrigger>
             <AlertDialogContent  className="sm:max-w-[425px]">
                 <AlertDialogHeader>

@@ -30,7 +30,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
         if (reviewId){
             const fetchReviewDetails = async () => {
                 const result = await reviewService.getReviewDetails(reviewId)
-                if (result.status == 1 && result.data) {
+                if (result.data != null) {
                     setReviewDetails(result.data)
                     if (result.data.fileUpload) {
                         const responseLoadfile = await fetch(result.data.fileUpload);
@@ -39,7 +39,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                         const file = new File([blob], fileName[1], {type: blob.type || ".xlsx"} )
                         setFileupload(file)
                     }
-                    if (result.data.project?.idea && result.data.project.topic.topicVersions){
+                    if ( result.data.project != null && result.data.project.topic.topicVersions.length > 0){
                         const listTopicVersion : TopicVersion[] = []
                         // const listFile : File[] = []
                         for (const ideaHistory of result.data.project.topic.topicVersions) {
