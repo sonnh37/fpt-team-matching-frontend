@@ -466,9 +466,9 @@ export default function TeamInfo() {
                               Tệp đính kèm
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.topic.ideaVersion.idea.file ? (
+                              {project.topic.ideaVersion.file ? (
                                 <a
-                                  href={project.topic.ideaVersion.idea.file}
+                                  href={project.topic.ideaVersion.file}
                                   className="text-blue-500 underline"
                                   target="_blank"
                                 >
@@ -496,7 +496,7 @@ export default function TeamInfo() {
                                 Tên doanh nghiệp
                               </TypographySmall>
                               <TypographyP className="p-0">
-                                {project.topic.ideaVersion.idea.enterpriseName || "-"}
+                                {project.topic.ideaVersion.enterpriseName || "-"}
                               </TypographyP>
                             </div>
                           )}
@@ -536,7 +536,7 @@ export default function TeamInfo() {
                               Số lượng thành viên tối đa
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.topic.ideaVersion.idea.maxTeamSize || "-"}
+                              {project.topic.ideaVersion.teamSize || "-"}
                             </TypographyP>
                           </div>
                         </div>
