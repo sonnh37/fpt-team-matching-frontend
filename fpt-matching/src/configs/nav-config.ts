@@ -52,7 +52,7 @@ export const NAV_CONFIG = {
           roles: ["Student"],
         },
         {
-          title: "Quản lý đánh giá",
+          title: "Quản lý review",
           icon: Pencil,
           url: "/team/manage-review",
           roles: ["Student"],
@@ -114,7 +114,7 @@ export const NAV_CONFIG = {
 
   management: [
     {
-      title: "Quản lý đánh giá",
+      title: "Quản lý review",
       url: "/manage-review",
       icon: SquareUserRound,
       roles: ["Reviewer", "Manager"],

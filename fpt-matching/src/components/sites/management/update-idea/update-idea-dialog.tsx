@@ -13,12 +13,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import {Button} from "@/components/ui/button";
 import {Loader2} from "lucide-react";
-import {IdeaHistoryStatus} from "@/types/enums/idea-history";
-import { ideaHistoryService } from "@/services/idea-history-service";
+import {TopicVersionStatus} from "@/types/enums/topic-version";
+import {topicVersionRequestService} from "@/services/topic-version-request-service";
+import {TopicVersionRequestStatus} from "@/types/enums/topic-version-request";
 
 export function UpdateIdeaDialog(
     {isOpen, setIsOpen, comment, decision, ideaHistoryId, setDecision, setStatus} :
-    {isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, comment: string | null, decision: IdeaHistoryStatus | null, ideaHistoryId : string, setDecision:Dispatch<SetStateAction<IdeaHistoryStatus | null>>, setStatus: Dispatch<SetStateAction<IdeaHistoryStatus | null>>}
+    {isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, comment: string | null, decision: TopicVersionRequestStatus | null, ideaHistoryId : string, setDecision:Dispatch<SetStateAction<TopicVersionRequestStatus | null>>, setStatus: Dispatch<SetStateAction<TopicVersionRequestStatus | null>>}
 ) {
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -37,10 +38,10 @@ export function UpdateIdeaDialog(
                 toast.error("Quyết định cuối cùng không phù hợp")
                 throw new Error("Quyết định cuối cùng không phù hợp");
             }
-            const result = await ideaHistoryService.lectureUpdate({
-                comment,
+            const result = await topicVersionRequestService.responseByManagerOrMentor({
+                feedback: comment,
                 status: decision,
-                ideaHistoryId
+                id: ideaHistoryId
             })
 
             if (result && result.status == 1) {
@@ -65,7 +66,7 @@ export function UpdateIdeaDialog(
                     <Button
                         onClick={() => {
                             setIsOpen(true)
-                            setDecision(IdeaHistoryStatus.Approved)
+                            setDecision(TopicVersionRequestStatus.Approved)
                         }}
                         variant={"default"}
                         className={"bg-green-500"}
@@ -75,7 +76,7 @@ export function UpdateIdeaDialog(
                     <Button
                         onClick={() => {
                             setIsOpen(true)
-                            setDecision(IdeaHistoryStatus.Rejected)
+                            setDecision(TopicVersionRequestStatus.Rejected)
                         }}
                         variant={"default"}
                         className={"bg-red-500"}
@@ -88,7 +89,7 @@ export function UpdateIdeaDialog(
                 <AlertDialogHeader>
                     <AlertDialogTitle>Chỉnh sửa đề tài</AlertDialogTitle>
                     <AlertDialogDescription>
-                        {decision == IdeaHistoryStatus.Approved ? "Bạn có chắc là ĐỒNG Ý duyệt chỉnh sửa đề tài này không?" : "Bạn có chắc là TỪ CHỐI chỉnh sửa đề tài này không?"}
+                        {decision == TopicVersionRequestStatus.Approved ? "Bạn có chắc là ĐỒNG Ý duyệt chỉnh sửa đề tài này không?" : "Bạn có chắc là TỪ CHỐI chỉnh sửa đề tài này không?"}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 

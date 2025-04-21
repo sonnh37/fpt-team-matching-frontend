@@ -1,4 +1,3 @@
-import {IdeaHistory} from "@/types/idea-history";
 import React, {Dispatch, SetStateAction} from "react";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible";
 import {Button} from "@/components/ui/button";
@@ -7,10 +6,12 @@ import Link from "next/link";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {Badge} from "@/components/ui/badge";
 import {IdeaHistoryStatus} from "@/types/enums/idea-history";
+import {TopicVersion} from "@/types/topic-version";
+import {TopicVersionStatus} from "@/types/enums/topic-version";
 
 export default function CollapsibleIdeaHistory(
     {ideaHis, selectedIdeaHistory, setSelectedIdeaHistory}:
-    {ideaHis:IdeaHistory[], selectedIdeaHistory:IdeaHistory | null, setSelectedIdeaHistory:Dispatch<SetStateAction<IdeaHistory | null>>}
+    {ideaHis:TopicVersion[], selectedIdeaHistory:TopicVersion | null, setSelectedIdeaHistory:Dispatch<SetStateAction<TopicVersion | null>>}
 ) {
     const [isOpen, setIsOpen] = React.useState(false)
     return (
@@ -57,7 +58,7 @@ export default function CollapsibleIdeaHistory(
                                         }}  className={"text-center w-[7vw] flex flex-col justify-center overflow-ellipsis overflow-hidden flex-nowrap"}>CAPSTONE_REGISTER_{idea.fileUpdate?.split("CAPSTONE_REGISTER_")[1]}</p>
                                         <Badge
                                             variant={"default"}
-                                            className={`p-1 ${idea.status == IdeaHistoryStatus.Pending ? "bg-amber-600" : idea.status == IdeaHistoryStatus.Approved ? "bg-green-500": "bg-red-500"}`}
+                                            className={`p-1 ${idea.status == TopicVersionStatus.Pending ? "bg-amber-600" : idea.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"}`}
                                         >{IdeaHistoryStatus[idea.status!]}</Badge>
                                     </div>
                                     <Link className={""} href={idea.fileUpdate ? idea.fileUpdate : ""}><Download /></Link>
