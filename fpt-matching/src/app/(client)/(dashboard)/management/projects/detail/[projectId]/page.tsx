@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -93,7 +92,7 @@ export default function ProjectDetail() {
                   </TypographyMuted>
                 </div>
               </CardTitle>
-              <MenuAction ideaId={project.ideaId!} />
+              <MenuAction ideaId={project?.topic.ideaVersion?.id!} />
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Abbreviation & Vietnamese Title */}
@@ -101,13 +100,13 @@ export default function ProjectDetail() {
                 <div>
                   <p className="text-gray-500">Abbreviations</p>
                   <p className="font-semibold italic">
-                    {project?.idea?.abbreviations}
+                    {project?.topic.ideaVersion?.abbreviations}
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-500">Vietnamese Title</p>
                   <p className="font-semibold italic">
-                    {project?.idea?.vietNamName}
+                    {project?.topic.ideaVersion?.vietNamName}
                   </p>
                 </div>
               </div>
@@ -131,7 +130,7 @@ export default function ProjectDetail() {
               {/* Description */}
               <div>
                 <p className="text-gray-500">Description</p>
-                <p className="italic">{project?.idea?.description}</p>
+                <p className="italic">{project?.topic.ideaVersion?.description}</p>
               </div>
 
               {/* Members */}
