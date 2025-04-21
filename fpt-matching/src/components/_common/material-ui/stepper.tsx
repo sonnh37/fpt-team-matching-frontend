@@ -183,6 +183,7 @@ export default function HorizontalLinearStepper({
   idea,
 }: HorizontalLinearStepperProps) {
   if (!idea) return null;
+  if (!idea.ideaVersions) return <>Không có version hiện tại..</>;
   const user = useSelectorUser();
   if (!user) return null;
 
@@ -198,6 +199,8 @@ export default function HorizontalLinearStepper({
             (prev.version ?? 0) > (current.version ?? 0) ? prev : current
           )
         : undefined;
+    if (!highestVersion) return <>Không có verson hiện tại</>;
+
     const ideaVersionRequests = highestVersion?.ideaVersionRequests || [];
     const isStudent = user.userXRoles?.some(
       (m) => m.role?.roleName === "Student"
@@ -205,12 +208,15 @@ export default function HorizontalLinearStepper({
     const isLecturer = user.userXRoles?.some(
       (m) => m.role?.roleName === "Lecturer"
     );
-    const resultDate = idea.stageIdea?.resultDate
-      ? new Date(idea.stageIdea.resultDate)
+    const resultDate = highestVersion?.stageIdea?.resultDate
+      ? new Date(highestVersion.stageIdea.resultDate)
       : null;
+      
     const isResultDay = resultDate ? resultDate.getTime() <= Date.now() : false;
 
-    const mentorApproval = ideaVersionRequests.find((req) => req.role === "Mentor");
+    const mentorApproval = ideaVersionRequests.find(
+      (req) => req.role === "Mentor"
+    );
     const councilApprovals = ideaVersionRequests.filter(
       (req) => req.role === "Council"
     );

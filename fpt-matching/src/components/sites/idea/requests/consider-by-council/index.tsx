@@ -11,9 +11,9 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function IdeaRequestPendingTable() {
+export function IdeaRequestConsiderByCouncilTable() {
   const queryParams: IdeaGetCurrentByStatusQuery = {
-    status: IdeaStatus.Pending,
+    status: IdeaStatus.ConsiderByCouncil,
     isPagination: false,
   };
 
