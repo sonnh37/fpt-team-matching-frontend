@@ -29,34 +29,33 @@ import { Label } from "@/components/ui/label"
 import { CriteriaFormCreateCommand } from '@/types/models/commands/criteria-form/criteria-forn-create-command';
 import { PlusCircle } from 'lucide-react';
 import DetailFormCriteria from '../criteria-form-detail/detail-form';
-import { CriteriaFGetAllQuery } from '@/types/models/queries/criteria-form/criteria-get-all-query';
 import { Pagination } from '@/components/ui/pagination';
+import { CriteriaFormGetAllQuery } from '@/types/models/queries/criteria-form-get-all-query.ts/criteria-form-get-all-query';
 
 const CriteriaForm = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
     const [title, setTitle] = useState<string>("");
     const [search, setSearch] = useState<string>("");
-
+    const [queryParams, setQueryParams] = useState<CriteriaFormGetAllQuery>({
+        title: "",
+        pageNumber: 1,
+        pageSize: 5,
+        isDeleted: false,
+        isPagination: true,
+    });
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTitle(e.target.value);
     };
 
 
 
-    const query: CriteriaFGetAllQuery = {
-        question: title ?? "",
-        pageNumber: currentPage,
-        pageSize: 5,
-        isDeleted: false,
-        isPagination: true,
-    };
     const {
         data: form,
         refetch
     } = useQuery({
-        queryKey: ["getFormCriteria", query],
-        queryFn: () => criteriaFormService.getAll(query),
+        queryKey: ["getALlFormCriteria", queryParams],
+        queryFn: () => criteriaFormService.getAll(queryParams),
         refetchOnWindowFocus: false,
     });
 
@@ -94,11 +93,14 @@ const CriteriaForm = () => {
         }
 
     }
-    
-    const handleSearch = async () => {
 
-        
-    }
+    const handleSearch = () => {
+        setQueryParams((prev) => ({
+            ...prev,
+            title: search,   // lấy từ khóa từ input
+            pageNumber: 1,      // reset về trang 1 khi search
+        }));
+    };
     const handCreate = async () => {
 
         let query: CriteriaFormCreateCommand = {
@@ -120,13 +122,16 @@ const CriteriaForm = () => {
                 <div className="flex items-center gap-2">
                     {/* Search Input */}
                     <input
+                        id='search'
+                        name='search'
+                        onChange={(e) => setSearch(e.target.value)}
                         type="text"
                         placeholder="Tìm kiếm..."
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300"
                     />
 
                     {/* Search Buttons */}
-                    <Button className=" bg-blue-500 hover:bg-blue-600" onClick={()=> handleSearch()}>
+                    <Button className=" bg-blue-500 hover:bg-blue-600" onClick={() => handleSearch()}>
                         Tìm kiếm
                     </Button>
 
@@ -234,21 +239,19 @@ const CriteriaForm = () => {
                             </TableRow>
                         ))}
                     </TableBody>
-                    <TableFooter className='flex items-center justify-center w-full'>
 
-                    </TableFooter>
 
                 </Table>
             )
 
             }
-         
-                <Pagination
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                />
-      
+
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
+
 
 
         </div>
