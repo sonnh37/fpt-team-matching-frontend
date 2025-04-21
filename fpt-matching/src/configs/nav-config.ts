@@ -192,7 +192,13 @@ export const NAV_CONFIG = {
       url: "/calendar",
       icon: ShieldHalf,
       roles: ["Reviewer"],
-    }
+    },
+    {
+      title: "Quản lý chỉnh sửa đề tài",
+      url: "/management/update-topic-management",
+      icon: ShieldHalf,
+      roles: ["Manager"],
+    },
   ],
 };
 

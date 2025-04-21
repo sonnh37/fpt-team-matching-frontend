@@ -125,13 +125,16 @@ const Page = () => {
                     {/*1.1.1*/}
                     <div className={"mx-4 mt-2 flex flex-col gap-2 "}>
                         <Label className={"text-sm mt-2 font-bold flex flex-row items-center gap-2"}>{<Plus className={"size-4"} />} Tiếng việt | Vietnamese: </Label>
-                        <Input readOnly={true} className={"w-3/4"} value={project?.idea?.vietNamName ?? ""} />
+                        <Input readOnly={true} className={"w-3/4"}
+                               // value={project?.idea?.ideaVersions.sort(x => x.version) ?? ""}
+                            value={project?.topic.ideaVersion?.vietNamName ?? undefined}
+                        />
                     </div>
 
                     {/*1.1.2*/}
                     <div className={"mx-4 mt-2 flex flex-col gap-2"}>
                         <Label className={"text-sm mt-2 font-bold flex flex-row items-center gap-2"}>{<Plus className={"size-4"} />} Tiếng anh | English: </Label>
-                        <Input readOnly={true} className={"w-3/4"} value={project?.idea?.englishName ?? ""} />
+                        <Input readOnly={true} className={"w-3/4"} value={project?.topic.ideaVersion?.englishName ?? undefined} />
                     </div>
                 </div>
 

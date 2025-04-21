@@ -62,11 +62,20 @@ function SelectReview({setReviewNumber}: {setReviewNumber: Dispatch<SetStateActi
 }
 
 function ButtonWithIcon({router} : {router: AppRouterInstance}) {
+    const handleDownTemplate = async () => {
+        const filePath = process.env.NEXT_PUBLIC_API_BASE+"/api/reviews/export-excel-for-reviews"
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        window.location = filePath
+    }
     return (
-        <div>
+        <div className={"flex flex-row gap-2"}>
             <Button className={""} onClick={() => {router.push("manage-review/import-csv")}}>
                 <Import /> Import csv file
             </Button>
+            <div className={"mb-4"}>
+                <Button onClick={() => handleDownTemplate()}>Tải template tại đây</Button>
+            </div>
         </div>
     )
 }

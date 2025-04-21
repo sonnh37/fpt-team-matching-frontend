@@ -84,7 +84,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                         />
                         <div className={"font-bold text-xl mt-6"}>
                             <div>
-                                {reviewDetails.project?.idea?.englishName}
+                                {reviewDetails.project?.topic.ideaVersion?.englishName}
                             </div>
                             <div className={"pt-4"}>
                                 {reviewDetailsRBAC.hasPermission(currentRole, "feedbackUpdatedCapstone")
@@ -92,7 +92,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                         <Link className={"font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/management/projects/detail/idea/update-idea?ideaId=${reviewDetails.project?.idea?.id}`} >Xem nội dùng đề tài chỉnh sửa</Link>
                                     )
                                     : (reviewDetails.number != 3 && reviewDetails.number != 4)
-                                        ? <UpdateIdeaSheet ideaId={reviewDetails && reviewDetails.project!.topic.ideaVersion?.id!} reviewStage={reviewDetails.number} ideaHis={topicVersion} />
+                                        ? <UpdateIdeaSheet topicVersionId={reviewDetails?.project?.topic.ideaVersion?.id!} ideaId={reviewDetails && reviewDetails.project!.topic.id!} reviewStage={reviewDetails.number} ideaHis={topicVersion} />
                                         : <div></div>}
                                 {
                                     (topicVersion &&

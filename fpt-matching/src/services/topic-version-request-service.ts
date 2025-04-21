@@ -19,6 +19,11 @@ class TopicVersionRequestService extends BaseService<TopicVersionRequest> {
 
         return response.data
     }
+
+    public async getByRole (role: string) : Promise<BusinessResult<TopicVersionRequest[]>> {
+        const response = await axiosInstance.get<BusinessResult<TopicVersionRequest[]>>(`${this.endpoint}/get-by-role?role=${role}`)
+        return response.data
+    }
 }
 
 export const topicVersionRequestService = new TopicVersionRequestService();

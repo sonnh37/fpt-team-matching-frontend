@@ -131,7 +131,7 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                                             "bg-amber-600" :
                                                             selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Mentor")[0].status == TopicVersionRequestStatus.Approved ?
                                                                 "bg-green-500": "bg-red-500"} px-2`}
-                                                    >{TopicVersionStatus[selectedIdeaHistory.status!]}</Badge>
+                                                    >{TopicVersionStatus[selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Mentor")[0].status!]}</Badge>
                                                 ) : mentorStatus
                                                     ? (<Badge
                                                         variant={"default"}
@@ -181,7 +181,7 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                                     : selectedIdeaHistory && (
                                                     <UpdateIdeaDialog isOpen={isOpen} setIsOpen={setIsOpen} comment={managerComment}
                                                                       decision={decision}
-                                                                      setStatus={setMentorStatus}
+                                                                      setStatus={setManagerStatus}
                                                                       ideaHistoryId={selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Manager")[0] != null ? selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Manager")[0].id! : ""}
                                                                       setDecision={setDecision}/>
                                                 )
