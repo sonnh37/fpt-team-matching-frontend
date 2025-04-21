@@ -72,7 +72,7 @@ const Page = () => {
                     <div className={""}>
                         <BreadcrumbReviewDetails
                             semesterName={semester!.semesterName!}
-                            ideaCode={reviewDetails.project!.idea!.ideaCode!}
+                            ideaCode={reviewDetails.project!.topic.topicCode!}
                             projectCode={reviewDetails.project!.teamCode!}
                             reviewNumber={reviewDetails.number}
                         />
@@ -106,15 +106,15 @@ const Page = () => {
                                             </AccordionTrigger>
                                             <AccordionContent>
                                                 <div className={"flex flex-col gap-1.5 font-bold"}>
-                                                    <div>Idea code: <span className={"font-medium ml-2"}>{reviewDetails.project?.idea?.ideaCode}</span></div>
-                                                    <div>English name: <span className={"font-medium ml-2"}>{reviewDetails.project?.idea?.englishName}</span></div>
-                                                    <div>Vietnamese name: <span className={"font-medium ml-2"}>{reviewDetails.project?.idea?.vietNamName}</span></div>
-                                                    <div>Abbreviations: <span className={"font-medium ml-2"}>{reviewDetails.project?.idea?.abbreviations}</span></div>
-                                                    <div>Description: <span className={"font-medium ml-2"}>{reviewDetails.project?.idea?.description}</span></div>
+                                                    <div>Idea code: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic.topicCode}</span></div>
+                                                    <div>English name: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic.ideaVersion?.englishName}</span></div>
+                                                    <div>Vietnamese name: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic.ideaVersion?.vietNamName}</span></div>
+                                                    <div>Abbreviations: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic.ideaVersion?.abbreviations}</span></div>
+                                                    <div>Description: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic.ideaVersion?.description}</span></div>
                                                     <div>Enterprise project:
                                                         <Button
                                                             className={"ml-4"}
-                                                            variant={reviewDetails.project?.idea?.status != null ? "destructive" : "ghost"}>{reviewDetails.project?.idea?.status != null ? "No" : reviewDetails.project?.idea?.enterpriseName}</Button>
+                                                            variant={reviewDetails.project?.topic.ideaVersion?.idea?.isEnterpriseTopic != null ? "destructive" : "ghost"}>{reviewDetails.project?.topic.ideaVersion?.idea?.isEnterpriseTopic != null ? "No" : reviewDetails.project?.topic.ideaVersion?.idea?.isEnterpriseTopic}</Button>
                                                     </div>
                                                 </div>
                                             </AccordionContent>

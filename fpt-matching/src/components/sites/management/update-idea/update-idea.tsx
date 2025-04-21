@@ -1,9 +1,6 @@
 import React, {useEffect} from 'react';
-import {IdeaHistory} from "@/types/idea-history";
-import {IdeaHistoryStatus} from "@/types/enums/idea-history";
-import {ideaHistoryService} from "@/services/idea-history-service";
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
-import {TabsContent, TabsList, Tabs, TabsTrigger} from "@/components/ui/tabs";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import CollapsibleIdeaHistory from "@/components/sites/management/update-idea/collapsile-idea-history";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
@@ -11,15 +8,20 @@ import {Badge} from "@/components/ui/badge";
 import {Textarea} from "@/components/ui/textarea";
 import {UpdateIdeaDialog} from "@/components/sites/management/update-idea/update-idea-dialog";
 import DocxView from "@/components/sites/management/docx-view/docx-view";
-import { useCurrentRole } from '@/hooks/use-current-role';
+import {useCurrentRole} from '@/hooks/use-current-role';
+import {TopicVersion} from "@/types/topic-version";
+import {TopicVersionStatus} from "@/types/enums/topic-version";
+import {topicVersionService} from '@/services/topic-version-service';
+import {TopicVersionRequestStatus} from "@/types/enums/topic-version-request";
 
 const UpdateIdea = ({ideaId} : {ideaId: string}) => {
-    const [ideaHistories, setIdeaHistoies] = React.useState<IdeaHistory[]>([]);
-    const [selectedIdeaHistory, setSelectedIdeaHistory] = React.useState<IdeaHistory | null>(null);
+    const [topicVersion, setTopicVersion] = React.useState<TopicVersion[]>([]);
+    const [selectedIdeaHistory, setSelectedIdeaHistory] = React.useState<TopicVersion | null>(null);
     const [fileUrl, setFileUrl] = React.useState<string | null>(null);
-    const [status, setStatus] = React.useState<IdeaHistoryStatus | null>(null);
+    const [mentorStatus, setMentorStatus] = React.useState<TopicVersionRequestStatus | null>(null);
+    const [managerStatus, setManagerStatus] = React.useState<TopicVersionRequestStatus | null>(null);
     const [comment, setComment] = React.useState<string | null>(null);
-    const [decision, setDecision] = React.useState<IdeaHistoryStatus| null>(null);
+    const [decision, setDecision] = React.useState<TopicVersionRequestStatus| null>(null);
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
     const currentRole = useCurrentRole();
@@ -27,11 +29,11 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
         const fetchData = async () => {
             if (!ideaId) return
 
-            const response = await ideaHistoryService.getAllIdeaHistoryByIdeaId(ideaId);
+            const response = await topicVersionService.getByIdeaId(ideaId);
             if (response.data && response) {
                 // const sortData = response.data.sort((a, b) => a.createdDate! - b.createdDate!);
-                setIdeaHistoies(response.data);
-                const selected = response.data.filter(x => x.status == IdeaHistoryStatus.Pending)[0]
+                setTopicVersion(response.data);
+                const selected = response.data.filter(x => x.status == TopicVersionStatus.Pending)[0]
                 if (selected) {
                     setSelectedIdeaHistory(selected)
                 } else {
@@ -44,7 +46,15 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
     useEffect(() => {
         if (selectedIdeaHistory && selectedIdeaHistory.fileUpdate) {
             setFileUrl(selectedIdeaHistory.fileUpdate)
-            setStatus(selectedIdeaHistory.status!)
+            selectedIdeaHistory.topicVersionRequests.forEach(x => {
+                if (x.role == "Mentor"){
+                    setMentorStatus(x.status!)
+                }
+                if (x.role == "Manager"){
+                    setManagerStatus(x.status!)
+                }
+            })
+            // selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Mentor") ? setMentorStatus(selectedIdeaHistory.topicVersionRequests[0].status ?? TopicVersionRequestStatus.Pending)
             if (selectedIdeaHistory.comment) {
                 setComment(selectedIdeaHistory.comment)
             }
@@ -68,7 +78,7 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                             <TabsContent className={"mt-4"} value="fileInfo">
                                 <CollapsibleIdeaHistory selectedIdeaHistory={selectedIdeaHistory}
                                                         setSelectedIdeaHistory={setSelectedIdeaHistory}
-                                                        ideaHis={ideaHistories}/>
+                                                        ideaHis={topicVersion}/>
                                 <div className={"mt-8 flex flex-col gap-4"}>
                                     <div className={"w-full"}>
                                         <Label className={"pl-2 font-bold"}>Tên file :</Label>
@@ -88,8 +98,8 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                         <Label className={"pl-2 font-bold"}>Trạng thái: </Label>
                                         <Badge
                                             variant={"default"}
-                                            className={`ml-2 p-1 ${selectedIdeaHistory.status == IdeaHistoryStatus.Pending ? "bg-amber-600" : selectedIdeaHistory.status == IdeaHistoryStatus.Approved ? "bg-green-500" : "bg-red-500"}`}
-                                        >{IdeaHistoryStatus[selectedIdeaHistory.status!]}</Badge>
+                                            className={`ml-2 p-1 ${selectedIdeaHistory.status == TopicVersionStatus.Pending ? "bg-amber-600" : selectedIdeaHistory.status == TopicVersionStatus.Approved ? "bg-green-500" : "bg-red-500"}`}
+                                        >{TopicVersionStatus[selectedIdeaHistory.status!]}</Badge>
                                     </div>
                                     <div className={"w-full flex flex-rows items-center"}>
                                         <Label className={"pl-2 font-bold mr-2"}>Note: </Label>
@@ -99,35 +109,72 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                             </TabsContent>
                             <TabsContent value="action">
                                 <div className={"w-full flex flex-col gap-4"}>
-                                    <div>
-                                        <Label className={"pl-2 font-bold"}>Nhận xét</Label>
-                                        <Textarea
-                                            disabled={!!(currentRole && currentRole == "Student")}
-                                            value={comment || undefined} onChange={(e) => {
-                                            setComment(e.target.value)
-                                        }} placeholder="Type your message here."/>
+                                    <div className={"w-full flex flex-col gap-4"}>
+                                        <div>
+                                            <Label className={"pl-2 font-bold"}>Nhận xét của mentor</Label>
+                                            <Textarea
+                                                disabled={!!(currentRole && currentRole == "Student")}
+                                                value={comment || undefined} onChange={(e) => {
+                                                setComment(e.target.value)
+                                            }} placeholder="Type your message here."/>
+                                        </div>
+                                        <div className={"w-full flex flex-col gap-2"}>
+                                            <Label className={"pl-2 mb-4 font-bold"}>Đánh giá của mentor</Label>
+                                            {
+                                                currentRole && (currentRole == "Student" || currentRole == "Manager") ? (
+                                                    <Badge
+                                                        variant={"default"}
+                                                        className={`text-center py-4 flex justify-center items-center ${selectedIdeaHistory.status == TopicVersionStatus.Pending ? "bg-amber-600" : selectedIdeaHistory.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
+                                                    >{TopicVersionStatus[selectedIdeaHistory.status!]}</Badge>
+                                                ) : mentorStatus
+                                                    ? (<Badge
+                                                        variant={"default"}
+                                                        className={`text-center py-4 flex justify-center items-center ${mentorStatus == TopicVersionRequestStatus.Approved ? "bg-green-500" : "bg-red-500"}`}
+                                                    >{TopicVersionStatus[mentorStatus]}</Badge>)
+                                                    : selectedIdeaHistory && (
+                                                    <UpdateIdeaDialog isOpen={isOpen} setIsOpen={setIsOpen} comment={comment}
+                                                                      decision={decision}
+                                                                      setStatus={setMentorStatus}
+                                                                      ideaHistoryId={selectedIdeaHistory.id!}
+                                                                      setDecision={setDecision}/>
+                                                )
+                                            }
+                                        </div>
                                     </div>
-                                    <div className={"w-full flex flex-col gap-2"}>
-                                        <Label className={"pl-2 mb-4 font-bold"}>Đánh giá cuối cùng</Label>
-                                        {
-                                            currentRole && currentRole == "Student" ? (
-                                                <Badge
-                                                    variant={"default"}
-                                                    className={`text-center py-4 flex justify-center items-center ${selectedIdeaHistory.status == IdeaHistoryStatus.Pending ? "bg-amber-600" : selectedIdeaHistory.status == IdeaHistoryStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
-                                                >{IdeaHistoryStatus[selectedIdeaHistory.status!]}</Badge>
-                                            ) :status
-                                                ? (<Badge
-                                                    variant={"default"}
-                                                    className={`text-center py-4 flex justify-center items-center ${status == IdeaHistoryStatus.Approved ? "bg-green-500" : "bg-red-500"}`}
-                                                >{IdeaHistoryStatus[status]}</Badge>)
-                                                : selectedIdeaHistory && (
-                                                <UpdateIdeaDialog isOpen={isOpen} setIsOpen={setIsOpen} comment={comment}
-                                                                  decision={decision}
-                                                                  setStatus={setStatus}
-                                                                  ideaHistoryId={selectedIdeaHistory.id!}
-                                                                  setDecision={setDecision}/>
-                                            )
-                                        }
+
+                                    <div className={"w-full h-[1px] bg-gray-500 my-8"}></div>
+
+                                    <div className={"w-full flex flex-col gap-4"}>
+                                        <div>
+                                            <Label className={"pl-2 font-bold"}>Nhận xét của manager</Label>
+                                            <Textarea
+                                                disabled={!!(currentRole && currentRole == "Student")}
+                                                value={comment || undefined} onChange={(e) => {
+                                                setComment(e.target.value)
+                                            }} placeholder="Type your message here."/>
+                                        </div>
+                                        <div className={"w-full flex flex-col gap-2"}>
+                                            <Label className={"pl-2 mb-4 font-bold"}>Đánh giá của manager</Label>
+                                            {
+                                                currentRole && (currentRole == "Student" || currentRole == "Lecturer") ? (
+                                                    <Badge
+                                                        variant={"default"}
+                                                        className={`text-center py-4 flex justify-center items-center ${selectedIdeaHistory.status == TopicVersionStatus.Pending ? "bg-amber-600" : selectedIdeaHistory.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
+                                                    >{TopicVersionStatus[selectedIdeaHistory.status!]}</Badge>
+                                                ) : managerStatus
+                                                    ? (<Badge
+                                                        variant={"default"}
+                                                        className={`text-center py-4 flex justify-center items-center ${managerStatus == TopicVersionRequestStatus.Approved ? "bg-green-500" : "bg-red-500"}`}
+                                                    >{TopicVersionStatus[managerStatus]}</Badge>)
+                                                    : selectedIdeaHistory && (
+                                                    <UpdateIdeaDialog isOpen={isOpen} setIsOpen={setIsOpen} comment={comment}
+                                                                      decision={decision}
+                                                                      setStatus={setMentorStatus}
+                                                                      ideaHistoryId={selectedIdeaHistory.id!}
+                                                                      setDecision={setDecision}/>
+                                                )
+                                            }
+                                        </div>
                                     </div>
                                 </div>
                             </TabsContent>

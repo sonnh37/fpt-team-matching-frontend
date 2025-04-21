@@ -34,36 +34,36 @@ const ActionCell = ({row}: {row :Row<Review>}) => {
 export const ReviewColumns: ColumnDef<Review>[] = [
     {
         accessorKey: "number",
-        header: "Review number",
+        header: "Review",
         size: 100
     },
     {
         accessorKey: "project.teamCode",
         id: "teamCode",
-        header: "Team Code",
+        header: "Mã nhóm",
         size: 150
     },
     {
-        accessorKey: "project.idea.ideaCode",
+        accessorKey: "project.topic.topicCode",
         id: "ideaCode",
-        header: "Idea Code",
+        header: "Mã đề tài",
         size: 150
     },
     {
-        accessorKey: "project.idea.vietNamName",
+        accessorKey: "project.topic.ideaVersion.vietNamName",
         id: "vietnameseName",
-        header: "Vietnamese",
+        header: "Tên tiếng Việt",
         size: 250
     },
     {
-        accessorKey: "project.idea.englishName",
+        accessorKey: "project.topic.ideaVersion.englishName",
         id: "englishName",
-        header: "English/Japanese name",
+        header: "Tên tiếng Anh / Nhật",
         size: 250
     },
     {
         accessorKey: "reviewDate",
-        header: "Review Date",
+        header: "Ngày review",
         cell: ({row}) => {
             const reviewDate = row.getValue<Date | null>("reviewDate");
 
@@ -72,7 +72,7 @@ export const ReviewColumns: ColumnDef<Review>[] = [
     },
     {
         accessorKey: "room",
-        header: "Room",
+        header: "Phòng",
         cell: ({row}) => {
             const room = row.getValue<string | null>("room");
             return room ? room : <div className={"text-gray-500"}>Not yet</div>;
@@ -89,7 +89,7 @@ export const ReviewColumns: ColumnDef<Review>[] = [
     },
     {
         id:"status",
-        header: "Status",
+        header: "Trạng thái",
         size: 150,
         accessorFn: (row) => {
             return row.reviewDate && row.room && row.slot ? "Assigned" : "Not yet";

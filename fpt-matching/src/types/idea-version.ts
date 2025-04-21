@@ -16,6 +16,10 @@ export interface IdeaVersion extends BaseEntity {
   teamSize?: number;
   file?: string;
   idea?: Idea;
+  vietNamName?: string;
+  description?: string;
+  abbreviations?: string;
+  englishName?: string;
   stageIdea?: StageIdea;
   topic?: Topic;
   ideaVersionRequests: IdeaVersionRequest[];
