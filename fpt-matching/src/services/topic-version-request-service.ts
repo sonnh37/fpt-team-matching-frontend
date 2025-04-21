@@ -7,7 +7,7 @@ import {TopicVersionRequestStatus} from "@/types/enums/topic-version-request";
 
 class TopicVersionRequestService extends BaseService<TopicVersionRequest> {
     constructor() {
-        super(Const.TOPIC_VERSIONS);
+        super(Const.TOPIC_VERSIONS_REQUEST);
     }
 
     public async responseByManagerOrMentor({id, status, feedback}: {id: string, status: TopicVersionRequestStatus, feedback: string}) : Promise<BusinessResult<void>> {
@@ -17,6 +17,11 @@ class TopicVersionRequestService extends BaseService<TopicVersionRequest> {
             feedback,
         })
 
+        return response.data
+    }
+
+    public async getByRole (role: string) : Promise<BusinessResult<TopicVersionRequest[]>> {
+        const response = await axiosInstance.get<BusinessResult<TopicVersionRequest[]>>(`${this.endpoint}/get-by-role?role=${role}`)
         return response.data
     }
 }

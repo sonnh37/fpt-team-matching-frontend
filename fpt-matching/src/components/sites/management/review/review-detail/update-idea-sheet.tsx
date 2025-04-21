@@ -88,7 +88,7 @@ function CollapsibleFile({ideaHis}:{ideaHis:TopicVersion[]}) {
     )
 }
 
-export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: TopicVersion[], ideaId: string, reviewStage: number}) {
+export function UpdateIdeaSheet({topicVersionId,ideaHis, ideaId, reviewStage}: {topicVersionId:string, ideaHis: TopicVersion[], ideaId: string, reviewStage: number}) {
     const [fileChange, setFileChange] = React.useState<File | null>(null)
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [note, setNote] = React.useState<string | null>(null);
@@ -122,7 +122,7 @@ export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: TopicV
                             </SheetDescription>
                         </div>
                         <div>
-                            <Link className={" mt-4 font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/team/view-update-idea?ideaId=${ideaId}`} >Xem chi tiết chỉnh sửa</Link>
+                            <Link className={" mt-4 font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/team/view-update-idea?ideaId=${topicVersionId}`} >Xem chi tiết chỉnh sửa</Link>
                         </div>
                     </SheetHeader>
                     <div className={"m-2 mt-0 h-1/2 flex flex-row gap-2 justify-between"}>

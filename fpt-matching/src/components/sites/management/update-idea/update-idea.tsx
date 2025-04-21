@@ -20,7 +20,8 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
     const [fileUrl, setFileUrl] = React.useState<string | null>(null);
     const [mentorStatus, setMentorStatus] = React.useState<TopicVersionRequestStatus | null>(null);
     const [managerStatus, setManagerStatus] = React.useState<TopicVersionRequestStatus | null>(null);
-    const [comment, setComment] = React.useState<string | null>(null);
+    const [mentorComment, setMentorComment] = React.useState<string | null>(null);
+    const [managerComment, setManagerComment] = React.useState<string | null>(null);
     const [decision, setDecision] = React.useState<TopicVersionRequestStatus| null>(null);
     const [isOpen, setIsOpen] = React.useState<boolean>(false);
 
@@ -49,15 +50,17 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
             selectedIdeaHistory.topicVersionRequests.forEach(x => {
                 if (x.role == "Mentor"){
                     setMentorStatus(x.status!)
+                    setMentorComment(x.feedback ?? null)
                 }
                 if (x.role == "Manager"){
                     setManagerStatus(x.status!)
+                    setManagerComment(x.feedback ?? null)
                 }
             })
             // selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Mentor") ? setMentorStatus(selectedIdeaHistory.topicVersionRequests[0].status ?? TopicVersionRequestStatus.Pending)
-            if (selectedIdeaHistory.comment) {
-                setComment(selectedIdeaHistory.comment)
-            }
+            // if (selectedIdeaHistory.comment) {
+            //     setComment(selectedIdeaHistory.comment)
+            // }
         }
     }, [selectedIdeaHistory]);
 
@@ -114,8 +117,8 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                             <Label className={"pl-2 font-bold"}>Nhận xét của mentor</Label>
                                             <Textarea
                                                 disabled={!!(currentRole && currentRole == "Student")}
-                                                value={comment || undefined} onChange={(e) => {
-                                                setComment(e.target.value)
+                                                value={mentorComment || undefined} onChange={(e) => {
+                                                setMentorComment(e.target.value)
                                             }} placeholder="Type your message here."/>
                                         </div>
                                         <div className={"w-full flex flex-col gap-2"}>
@@ -124,18 +127,21 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                                 currentRole && (currentRole == "Student" || currentRole == "Manager") ? (
                                                     <Badge
                                                         variant={"default"}
-                                                        className={`text-center py-4 flex justify-center items-center ${selectedIdeaHistory.status == TopicVersionStatus.Pending ? "bg-amber-600" : selectedIdeaHistory.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
-                                                    >{TopicVersionStatus[selectedIdeaHistory.status!]}</Badge>
+                                                        className={`text-center py-4 flex justify-center items-center ${selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Mentor")[0].status == TopicVersionRequestStatus.Pending ?
+                                                            "bg-amber-600" :
+                                                            selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Mentor")[0].status == TopicVersionRequestStatus.Approved ?
+                                                                "bg-green-500": "bg-red-500"} px-2`}
+                                                    >{TopicVersionStatus[selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Mentor")[0].status!]}</Badge>
                                                 ) : mentorStatus
                                                     ? (<Badge
                                                         variant={"default"}
                                                         className={`text-center py-4 flex justify-center items-center ${mentorStatus == TopicVersionRequestStatus.Approved ? "bg-green-500" : "bg-red-500"}`}
                                                     >{TopicVersionStatus[mentorStatus]}</Badge>)
                                                     : selectedIdeaHistory && (
-                                                    <UpdateIdeaDialog isOpen={isOpen} setIsOpen={setIsOpen} comment={comment}
+                                                    <UpdateIdeaDialog isOpen={isOpen} setIsOpen={setIsOpen} comment={mentorComment}
                                                                       decision={decision}
                                                                       setStatus={setMentorStatus}
-                                                                      ideaHistoryId={selectedIdeaHistory.id!}
+                                                                      ideaHistoryId={selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Mentor")[0].id!}
                                                                       setDecision={setDecision}/>
                                                 )
                                             }
@@ -149,8 +155,8 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                             <Label className={"pl-2 font-bold"}>Nhận xét của manager</Label>
                                             <Textarea
                                                 disabled={!!(currentRole && currentRole == "Student")}
-                                                value={comment || undefined} onChange={(e) => {
-                                                setComment(e.target.value)
+                                                value={managerComment || undefined} onChange={(e) => {
+                                                setManagerComment(e.target.value)
                                             }} placeholder="Type your message here."/>
                                         </div>
                                         <div className={"w-full flex flex-col gap-2"}>
@@ -159,18 +165,24 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                                 currentRole && (currentRole == "Student" || currentRole == "Lecturer") ? (
                                                     <Badge
                                                         variant={"default"}
-                                                        className={`text-center py-4 flex justify-center items-center ${selectedIdeaHistory.status == TopicVersionStatus.Pending ? "bg-amber-600" : selectedIdeaHistory.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
-                                                    >{TopicVersionStatus[selectedIdeaHistory.status!]}</Badge>
+                                                        className={`text-center py-4 flex justify-center items-center ${
+                                                            selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Manager")[0] == null ? 
+                                                               "bg-purple-500" :
+                                                            selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Manager")[0].status == TopicVersionRequestStatus.Pending ?
+                                                            "bg-amber-600" :
+                                                            selectedIdeaHistory.status == TopicVersionStatus.Approved ?
+                                                                "bg-green-500": "bg-red-500"} px-2`}
+                                                    >{selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Manager")[0] == null ? "Chưa được gửi" : TopicVersionStatus[selectedIdeaHistory.status!]}</Badge>
                                                 ) : managerStatus
                                                     ? (<Badge
                                                         variant={"default"}
                                                         className={`text-center py-4 flex justify-center items-center ${managerStatus == TopicVersionRequestStatus.Approved ? "bg-green-500" : "bg-red-500"}`}
                                                     >{TopicVersionStatus[managerStatus]}</Badge>)
                                                     : selectedIdeaHistory && (
-                                                    <UpdateIdeaDialog isOpen={isOpen} setIsOpen={setIsOpen} comment={comment}
+                                                    <UpdateIdeaDialog isOpen={isOpen} setIsOpen={setIsOpen} comment={managerComment}
                                                                       decision={decision}
-                                                                      setStatus={setMentorStatus}
-                                                                      ideaHistoryId={selectedIdeaHistory.id!}
+                                                                      setStatus={setManagerStatus}
+                                                                      ideaHistoryId={selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Manager")[0] != null ? selectedIdeaHistory.topicVersionRequests.filter(x => x.role == "Manager")[0].id! : ""}
                                                                       setDecision={setDecision}/>
                                                 )
                                             }
