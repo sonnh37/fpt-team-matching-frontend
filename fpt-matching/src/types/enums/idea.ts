@@ -1,11 +1,13 @@
 export enum IdeaType {
-    Student,
-    Lecturer,
-    Enterprise
+  Student,
+  Lecturer,
+  Enterprise,
 }
 
 export enum IdeaStatus {
-    Pending,
-    Approved,
-    Rejected
+  Pending,
+  Approved,
+  Rejected,
+  ConsiderByMentor,
+  ConsiderByCouncil,
 }

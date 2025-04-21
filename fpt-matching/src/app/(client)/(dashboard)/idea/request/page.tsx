@@ -31,15 +31,16 @@ import { IdeaStatus } from "@/types/enums/idea";
 import { Idea } from "@/types/idea";
 import { Badge } from "@/components/ui/badge";
 import TimeStageIdea from "@/components/_common/time-stage-idea";
+import { useCurrentRole } from "@/hooks/use-current-role";
+import { IdeaRequestConsiderByMentorTable } from "@/components/sites/idea/requests/consider-by-mentor";
+import { IdeaRequestConsiderByCouncilTable } from "@/components/sites/idea/requests/consider-by-council";
 export default function Page() {
   const user = useSelectorUser();
+  const role = useCurrentRole();
+  if (!role) return;
   if (!user) return;
 
   const dispatch = useDispatch();
-
-  const tab_1 = "Pending";
-  const tab_2 = "Approved";
-  const tab_3 = "Rejected";
 
   const {
     data: res_ideas,
@@ -58,49 +59,126 @@ export default function Page() {
     return <ErrorSystem />;
   }
 
+  const tab_1 = "Pending";
+  const tab_2 = "Approved";
+  const tab_3 = "Rejected";
+  const tab_4 = "Consider By Mentor";
+  const tab_5 = "Consider By Council";
+
   const countIdeasByStatus = (status: IdeaStatus) => {
     return res_ideas?.data?.filter((m) => m.status == status).length ?? 0;
   };
+
   return (
     <>
       <Tabs defaultValue={tab_1} className="w-full container mx-auto">
         <div className="flex justify-between">
           <TabsList>
-            <TabsTrigger value={tab_1}>
-              <span className="flex items-center gap-2">
-                {tab_1}{" "}
-                {countIdeasByStatus(IdeaStatus.Pending) != 0 ? (
-                  <Badge>{countIdeasByStatus(IdeaStatus.Pending)}</Badge>
-                ) : null}
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value={tab_2}>
-              <span className="flex items-center gap-2">
-                {tab_2}{" "}
-                {countIdeasByStatus(IdeaStatus.Approved) != 0 ? (
-                  <Badge>{countIdeasByStatus(IdeaStatus.Approved)}</Badge>
-                ) : null}
-              </span>
-            </TabsTrigger>
-            <TabsTrigger value={tab_3}>
-              <span className="flex items-center gap-2">
-                {tab_3}{" "}
-                {countIdeasByStatus(IdeaStatus.Rejected) != 0 ? (
-                  <Badge>{countIdeasByStatus(IdeaStatus.Rejected)}</Badge>
-                ) : null}
-              </span>
-            </TabsTrigger>
+            {/* Student sẽ thấy tất cả các tab */}
+            {role === "Student" && (
+              <>
+                <TabsTrigger value={tab_1}>
+                  <span className="flex items-center gap-2">
+                    {tab_1}{" "}
+                    {countIdeasByStatus(IdeaStatus.Pending) != 0 && (
+                      <Badge>{countIdeasByStatus(IdeaStatus.Pending)}</Badge>
+                    )}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value={tab_4}>
+                  <span className="flex items-center gap-2">
+                    {tab_4}{" "}
+                    {countIdeasByStatus(IdeaStatus.ConsiderByMentor) != 0 && (
+                      <Badge variant="secondary">
+                        {countIdeasByStatus(IdeaStatus.ConsiderByMentor)}
+                      </Badge>
+                    )}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value={tab_5}>
+                  <span className="flex items-center gap-2">
+                    {tab_5}{" "}
+                    {countIdeasByStatus(IdeaStatus.ConsiderByCouncil) != 0 && (
+                      <Badge variant="secondary">
+                        {countIdeasByStatus(IdeaStatus.ConsiderByCouncil)}
+                      </Badge>
+                    )}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value={tab_2}>
+                  <span className="flex items-center gap-2">
+                    {tab_2}{" "}
+                    {countIdeasByStatus(IdeaStatus.Approved) != 0 && (
+                      <Badge variant="default">
+                        {countIdeasByStatus(IdeaStatus.Approved)}
+                      </Badge>
+                    )}
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value={tab_3}>
+                  <span className="flex items-center gap-2">
+                    {tab_3}{" "}
+                    {countIdeasByStatus(IdeaStatus.Rejected) != 0 && (
+                      <Badge variant="destructive">
+                        {countIdeasByStatus(IdeaStatus.Rejected)}
+                      </Badge>
+                    )}
+                  </span>
+                </TabsTrigger>
+              </>
+            )}
+
+            {/* Mentor chỉ thấy tab ConsiderByMentor */}
+            {role === "Mentor" && (
+              <TabsTrigger value={tab_4}>
+                <span className="flex items-center gap-2">
+                  {tab_4}{" "}
+                  {countIdeasByStatus(IdeaStatus.ConsiderByMentor) != 0 && (
+                    <Badge variant="secondary">
+                      {countIdeasByStatus(IdeaStatus.ConsiderByMentor)}
+                    </Badge>
+                  )}
+                </span>
+              </TabsTrigger>
+            )}
+
+            {/* Council chỉ thấy tab ConsiderByCouncil */}
+            {role === "Council" && (
+              <TabsTrigger value={tab_5}>
+                <span className="flex items-center gap-2">
+                  {tab_5}{" "}
+                  {countIdeasByStatus(IdeaStatus.ConsiderByCouncil) != 0 && (
+                    <Badge variant="secondary">
+                      {countIdeasByStatus(IdeaStatus.ConsiderByCouncil)}
+                    </Badge>
+                  )}
+                </span>
+              </TabsTrigger>
+            )}
           </TabsList>
         </div>
-        <TabsContent value={tab_1}>
-          <IdeaRequestPendingTable />
-        </TabsContent>
-        <TabsContent value={tab_2}>
-          <IdeaRequestApprovedTable />
-        </TabsContent>
-        <TabsContent value={tab_3}>
-          <IdeaRequestRejectedTable />
-        </TabsContent>
+
+        {/* Student tabs */}
+
+        <>
+          <TabsContent value={tab_1}>
+            <IdeaRequestPendingTable />
+          </TabsContent>
+          {role !== "Lecturer" && (
+            <TabsContent value={tab_4}>
+              <IdeaRequestConsiderByMentorTable />
+            </TabsContent>
+          )}
+          <TabsContent value={tab_5}>
+            <IdeaRequestConsiderByCouncilTable />
+          </TabsContent>
+          <TabsContent value={tab_2}>
+            <IdeaRequestApprovedTable />
+          </TabsContent>
+          <TabsContent value={tab_3}>
+            <IdeaRequestRejectedTable />
+          </TabsContent>
+        </>
       </Tabs>
     </>
   );
