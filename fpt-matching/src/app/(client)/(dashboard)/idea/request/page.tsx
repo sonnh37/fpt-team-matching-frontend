@@ -32,8 +32,8 @@ import { Idea } from "@/types/idea";
 import { Badge } from "@/components/ui/badge";
 import TimeStageIdea from "@/components/_common/time-stage-idea";
 import { useCurrentRole } from "@/hooks/use-current-role";
-import { IdeaVersionRequestConsiderByMentorTable } from "@/components/sites/idea/requests/consider-by-mentor";
 import { IdeaVersionRequestConsiderByCouncilTable } from "@/components/sites/idea/requests/consider-by-council";
+import { IdeaVersionRequestConsiderByMentorTable } from "@/components/sites/idea/requests/consider-by-mentor";
 export default function Page() {
   const user = useSelectorUser();
   const role = useCurrentRole();

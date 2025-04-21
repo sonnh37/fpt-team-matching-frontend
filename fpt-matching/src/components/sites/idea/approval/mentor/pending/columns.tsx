@@ -168,55 +168,26 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     return null;
   }
 
-  const handleApprove = async () => {
+  const handleStatusUpdate = async (status: IdeaVersionRequestStatus) => {
     try {
-      row.original.status = IdeaVersionRequestStatus.Approved;
+      row.original.status = status;
       const command: IdeaVersionRequestUpdateStatusCommand = {
-        status: IdeaVersionRequestStatus.Approved,
+        status,
         id: row.original.id,
         content: feedback,
       };
-      const res = await ideaVersionRequestService.updateStatusByLecturer(
-        command
-      );
+      
+      const res = await ideaVersionRequestService.updateStatusByLecturer(command);
       if (res.status != 1) throw new Error(res.message);
-
-      toast.success("Feedback submitted successfully");
-
-      queryClient.refetchQueries({
-        queryKey: ["data_ideaversionrequest_pending"],
-      });
-
-      setOpen(false);
-    } catch (error: any) {
-      toast.error(error);
-      setOpen(false);
-      return;
-    }
-  };
-
-  const handleReject = async () => {
-    try {
-      row.original.status = IdeaVersionRequestStatus.Approved;
-      const command: IdeaVersionRequestUpdateStatusCommand = {
-        status: IdeaVersionRequestStatus.Rejected,
-        id: row.original.id,
-        content: feedback,
-      };
-      const res = await ideaVersionRequestService.updateStatusByLecturer(
-        command
-      );
-      if (res.status != 1) throw new Error(res.message);
-
+  
       toast.success("Feedback submitted successfully");
       queryClient.refetchQueries({
         queryKey: ["data_ideaversionrequest_pending"],
       });
       setOpen(false);
     } catch (error: any) {
-      toast.error(error || "An unexpected error occurred");
+      toast.error(error?.message || "An unexpected error occurred");
       setOpen(false);
-      return;
     }
   };
 
@@ -252,16 +223,23 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                       <Button
                         variant="default"
                         size="sm"
-                        onClick={() => handleApprove()}
+                        onClick={() => handleStatusUpdate(IdeaVersionRequestStatus.Approved)}
                       >
-                        Approve
+                        Đồng ý
                       </Button>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleReject()}
+                        onClick={() => handleStatusUpdate(IdeaVersionRequestStatus.Consider)}
                       >
-                        Reject
+                        Yêu cầu chỉnh sửa
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleStatusUpdate(IdeaVersionRequestStatus.Rejected)}
+                      >
+                        Từ chối
                       </Button>
                     </div>
                   </div>
