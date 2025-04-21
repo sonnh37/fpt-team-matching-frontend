@@ -368,20 +368,20 @@ export default function TeamInfo() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-6">
-              {project.ideaId != null ? (
+              {project.topic.ideaVersion != null ? (
                 <>
                   {/* Team Description */}
-                  {project?.description && (
+                  {project?.topic.ideaVersion?.description && (
                     <div>
                       <h4 className="text-sm font-medium text-gray-500 mb-2">
                         Description
                       </h4>
-                      <p className="text-gray-700">{project.description}</p>
+                      <p className="text-gray-700">{project.topic.ideaVersion.description}</p>
                     </div>
                   )}
 
                   {/* Idea Information */}
-                  {project?.idea && (
+                  {project?.topic.ideaVersion.idea && (
                     <>
                       <Separator />
                       <div>
@@ -395,7 +395,7 @@ export default function TeamInfo() {
                               Viết tắt
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.abbreviations || "-"}
+                              {project.topic.ideaVersion.abbreviations || "-"}
                             </TypographyP>
                           </div>
 
@@ -405,7 +405,7 @@ export default function TeamInfo() {
                               Tiếng Việt
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.vietNamName || "-"}
+                              {project.topic.ideaVersion.vietNamName || "-"}
                             </TypographyP>
                           </div>
 
@@ -415,7 +415,7 @@ export default function TeamInfo() {
                               Tiếng Anh
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.englishName || "-"}
+                              {project.topic.ideaVersion.englishName || "-"}
                             </TypographyP>
                           </div>
 
@@ -425,7 +425,7 @@ export default function TeamInfo() {
                               Mã đề tài
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.ideaCode || "-"}
+                              {project.topic.topicCode || "-"}
                             </TypographyP>
                           </div>
 
@@ -435,7 +435,7 @@ export default function TeamInfo() {
                               Ngành
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.specialty?.profession
+                              {project.topic.ideaVersion.idea.specialty?.profession
                                 ?.professionName || "-"}
                             </TypographyP>
                           </div>
@@ -446,7 +446,7 @@ export default function TeamInfo() {
                               Chuyên ngành
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.specialty?.specialtyName || "-"}
+                              {project.topic.ideaVersion.idea.specialty?.specialtyName || "-"}
                             </TypographyP>
                           </div>
 
@@ -456,7 +456,7 @@ export default function TeamInfo() {
                               Mô tả
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.description || "-"}
+                              {project.topic.ideaVersion.description || "-"}
                             </TypographyP>
                           </div>
 
@@ -466,9 +466,9 @@ export default function TeamInfo() {
                               Tệp đính kèm
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.file ? (
+                              {project.topic.ideaVersion.idea.file ? (
                                 <a
-                                  href={project.idea.file}
+                                  href={project.topic.ideaVersion.idea.file}
                                   className="text-blue-500 underline"
                                   target="_blank"
                                 >
@@ -486,17 +486,17 @@ export default function TeamInfo() {
                               Đề tài doanh nghiệp
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.isEnterpriseTopic ? "Có" : "Không"}
+                              {project.topic.ideaVersion.idea.isEnterpriseTopic ? "Có" : "Không"}
                             </TypographyP>
                           </div>
 
-                          {project.idea.isEnterpriseTopic && (
+                          {project.topic.ideaVersion.idea.isEnterpriseTopic && (
                             <div className="space-y-1">
                               <TypographySmall className="text-muted-foreground">
                                 Tên doanh nghiệp
                               </TypographySmall>
                               <TypographyP className="p-0">
-                                {project.idea.enterpriseName || "-"}
+                                {project.topic.ideaVersion.idea.enterpriseName || "-"}
                               </TypographyP>
                             </div>
                           )}
@@ -507,7 +507,7 @@ export default function TeamInfo() {
                               Mentor
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.mentor?.email || "-"}
+                              {project.topic.ideaVersion.idea.mentor?.email || "-"}
                             </TypographyP>
                           </div>
 
@@ -516,7 +516,7 @@ export default function TeamInfo() {
                               Mentor phụ
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.subMentor?.email || "-"}
+                              {project.topic.ideaVersion.idea.subMentor?.email || "-"}
                             </TypographyP>
                           </div>
 
@@ -526,7 +526,7 @@ export default function TeamInfo() {
                               Trạng thái
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {IdeaStatus[project.idea.status ?? 0] || "-"}
+                              {IdeaStatus[project.topic.ideaVersion.idea.status ?? 0] || "-"}
                             </TypographyP>
                           </div>
 
@@ -536,7 +536,7 @@ export default function TeamInfo() {
                               Số lượng thành viên tối đa
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.maxTeamSize || "-"}
+                              {project.topic.ideaVersion.idea.maxTeamSize || "-"}
                             </TypographyP>
                           </div>
                         </div>
