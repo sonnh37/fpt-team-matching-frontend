@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Table,
     TableBody,
@@ -30,8 +30,21 @@ import { Button } from "@/components/ui/button"
 import { CriteriaCreateCommand } from '@/types/models/commands/criteria/criteria-create-command';
 import { PlusCircle } from 'lucide-react';
 import { CriteriaValueType } from '@/types/enums/criteria';
+import { CriteriaGetAllQuery } from '@/types/models/queries/criteria-form/criteria-get-all-query';
+import { Pagination } from '@/components/ui/pagination';
 
 const Criteria = () => {
+
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
+    const [search, setSearch] = useState("");
+    const [queryParams, setQueryParams] = useState<CriteriaGetAllQuery>({
+      question: "",
+      pageNumber: 1,
+      pageSize: 5,
+      isDeleted: false,
+      isPagination: true,
+    });
     const [formData, setFormData] = useState({
         question: "",
         valueType: CriteriaValueType.Boolean,
@@ -39,16 +52,16 @@ const Criteria = () => {
 
     const valueTypeText = (type: number) => {
         switch (type) {
-          case 0:
-            return "Đúng/Sai";
-          case 1:
-            return "Đánh giá (ý kiến)";
-          case 2:
-            return "Số liệu (nhập số)";
-          default:
-            return "Không xác định";
+            case 0:
+                return "Đúng/Sai";
+            case 1:
+                return "Đánh giá (ý kiến)";
+            case 2:
+                return "Số liệu (nhập số)";
+            default:
+                return "Không xác định";
         }
-      };
+    };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -63,13 +76,23 @@ const Criteria = () => {
         data: criteria,
         refetch
     } = useQuery({
-        queryKey: ["getAllCriteria"],
-        queryFn: () => criteriaService.getAll(),
+        queryKey: ["getAllCriteria", queryParams],
+        queryFn: () => criteriaService.getAll(queryParams),
         refetchOnWindowFocus: false,
     });
 
+    useEffect(() => {
+        if (criteria?.data) {
+            setTotalPages(criteria?.data?.totalPages || 1);
+            // Chỉ reset về trang 1 nếu dữ liệu mới có số trang nhỏ hơn trang hiện tại
+            if (criteria.data.pageNumber && currentPage > criteria.data.pageNumber) {
+                setCurrentPage(1);
+            }
+        }
+    }, [criteria]);
 
-   
+
+
     //Đây là form delete trả về true false tái sử dụng được
     const confirm = useConfirm()
     const handleDelete = async (id: string) => {
@@ -90,7 +113,6 @@ const Criteria = () => {
         } else {
             return
         }
-
     }
 
     const handCreate = async () => {
@@ -105,8 +127,13 @@ const Criteria = () => {
             toast.success("Tạo thành công đơn!")
             refetch();
         }
-
-
+    }
+    const handleSearch = async () => {
+        setQueryParams((prev) => ({
+            ...prev,
+            question: search,   // lấy từ khóa từ input
+            pageNumber: 1,      // reset về trang 1 khi search
+          }));
     }
     return (
         <div className='bg-slate-50 border-2 rounded-sm shadow-lg p-4'>
@@ -115,13 +142,15 @@ const Criteria = () => {
                 <div className="flex items-center gap-2">
                     {/* Search Input */}
                     <input
-                        type="text"
+                        id="search"
+                        name="search"
+                        onChange={(e) => setSearch(e.target.value)} // ✅ cập nhật search khi người dùng nhập
                         placeholder="Tìm kiếm..."
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300"
                     />
 
                     {/* Search Buttons */}
-                    <Button className=" bg-blue-500 hover:bg-blue-600">
+                    <Button className=" bg-blue-500 hover:bg-blue-600" onClick={() => handleSearch()}>
                         Tìm kiếm
                     </Button>
 
@@ -195,7 +224,7 @@ const Criteria = () => {
                             <TableHead>Ngày nộp</TableHead>
                             <TableHead>Tên người nộp</TableHead>
                             <TableHead>Tên câu hỏi</TableHead>
-                            <TableHead className="max-h-[500px] overflow-x-auto whitespace-nowrap">Thể loại</TableHead>
+                            <TableHead className=" overflow-x-auto whitespace-nowrap">Thể loại</TableHead>
                             <TableHead className="text-center">Trạng thái </TableHead>
                             <TableHead className="text-center">Hành động </TableHead>
                         </TableRow>
@@ -210,7 +239,7 @@ const Criteria = () => {
                             <TableHead>Ngày nộp</TableHead>
                             <TableHead>Tên người nộp</TableHead>
                             <TableHead>Tên câu hỏi</TableHead>
-                            <TableHead className="max-h-[500px] overflow-x-auto whitespace-nowrap">Thể loại</TableHead>
+                            <TableHead className=" overflow-x-auto whitespace-nowrap">Thể loại</TableHead>
                             <TableHead className="text-center">Trạng thái </TableHead>
                             <TableHead className="text-center">Hành động </TableHead>
                         </TableRow>
@@ -227,7 +256,9 @@ const Criteria = () => {
                                 })
                                     : "Không có ngày "}</TableCell>
                                 <TableCell>{cv.createdBy}  </TableCell>
-                                <TableCell >{cv.question}</TableCell>
+                                <TableCell className="max-w-[300px] overflow-x-auto whitespace-nowrap">
+                                    <div className="overflow-x-auto">{cv.question}</div>
+                                </TableCell>
                                 <TableCell>{valueTypeText(cv.valueType ?? -1)}</TableCell>
                                 <TableCell className=' justify-center'>
                                     {cv.isDeleted ? (
@@ -243,7 +274,19 @@ const Criteria = () => {
                                 {/* <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`/social/blog/profile-social/${cv.user?.id}`}>Xem profile</a></button></TableCell> */}
                                 <TableCell className='flex justify-center' >
                                     <Button variant={"destructive"} onClick={() => handleDelete(cv.id ?? "")}> Xóa đơn</Button>
-                                    <Button className="p-2 px-4 bg-blue-500  ml-3 rounded-sm text-white" >Chi tiết</Button>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button className="p-2 px-4 bg-blue-500  ml-3 rounded-sm text-white" >Chi tiết</Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="sm:max-w-[425px]">
+                                            <DialogHeader>
+                                                <DialogTitle> Chi tiết tiêu chí</DialogTitle>
+                                                <DialogDescription>
+                                                    {cv.question}
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                        </DialogContent>
+                                    </Dialog>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -254,7 +297,11 @@ const Criteria = () => {
                 </Table>)
 
             }
-
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
         </div>
 
     )
