@@ -49,7 +49,7 @@ const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
 });
 //#endregion
-export default function CouncilIdeaRequestPendingTable() {
+export default function CouncilIdeaVersionRequestPendingTable() {
   const searchParams = useSearchParams();
 
   const filterEnums: FilterEnum[] = [
@@ -112,7 +112,7 @@ export default function CouncilIdeaRequestPendingTable() {
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: () =>
-      userService.getAllByCouncilWithIdeaRequestPending(queryParams),
+      userService.getAllByCouncilWithIdeaVersionRequestPending(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

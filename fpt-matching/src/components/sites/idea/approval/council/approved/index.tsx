@@ -2,8 +2,8 @@ import { DataTableComponent } from "@/components/_common/data-table-api/data-tab
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
-import { ideaRequestService } from "@/services/idea-request-service";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -23,7 +23,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
 import { Idea } from "@/types/idea";
-import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
+import { IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-current-by-status-and-roles";
 import { RootState } from "@/lib/redux/store";
 import { useSelector } from "react-redux";
 
@@ -32,7 +32,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaRequestApprovedByCouncilTable() {
+export default function IdeaVersionRequestApprovedByCouncilTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -69,12 +69,12 @@ export default function IdeaRequestApprovedByCouncilTable() {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
+  const queryParams: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
     useMemo(() => {
-      const params: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
+      const params: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
         useQueryParams(inputFields, columnFilters, pagination, sorting);
 
-      params.status = IdeaRequestStatus.Approved;
+      params.status = IdeaVersionRequestStatus.Approved;
 
       params.roles = ["Council"];
 
@@ -92,8 +92,8 @@ export default function IdeaRequestApprovedByCouncilTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () =>
-      ideaRequestService.GetIdeaRequestsCurrentByStatusAndRoles(queryParams),
+    queryFn: async () =>
+      await ideaVersionRequestService.GetIdeaVersionRequestsCurrentByStatusAndRoles(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

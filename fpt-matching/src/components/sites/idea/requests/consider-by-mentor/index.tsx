@@ -11,7 +11,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function IdeaRequestConsiderByMentorTable() {
+export function IdeaVersionRequestConsiderByMentorTable() {
   const queryParams: IdeaGetCurrentByStatusQuery = {
     status: IdeaStatus.ConsiderByMentor,
     isPagination: false,

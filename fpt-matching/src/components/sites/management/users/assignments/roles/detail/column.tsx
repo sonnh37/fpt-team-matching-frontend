@@ -10,8 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ideaRequestService } from "@/services/idea-request-service";
-import { IdeaRequest } from "@/types/idea-request";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
+import { IdeaVersionRequest } from "@/types/idea-version-request";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -19,12 +19,12 @@ import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { userService } from "@/services/user-service";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
-import { IdeaRequestUpdateCommand } from "@/types/models/commands/idea-requests/idea-request-update-command";
+import { IdeaVersionRequestUpdateCommand } from "@/types/models/commands/idea-version-requests/idea-version-request-update-command";
 import { BusinessResult } from "@/types/models/responses/business-result";
 import { User } from "@/types/user";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { formatDate } from "@/lib/utils";
 import { UserXRole } from "@/types/user-x-role";
 import { semesterService } from "@/services/semester-service";

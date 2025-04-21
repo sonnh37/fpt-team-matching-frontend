@@ -11,7 +11,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function IdeaRequestPendingTable() {
+export function IdeaVersionRequestPendingTable() {
   const queryParams: IdeaGetCurrentByStatusQuery = {
     status: IdeaStatus.Pending,
     isPagination: false,

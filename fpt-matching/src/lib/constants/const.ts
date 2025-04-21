@@ -22,6 +22,7 @@ export class Const {
   static readonly SEMESTERS = "semesters";
   static readonly IDEAS = "ideas";
   static readonly IDEA_REQUESTS = "idea-requests";
+  static readonly IDEA_VERSION_REQUESTS = "idea-version-requests";
   static readonly INVITATIONS = "invitations";
   static readonly SPECIALTIES = "specialties";
   static readonly PROFESSIONS = "professions";

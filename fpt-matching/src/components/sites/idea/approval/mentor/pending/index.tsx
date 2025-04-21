@@ -26,10 +26,10 @@ import {
 import { useQueryParams } from "@/hooks/use-query-params";
 import { RootState } from "@/lib/redux/store";
 import { cn, formatDate } from "@/lib/utils";
-import { ideaRequestService } from "@/services/idea-request-service";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
 import { stageideaService } from "@/services/stage-idea-service";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
-import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
+import { IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-current-by-status-and-roles";
 import { StageIdea } from "@/types/stage-idea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData } from "@tanstack/react-query";
@@ -51,12 +51,13 @@ import { columns } from "./columns";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
+import { useSelectorUser } from "@/hooks/use-auth";
 
 const defaultSchema = z.object({
   stageNumber: z.number().default(1).optional(),
 });
 
-export function IdeaRequestPendingByMentorTable() {
+export function IdeaVersionRequestPendingByMentorTable() {
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "createdDate", desc: true },
   ]);
@@ -80,15 +81,15 @@ export function IdeaRequestPendingByMentorTable() {
   const formValues = useWatch({
     control: form.control,
   });
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelectorUser();
 
   if (!user) return null;
 
-  const queryParams: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
+  const queryParams: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
     useMemo(() => {
-      const params: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
+      const params: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
         useQueryParams(formValues, columnFilters, pagination, sorting);
-      params.status = IdeaRequestStatus.Pending;
+      params.status = IdeaVersionRequestStatus.Pending;
       params.roles = ["Mentor"];
       return { ...params };
     }, [formValues, columnFilters, pagination, sorting]);
@@ -100,26 +101,12 @@ export function IdeaRequestPendingByMentorTable() {
   }, [columnFilters, formValues]);
 
   const { data, isFetching, error } = useQuery({
-    queryKey: ["data_idearequest_pending", formValues],
-    queryFn: () =>
-      ideaRequestService.GetIdeaRequestsCurrentByStatusAndRoles(queryParams),
+    queryKey: ["data_ideaversionrequest_pending", formValues],
+    queryFn: async () =>
+      await ideaVersionRequestService.GetIdeaVersionRequestsCurrentByStatusAndRoles(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
-
-  const {
-    data: res_stageIdea,
-    isFetching: isFetchingStage,
-    refetch: refetch_stage,
-  } = useQuery({
-    queryKey: ["stage_idea_latest"],
-    queryFn: () =>
-      stageideaService.getCurrentStageIdea(),
-    placeholderData: keepPreviousData,
-    refetchOnWindowFocus: false,
-  });
-
-  const stageIdea = res_stageIdea?.data ?? ({} as StageIdea);
 
   if (error) return (
     <Alert variant="destructive" className="my-4">
@@ -144,64 +131,12 @@ export function IdeaRequestPendingByMentorTable() {
   });
 
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-    refetch_stage();
   };
 
   return (
     <div className="space-y-6 py-4">
       {/* Thông báo giai đoạn */}
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Thông tin Giai đoạn Đánh giá
-          </CardTitle>
-          <CardDescription>
-            Các yêu cầu ý tưởng đang chờ phê duyệt
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {stageIdea ? (
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="flex flex-col items-center pt-1">
-                  <div className="h-2 w-2 rounded-full bg-primary" />
-                  <div className="h-full w-px bg-border" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">
-                    Thời gian đánh giá:{" "}
-                    <Badge variant="outline" className="ml-2">
-                      {formatDate(stageIdea.startDate)} - {formatDate(stageIdea.endDate)}
-                    </Badge>
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <div className="flex flex-col items-center pt-1">
-                  <div className="h-2 w-2 rounded-full bg-primary" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">
-                    Ngày công bố kết quả:{" "}
-                    <Badge variant="outline" className="ml-2">
-                      {formatDate(stageIdea.resultDate)}
-                    </Badge>
-                  </p>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>Không có thông tin</AlertTitle>
-              <AlertDescription>
-                Hiện không có giai đoạn đánh giá nào đang diễn ra.
-              </AlertDescription>
-            </Alert>
-          )}
-        </CardContent>
-      </Card>
+     
 
       {/* Bảng dữ liệu */}
       <div className="space-y-4">
@@ -217,8 +152,8 @@ export function IdeaRequestPendingByMentorTable() {
           <CardContent>
             <DataTableComponent
               table={table}
-              restore={ideaRequestService.restore}
-              // deletePermanent={ideaRequestService.deletePermanent}
+              restore={ideaVersionRequestService.restore}
+              // deletePermanent={ideaVersionRequestService.deletePermanent}
             />
             <DataTablePagination table={table} />
           </CardContent>

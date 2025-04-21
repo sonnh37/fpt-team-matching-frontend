@@ -3,9 +3,9 @@ import { Criteria } from "./criteria";
 import { IdeaVersionRequest } from "./idea-version-request";
 
 export interface AnswerCriteria extends BaseEntity {
-  ideaRequestId?: string;
+  ideaVersionRequestId?: string;
   criteriaId?: string;
   value?: string;
-  ideaRequest?: IdeaVersionRequest;
+  ideaVersionRequest?: IdeaVersionRequest;
   criteria?: Criteria;
 }

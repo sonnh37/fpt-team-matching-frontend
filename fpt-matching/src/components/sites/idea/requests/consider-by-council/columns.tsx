@@ -25,9 +25,9 @@ import { RootState } from "@/lib/redux/store";
 import { ideaService } from "@/services/idea-service";
 import { stageideaService } from "@/services/stage-idea-service";
 import { IdeaStatus } from "@/types/enums/idea";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { Idea } from "@/types/idea";
-import { IdeaRequest } from "@/types/idea-request";
+import { IdeaVersionRequest } from "@/types/idea-version-request";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useState } from "react";
@@ -35,7 +35,6 @@ import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 
 export const columns: ColumnDef<Idea>[] = [
   {

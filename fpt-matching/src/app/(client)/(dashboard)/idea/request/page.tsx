@@ -1,6 +1,6 @@
 "use client";
-import IdeaRequestApprovedTable from "@/components/sites/idea/requests/approved";
-import IdeaRequestRejectedTable from "@/components/sites/idea/requests/rejected";
+import IdeaVersionRequestApprovedTable from "@/components/sites/idea/requests/approved";
+import IdeaVersionRequestRejectedTable from "@/components/sites/idea/requests/rejected";
 import {
   Card,
   CardContent,
@@ -19,7 +19,7 @@ import { useDispatch } from "react-redux";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import HorizontalLinearStepper from "@/components/_common/material-ui/stepper";
-import { IdeaRequestPendingTable } from "@/components/sites/idea/requests/pending";
+import { IdeaVersionRequestPendingTable } from "@/components/sites/idea/requests/pending";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { stageideaService } from "@/services/stage-idea-service";
@@ -32,13 +32,12 @@ import { Idea } from "@/types/idea";
 import { Badge } from "@/components/ui/badge";
 import TimeStageIdea from "@/components/_common/time-stage-idea";
 import { useCurrentRole } from "@/hooks/use-current-role";
-import { IdeaRequestConsiderByMentorTable } from "@/components/sites/idea/requests/consider-by-mentor";
-import { IdeaRequestConsiderByCouncilTable } from "@/components/sites/idea/requests/consider-by-council";
+import { IdeaVersionRequestConsiderByMentorTable } from "@/components/sites/idea/requests/consider-by-mentor";
+import { IdeaVersionRequestConsiderByCouncilTable } from "@/components/sites/idea/requests/consider-by-council";
 export default function Page() {
   const user = useSelectorUser();
   const role = useCurrentRole();
-  if (!role) return;
-  if (!user) return;
+  
 
   const dispatch = useDispatch();
 
@@ -53,6 +52,9 @@ export default function Page() {
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
+
+  if (!role) return;
+  if (!user) return;
 
   if (isLoadingAnother) return <LoadingComponent />;
   if (isErrorAnother) {
@@ -162,21 +164,21 @@ export default function Page() {
 
         <>
           <TabsContent value={tab_1}>
-            <IdeaRequestPendingTable />
+            <IdeaVersionRequestPendingTable />
           </TabsContent>
           {role !== "Lecturer" && (
             <TabsContent value={tab_4}>
-              <IdeaRequestConsiderByMentorTable />
+              <IdeaVersionRequestConsiderByMentorTable />
             </TabsContent>
           )}
           <TabsContent value={tab_5}>
-            <IdeaRequestConsiderByCouncilTable />
+            <IdeaVersionRequestConsiderByCouncilTable />
           </TabsContent>
           <TabsContent value={tab_2}>
-            <IdeaRequestApprovedTable />
+            <IdeaVersionRequestApprovedTable />
           </TabsContent>
           <TabsContent value={tab_3}>
-            <IdeaRequestRejectedTable />
+            <IdeaVersionRequestRejectedTable />
           </TabsContent>
         </>
       </Tabs>

@@ -30,7 +30,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { mentoridearequestService } from "@/services/mentor-idea-request-service";
+import { mentortopicrequestService } from "@/services/mentor-idea-request-service";
 import { projectService } from "@/services/project-service";
 import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Idea } from "@/types/idea";
@@ -192,10 +192,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       </>
     );
 
-  model.mentorIdeaRequests = model.mentorIdeaRequests ?? [];
+  model.mentorTopicRequests = model.mentorTopicRequests ?? [];
   const isSent =
-    model.mentorIdeaRequests.length > 0
-      ? model.mentorIdeaRequests.some((m) => m.projectId == result.data?.id)
+    model.mentorTopicRequests.length > 0
+      ? model.mentorTopicRequests.some((m) => m.projectId == result.data?.id)
       : false;
   const project = result.data;
   const teammembers = project.teamMembers;
@@ -213,7 +213,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         projectId: project.id,
         ideaId: model.id,
       };
-      const res = await mentoridearequestService.sendRequestIdeaByStudent(
+      const res = await mentortopicrequestService.sendRequestIdeaByStudent(
         command
       );
       if (res.status != 1) {

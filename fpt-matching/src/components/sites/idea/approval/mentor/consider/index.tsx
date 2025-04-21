@@ -26,13 +26,14 @@ import { Idea } from "@/types/idea";
 import { IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-current-by-status-and-roles";
 import { RootState } from "@/lib/redux/store";
 import { useSelector } from "react-redux";
+import { useSelectorUser } from "@/hooks/use-auth";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaVersionRequestApprovedByMentorTable() {
+export default function IdeaVersionRequestConsiderByMentorTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -68,7 +69,7 @@ export default function IdeaVersionRequestApprovedByMentorTable() {
   const [inputFields, setInputFields] =
     useState<z.infer<typeof defaultSchema>>();
 
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelectorUser();
 
   if (!user) {
     return null;
@@ -84,7 +85,7 @@ export default function IdeaVersionRequestApprovedByMentorTable() {
       const params: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
         useQueryParams(inputFields, columnFilters, pagination, sorting);
 
-      params.status = IdeaVersionRequestStatus.Approved;
+      params.status = IdeaVersionRequestStatus.Consider;
 
       params.roles = ["Mentor"];
 

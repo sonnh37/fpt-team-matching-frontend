@@ -32,7 +32,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaVersionRequestApprovedByMentorTable() {
+export default function IdeaVersionRequestApprovedByCouncilTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -68,25 +68,15 @@ export default function IdeaVersionRequestApprovedByMentorTable() {
   const [inputFields, setInputFields] =
     useState<z.infer<typeof defaultSchema>>();
 
-  const user = useSelector((state: RootState) => state.user.user);
-
-  if (!user) {
-    return null;
-  }
-
-  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
-  const isLecturer = user.userXRoles.some(
-    (m) => m.role?.roleName === "Lecturer"
-  );
   // default field in table
   const queryParams: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
     useMemo(() => {
       const params: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
         useQueryParams(inputFields, columnFilters, pagination, sorting);
 
-      params.status = IdeaVersionRequestStatus.Approved;
+      params.status = IdeaVersionRequestStatus.Consider;
 
-      params.roles = ["Mentor"];
+      params.roles = ["Council"];
 
       return { ...params };
     }, [inputFields, columnFilters, pagination, sorting]);
@@ -123,6 +113,7 @@ export default function IdeaVersionRequestApprovedByMentorTable() {
     manualPagination: true,
     debugTable: true,
   });
+
   //#endregion
 
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {

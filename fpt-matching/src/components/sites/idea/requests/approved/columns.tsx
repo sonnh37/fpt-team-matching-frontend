@@ -16,9 +16,9 @@ import {
 import { RootState } from "@/lib/redux/store";
 import { formatDate } from "@/lib/utils";
 import { IdeaStatus } from "@/types/enums/idea";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { Idea } from "@/types/idea";
-import { IdeaRequest } from "@/types/idea-request";
+import { IdeaVersionRequest } from "@/types/idea-version-request";
 import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useState } from "react";
