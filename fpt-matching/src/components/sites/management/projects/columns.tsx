@@ -39,7 +39,7 @@ export const columns: ColumnDef<Project>[] = [
     ),
   },
   {
-    accessorKey: "idea.englishName",
+    accessorKey: "topic.ideaVersion.englishName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Idea name" />
     ),
