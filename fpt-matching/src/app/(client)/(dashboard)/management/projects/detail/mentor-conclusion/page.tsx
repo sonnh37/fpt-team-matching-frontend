@@ -77,7 +77,6 @@ const Page = () => {
             const response = await projectService.getById(projectId);
             if (response && response.data) {
                 setProject(response.data)
-                console.log(response.data)
                 if (response.data.mentorFeedback){
                     setMentorFeedback(response.data.mentorFeedback);
                 } else {
@@ -148,7 +147,9 @@ const Page = () => {
             setIsOpen(false)
         }
     };
-    return (
+
+    console.log(project)
+    return project && (
         <div className={"p-8"}>
             {/*Start 1*/}
             <div className={"flex justify-between gap-4"}>
@@ -307,10 +308,34 @@ const Page = () => {
             </div>
             {/*End 4*/}
             <div className={"mt-6"}>
-                {/*<Button onClick={()=>{*/}
-                {/*    handleSaveChange()*/}
-                {/*}} variant={"default"} >Cập nhật thay đổi</Button>*/}
-                <ConfirmSaveChange isOpen={isOpen} setIsOpen={setIsOpen} loading={loading} handleSaveChange={handleSaveChange} />
+                {
+
+                    project.reviews.filter(x => x.number == 3)[0].reviewDate != null ?
+                        new Date(new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTime()+new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTimezoneOffset()*60*1000) < new Date(Date.now()) ?
+                            (
+                                <ConfirmSaveChange isOpen={isOpen} setIsOpen={setIsOpen} loading={loading} handleSaveChange={handleSaveChange} />
+                            ):
+                            (
+                                <>
+                                    <Button disabled={true}>
+                                        Cập nhật thay đổi
+                                    </Button>
+                                    <div className={"font-bold text-red-500 text-xs mt-4"}>
+                                        Hiện tại chưa tới thời gian để cập nhật. Vui lòng quay lại sau review 3
+                                    </div>
+                                </>
+                            ):
+                        (
+                            <>
+                                <Button disabled={true}>
+                                    Cập nhật thay đổi
+                                </Button>
+                                <div className={"font-bold text-red-500 text-xs mt-4"}>
+                                    Hiện tại chưa tới thời gian để cập nhật. Vui lòng quay lại sau review 3
+                                </div>
+                            </>
+                        )
+                }
             </div>
         </div>
     );
