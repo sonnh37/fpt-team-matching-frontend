@@ -16,6 +16,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -34,7 +39,7 @@ import { IdeaVersionRequestUpdateStatusCommand } from "@/types/models/commands/i
 import { User } from "@/types/user";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { ListChecks, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -43,6 +48,7 @@ import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
+import Link from "next/link";
 
 export const columns: ColumnDef<IdeaVersionRequest>[] = [
   {
@@ -162,7 +168,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const handleSubmit = async () => {
     try {
       if (!ideaId) throw new Error("Idea ID is required");
-      const res = await ideaVersionRequestService.createCouncilRequestsForIdea(ideaId);
+      const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
+        ideaId
+      );
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Submitted to council!");
@@ -182,36 +190,62 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     <div className="flex flex-col gap-2">
       <>
         <div className="flex gap-2">
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button
-                size="sm"
-                variant={`${hasCouncilRequests ? "secondary" : "default"}`}
-                // disabled={hasCouncilRequests}
-              >
-                View {hasCouncilRequests ? "(Sent)" : ""}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Idea detail</DialogTitle>
-                <DialogDescription></DialogDescription>
-              </DialogHeader>
-              <div className="grid p-4 space-y-24">
-                <IdeaDetailForm idea={idea} />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant={`${
+                        hasCouncilRequests ? "secondary" : "default"
+                      }`}
+                      // disabled={hasCouncilRequests}
+                    >
+                      View {hasCouncilRequests ? "(Sent)" : ""}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Idea detail</DialogTitle>
+                      <DialogDescription></DialogDescription>
+                    </DialogHeader>
+                    <div className="grid p-4 space-y-24">
+                      <IdeaDetailForm idea={idea} />
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        variant={`${
+                          hasCouncilRequests ? "secondary" : "default"
+                        }`}
+                        size="sm"
+                        onClick={() => handleSubmit()}
+                        disabled={hasCouncilRequests}
+                      >
+                        {hasCouncilRequests ? "Sent" : "Submit to council"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
-              <DialogFooter>
-                <Button
-                  variant={`${hasCouncilRequests ? "secondary" : "default"}`}
-                  size="sm"
-                  onClick={() => handleSubmit()}
-                  disabled={hasCouncilRequests}
-                >
-                  {hasCouncilRequests ? "Sent" : "Submit to council"}
+            </TooltipTrigger>
+
+            <TooltipContent>
+              <p>Xem nhanh</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href={`/idea/reviews/mentor/${row.original.id}`} passHref>
+                <Button size="icon" variant="default">
+                  <ListChecks className="h-4 w-4" />
                 </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Xem lại đánh giá</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </>
     </div>

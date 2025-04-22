@@ -39,7 +39,7 @@ class InvitationService extends BaseService<Invitation> {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
       .get<BusinessResult<QueryResult<Invitation>>>(
-        `${this.endpoint}/me/by-status?isPagination=true&${cleanedQuery}`
+        `${this.endpoint}/me/by-status?${cleanedQuery}`
       )
       .then((response) => {
         return response.data;

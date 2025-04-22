@@ -23,7 +23,7 @@ axiosInstance.interceptors.response.use(
         ).data as BusinessResult<null>;
 
         if (refreshResponse.status !== 1) {
-          window.location.href = "/login";
+          // window.location.href = "/login";
           return Promise.reject(error);
         }
 

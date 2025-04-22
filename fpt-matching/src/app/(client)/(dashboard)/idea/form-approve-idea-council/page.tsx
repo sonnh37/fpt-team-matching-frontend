@@ -1,159 +1,239 @@
-"use client"
-import React, { useState } from 'react'
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Textarea } from "@/components/ui/textarea"
-import { useParams } from 'next/navigation'
-import { useQuery } from '@tanstack/react-query'
-import { criteriaFormService } from '@/services/criteria-form-service'
-import { CriteriaValueType } from '@/types/enums/criteria'
-import { AnswerCriteriaCreateCommand } from '@/types/models/commands/answer-criteria/answer-criteria-command'
-import { toast } from 'sonner'
-import { answerCriteriaService } from '@/services/answer-criteria-service'
+"use client";
+import { TypographyH3 } from "@/components/_common/typography/typography-h3";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { answerCriteriaService } from "@/services/answer-criteria-service";
+import { criteriaFormService } from "@/services/criteria-form-service";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
+import { CriteriaValueType } from "@/types/enums/criteria";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
+import {
+  AnswerCriteriaForLecturerRespond,
+  IdeaVersionRequestUpdateStatusCommand,
+} from "@/types/models/commands/idea-version-requests/idea-version-request-update-status-command";
+import { AnswerCriteriaGetAllQuery } from "@/types/models/queries/answer-criteria/answer-criteria-get-all-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
+const evaluationFormSchema = z.object({
+  answers: z.record(z.string()),
+});
 
+type EvaluationFormValues = z.infer<typeof evaluationFormSchema>;
 
-
-
-
-
-
-
-const FormCouncil = () => {
-    const [answers, setAnswers] = useState<Record<string, string>>({});
-    const { idRequestId } = useParams<{ idRequestId: string }>(); // Lấy giá trị từ params
-    const {
-        data: result,
-    } = useQuery({
-        queryKey: ["getFormById", idRequestId],
-        queryFn: () => criteriaFormService.getById("f71576c8-f933-46f7-8177-6d1054c95e00"),
-        refetchOnWindowFocus: false,
-    });
-    // Cập nhật câu trả lời cho 1 criteriaId
-    const handleAnswerChange = (criteriaId: string, value: string) => {
-        setAnswers((prev) => ({
-            ...prev,
-            [criteriaId]: value,
-        }));
-    };
-
-    console.log("Answers hiện tại: ", answers);
-    console.log("Tổng số câu hỏi:", result?.data?.criteriaXCriteriaForms.filter(x=>x.isDeleted==false).length);
-    console.log("Số câu đã trả lời:", Object.keys(answers).length);
-
-    const handleSubmitAnswers = async () => {
-
-
-        let query: AnswerGet
-        const check = await answerCriteriaService.getAll({
-            ideaRequestId: "abc-xyz", // truyền ID đang cần kiểm
-            isDeleted: false
-        });
-        
-        if (check.data && check.data.length > 0) {
-            toast.error("Đơn này đã được trả lời trước đó.");
-            return;
-        }
-        const activeCriteriaCount = result?.data?.criteriaXCriteriaForms?.filter(x => x.isDeleted === false)?.length ?? 0;
-
-        if (Object.keys(answers).length < activeCriteriaCount) {
-            toast.error("Bạn cần trả lời tất cả các câu hỏi trước khi gửi.");
-            
-        }
-        try {
-            // Chuyển state answers thành mảng payloads
-            const payloads: AnswerCriteriaCreateCommand[] = Object.entries(answers).map(
-                ([criteriaId, value]) => ({
-                    ideaVersionRequestId: "ed1b5f52-7452-45b7-bb4a-414fb0c87660", // bạn có thể truyền động ở đây
-                    criteriaId,
-                    value,
-                })
-            );
-
-            // Gửi tất cả payloads qua API
-            const requests = payloads.map(payload => answerCriteriaService.create(payload));
-            await Promise.all(requests);
-            toast.success("Gửi đánh giá thành công!");
-        } catch (error) {
-            console.error(error);
-            toast.error("Có lỗi xảy ra khi gửi đánh giá.");
-        }
-    };
-
-
-    return (
-        <div className="min-h-screen bg-gray-50 py-8 px-4">
-            <form className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
-                <h1 className="text-2xl font-bold text-center mb-8 text-orange-600">
-                    Đánh giá đề tài Capstone Project
-                </h1>
-
-                {result?.data?.criteriaXCriteriaForms.filter(x => x.isDeleted == false).map((criteria, index) => (
-                    <div key={criteria.id} className="mb-8 p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-start mb-4">
-                            <span className="text-lg font-semibold mr-2 text-gray-700">
-                                Câu {index + 1}:
-                            </span>
-                            <p className="text-gray-700 flex-1">{criteria?.criteria?.question}</p>
-                        </div>
-
-                        <div className="flex gap-4">
-                            {
-                                (criteria?.criteria?.valueType === CriteriaValueType.Boolean) ? (
-                                    <RadioGroup defaultValue="comfortable"
-                                        onValueChange={(value) => {
-                                            setAnswers(prev => ({ ...prev, [criteria.criteria?.id || ""]: value }));
-                                        }}
-                                    >
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="yes" id="r1" />
-                                            <Label htmlFor="r1">Có</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="no" id="r2" />
-                                            <Label htmlFor="r2">Không</Label>
-                                        </div>
-
-                                    </RadioGroup>
-
-                                ) : (
-
-                                    <div className="mb-8 p-4 bg-gray-50 rounded-lg w-full min-h-[200px]">
-                                        <div className="flex items-start mb-4">
-                                            <span className="text-lg font-semibold mr-2 text-gray-700">
-                                                Đánh giá
-                                            </span>
-                                            <p className="text-gray-700 flex-1"></p>
-                                        </div>
-
-                                        <div className="flex gap-4 w-full h-full">
-                                            <Textarea
-                                                placeholder="Nhập đánh giá"
-                                                onChange={(e) =>
-                                                    setAnswers(prev => ({ ...prev, [criteria.criteria?.id || ""]: e.target.value }))
-                                                }
-                                            ></Textarea>
-                                        </div>
-                                    </div>
-                                )
-                            }
-
-                        </div>
-                    </div>
-                ))}
-
-                <div className="mt-8 text-center">
-                    <button
-                        type="submit"
-                        className="bg-orange-600 text-white px-8 py-3 rounded-lg hover:bg-orange-700 transition-colors"
-                        onClick={() => handleSubmitAnswers()}
-                    >
-                        Gửi đánh giá
-                    </button>
-                </div>
-            </form>
-        </div>
-    )
+interface CriteriaFormProps {
+  criteriaId?: string;
+  ideaVersionRequestId?: string;
+  isAnswered: boolean;
 }
 
-export default FormCouncil
+const EvaluteCriteriaForm = ({
+  criteriaId,
+  ideaVersionRequestId,
+  isAnswered = false,
+}: CriteriaFormProps) => {
+  const queryAnswer: AnswerCriteriaGetAllQuery = {
+    ideaVersionRequestId: ideaVersionRequestId,
+    isPagination: false,
+  };
+
+  // 1. Fetch form criteria
+  const { data: result } = useQuery({
+    queryKey: ["getFormById", criteriaId],
+    queryFn: async () => await criteriaFormService.getById(criteriaId),
+    refetchOnWindowFocus: false,
+  });
+
+  // 2. Fetch existing answers
+  const { data: res_answer } = useQuery({
+    queryKey: ["getAnswerCriterias", queryAnswer],
+    queryFn: async () => await answerCriteriaService.getAll(queryAnswer),
+    enabled: !!ideaVersionRequestId,
+    refetchOnWindowFocus: false,
+  });
+
+  // 3. Initialize form
+  const form = useForm<EvaluationFormValues>({
+    resolver: zodResolver(evaluationFormSchema),
+    defaultValues: {
+      answers: {},
+    },
+  });
+
+  // 4. Reset form when answers are loaded
+  useEffect(() => {
+    if (res_answer?.data?.results) {
+      const defaultValues = res_answer.data.results.reduce((acc, answer) => {
+        if (answer.criteriaId && answer.value) {
+          acc[answer.criteriaId] = answer.value;
+        }
+        return acc;
+      }, {} as Record<string, string>);
+
+      form.reset({ answers: defaultValues });
+    }
+  }, [res_answer, form]);
+
+  const handleStatusUpdate = async (status: IdeaVersionRequestStatus) => {
+    try {
+      const activeCriteriaCount =
+        result?.data?.criteriaXCriteriaForms?.filter(
+          (x) => x.isDeleted === false
+        )?.length ?? 0;
+
+      const currentAnswers = form.getValues().answers;
+
+      if (Object.keys(currentAnswers).length < activeCriteriaCount) {
+        toast.error("Bạn cần trả lời tất cả các câu hỏi trước khi gửi.");
+        return;
+      }
+
+      const answerCriteriaList = Object.entries(currentAnswers).map(
+        ([criteriaId, value]) =>
+          ({
+            criteriaId,
+            value,
+          } as AnswerCriteriaForLecturerRespond)
+      );
+
+      const command: IdeaVersionRequestUpdateStatusCommand = {
+        status,
+        id: ideaVersionRequestId,
+        answerCriteriaList,
+      };
+
+      const res =
+        await ideaVersionRequestService.updateStatusWithCriteriaByMentorOrCouncil(
+          command
+        );
+
+      if (res.status != 1) throw new Error(res.message);
+      toast.success("Đã gửi feedback thành công!");
+    } catch (error: any) {
+      toast.error(error?.message || "An unexpected error occurred");
+    }
+  };
+
+  return (
+    <div className="min-h-screen py-8 px-4">
+      <form className="max-w-3xl bg-muted mx-auto p-6 rounded-lg shadow-md">
+        <TypographyH3 className="mb-6">
+          Đánh giá đề tài Capstone Project
+        </TypographyH3>
+
+        {result?.data?.criteriaXCriteriaForms &&
+          result?.data?.criteriaXCriteriaForms
+            .filter((x) => x.isDeleted == false)
+            .map((criteria, index) => {
+              const answerValue = form.watch(`answers.${criteria.criteria?.id}`);
+              
+              return (
+                <Card key={criteria.id} className="mb-8 p-4">
+                  <CardHeader>
+                    <div className="flex items-start gap-2">
+                      <span className="font-semibold whitespace-nowrap">
+                        Câu {index + 1}:
+                      </span>
+                      <p className="flex-1">{criteria?.criteria?.question}</p>
+                    </div>
+                    <Separator />
+                  </CardHeader>
+
+                  <CardContent className="flex gap-4">
+                    {criteria?.criteria?.valueType ===
+                    CriteriaValueType.Boolean ? (
+                      <RadioGroup
+                        value={answerValue}
+                        onValueChange={(value) => {
+                          form.setValue(
+                            `answers.${criteria.criteria?.id}`,
+                            value
+                          );
+                        }}
+                        disabled={isAnswered}
+                      >
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="yes"
+                            id={`r1-${criteria.id}`}
+                          />
+                          <Label htmlFor={`r1-${criteria.id}`}>Có</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <RadioGroupItem
+                            value="no"
+                            id={`r2-${criteria.id}`}
+                          />
+                          <Label htmlFor={`r2-${criteria.id}`}>Không</Label>
+                        </div>
+                      </RadioGroup>
+                    ) : (
+                      <div className="dark: rounded-lg w-full min-h-[200px]">
+                        <div className="flex gap-4 w-full h-full">
+                          <Textarea
+                            value={answerValue || ""}
+                            onChange={(e) =>
+                              form.setValue(
+                                `answers.${criteria.criteria?.id}`,
+                                e.target.value
+                              )
+                            }
+                            disabled={isAnswered}
+                            placeholder="Nhập đánh giá"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })}
+
+        <div className="mt-8 text-center">
+          <div className="w-full flex flex-row gap-4 items-end">
+            <Button
+              type="button"
+              variant="default"
+              disabled={isAnswered}
+              onClick={() =>
+                handleStatusUpdate(IdeaVersionRequestStatus.Approved)
+              }
+            >
+              Đồng ý
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={isAnswered}
+              onClick={() =>
+                handleStatusUpdate(IdeaVersionRequestStatus.Consider)
+              }
+            >
+              Yêu cầu chỉnh sửa
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={isAnswered}
+              onClick={() =>
+                handleStatusUpdate(IdeaVersionRequestStatus.Rejected)
+              }
+            >
+              Từ chối
+            </Button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default EvaluteCriteriaForm;

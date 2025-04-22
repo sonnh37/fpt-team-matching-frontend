@@ -101,10 +101,9 @@ export function IdeaVersionRequestPendingByMentorTable() {
   }, [columnFilters, formValues]);
 
   const { data, isFetching, error } = useQuery({
-    queryKey: ["data_ideaversionrequest_pending", formValues],
+    queryKey: ["data_ideaversionrequest_pending", IdeaVersionRequestStatus.Pending],
     queryFn: async () =>
       await ideaVersionRequestService.GetIdeaVersionRequestsCurrentByStatusAndRoles(queryParams),
-    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
@@ -130,15 +129,8 @@ export function IdeaVersionRequestPendingByMentorTable() {
     debugTable: true,
   });
 
-  const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-  };
-
   return (
     <div className="space-y-6 py-4">
-      {/* Thông báo giai đoạn */}
-     
-
-      {/* Bảng dữ liệu */}
       <div className="space-y-4">
         <Card>
           <CardHeader>

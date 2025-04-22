@@ -83,11 +83,11 @@ class IdeaVersionRequestService extends BaseService<IdeaVersionRequest> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-  public updateStatusByLecturer = (
+  public updateStatusWithCriteriaByMentorOrCouncil = (
       command: IdeaVersionRequestUpdateStatusCommand
   ): Promise<BusinessResult<IdeaVersionRequest>> => {
     return axiosInstance
-        .put<BusinessResult<IdeaVersionRequest>>(`${this.endpoint}/lecturer-response`, command)
+        .put<BusinessResult<IdeaVersionRequest>>(`${this.endpoint}/respond-by-mentor-or-council`, command)
         .then((response) => response.data)
         .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
