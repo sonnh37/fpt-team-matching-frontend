@@ -5,7 +5,7 @@ import {AlertDialog, AlertDialogCancel, AlertDialogContent,
 import React, {Dispatch, SetStateAction, useState} from "react";
 import {Loader2} from "lucide-react";
 import {toast} from "sonner";
-import {ideaHistoryService} from "@/services/idea-history-service";
+import {topicVersionService} from "@/services/topic-version-service";
 
 
 export function EditIdeaDialog(
@@ -31,7 +31,7 @@ export function EditIdeaDialog(
             //     }
             // }
             if (result) {
-                const response = await ideaHistoryService.studentUpdateIdea({ideaId, fileUpdate: result, reviewStage: reviewNumber, note})
+                const response = await topicVersionService.updateByStudent({topicId: ideaId, fileUpdate: result, reviewStage: reviewNumber, note})
                     if (response.status == 1) {
                         toast.success("Successfully uploaded");
                     } else {
@@ -48,7 +48,7 @@ export function EditIdeaDialog(
     return (
         <AlertDialog open={isOpen}>
             <AlertDialogTrigger asChild>
-                <Button onClick={() => {setIsOpen(true)}} variant="destructive">Upload file</Button>
+                <Button className={"mb-8"} onClick={() => {setIsOpen(true)}} variant="destructive">Upload file</Button>
             </AlertDialogTrigger>
             <AlertDialogContent  className="sm:max-w-[425px]">
                 <AlertDialogHeader>

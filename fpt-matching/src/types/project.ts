@@ -7,15 +7,15 @@ import { Invitation } from "./invitation";
 import { MentorTopicRequest } from "./mentor-topic-request";
 import { Review } from "./review";
 import { TeamMember } from "./team-member";
+import { Topic } from "./topic";
 import { User } from "./user";
-import {MentorFeedback} from "@/types/mentor-feedback";
 
 export interface Project extends BaseEntity {
   leaderId?: string;
-  ideaId?: string;
+  topicId?: string;
   teamName?: string;
   teamCode?: string;
-  description?: string;
+  // description?: string;
   status?: ProjectStatus;
   teamSize?: number;
   leader?: User;
@@ -24,8 +24,9 @@ export interface Project extends BaseEntity {
   reviews: Review[];
   teamMembers: TeamMember[];
   blogs: Blog[]
-  mentorIdeaRequests: MentorTopicRequest[];
+  mentorTopicRequests: MentorTopicRequest[];
   capstoneSchedules: CapstoneSchedule[];
+  topic: Topic;
   mentorFeedback: MentorFeedback | null;
   defenseStage?: number
 }

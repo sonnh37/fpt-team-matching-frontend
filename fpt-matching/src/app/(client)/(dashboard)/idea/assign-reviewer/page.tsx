@@ -11,15 +11,15 @@
 // import { useDispatch, useSelector } from "react-redux";
 
 // import { Badge } from "@/components/ui/badge";
-// import { ideaRequestService } from "@/services/idea-request-service";
+// import { ideaVersionRequestService } from "@/services/idea-request-service";
 // import { IdeaStatus } from "@/types/enums/idea";
 // import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
-// import { ApproveByCouncilIdeaRequestTable } from "@/components/sites/idea/assign-reviewer/new-idea-request-assigned";
-// import { AssignReviewerIdeaRequestTable } from "@/components/sites/idea/assign-reviewer/assign-reviewer";
+// import { ApproveByCouncilIdeaVersionRequestTable } from "@/components/sites/idea/assign-reviewer/new-idea-request-assigned";
+// import { AssignReviewerIdeaVersionRequestTable } from "@/components/sites/idea/assign-reviewer/assign-reviewer";
 // import { RootState } from "@/lib/redux/store";
 // import { table } from "console";
-// import { IdeaRequestStatus } from "@/types/enums/idea-request";
-// import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-query";
+// import { IdeaVersionRequestStatus } from "@/types/enums/idea-request";
+// import { IdeaVersionRequestGetAllQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-query";
 // import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 // export default function Page() {
 //   const dispatch = useDispatch();
@@ -31,17 +31,17 @@
 //   ] = useQueries({
 //     queries: [
 //       {
-//         queryKey: ["dataIdeaRequestByCouncilPending"],
+//         queryKey: ["dataIdeaVersionRequestByCouncilPending"],
 //         queryFn: () =>
-//           ideaRequestService.getAll({
-//             status: IdeaRequestStatus.CouncilPending
-//           } as IdeaRequestGetAllQuery),
+//           ideaVersionRequestService.getAll({
+//             status: IdeaVersionRequestStatus.CouncilPending
+//           } as IdeaVersionRequestGetAllQuery),
 //         refetchOnWindowFocus: false,
 //       },
 //       {
 //         queryKey: ["dataWithoutReviewer"],
 //         queryFn: () =>
-//           ideaRequestService.getAllWithoutReviewer(),
+//           ideaVersionRequestService.getAllWithoutReviewer(),
 //         refetchOnWindowFocus: false,
 //       },
 //     ],
@@ -73,10 +73,10 @@
 //         </TabsList>
 //       </div>
 //       <TabsContent value={tab_1_value}>
-//         <ApproveByCouncilIdeaRequestTable />
+//         <ApproveByCouncilIdeaVersionRequestTable />
 //       </TabsContent>
 //       <TabsContent value={tab_2_value}>
-//         <AssignReviewerIdeaRequestTable />
+//         <AssignReviewerIdeaVersionRequestTable />
 //       </TabsContent>
 //     </Tabs>
 //   );

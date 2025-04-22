@@ -2,7 +2,8 @@
 
 import {Button} from "@/components/ui/button"
 import {
-    Sheet, SheetClose,
+    Sheet,
+    SheetClose,
     SheetContent,
     SheetDescription,
     SheetFooter,
@@ -16,15 +17,16 @@ import {ChevronsUpDown, Download, Paperclip} from "lucide-react"
 
 import {Collapsible, CollapsibleContent, CollapsibleTrigger,} from "@/components/ui/collapsible"
 import {ScrollArea} from "@/components/ui/scroll-area";
-import {IdeaHistory} from "@/types/idea-history";
 import Link from "next/link";
 import {IdeaHistoryStatus} from "@/types/enums/idea-history";
-import { Badge } from "@/components/ui/badge";
+import {Badge} from "@/components/ui/badge";
 import {EditIdeaDialog} from "@/components/sites/management/review/review-detail/edit-idea-dialog";
 import {Label} from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import {Textarea} from "@/components/ui/textarea";
+import {TopicVersion} from "@/types/topic-version";
+import {TopicVersionStatus} from "@/types/enums/topic-version";
 
-function CollapsibleFile({ideaHis}:{ideaHis:IdeaHistory[]}) {
+function CollapsibleFile({ideaHis}:{ideaHis:TopicVersion[]}) {
     const [isOpen, setIsOpen] = React.useState(false)
     return (
         <Collapsible
@@ -44,14 +46,14 @@ function CollapsibleFile({ideaHis}:{ideaHis:IdeaHistory[]}) {
                 </CollapsibleTrigger>
             </div>
             <div className="rounded-md border px-4 py-3 font-mono text-sm">
-                {ideaHis.filter(x => x.status == IdeaHistoryStatus.Pending).map((idea, i) => (
+                {ideaHis.filter(x => x.status == TopicVersionStatus.Pending).map((idea, i) => (
                     <div key={i} className={"items-center flex justify-between gap-4"}>
                         <div className="overflow-ellipsis overflow-hidden flex gap-2">
                             <p>CAPSTONE_REGISTER_{idea.fileUpdate?.split("CAPSTONE_REGISTER_")[1]}</p>
-                            {/*<Badge*/}
-                            {/*    variant={"default"}*/}
-                            {/*    className={`${idea.status == IdeaHistoryStatus.Pending ? "bg-amber-600" : idea.status == IdeaHistoryStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}*/}
-                            {/*>{IdeaHistoryStatus[idea.status!]}</Badge>*/}
+                            <Badge
+                                variant={"default"}
+                                className={`${idea.status == TopicVersionStatus.Pending ? "bg-amber-600" : idea.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
+                            >{IdeaHistoryStatus[idea.status!]}</Badge>
                         </div>
                         <Link className={""} href={idea.fileUpdate ? idea.fileUpdate : ""}><Download /></Link>
                     </div>
@@ -72,7 +74,7 @@ function CollapsibleFile({ideaHis}:{ideaHis:IdeaHistory[]}) {
                                         <p className={"overflow-ellipsis overflow-hidden w-[20vw]"}>CAPSTONE_REGISTER_{idea.fileUpdate?.split("CAPSTONE_REGISTER_")[1]}</p>
                                         <Badge
                                             variant={"default"}
-                                            className={`${idea.status == IdeaHistoryStatus.Pending ? "bg-amber-600" : idea.status == IdeaHistoryStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
+                                            className={`${idea.status == TopicVersionStatus.Pending ? "bg-amber-600" : idea.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
                                         >{IdeaHistoryStatus[idea.status!]}</Badge>
                                     </div>
                                     <Link className={""} href={idea.fileUpdate ? idea.fileUpdate : ""}><Download /></Link>
@@ -86,7 +88,7 @@ function CollapsibleFile({ideaHis}:{ideaHis:IdeaHistory[]}) {
     )
 }
 
-export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHistory[], ideaId: string, reviewStage: number}) {
+export function UpdateIdeaSheet({topicVersionId,ideaHis, ideaId, reviewStage}: {topicVersionId:string, ideaHis: TopicVersion[], ideaId: string, reviewStage: number}) {
     const [fileChange, setFileChange] = React.useState<File | null>(null)
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [note, setNote] = React.useState<string | null>(null);
@@ -103,6 +105,7 @@ export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHi
             setFileChange(newFile)
         }
     }
+    console.log(ideaHis)
     return (
         <div className="grid grid-cols-2 gap-2">
             <Sheet >
@@ -115,12 +118,12 @@ export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHi
                             <SheetTitle>Cập nhập lại đề tài</SheetTitle>
                             <SheetDescription>
                                 {
-                                    ideaHis.some(x => x.status == IdeaHistoryStatus.Pending) ? "Bạn đã nộp file chỉnh sửa trước đó. Vui lòng chờ được mentor cập nhật" : "Vui lòng upload lại file đề tài mới tại đây để chỉnh sửa."
+                                    ideaHis.some(x => x.status == TopicVersionStatus.Pending) ? "Bạn đã nộp file chỉnh sửa trước đó. Vui lòng chờ được mentor cập nhật" : "Vui lòng upload lại file đề tài mới tại đây để chỉnh sửa."
                                 }
                             </SheetDescription>
                         </div>
                         <div>
-                            <Link className={" mt-4 font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/team/view-update-idea?ideaId=${ideaId}`} >Xem chi tiết chỉnh sửa</Link>
+                            <Link className={" mt-4 font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/team/view-update-idea?ideaId=${topicVersionId}`} >Xem chi tiết chỉnh sửa</Link>
                         </div>
                     </SheetHeader>
                     <div className={"m-2 mt-0 h-1/2 flex flex-row gap-2 justify-between"}>
@@ -138,7 +141,7 @@ export function UpdateIdeaSheet({ideaHis, ideaId, reviewStage}: {ideaHis: IdeaHi
                                             className="font-semibold">Click để tải lên</span> hoặc kéo thả tại đây</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Import your review file with template</p>
                                     </div>
-                                    <input disabled={ideaHis.some(x => x.status == IdeaHistoryStatus.Pending)} id="dropzone-file" onChange={handleFileChange} type="file" className="hidden"/>
+                                    <input disabled={ideaHis.some(x => x.status == TopicVersionStatus.Pending)} id="dropzone-file" onChange={handleFileChange} type="file" className="hidden"/>
                                 </label>
 
                             </div>

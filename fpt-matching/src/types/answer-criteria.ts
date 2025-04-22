@@ -6,6 +6,6 @@ export interface AnswerCriteria extends BaseEntity {
   ideaVersionRequestId?: string;
   criteriaId?: string;
   value?: string;
-  ideaRequest?: IdeaVersionRequest;
+  ideaVersionRequest?: IdeaVersionRequest;
   criteria?: Criteria;
 }

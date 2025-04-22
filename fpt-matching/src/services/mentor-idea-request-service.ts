@@ -64,4 +64,4 @@ class MentorTopicRequestService extends BaseService<MentorTopicRequest> {
  
 }
 
-export const mentoridearequestService = new MentorTopicRequestService();
+export const mentortopicrequestService = new MentorTopicRequestService();

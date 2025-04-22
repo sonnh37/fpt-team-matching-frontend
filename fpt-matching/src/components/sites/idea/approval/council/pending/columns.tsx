@@ -16,12 +16,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { ideaRequestService } from "@/services/idea-request-service";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
 import { ideaService } from "@/services/idea-service";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { Idea } from "@/types/idea";
-import { IdeaRequest } from "@/types/idea-request";
-import { IdeaRequestUpdateStatusCommand } from "@/types/models/commands/idea-requests/idea-request-update-status-command";
+import { IdeaVersionRequest } from "@/types/idea-version-request";
+import { IdeaVersionRequestUpdateStatusCommand } from "@/types/models/commands/idea-version-requests/idea-version-request-update-status-command";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import {useEffect, useState} from "react";
@@ -43,7 +43,7 @@ import SamilaritiesProjectModels from "@/types/models/samilarities-project-model
 import {apiHubsService} from "@/services/api-hubs-service";
 import {Brain} from "lucide-react";
 import {Separator} from "@/components/ui/separator";
-export const columns: ColumnDef<IdeaRequest>[] = [
+export const columns: ColumnDef<IdeaVersionRequest>[] = [
   {
     accessorKey: "idea.englishName",
     header: ({ column }) => (
@@ -78,8 +78,8 @@ export const columns: ColumnDef<IdeaRequest>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as IdeaRequestStatus;
-      const statusText = IdeaRequestStatus[status];
+      const status = row.getValue("status") as IdeaVersionRequestStatus;
+      const statusText = IdeaVersionRequestStatus[status];
 
       let badgeVariant:
         | "secondary"
@@ -89,7 +89,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
         | null = "default";
 
       switch (status) {
-        case IdeaRequestStatus.Pending:
+        case IdeaVersionRequestStatus.Pending:
           badgeVariant = "secondary";
           break;
         default:
@@ -118,13 +118,15 @@ export const columns: ColumnDef<IdeaRequest>[] = [
 ];
 
 interface ActionsProps {
-  row: Row<IdeaRequest>;
+  row: Row<IdeaVersionRequest>;
 }
 
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
-  const ideaId = row.original.ideaId;
+  const model = row.original;
+  const ideaVersion = row.original.ideaVersion;
+  const ideaId = row.original.ideaVersion?.ideaId;
   const initialFeedback = row.getValue("content") as string;
   const [open, setOpen] = useState(false);
 
@@ -146,7 +148,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       setLoadingAI(true);
       if (result?.data) {
         const idea = result.data;
-        const response = await apiHubsService.getSimilaritiesProject(idea.description!);
+        const response = await apiHubsService.getSimilaritiesProject(ideaVersion?.description ?? "");
         if (response) {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-expect-error
@@ -170,18 +172,18 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const handleApprove = async () => {
     try {
-      row.original.status = IdeaRequestStatus.Approved;
-      const command: IdeaRequestUpdateStatusCommand = {
-        status: IdeaRequestStatus.Approved,
+      row.original.status = IdeaVersionRequestStatus.Approved;
+      const command: IdeaVersionRequestUpdateStatusCommand = {
+        status: IdeaVersionRequestStatus.Approved,
         id: row.original.id,
         content: feedback,
       };
-      const res = await ideaRequestService.updateStatusByLecturer(command);
+      const res = await ideaVersionRequestService.updateStatusByLecturer(command);
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
   
-      queryClient.refetchQueries({ queryKey: ["data_idearequest_pending"] });
+      queryClient.refetchQueries({ queryKey: ["data_ideaversionrequest_pending"] });
      
       setOpen(false);
     } catch (error: any) {
@@ -193,17 +195,17 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const handleReject = async () => {
     try {
-      row.original.status = IdeaRequestStatus.Approved;
-      const command: IdeaRequestUpdateStatusCommand = {
-        status: IdeaRequestStatus.Rejected,
+      row.original.status = IdeaVersionRequestStatus.Approved;
+      const command: IdeaVersionRequestUpdateStatusCommand = {
+        status: IdeaVersionRequestStatus.Rejected,
         id: row.original.id,
         content: feedback,
       };
-      const res = await ideaRequestService.updateStatusByLecturer(command);
+      const res = await ideaVersionRequestService.updateStatusByLecturer(command);
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Feedback submitted successfully");
-      queryClient.refetchQueries({ queryKey: ["data_idearequest_pending"] });
+      queryClient.refetchQueries({ queryKey: ["data_ideaversionrequest_pending"] });
       setOpen(false);
     } catch (error: any) {
       toast.error(error || "An unexpected error occurred");
@@ -307,7 +309,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                                             </div>
                                             <div className="flex flex-row gap-2">
                                               <h2 className={"text-sm font-bold text-nowrap"} >Similarities percent: </h2>
-                                              <p className={"text-sm"}>{project.similarity.toFixed(2)! * 100}%</p>
+                                              <p className={"text-sm"}>{(Number(project.similarity.toFixed(2)) * 100).toFixed(2)}%</p>
                                             </div>
                                           </div>
                                       </CardContent>

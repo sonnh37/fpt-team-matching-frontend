@@ -34,7 +34,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { RootState } from "@/lib/redux/store";
 import { formatDate } from "@/lib/utils";
 import { projectService } from "@/services/project-service";
 import { teammemberService } from "@/services/team-member-service";
@@ -44,27 +43,21 @@ import { TeamMemberRole } from "@/types/enums/team-member";
 import { ProjectUpdateCommand } from "@/types/models/commands/projects/project-update-command";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {  useQuery } from "@tanstack/react-query";
 import { Pencil, Save, Trash, Users, X } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import UpdateProjectTeam from "../idea/updateidea/page";
-import { useCurrentRole } from "@/hooks/use-current-role";
 import { TeamMember } from "@/types/team-member";
 import { useSelectorUser } from "@/hooks/use-auth";
 
 export default function TeamInfo() {
-  const router = useRouter();
   //lay thong tin tu redux luc dang nhap
   const user = useSelectorUser();
   const [isEditing, setIsEditing] = useState(false);
   const [teamName, setTeamName] = useState("");
   const confirm = useConfirm();
-  const queryClient = useQueryClient();
-  const roleCurrent = useCurrentRole();
 
   //goi api bang tanstack
   const {
@@ -126,21 +119,21 @@ export default function TeamInfo() {
   };
 
   const infoMember = project?.teamMembers?.find(
-    (member) => member.userId === user?.id
+    (member: TeamMember) => member.userId === user?.id
   );
 
   //check xem thang dang nhap coi no phai member va la leader khong
   const isLeader =
-    result?.data?.teamMembers?.find((member) => member.userId === user?.id)
+    result?.data?.teamMembers?.find((member: TeamMember) => member.userId === user?.id)
       ?.role === TeamMemberRole.Leader;
 
   const teamMembers = result?.data?.teamMembers ?? [];
   // Tách Leader ra trước
   const leaders = teamMembers.filter(
-    (member) => member.role === TeamMemberRole.Leader
+    (member: TeamMember) => member.role === TeamMemberRole.Leader
   );
   const others = teamMembers.filter(
-    (member) => member.role !== TeamMemberRole.Leader
+    (member: TeamMember) => member.role !== TeamMemberRole.Leader
   );
 
   // Ghép lại, đảm bảo Leader luôn ở đầu
@@ -153,7 +146,7 @@ export default function TeamInfo() {
     availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
   } else {
     availableSlots =
-      (project?.idea?.maxTeamSize ?? 0) - (project?.teamMembers.length ?? 0);
+      (project?.topic.ideaVersion?.teamSize ?? 0) - (project?.teamMembers.length ?? 0);
   }
 
   const isLockListInviteRequest = availableSlots === 0;
@@ -236,7 +229,6 @@ export default function TeamInfo() {
       m.type == InvitationType.SentByStudent &&
       m.status == InvitationStatus.Pending
   );
-
   return (
     <div className="grid grid-cols-4 p-4 gap-4">
       <div className="col-span-3 space-y-2">
@@ -368,20 +360,20 @@ export default function TeamInfo() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-6">
-              {project.ideaId != null ? (
+              {project.topic.ideaVersion != null ? (
                 <>
                   {/* Team Description */}
-                  {project?.description && (
+                  {project?.topic.ideaVersion?.description && (
                     <div>
                       <h4 className="text-sm font-medium text-gray-500 mb-2">
                         Description
                       </h4>
-                      <p className="text-gray-700">{project.description}</p>
+                      <p className="text-gray-700">{project.topic.ideaVersion.description}</p>
                     </div>
                   )}
 
                   {/* Idea Information */}
-                  {project?.idea && (
+                  {project?.topic.ideaVersion.idea && (
                     <>
                       <Separator />
                       <div>
@@ -395,7 +387,7 @@ export default function TeamInfo() {
                               Viết tắt
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.abbreviations || "-"}
+                              {project.topic.ideaVersion.abbreviations || "-"}
                             </TypographyP>
                           </div>
 
@@ -405,7 +397,7 @@ export default function TeamInfo() {
                               Tiếng Việt
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.vietNamName || "-"}
+                              {project.topic.ideaVersion.vietNamName || "-"}
                             </TypographyP>
                           </div>
 
@@ -415,7 +407,7 @@ export default function TeamInfo() {
                               Tiếng Anh
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.englishName || "-"}
+                              {project.topic.ideaVersion.englishName || "-"}
                             </TypographyP>
                           </div>
 
@@ -425,7 +417,7 @@ export default function TeamInfo() {
                               Mã đề tài
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.ideaCode || "-"}
+                              {project.topic.topicCode || "-"}
                             </TypographyP>
                           </div>
 
@@ -435,7 +427,7 @@ export default function TeamInfo() {
                               Ngành
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.specialty?.profession
+                              {project.topic.ideaVersion.idea.specialty?.profession
                                 ?.professionName || "-"}
                             </TypographyP>
                           </div>
@@ -446,7 +438,7 @@ export default function TeamInfo() {
                               Chuyên ngành
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.specialty?.specialtyName || "-"}
+                              {project.topic.ideaVersion.idea.specialty?.specialtyName || "-"}
                             </TypographyP>
                           </div>
 
@@ -456,7 +448,7 @@ export default function TeamInfo() {
                               Mô tả
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.description || "-"}
+                              {project.topic.ideaVersion.description || "-"}
                             </TypographyP>
                           </div>
 
@@ -466,9 +458,9 @@ export default function TeamInfo() {
                               Tệp đính kèm
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.file ? (
+                              {project.topic.ideaVersion.file ? (
                                 <a
-                                  href={project.idea.file}
+                                  href={project.topic.ideaVersion.file}
                                   className="text-blue-500 underline"
                                   target="_blank"
                                 >
@@ -486,17 +478,17 @@ export default function TeamInfo() {
                               Đề tài doanh nghiệp
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.isEnterpriseTopic ? "Có" : "Không"}
+                              {project.topic.ideaVersion.idea.isEnterpriseTopic ? "Có" : "Không"}
                             </TypographyP>
                           </div>
 
-                          {project.idea.isEnterpriseTopic && (
+                          {project.topic.ideaVersion.idea.isEnterpriseTopic && (
                             <div className="space-y-1">
                               <TypographySmall className="text-muted-foreground">
                                 Tên doanh nghiệp
                               </TypographySmall>
                               <TypographyP className="p-0">
-                                {project.idea.enterpriseName || "-"}
+                                {project.topic.ideaVersion.enterpriseName || "-"}
                               </TypographyP>
                             </div>
                           )}
@@ -507,7 +499,7 @@ export default function TeamInfo() {
                               Mentor
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.mentor?.email || "-"}
+                              {project.topic.ideaVersion.idea.mentor?.email || "-"}
                             </TypographyP>
                           </div>
 
@@ -516,7 +508,7 @@ export default function TeamInfo() {
                               Mentor phụ
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.subMentor?.email || "-"}
+                              {project.topic.ideaVersion.idea.subMentor?.email || "-"}
                             </TypographyP>
                           </div>
 
@@ -526,7 +518,7 @@ export default function TeamInfo() {
                               Trạng thái
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {IdeaStatus[project.idea.status ?? 0] || "-"}
+                              {IdeaStatus[project.topic.ideaVersion.idea.status ?? 0] || "-"}
                             </TypographyP>
                           </div>
 
@@ -536,7 +528,7 @@ export default function TeamInfo() {
                               Số lượng thành viên tối đa
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.idea.maxTeamSize || "-"}
+                              {project.topic.ideaVersion.teamSize || "-"}
                             </TypographyP>
                           </div>
                         </div>
@@ -652,32 +644,64 @@ export default function TeamInfo() {
       </div>
       <div className="col-span-1 space-y-4">
         <div className="space-y-2">
-          <TypographyH4>Register group</TypographyH4>
+          <TypographyH4>Đăng ký nhóm</TypographyH4>
           <Card className="">
             <CardContent className="flex mt-4 flex-col justify-center items-center gap-1">
-              <TypographyP>Submit Registation</TypographyP>
+              <TypographyP>Nộp đăng ký đề tài</TypographyP>
               <TypographyMuted>
-                NOTICE: Registration request will be informed to other members
+                Lưu ý: Đề tài được nộp nên được thông qua bởi các thành viên trong nhóm
               </TypographyMuted>
-              <Button asChild>
-                <Link href={"/team/submit"}>Submit</Link>
+              <Button className={"mt-8 min-w-40"} asChild>
+                <Link href={"/team/submit"}>Nộp đề tài</Link>
               </Button>
             </CardContent>
           </Card>
         </div>
 
         <div className="space-y-2">
-          <TypographyH4> Request to the project</TypographyH4>
-
+          <TypographyH4>Xin đề tài từ giảng viên</TypographyH4>
           <Card>
-            <CardContent className="flex mt-4 flex-col justify-center items-center gap-1">
-              <TypographyP>Any request</TypographyP>
+            <CardContent className="flex mt-4 flex-col justify-center items-center gap-4">
+              <TypographyP>Xem những đề đang có của giảng viên</TypographyP>
               <TypographyMuted>
-                NOTICE: Registration request will be informed to other members
+                Lưu ý: Khi nộp đơn xin đề tài nên có sự đồng ý của thành viên trong nhóm
               </TypographyMuted>
+              {}
               <Button asChild>
-                <Link href={"/team/submit"}>Submit</Link>
+                <Link href={"/idea/supervisors"}>Xem danh sách đề tài</Link>
               </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="space-y-2">
+          <TypographyH4>Đánh giá thành viên nhóm</TypographyH4>
+          <Card>
+            <CardContent className="flex mt-4 flex-col justify-center items-center gap-4">
+              <TypographyP>Đánh giá quá trình làm thành viên</TypographyP>
+              <TypographyMuted>
+                Lưu ý: Chỉ được đánh giá sau ngày review 3, và phải nộp trước ngày bảo vệ 1 tuần
+              </TypographyMuted>
+              {
+
+                project.reviews.filter(x => x.number == 3)[0].reviewDate != null ?
+                    new Date(new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTime()+new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTimezoneOffset()*60*1000) < new Date(Date.now()) ?
+                        (
+                            <Button>
+                              <Link href={"/team/rate"}>Đánh giá thành viên</Link>
+                            </Button>
+                        ):
+                        (
+                            <Button disabled={true}>
+                              Đánh giá thành viên
+                            </Button>
+                        ):
+                    (
+                        <Button disabled={true}>
+                          Đánh giá thành viên
+                        </Button>
+                    )
+              }
             </CardContent>
           </Card>
         </div>

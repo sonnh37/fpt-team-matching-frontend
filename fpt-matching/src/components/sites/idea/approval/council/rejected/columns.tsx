@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { RootState } from "@/lib/redux/store";
 import { formatDate } from "@/lib/utils";
-import { ideaRequestService } from "@/services/idea-request-service";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
-import { IdeaRequest } from "@/types/idea-request";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
+import { IdeaVersionRequest } from "@/types/idea-version-request";
 import { User } from "@/types/user";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
@@ -27,7 +27,7 @@ import { useState } from "react";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 import { useSelector } from "react-redux";
 
-export const columns: ColumnDef<IdeaRequest>[] = [
+export const columns: ColumnDef<IdeaVersionRequest>[] = [
   {
     accessorKey: "idea.englishName",
     header: ({ column }) => (
@@ -62,8 +62,8 @@ export const columns: ColumnDef<IdeaRequest>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as IdeaRequestStatus;
-      const statusText = IdeaRequestStatus[status];
+      const status = row.getValue("status") as IdeaVersionRequestStatus;
+      const statusText = IdeaVersionRequestStatus[status];
 
       let badgeVariant:
         | "secondary"
@@ -73,7 +73,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
         | null = "default";
 
       switch (status) {
-        case IdeaRequestStatus.Rejected:
+        case IdeaVersionRequestStatus.Rejected:
           badgeVariant = "destructive";
           break;
         default:
@@ -89,7 +89,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
 ];
 
 interface ActionsProps {
-  row: Row<IdeaRequest>;
+  row: Row<IdeaVersionRequest>;
 }
 
 const Actions: React.FC<ActionsProps> = ({ row }) => {
@@ -126,7 +126,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       </DropdownMenu>
 
       <DeleteBaseEntitysDialog
-        deleteById={ideaRequestService.delete}
+        deleteById={ideaVersionRequestService.delete}
         open={showDeleteTaskDialog}
         buttonLeftMessage="Yes"
         buttonRightMessage="No"

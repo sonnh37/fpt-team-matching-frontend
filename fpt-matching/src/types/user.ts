@@ -5,7 +5,7 @@ import { Department, Gender } from "./enums/user";
 import { Idea } from "./idea";
 import { IdeaHistory } from "./idea-history";
 import { IdeaHistoryRequest } from "./idea-history-request";
-import { IdeaRequest } from "./idea-request";
+import { IdeaVersionRequest } from "./idea-version-request";
 import { Invitation } from "./invitation";
 import { Like } from "./like";
 import { ProfileStudent } from "./profile-student";
@@ -33,7 +33,7 @@ export interface User extends BaseEntity {
   department?: Department;
   profileStudent?: ProfileStudent;
   blogs: Blog[];
-  ideaRequestOfReviewers: IdeaRequest[];
+  ideaVersionRequestOfReviewers: IdeaVersionRequest[];
   ideaHistoryRequestOfReviewers: IdeaHistoryRequest[];
   ideaOfOwners: Idea[];
   ideaOfMentors: Idea[];

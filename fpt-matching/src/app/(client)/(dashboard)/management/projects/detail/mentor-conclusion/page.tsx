@@ -34,6 +34,8 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
+import ConfirmSaveChange
+    from "@/app/(client)/(dashboard)/management/projects/detail/mentor-conclusion/confirm-save-change";
 const TableOfSinhVien = ({sinhViens} : {sinhViens: TeamMember[]}) => {
     return (
         <Table>
@@ -50,7 +52,7 @@ const TableOfSinhVien = ({sinhViens} : {sinhViens: TeamMember[]}) => {
                     <TableRow key={sinhVien.id}>
                         <TableCell className="font-medium">{index}</TableCell>
                         <TableCell>{sinhVien.user?.code}</TableCell>
-                        <TableCell>{sinhVien.user?.firstName + " " + sinhVien.user?.lastName}</TableCell>
+                        <TableCell>{sinhVien.user?.lastName + " " + sinhVien.user?.firstName}</TableCell>
                     </TableRow>
                 ))}
             </TableBody>
@@ -65,6 +67,8 @@ const Page = () => {
     const [project, setProject] = useState<Project | null>(null);
     const [sinhViens, setSinhViens] = useState<TeamMember[]>([]);
     const [mentorFeedback, setMentorFeedback] = useState<MentorFeedback | null>(null);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
     useEffect(() => {
         if (!projectId) {
             return;
@@ -88,33 +92,62 @@ const Page = () => {
         fetchData()
     }, [projectId]);
     const handleSaveChange = async () => {
-        if (sinhViens.some(x => x.id == null)) {
-            toast.error("Có lỗi khi cập nhật")
-            return;
-        }
-        if (sinhViens.filter(x => x.attitude == null || x.attitude == "").length > 0 || sinhViens.filter(x => x.mentorConclusion == null).length > 0) {
-            toast.error("Vui lòng điền tất cả các field")
-            return;
-        }
-        const teamMemberConclusion : TeamMemberUpdateMentorConclusion[] = [] as TeamMemberUpdateMentorConclusion[];
-        sinhViens.forEach((sinhVien) => {
-            return teamMemberConclusion.push({id: sinhVien.id!, mentorConclusion: sinhVien.mentorConclusion!, attitude: sinhVien.attitude!, note: sinhVien.note!});
-        })
-        if (!mentorFeedback || !mentorFeedback.limitation || !mentorFeedback.thesisContent || !mentorFeedback.thesisForm || !mentorFeedback.achievementLevel) {
-            toast.error("Vui lòng điền tất cả các field")
-            return;
-        }
-        const projectResponse = await projectService.updateDefenseStage({projectId: project!.id!, defenseStage: project!.defenseStage!})
-        const teamMemberResponse = await  teammemberService.updateByMentor({teamMembersConclusion: teamMemberConclusion})
-        const mentorFeedbackResponse = await mentorFeedbackService.postFeedback(mentorFeedback);
-        if (mentorFeedbackResponse.status == 1 || teamMemberResponse.status == 1 || projectResponse.status==1) {
-            toast.success("Save success")
-        } else {
-            toast.error(teamMemberResponse.status != 1 ? teamMemberResponse.message : mentorFeedbackResponse.message)
-        }
+        setLoading(true);
 
-    }
-    console.log(project)
+        try {
+            if (sinhViens.some(x => x.id == null)) {
+                toast.error("Có lỗi khi cập nhật");
+                return;
+            }
+
+            if (sinhViens.filter(x => x.attitude == null || x.attitude === "").length > 0 ||
+                sinhViens.filter(x => x.mentorConclusion == null).length > 0) {
+                toast.error("Vui lòng điền tất cả các field");
+                return;
+            }
+
+            const teamMemberConclusion: TeamMemberUpdateMentorConclusion[] = sinhViens.map(sinhVien => ({
+                id: sinhVien.id!,
+                mentorConclusion: sinhVien.mentorConclusion!,
+                attitude: sinhVien.attitude!,
+                note: sinhVien.note!
+            }));
+
+            if (!mentorFeedback || !mentorFeedback.limitation || !mentorFeedback.thesisContent ||
+                !mentorFeedback.thesisForm || !mentorFeedback.achievementLevel) {
+                toast.error("Vui lòng điền tất cả các field");
+                return;
+            }
+
+            const projectResponse = await projectService.updateDefenseStage({
+                projectId: project!.id!,
+                defenseStage: project!.defenseStage!
+            });
+
+            const teamMemberResponse = await teammemberService.updateByMentor({
+                teamMembersConclusion: teamMemberConclusion
+            });
+
+            const mentorFeedbackResponse = await mentorFeedbackService.postFeedback(mentorFeedback);
+
+            if (
+                mentorFeedbackResponse.status === 1 ||
+                teamMemberResponse.status === 1 ||
+                projectResponse.status === 1
+            ) {
+                toast.success("Save success");
+            } else {
+                toast.error(
+                    teamMemberResponse.status !== 1
+                        ? teamMemberResponse.message
+                        : mentorFeedbackResponse.message
+                );
+            }
+        } finally {
+            setLoading(false);
+            setIsOpen(false)
+        }
+    };
     return (
         <div className={"p-8"}>
             {/*Start 1*/}
@@ -125,13 +158,16 @@ const Page = () => {
                     {/*1.1.1*/}
                     <div className={"mx-4 mt-2 flex flex-col gap-2 "}>
                         <Label className={"text-sm mt-2 font-bold flex flex-row items-center gap-2"}>{<Plus className={"size-4"} />} Tiếng việt | Vietnamese: </Label>
-                        <Input readOnly={true} className={"w-3/4"} value={project?.idea?.vietNamName ?? ""} />
+                        <Input readOnly={true} className={"w-3/4"}
+                               // value={project?.idea?.ideaVersions.sort(x => x.version) ?? ""}
+                            value={project?.topic.ideaVersion?.vietNamName ?? undefined}
+                        />
                     </div>
 
                     {/*1.1.2*/}
                     <div className={"mx-4 mt-2 flex flex-col gap-2"}>
                         <Label className={"text-sm mt-2 font-bold flex flex-row items-center gap-2"}>{<Plus className={"size-4"} />} Tiếng anh | English: </Label>
-                        <Input readOnly={true} className={"w-3/4"} value={project?.idea?.englishName ?? ""} />
+                        <Input readOnly={true} className={"w-3/4"} value={project?.topic.ideaVersion?.englishName ?? undefined} />
                     </div>
                 </div>
 
@@ -271,9 +307,10 @@ const Page = () => {
             </div>
             {/*End 4*/}
             <div className={"mt-6"}>
-                <Button onClick={()=>{
-                    handleSaveChange()
-                }} variant={"default"} >Save change</Button>
+                {/*<Button onClick={()=>{*/}
+                {/*    handleSaveChange()*/}
+                {/*}} variant={"default"} >Cập nhật thay đổi</Button>*/}
+                <ConfirmSaveChange isOpen={isOpen} setIsOpen={setIsOpen} loading={loading} handleSaveChange={handleSaveChange} />
             </div>
         </div>
     );

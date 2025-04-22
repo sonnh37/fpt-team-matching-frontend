@@ -29,7 +29,7 @@ import { columns } from "./columns";
 import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
 import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 import { MentorTopicRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
-import { mentoridearequestService } from "@/services/mentor-idea-request-service";
+import { mentortopicrequestService } from "@/services/mentor-idea-request-service";
 
 //#region INPUT
 const defaultSchema = z.object({});
@@ -88,7 +88,7 @@ export default function InvitationReceiveToGetIdeaByStudentTable() {
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: () =>
-      mentoridearequestService.getMentorMentorTopicRequests(queryParams),
+      mentortopicrequestService.getMentorMentorTopicRequests(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

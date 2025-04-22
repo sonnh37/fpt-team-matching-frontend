@@ -25,12 +25,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Textarea } from "@/components/ui/textarea";
 import { RootState } from "@/lib/redux/store";
-import { ideaRequestService } from "@/services/idea-request-service";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
 import { ideaService } from "@/services/idea-service";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { Idea } from "@/types/idea";
-import { IdeaRequest } from "@/types/idea-request";
-import { IdeaRequestUpdateStatusCommand } from "@/types/models/commands/idea-requests/idea-request-update-status-command";
+import { IdeaVersionRequest } from "@/types/idea-version-request";
+import { IdeaVersionRequestUpdateStatusCommand } from "@/types/models/commands/idea-version-requests/idea-version-request-update-status-command";
 import { User } from "@/types/user";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
@@ -44,7 +44,7 @@ import { toast } from "sonner";
 import {IdeaDetailForm} from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
 
-export const columns: ColumnDef<IdeaRequest>[] = [
+export const columns: ColumnDef<IdeaVersionRequest>[] = [
   {
     accessorKey: "idea.englishName",
     header: ({ column }) => (
@@ -79,8 +79,8 @@ export const columns: ColumnDef<IdeaRequest>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as IdeaRequestStatus;
-      const statusText = IdeaRequestStatus[status];
+      const status = row.getValue("status") as IdeaVersionRequestStatus;
+      const statusText = IdeaVersionRequestStatus[status];
 
       let badgeVariant:
         | "secondary"
@@ -90,7 +90,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
         | null = "default";
 
       switch (status) {
-        case IdeaRequestStatus.Approved:
+        case IdeaVersionRequestStatus.Approved:
           badgeVariant = "default";
           break;
         default:
@@ -113,7 +113,7 @@ export const columns: ColumnDef<IdeaRequest>[] = [
 ];
 
 interface ActionsProps {
-  row: Row<IdeaRequest>;
+  row: Row<IdeaVersionRequest>;
 }
 
 const Actions: React.FC<ActionsProps> = ({ row }) => {
@@ -149,7 +149,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const handleSubmit = async () => {
     try {
       if (!ideaId) throw new Error("Idea ID is required");
-      const res = await ideaRequestService.createCouncilRequestsForIdea(ideaId);
+      const res = await ideaVersionRequestService.createCouncilRequestsForIdea(ideaId);
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Submitted to council!");

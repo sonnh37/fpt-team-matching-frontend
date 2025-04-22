@@ -3,7 +3,7 @@
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import TimeStageIdea from "@/components/_common/time-stage-idea";
 import { TypographyP } from "@/components/_common/typography/typography-p";
-import HorizontalLinearStepper from "@/components/material-ui/stepper";
+import HorizontalLinearStepper from "@/components/_common/material-ui/stepper";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,17 +23,72 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 
 export const columns: ColumnDef<Idea>[] = [
-  {
-    accessorKey: "ideaCode",
+ {
+    accessorKey: "latestVersion",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Idea Code" />
+      <DataTableColumnHeader column={column} title="Latest Version" />
     ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if(!idea.ideaVersions) return;
+      const highestVersion = idea.ideaVersions.length > 0
+        ? idea.ideaVersions.reduce((prev, current) =>
+            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+          )
+        : undefined;
+      return highestVersion ? `v${highestVersion.version}` : "-";
+    },
   },
   {
     accessorKey: "englishName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Idea name" />
     ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if(!idea.ideaVersions) return;
+      const highestVersion =
+      idea.ideaVersions.length > 0
+        ? idea.ideaVersions.reduce((prev, current) =>
+            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+          )
+        : undefined;
+      return highestVersion?.englishName || "-"
+    },
+  },
+  {
+    accessorKey: "semester",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Semester" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if(!idea.ideaVersions) return;
+      const highestVersion = idea.ideaVersions.length > 0
+        ? idea.ideaVersions.reduce((prev, current) =>
+            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+          )
+        : undefined;
+      
+      return highestVersion?.stageIdea?.semester?.semesterName || "-";
+    },
+  },
+  {
+    accessorKey: "stage",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Current Stage" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if(!idea.ideaVersions) return;
+      const highestVersion = idea.ideaVersions.length > 0
+        ? idea.ideaVersions.reduce((prev, current) =>
+            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+          )
+        : undefined;
+      
+      return highestVersion?.stageIdea?.stageNumber || "-";
+    },
   },
   {
     accessorKey: "createdDate",
@@ -41,9 +96,9 @@ export const columns: ColumnDef<Idea>[] = [
       <DataTableColumnHeader column={column} title="Date created" />
     ),
     cell: ({ row }) => {
-      const date = new Date(row.getValue("createdDate"));
-      return formatDate(date)
-    },
+        const date = new Date(row.getValue("createdDate"));
+        return formatDate(date)
+      },
   },
   {
     accessorKey: "status",
@@ -97,7 +152,12 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const [feedback, setFeedback] = useState(initialFeedback ?? "");
 
   const idea = row.original;
-
+  const highestVersion =
+  idea.ideaVersions.length > 0
+    ? idea.ideaVersions.reduce((prev, current) =>
+        (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+      )
+    : undefined;
   return (
     <div className="flex flex-col gap-2">
       {/* Hiển thị trạng thái Mentor Approve */}
@@ -114,7 +174,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <DialogTitle>Idea detail</DialogTitle>
           </DialogHeader>
           <div className="flex justify-between p-4 gap-4">
-            <TimeStageIdea stageIdea={idea.stageIdea} />
+            <TimeStageIdea stageIdea={highestVersion?.stageIdea} />
             <HorizontalLinearStepper idea={idea} />
           </div>
         </DialogContent>

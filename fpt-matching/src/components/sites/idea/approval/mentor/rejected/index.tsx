@@ -38,20 +38,21 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
-import { IdeaRequestGetAllQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-query";
-import { ideaRequestService } from "@/services/idea-request-service";
-import { IdeaRequestStatus } from "@/types/enums/idea-request";
+import { IdeaVersionRequestGetAllQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-query";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { Idea } from "@/types/idea";
-import { IdeaRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-requests/idea-request-get-all-current-by-status-and-roles";
+import { IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-current-by-status-and-roles";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
+import { useSelectorUser } from "@/hooks/use-auth";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaRequestRejectedByMentorTable() {
+export default function IdeaVersionRequestRejectedByMentorTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -87,19 +88,19 @@ export default function IdeaRequestRejectedByMentorTable() {
   const [inputFields, setInputFields] =
     useState<z.infer<typeof defaultSchema>>();
 
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelectorUser();
 
   if (!user) {
     return null;
   }
 
   // default field in table
-  const queryParams: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
+  const queryParams: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
     useMemo(() => {
-      const params: IdeaRequestGetAllCurrentByStatusAndRolesQuery =
+      const params: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
         useQueryParams(inputFields, columnFilters, pagination, sorting);
 
-      params.status = IdeaRequestStatus.Rejected;
+      params.status = IdeaVersionRequestStatus.Rejected;
 
       params.roles = ["Mentor"];
 
@@ -117,8 +118,8 @@ export default function IdeaRequestRejectedByMentorTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () =>
-      ideaRequestService.GetIdeaRequestsCurrentByStatusAndRoles(queryParams),
+    queryFn: async () =>
+      await ideaVersionRequestService.GetIdeaVersionRequestsCurrentByStatusAndRoles(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

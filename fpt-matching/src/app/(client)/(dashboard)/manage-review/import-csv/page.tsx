@@ -210,18 +210,11 @@ export default function Page() {
         }
         fetchData()
     }, []);
-    const handleDownTemplate = async () => {
-        const filePath = process.env.NEXT_PUBLIC_API_BASE+"/api/reviews/export-excel-for-reviews"
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        window.location = filePath
-    }
+
     return (
         <div className={" items-center gap-1.5 px-8 py-2"}>
             <DropdownReviewListMenu setReview={setReview} review={review}/>
-            <div className={"mb-4"}>
-                <Button onClick={() => handleDownTemplate()}>Tải template tại đây</Button>
-            </div>
+
 
             {
                 (data == null) && (header == null) ? (
