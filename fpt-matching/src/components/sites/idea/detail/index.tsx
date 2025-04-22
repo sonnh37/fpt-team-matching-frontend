@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { getFileNameFromUrl, getPreviewUrl } from "@/lib/utils";
+import { formatDate, getFileNameFromUrl, getPreviewUrl } from "@/lib/utils";
 import { format } from "date-fns";
 import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { IdeaVersion } from "@/types/idea-version";
@@ -206,34 +206,32 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <ClipboardList className="h-5 w-5" />
-              <h3>Review bởi Mentor</h3>
+              <h3>Đánh giá bởi Mentor</h3>
             </div>
             <Separator />
 
             <div className="space-y-4">
-              {version.ideaVersionRequests.map((request) => (
+              {requests.map((request) => (
                 <div key={request.id} className="border rounded-lg p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1">
-                      <Label>Reviewer</Label>
+                      <Label>Người đánh giá</Label>
                       <p className="text-sm font-medium">
                         {request.reviewer?.email || "Unknown"}
                       </p>
                     </div>
 
                     <div className="space-y-1">
-                      <Label>Status</Label>
+                      <Label>Trạng thái</Label>
                       <div>
                         <RequestStatusBadge status={request.status} />
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <Label>Process Date</Label>
+                      <Label>Ngày xử lí</Label>
                       <p className="text-sm font-medium">
-                        {request.processDate
-                          ? format(new Date(request.processDate), "PPP")
-                          : "Not processed"}
+                        {formatDate(request.processDate)}
                       </p>
                     </div>
                   </div>
@@ -252,7 +250,7 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <GitCompare className="h-5 w-5 text-muted-foreground" />
-          <Label>Version</Label>
+          <Label>Phiên bản</Label>
         </div>
 
         <Select
@@ -284,7 +282,7 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
 
       {/* Status Badge */}
       <div className="space-y-1">
-        <Label>Idea Status</Label>
+        <Label>Trạng thái đề tài</Label>
         <div>
           <StatusBadge status={idea.status} />
         </div>

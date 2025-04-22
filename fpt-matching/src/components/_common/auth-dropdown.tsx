@@ -52,7 +52,7 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
       if (res.status == 1) {
         setTheme("light");
         dispatch(resetCache());
-        window.location.reload();
+        window.location.href = "/login";
       }
     });
   };

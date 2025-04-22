@@ -133,10 +133,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   if (!user) {
     return null;
   }
-  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
-  const isLecturer = user.userXRoles.some(
-    (m) => m.role?.roleName === "Lecturer"
-  );
 
   const {
     data: result,
@@ -167,13 +163,12 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   );
   const handleSubmit = async () => {
     try {
-      if (!ideaId) throw new Error("Idea ID is required");
       const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
-        ideaId
+        highestVersion?.id
       );
-      if (res.status != 1) throw new Error(res.message);
+      if (res.status != 1) return toast.error(res.message);
 
-      toast.success("Submitted to council!");
+      toast.success(res.message);
 
       queryClient.refetchQueries({
         queryKey: ["getIdeaDetailWhenClick", ideaId],

@@ -93,13 +93,13 @@ class IdeaVersionRequestService extends BaseService<IdeaVersionRequest> {
   };
 
   public createCouncilRequestsForIdea = (
-    ideaId: string
+    ideaVersionId?: string
   ): Promise<BusinessResult<IdeaVersionRequest>> => {
     return axiosInstance
       .post<BusinessResult<IdeaVersionRequest>>(
         `${this.endpoint}/create-council-requests`,
         {
-          ideaId,
+          ideaVersionId,
         }
       )
       .then((response) => response.data)

@@ -113,6 +113,7 @@ const EvaluteCriteriaForm = ({
 
       if (res.status != 1) throw new Error(res.message);
       toast.success("Đã gửi feedback thành công!");
+      window.location.reload();
     } catch (error: any) {
       toast.error(error?.message || "An unexpected error occurred");
     }
