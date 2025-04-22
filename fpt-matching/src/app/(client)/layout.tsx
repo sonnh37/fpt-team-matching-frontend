@@ -19,10 +19,10 @@ export default function ClientLayout({
     }
   }, [user, router]);
 
-  if (!user) return null;
-
   if (localStorage.getItem("showToast") === "true") {
-    toast.success(`Chào mừng ${user.firstName} đến với hệ sinh thái kết nối tài năng FPT! 🌍`);
+    if (user) {
+      toast.success(`Chào mừng ${user.firstName} đến với hệ sinh thái kết nối tài năng FPT! 🌍`);
+    }
     localStorage.removeItem("showToast");
   }
 

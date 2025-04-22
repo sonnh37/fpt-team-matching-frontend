@@ -45,71 +45,71 @@ import {IdeaDetailForm} from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
 
 export const columns: ColumnDef<IdeaVersionRequest>[] = [
-  {
-    accessorKey: "idea.englishName",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Idea name" />
-    ),
-  },
-  {
-    accessorKey: "content",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Content" />
-    ),
-  },
-  {
-    accessorKey: "processDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ProcessDate" />
-    ),
-  },
-  {
-    accessorKey: "createdDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Data created" />
-    ),
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdDate"));
-      return formatDate(date)
-    },
-  },
-  {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
-    ),
-    cell: ({ row }) => {
-      const status = row.getValue("status") as IdeaVersionRequestStatus;
-      const statusText = IdeaVersionRequestStatus[status];
-
-      let badgeVariant:
-        | "secondary"
-        | "destructive"
-        | "default"
-        | "outline"
-        | null = "default";
-
-      switch (status) {
-        case IdeaVersionRequestStatus.Approved:
-          badgeVariant = "default";
-          break;
-        default:
-          badgeVariant = "outline";
-      }
-
-      return <Badge variant={badgeVariant}>{statusText}</Badge>;
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-    cell: ({ row }) => {
-      return <Actions row={row} />;
-    },
-  },
+ {
+     accessorKey: "ideaVersion.englishName",
+     header: ({ column }) => (
+       <DataTableColumnHeader column={column} title="Tên đề tài tiếng anh" />
+     ),
+   },
+   {
+     accessorKey: "ideaVersion.version",
+     header: ({ column }) => (
+       <DataTableColumnHeader column={column} title="Phiên bản" />
+     ),
+   },
+   {
+     accessorKey: "processDate",
+     header: ({ column }) => (
+       <DataTableColumnHeader column={column} title="Ngày xử lí" />
+     ),
+   },
+   {
+     accessorKey: "createdDate",
+     header: ({ column }) => (
+       <DataTableColumnHeader column={column} title="Ngày tạo" />
+     ),
+     cell: ({ row }) => {
+       const date = new Date(row.getValue("createdDate"));
+       return formatDate(date);
+     },
+   },
+   {
+     accessorKey: "status",
+     header: ({ column }) => (
+       <DataTableColumnHeader column={column} title="Trạng thái" />
+     ),
+     cell: ({ row }) => {
+       const status = row.getValue("status") as IdeaVersionRequestStatus;
+       const statusText = IdeaVersionRequestStatus[status];
+ 
+       let badgeVariant:
+         | "secondary"
+         | "destructive"
+         | "default"
+         | "outline"
+         | null = "default";
+ 
+       switch (status) {
+         case IdeaVersionRequestStatus.Approved:
+           badgeVariant = "default";
+           break;
+         default:
+           badgeVariant = "outline";
+       }
+ 
+       return <Badge variant={badgeVariant}>{statusText}</Badge>;
+     },
+     filterFn: (row, id, value) => {
+       return value.includes(row.getValue(id));
+     },
+   },
+   {
+     accessorKey: "actions",
+     header: "Tùy chọn",
+     cell: ({ row }) => {
+       return <Actions row={row} />;
+     },
+   },
 ];
 
 interface ActionsProps {

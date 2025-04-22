@@ -45,14 +45,12 @@ const EvaluteCriteriaForm = ({
     isPagination: false,
   };
 
-  // 1. Fetch form criteria
   const { data: result } = useQuery({
     queryKey: ["getFormById", criteriaId],
     queryFn: async () => await criteriaFormService.getById(criteriaId),
     refetchOnWindowFocus: false,
   });
 
-  // 2. Fetch existing answers
   const { data: res_answer } = useQuery({
     queryKey: ["getAnswerCriterias", queryAnswer],
     queryFn: async () => await answerCriteriaService.getAll(queryAnswer),
@@ -60,7 +58,6 @@ const EvaluteCriteriaForm = ({
     refetchOnWindowFocus: false,
   });
 
-  // 3. Initialize form
   const form = useForm<EvaluationFormValues>({
     resolver: zodResolver(evaluationFormSchema),
     defaultValues: {
@@ -68,7 +65,6 @@ const EvaluteCriteriaForm = ({
     },
   });
 
-  // 4. Reset form when answers are loaded
   useEffect(() => {
     if (res_answer?.data?.results) {
       const defaultValues = res_answer.data.results.reduce((acc, answer) => {

@@ -41,42 +41,42 @@ import { useState } from "react";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import {IdeaDetailForm} from "@/components/sites/idea/detail";
+import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
 
 export const columns: ColumnDef<IdeaVersionRequest>[] = [
   {
-    accessorKey: "idea.englishName",
+    accessorKey: "ideaVersion.englishName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Idea name" />
+      <DataTableColumnHeader column={column} title="Tên đề tài tiếng anh" />
     ),
   },
   {
-    accessorKey: "content",
+    accessorKey: "ideaVersion.version",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Content" />
+      <DataTableColumnHeader column={column} title="Phiên bản" />
     ),
   },
   {
     accessorKey: "processDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ProcessDate" />
+      <DataTableColumnHeader column={column} title="Ngày xử lí" />
     ),
   },
   {
     accessorKey: "createdDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Data created" />
+      <DataTableColumnHeader column={column} title="Ngày tạo" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return formatDate(date)
+      return formatDate(date);
     },
   },
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as IdeaVersionRequestStatus;
@@ -105,7 +105,7 @@ export const columns: ColumnDef<IdeaVersionRequest>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Tùy chọn",
     cell: ({ row }) => {
       return <Actions row={row} />;
     },
@@ -119,7 +119,7 @@ interface ActionsProps {
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
-  const ideaId = row.original.ideaId;
+  const ideaId = row.original.ideaVersion?.ideaId;
   const [open, setOpen] = useState(false);
 
   const user = useSelector((state: RootState) => state.user.user);
@@ -149,7 +149,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const handleSubmit = async () => {
     try {
       if (!ideaId) throw new Error("Idea ID is required");
-      const res = await ideaVersionRequestService.createCouncilRequestsForIdea(ideaId);
+      const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
+        ideaId
+      );
       if (res.status != 1) throw new Error(res.message);
 
       toast.success("Submitted to council!");
@@ -185,7 +187,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 <DialogDescription></DialogDescription>
               </DialogHeader>
               <div className="grid p-4 space-y-24">
-                <IdeaDetailForm idea={idea}/>
+                <IdeaDetailForm idea={idea} />
               </div>
             </DialogContent>
           </Dialog>
