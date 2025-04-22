@@ -21,19 +21,19 @@ export const columns: ColumnDef<StageIdea>[] = [
   {
     accessorKey: "stageNumber",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Stage number" />
+      <DataTableColumnHeader column={column} title="Đợt" />
     ),
   },
   {
-    accessorKey: "stageideaName",
+    accessorKey: "numberReviewer",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader column={column} title="Số lượng người đánh giá" />
     ),
   },
   {
     accessorKey: "startDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="StartDate" />
+      <DataTableColumnHeader column={column} title="Ngày bắt đầu" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("startDate"));
@@ -43,18 +43,17 @@ export const columns: ColumnDef<StageIdea>[] = [
   {
     accessorKey: "endDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="EndDate" />
+      <DataTableColumnHeader column={column} title="Ngày kết thúc" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("endDate"));
       return formatDate(date)
     },
   },
-
   {
     accessorKey: "resultDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ResultDate" />
+      <DataTableColumnHeader column={column} title="Ngày kết quả" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("resultDate"));
@@ -62,40 +61,6 @@ export const columns: ColumnDef<StageIdea>[] = [
     },
   },
 
-  {
-    accessorKey: "isDeleted",
-    // header: ({ column }) => (
-    //   <DataTableColumnHeader column={column} title="Is Deleted" />
-    // ),
-    // cell: ({ row }) => {
-    //   const isDeleted = row.getValue("isDeleted") as boolean;
-    //   if (!isDeleted) {
-    //     return (
-    //       <Image
-    //         src="https://firebasestorage.googleapis.com/v0/b/smart-thrive.appspot.com/o/Blog%2Fcheck.png?alt=media&token=1bdb7751-4bdc-4af1-b6e1-9b758df3a3d5"
-    //         width={500}
-    //         height={500}
-    //         alt="Gallery Icon"
-    //         className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
-    //       />
-    //     );
-    //   }
-    //   return (
-    //     <Image
-    //       src="https://firebasestorage.googleapis.com/v0/b/smart-thrive.appspot.com/o/Blog%2Funcheck.png?alt=media&token=3b2b94d3-1c59-4a96-b4c6-312033d868b1"
-    //       width={500}
-    //       height={500}
-    //       alt="Gallery Icon"
-    //       className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0"
-    //     />
-    //   );
-    // },
-    header: () => null, // Không hiển thị header
-    cell: () => null,
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
 ];
 
 interface ActionsProps {

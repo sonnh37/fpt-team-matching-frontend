@@ -2,6 +2,7 @@
 import React from "react";
 import Loader from "@/components/_common/waiting-icon/page";
 import { Button } from "@/components/ui/button";
+import LoaderFire from "@/components/_common/waiting-icon/fire";
 function PageIsIdea() {
   return (
     <div className="absolute inset-0 flex justify-center items-center">
@@ -15,7 +16,7 @@ function PageIsIdea() {
         >
           Xem Duyệt
         </Button>
-        <Loader />
+        {/* <LoaderFire /> */}
       </div>
     </div>
   );

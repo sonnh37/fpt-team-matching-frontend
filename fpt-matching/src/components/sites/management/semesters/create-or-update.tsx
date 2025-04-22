@@ -12,16 +12,24 @@ import { z } from "zod";
 import { HeaderForm } from "@/components/_common/create-update-forms/header-form";
 import { InformationBaseCard } from "@/components/_common/create-update-forms/information-base-form";
 import { usePreviousPath } from "@/hooks/use-previous-path";
-import ConfirmationDialog, { FormInput, FormInputDate, FormInputDateTimePicker } from "@/lib/form-custom-shadcn";
+import ConfirmationDialog, {
+  FormInput,
+  FormInputDate,
+  FormInputDateTimePicker,
+  FormSelectObject,
+} from "@/lib/form-custom-shadcn";
 import { SemesterCreateCommand } from "@/types/models/commands/semesters/semester-create-command";
 import { SemesterUpdateCommand } from "@/types/models/commands/semesters/semester-update-command";
 import { BusinessResult } from "@/types/models/responses/business-result";
 import { Semester } from "@/types/semester";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { DataOnlyTable } from "@/components/_common/data-table-client/data-table";
 import { columns } from "./stage-idea/columns";
 import StageIdeaTable from "./stage-idea";
+import { criteriaFormService } from "@/services/criteria-form-service";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import ErrorSystem from "@/components/_common/errors/error-system";
 
 interface SemesterFormProps {
   initialData?: Semester | null;
@@ -30,21 +38,20 @@ interface SemesterFormProps {
 const formSchema = z.object({
   id: z.string().optional(),
   semesterCode: z.string().nullable().optional(),
+  criteriaFormId: z.string().nullable(),
   semesterName: z.string().nullable().optional(),
   semesterPrefixName: z.string().nullable().optional(),
-  startDate: z.date().optional().default(new Date()),
-  endDate: z.date().optional().default(new Date()),
-  createdDate: z.date().optional().default(new Date()),
-  createdBy: z.string().nullable().optional().default(null),
-  isDeleted: z.boolean().default(false),
+  startDate: z.date(),
+  endDate: z.date(),
+  publicTopicDate: z.date(),
 });
 
 export const SemesterForm: React.FC<SemesterFormProps> = ({
   initialData = null,
 }) => {
   const [loading, setLoading] = useState(false);
-  const title = initialData ? "Edit semester" : "Create semester";
-  const action = initialData ? "Save and continue" : "Create";
+  const title = initialData ? "Chỉnh sửa kì" : "Tạo mới kì";
+  const action = initialData ? "Lưu thay đổi" : "Tạo";
   const [firebaseLink, setFirebaseLink] = useState<string | null>(null);
   const router = useRouter();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
@@ -63,14 +70,28 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
           ...initialData,
           startDate: new Date(initialData.startDate ?? new Date()),
           endDate: new Date(initialData.endDate ?? new Date()),
-          createdDate: new Date(initialData.createdDate ?? new Date()),
+          publicTopicDate: new Date(initialData.publicTopicDate ?? new Date()),
         }
       : {},
   });
 
-  const handleFileUpload = (file: File | null) => {
-    setFile(file);
-  };
+  const [
+    {
+      data: res_criteriaforms,
+      isLoading: isLoading1,
+      isError: isError1,
+      error: error1,
+    },
+  ] = useQueries({
+    queries: [
+      {
+        queryKey: ["getall_criteriaform"],
+        queryFn: async () => await criteriaFormService.getAll(),
+        refetchOnWindowFocus: false,
+      },
+    ],
+  });
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       setLoading(true);
@@ -101,7 +122,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
     BusinessResult<Semester>
   > => {
     if (!pendingValues) {
-      toast.error("No pending values to create semester.");
+      toast.error("không có giá trị đang chờ để tạo học kỳ.");
       return Promise.reject(new Error("No pending values"));
     }
     setIsLoading(true);
@@ -129,6 +150,11 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
     }
   };
 
+  if (isLoading1) return <LoadingComponent />;
+  if (isError1) return <ErrorSystem />;
+
+  const criteriaforms = res_criteriaforms?.data?.results ?? [];
+
   return (
     <>
       <ConfirmationDialog
@@ -142,10 +168,10 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
           }
           router.push(previousPath);
         }}
-        title="Do you want to continue adding this semester?"
-        description="This action cannot be undone. Are you sure you want to permanently delete this file from our servers?"
-        confirmText="Yes"
-        cancelText="No"
+        title="Bạn có muốn tiếp tục tạo mới không?"
+        description="Nếu bạn tạo mới, tất cả dữ liệu sẽ được lưu lại và không thể hoàn tác."
+        confirmText="Có"
+        cancelText="Không"
       />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -166,39 +192,52 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                   <CardContent className="p-6">
                     <div className="grid gap-6">
                       <div className="grid gap-3">
+                        <FormSelectObject
+                          form={form}
+                          name="criteriaFormId"
+                          label="Mẫu tiêu chí đánh giá"
+                          options={criteriaforms}
+                          selectValue={"id"}
+                          selectLabel={"title"}
+                          placeholder="Chọn mẫu tiêu chí đánh giá"
+                        />
+
                         <FormInput
                           form={form}
                           name="semesterCode"
-                          label="Semester Code"
-                          description="This is your public display code."
-                          placeholder="Enter code"
+                          label="Mã code kì"
+                          placeholder="Nhập mã code kì"
                         />
 
                         <FormInput
                           form={form}
                           name="semesterName"
-                          label="Semester Name"
-                          description="This is your public display name."
-                          placeholder="Enter name"
-                        />
-
-                        <FormInputDateTimePicker
-                          form={form}
-                          name="startDate"
-                          label="Start Date"
-                        />
-                        <FormInputDateTimePicker
-                          form={form}
-                          name="endDate"
-                          label="End Date"
+                          label="Tên kì"
+                          placeholder="Nhập tên kì"
                         />
 
                         <FormInput
                           form={form}
                           name="semesterPrefixName"
-                          label="Semester Prefix Name"
-                          description="This is your public display prefix name."
-                          placeholder="Enter prefix name"
+                          label="Tên hậu kì"
+                          placeholder="Nhập tên hậu kì"
+                        />
+
+                        <FormInputDateTimePicker
+                          form={form}
+                          name="startDate"
+                          label="Ngày bắt đầu"
+                        />
+                        <FormInputDateTimePicker
+                          form={form}
+                          name="endDate"
+                          label="Ngày kết thúc"
+                        />
+
+                        <FormInputDateTimePicker
+                          form={form}
+                          name="publicTopicDate"
+                          label="Ngày công khai đề tài"
                         />
                       </div>
                     </div>
@@ -206,9 +245,9 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                 </Card>
               </div>
 
-              <div className="grid gap-4 h-fit">
+              {/* <div className="grid gap-4 h-fit">
                 <InformationBaseCard form={form} initialData={initialData} />
-              </div>
+              </div> */}
             </div>
             <div>
               {/* Button create */}

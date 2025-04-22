@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { getFileNameFromUrl, getPreviewUrl } from "@/lib/utils";
+import { formatDate, getFileNameFromUrl, getPreviewUrl } from "@/lib/utils";
 import { format } from "date-fns";
 import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { IdeaVersion } from "@/types/idea-version";
@@ -54,6 +54,7 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
   const councilApprovals = ideaVersionRequests.filter(
     (req) => req.role === "Council"
   );
+
   const [selectedVersion, setSelectedVersion] = useState<
     IdeaVersion | undefined
   >(highestVersion);
@@ -69,46 +70,49 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
       );
     }
 
+    const requests = version.ideaVersionRequests.filter(m => m.role === "Mentor");
+
+
     return (
       <div className="space-y-6">
         {/* Version Information Section */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-lg font-semibold">
             <FileText className="h-5 w-5" />
-            <h3>Version Information</h3>
+            <h3>Thông tin phiên bản </h3>
           </div>
           <Separator />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <Label>Vietnamese Name</Label>
+              <Label>Tên tiếng việt</Label>
               <p className="text-sm font-medium">
                 {version.vietNamName || "-"}
               </p>
             </div>
 
             <div className="space-y-1">
-              <Label>English Name</Label>
+              <Label>Tên tiếng anh</Label>
               <p className="text-sm font-medium">
                 {version.englishName || "-"}
               </p>
             </div>
 
             <div className="space-y-1">
-              <Label>Abbreviations</Label>
+              <Label>Viết tắt</Label>
               <p className="text-sm font-medium">
                 {version.abbreviations || "-"}
               </p>
             </div>
 
             <div className="space-y-1">
-              <Label>Team Size</Label>
+              <Label>Số lượng người tối đa</Label>
               <p className="text-sm font-medium">{version.teamSize || "-"}</p>
             </div>
           </div>
 
           <div className="space-y-1">
-            <Label>Description</Label>
+            <Label>Mô tả</Label>
             <p className="text-sm font-medium">
               {version.description || "No description provided"}
             </p>
@@ -117,7 +121,7 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
           {/* Enterprise Info */}
           {idea.isEnterpriseTopic && (
             <div className="space-y-1">
-              <Label>Enterprise Name</Label>
+              <Label>Tên doanh nghiệp</Label>
               <p className="text-sm font-medium">
                 {version.enterpriseName || "-"}
               </p>
@@ -128,12 +132,12 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <FileText className="h-5 w-5" />
-              <h3>Attachments</h3>
+              <h3>Tệp đính kèm</h3>
             </div>
             <Separator />
 
             <div className="space-y-2">
-              <Label>Attached File</Label>
+              <Label>Tệp</Label>
               {version.file ? (
                 <div className="flex items-center gap-3">
                   <p className="text-sm font-medium flex-1 truncate">
@@ -151,7 +155,7 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
                       className="flex items-center gap-1"
                     >
                       <Eye className="h-4 w-4" />
-                      Preview
+                      Xem nhanh
                     </Button>
                   </Link>
 
@@ -166,12 +170,12 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
                       className="flex items-center gap-1"
                     >
                       <Download className="h-4 w-4" />
-                      Download
+                      Tải
                     </Button>
                   </Link>
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">No file attached</p>
+                <p className="text-sm text-gray-500">Không có file đính kèm</p>
               )}
             </div>
           </div>
@@ -182,12 +186,12 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <Building2 className="h-5 w-5" />
-              <h3>Topic Information</h3>
+              <h3>Thông tin đề tài</h3>
             </div>
             <Separator />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <Label>Topic Name</Label>
+                <Label>Tên đề tài</Label>
                 <p className="text-sm font-medium">
                   {version.enterpriseName || "-"}
                 </p>
@@ -198,38 +202,36 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
         )}
 
         {/* Version Requests Section */}
-        {version.ideaVersionRequests?.length > 0 && (
+        {requests?.length > 0 && (
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <ClipboardList className="h-5 w-5" />
-              <h3>Review Requests</h3>
+              <h3>Đánh giá bởi Mentor</h3>
             </div>
             <Separator />
 
             <div className="space-y-4">
-              {version.ideaVersionRequests.map((request) => (
+              {requests.map((request) => (
                 <div key={request.id} className="border rounded-lg p-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1">
-                      <Label>Reviewer</Label>
+                      <Label>Người đánh giá</Label>
                       <p className="text-sm font-medium">
                         {request.reviewer?.email || "Unknown"}
                       </p>
                     </div>
 
                     <div className="space-y-1">
-                      <Label>Status</Label>
+                      <Label>Trạng thái</Label>
                       <div>
                         <RequestStatusBadge status={request.status} />
                       </div>
                     </div>
 
                     <div className="space-y-1">
-                      <Label>Process Date</Label>
+                      <Label>Ngày xử lí</Label>
                       <p className="text-sm font-medium">
-                        {request.processDate
-                          ? format(new Date(request.processDate), "PPP")
-                          : "Not processed"}
+                        {formatDate(request.processDate)}
                       </p>
                     </div>
                   </div>
@@ -248,7 +250,7 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <GitCompare className="h-5 w-5 text-muted-foreground" />
-          <Label>Version</Label>
+          <Label>Phiên bản</Label>
         </div>
 
         <Select
@@ -271,7 +273,7 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
                   key={version.id}
                   value={version.version?.toString() || ""}
                 >
-                  Version {version.version}
+                  Phiên bản {version.version}
                 </SelectItem>
               ))}
           </SelectContent>
@@ -280,7 +282,7 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
 
       {/* Status Badge */}
       <div className="space-y-1">
-        <Label>Idea Status</Label>
+        <Label>Trạng thái đề tài</Label>
         <div>
           <StatusBadge status={idea.status} />
         </div>
@@ -290,48 +292,48 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
       <div className="space-y-3">
         <div className="flex items-center gap-2 text-lg font-semibold">
           <Users className="h-5 w-5" />
-          <h3>Team & Mentorship</h3>
+          <h3>Thông tin chung</h3>
         </div>
         <Separator />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1">
-            <Label>Owner</Label>
+            <Label>Người sở hữu</Label>
             <p className="text-sm font-medium">
               {idea.owner?.email || "Unknown"}
             </p>
           </div>
 
           <div className="space-y-1">
-            <Label>Mentor</Label>
+            <Label>Người hướng dẫn</Label>
             <p className="text-sm font-medium">
               {idea.mentor?.email || "Not assigned"}
             </p>
           </div>
 
           <div className="space-y-1">
-            <Label>Sub-Mentor</Label>
+            <Label>Người hướng dẫn 2</Label>
             <p className="text-sm font-medium">
               {idea.subMentor?.email || "Not assigned"}
             </p>
           </div>
 
           <div className="space-y-1">
-            <Label>Type</Label>
+            <Label>Thể loại đề tài</Label>
             <p className="text-sm font-medium">
               {IdeaType[idea.type ?? -1] || "-"}
             </p>
           </div>
 
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <Label>Existing Team</Label>
             <p className="text-sm font-medium">
               {idea.isExistedTeam ? "Yes" : "No"}
             </p>
-          </div>
+          </div> */}
 
           <div className="space-y-1">
-            <Label>Enterprise Topic</Label>
+            <Label>Chủ đề doanh nghiệp</Label>
             <p className="text-sm font-medium">
               {idea.isEnterpriseTopic ? "Yes" : "No"}
             </p>

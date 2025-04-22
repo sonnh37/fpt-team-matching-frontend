@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { number, z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -38,7 +38,8 @@ import { useEffect } from "react";
 const formSchema = z.object({
   id: z.string().optional(),
   stageNumber: z.number().min(1, "Stage number is required"),
-  semesterId: z.string().min(1, "Name is required"),
+  numberReviewer: z.number().min(2, "Number review is required"),
+  semesterId: z.string(),
   startDate: z.date(),
   endDate: z.date(),
   resultDate: z.date(),
@@ -71,10 +72,12 @@ export function StageIdeaFormDialog({
         resultDate: stageIdea.resultDate
           ? new Date(stageIdea.resultDate)
           : new Date(),
+          numberReviewer: stageIdea.numberReviewer ?? 2,
       };
     }
     return {
       semesterId: params.semesterId as string,
+      numberReviewer: 2,
     };
   };
 
@@ -94,13 +97,13 @@ export function StageIdeaFormDialog({
       if (stageIdea) {
         // Edit mode
         const res = await stageideaService.update(values);
-        if (res.status == 1) toast.success("Stage idea updated successfully!");
+        if (res.status == 1) toast.success(res.message);
         else throw Error(res.message);
       } else {
         // Create mode
         const res = await stageideaService.create(values);
         if (res.status == 1) {
-          toast.success("Stage idea created successfully!");
+          toast.success(res.message);
         } else throw Error(res.message);
       }
       onOpenChange(false);
@@ -115,7 +118,7 @@ export function StageIdeaFormDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {stageIdea ? "Edit Stage Idea" : "Create New Stage Idea"}
+            {stageIdea ? "Chỉnh sửa đợt đề tài" : "Tạo mới đợt đề tài"}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -129,15 +132,22 @@ export function StageIdeaFormDialog({
             <FormInputNumber
               form={form}
               name="stageNumber"
-              label="Stage Number"
+              label="Đợt đánh giá"
               decimalScale={0}
               min={1}
             />
-            <FormInputDateTimePicker form={form} name="startDate" label="Start Date" />
-            <FormInputDateTimePicker form={form} name="endDate" label="End Date" />
-            <FormInputDateTimePicker form={form} name="resultDate" label="Result Date" />
+            <FormInputNumber
+              form={form}
+              name="numberReviewer"
+              label="Số lượng người đánh giá"
+              decimalScale={0}
+              min={2}
+            />
+            <FormInputDateTimePicker form={form} name="startDate" label="Ngày bắt đầu" />
+            <FormInputDateTimePicker form={form} name="endDate" label="Ngày kết thúc" />
+            <FormInputDateTimePicker form={form} name="resultDate" label="Ngày có kết quả" />
             <Button type="submit" className="w-full">
-              {stageIdea ? "Update" : "Create"}
+              {stageIdea ? "Cập nhật" : "Tạo mới"}
             </Button>
           </form>
         </Form>

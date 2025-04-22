@@ -35,14 +35,13 @@ export const HeaderForm: React.FC<HeaderFormProps> = ({
         </TypographyH3>
         <TypographyMuted>
           {initialData && initialData.updatedDate
-            ? `Last Updated: ${new Date(initialData.updatedDate).toLocaleString()}`
+            ? `Lần cuối chỉnh sửa: ${new Date(initialData.updatedDate).toLocaleString()}`
             : null}
         </TypographyMuted>
       </div>
       <div className="flex justify-end">
         <ButtonLoading
           className="flex justify-center items-center"
-          size="lg"
           type="submit"
           disabled={loading}
         >

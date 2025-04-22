@@ -20,8 +20,13 @@ class ApiHubsService {
   }
 
   async getSimilaritiesProject(context: string) : Promise<object> {
-    const response = await axiosInstance.post<object>("api_hubs/get-similarities-project", {context})
-    return response.data;
+    try{
+      const response = await axiosInstance.post<object>("api_hubs/get-similarities-project", {context})
+      return response.data;
+    } catch (error) {
+      console.error("Error getting similarities project:", error);
+      throw error;
+    }
   }
   async getRecommendBlogs(candidateInput: string) : Promise<BlogRecommendations[]> {
     interface ResponseBlogRecommendations {

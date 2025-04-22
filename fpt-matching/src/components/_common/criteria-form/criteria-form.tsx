@@ -32,7 +32,7 @@ import DetailFormCriteria from '../criteria-form-detail/detail-form';
 import { Pagination } from '@/components/ui/pagination';
 import { CriteriaFormGetAllQuery } from '@/types/models/queries/criteria-form-get-all-query.ts/criteria-form-get-all-query';
 
-const CriteriaForm = () => {
+const CriteriaFormTable = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
     const [title, setTitle] = useState<string>("");
@@ -259,4 +259,4 @@ const CriteriaForm = () => {
     )
 }
 
-export default CriteriaForm
+export default CriteriaFormTable

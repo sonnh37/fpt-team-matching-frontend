@@ -21,7 +21,7 @@ import { useConfirm } from "@/components/_common/formdelete/confirm-context";
 import { criteriaFormService } from "@/services/criteria-form-service";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import CriteriaForm from "@/components/_common/criteria-form/criteria-form";
+import CriteriaFormTable from "@/components/_common/criteria-form/criteria-form";
 import Criteria from "@/components/_common/criteria/criteria";
 
 export default function Page() {
@@ -54,7 +54,7 @@ export default function Page() {
                     </TabsList>
 
                     <TabsContent value={tabs.form}>
-                    <CriteriaForm/>
+                    <CriteriaFormTable/>
                     </TabsContent>
 
                     <TabsContent value={tabs.criteria}>
