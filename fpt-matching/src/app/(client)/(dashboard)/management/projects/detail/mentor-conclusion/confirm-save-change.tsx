@@ -18,7 +18,9 @@ const ConfirmSaveChange = ({isOpen, setIsOpen, loading, handleSaveChange} :
             </AlertDialogTrigger>
             <AlertDialogContent  className="sm:max-w-[425px]">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Upload checklist</AlertDialogTitle>
+                    <AlertDialogTitle>
+                        Quyết định của mentor
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
                         Bạn có chắc những cập nhật ở trên. Vui lòng xem lại
                     </AlertDialogDescription>

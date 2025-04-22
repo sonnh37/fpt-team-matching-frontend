@@ -21,15 +21,6 @@ export function EditIdeaDialog(
             setLoading(true)
             //2. upload file
             const result = await cloudinaryService.uploadFile(file)
-            // if(reviewId && result) {
-            //     const response = await reviewService.uploadFileUrp({reviewId: reviewId, fileUrl: result})
-            //     console.log(response)
-            //     if (response.status == 1) {
-            //         toast.success("Successfully uploaded");
-            //     } else {
-            //         toast.error(response.message);
-            //     }
-            // }
             if (result) {
                 const response = await topicVersionService.updateByStudent({topicId: ideaId, fileUpdate: result, reviewStage: reviewNumber, note})
                     if (response.status == 1) {
@@ -48,13 +39,13 @@ export function EditIdeaDialog(
     return (
         <AlertDialog open={isOpen}>
             <AlertDialogTrigger asChild>
-                <Button className={"mb-8"} onClick={() => {setIsOpen(true)}} variant="destructive">Upload file</Button>
+                <Button className={"mb-8"} onClick={() => {setIsOpen(true)}} variant="destructive">Cập nhật</Button>
             </AlertDialogTrigger>
             <AlertDialogContent  className="sm:max-w-[425px]">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Upload checklist</AlertDialogTitle>
+                    <AlertDialogTitle>Cập nhật đề tài</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure want to upload this file ?
+                         Bạn có chắc đây là thông tin cần cập nhật? Vui lòng kiểm tra lại trước khi nộp
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 

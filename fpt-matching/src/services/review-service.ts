@@ -2,6 +2,7 @@ import {BaseService} from "@/services/_base/base-service";
 import {BusinessResult} from "@/types/models/responses/business-result";
 import axiosInstance from "@/lib/interceptors/axios-instance";
 import {Review} from "@/types/review";
+import {ReviewExcelModels} from "@/types/review-excel-models";
 
 class ReviewService extends BaseService<Review>{
     constructor() {
@@ -12,14 +13,14 @@ class ReviewService extends BaseService<Review>{
         file: File,
         reviewNumber: number,
         semesterId: string,
-    ): Promise<BusinessResult<[Review]>> => {
+    ): Promise<BusinessResult<ReviewExcelModels[]>> => {
         try {
 
             const formData = new FormData();
             formData.append("file", file);
             formData.append("reviewNumber", reviewNumber.toString())
             formData.append("semesterId", semesterId);
-            const response = await axiosInstance.post(`${this.endpoint}/import-file-excel-review`, formData, {});
+            const response = await axiosInstance.post<BusinessResult<ReviewExcelModels[]>>(`${this.endpoint}/import-file-excel-review`, formData, {});
             return response.data;
         } catch (error) {
             this.handleError(error);
