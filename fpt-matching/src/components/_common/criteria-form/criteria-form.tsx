@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Table,
     TableBody,
@@ -29,23 +29,45 @@ import { Label } from "@/components/ui/label"
 import { CriteriaFormCreateCommand } from '@/types/models/commands/criteria-form/criteria-forn-create-command';
 import { PlusCircle } from 'lucide-react';
 import DetailFormCriteria from '../criteria-form-detail/detail-form';
+import { Pagination } from '@/components/ui/pagination';
+import { CriteriaFormGetAllQuery } from '@/types/models/queries/criteria-form-get-all-query.ts/criteria-form-get-all-query';
 
 const CriteriaForm = () => {
-
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [totalPages, setTotalPages] = useState<number>(1);
     const [title, setTitle] = useState<string>("");
-
+    const [search, setSearch] = useState<string>("");
+    const [queryParams, setQueryParams] = useState<CriteriaFormGetAllQuery>({
+        title: "",
+        pageNumber: 1,
+        pageSize: 5,
+        isDeleted: false,
+        isPagination: true,
+    });
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTitle(e.target.value);
     };
+
+
 
     const {
         data: form,
         refetch
     } = useQuery({
-        queryKey: ["getFormCriteria"],
-        queryFn: () => criteriaFormService.getAll(),
+        queryKey: ["getALlFormCriteria", queryParams],
+        queryFn: () => criteriaFormService.getAll(queryParams),
         refetchOnWindowFocus: false,
     });
+
+    useEffect(() => {
+        if (form?.data) {
+            setTotalPages(form?.data?.totalPages || 1);
+            // Chỉ reset về trang 1 nếu dữ liệu mới có số trang nhỏ hơn trang hiện tại
+            if (form.data.pageNumber && currentPage > form.data.pageNumber) {
+                setCurrentPage(1);
+            }
+        }
+    }, [form]);
 
     console.log(form, "testform")
 
@@ -71,6 +93,14 @@ const CriteriaForm = () => {
         }
 
     }
+
+    const handleSearch = () => {
+        setQueryParams((prev) => ({
+            ...prev,
+            title: search,   // lấy từ khóa từ input
+            pageNumber: 1,      // reset về trang 1 khi search
+        }));
+    };
     const handCreate = async () => {
 
         let query: CriteriaFormCreateCommand = {
@@ -92,13 +122,16 @@ const CriteriaForm = () => {
                 <div className="flex items-center gap-2">
                     {/* Search Input */}
                     <input
+                        id='search'
+                        name='search'
+                        onChange={(e) => setSearch(e.target.value)}
                         type="text"
                         placeholder="Tìm kiếm..."
                         className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300"
                     />
 
                     {/* Search Buttons */}
-                    <Button className=" bg-blue-500 hover:bg-blue-600">
+                    <Button className=" bg-blue-500 hover:bg-blue-600" onClick={() => handleSearch()}>
                         Tìm kiếm
                     </Button>
 
@@ -177,7 +210,7 @@ const CriteriaForm = () => {
                     <TableBody>
                         {form?.data?.results?.map((cv, index) => (
                             <TableRow key={cv.id}>
-                                <TableCell className="font-medium">{index}</TableCell>
+                                <TableCell className="font-medium">{index + 1}</TableCell>
                                 <TableCell className="font-medium">{cv.createdDate ? new Date(cv.createdDate).toLocaleString("vi-VN", {
                                     day: "2-digit",
                                     month: "2-digit",
@@ -206,12 +239,20 @@ const CriteriaForm = () => {
                             </TableRow>
                         ))}
                     </TableBody>
-                    <TableFooter>
 
-                    </TableFooter>
-                </Table>)
+
+                </Table>
+            )
 
             }
+
+            <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+            />
+
+
 
         </div>
 

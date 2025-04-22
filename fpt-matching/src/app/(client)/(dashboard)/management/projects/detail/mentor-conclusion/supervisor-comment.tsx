@@ -25,7 +25,7 @@ export default function SupervisorComment({sinhViens, setSinhViens}: {sinhViens:
                         <TableRow key={sinhVien.id}>
                             <TableCell>{index + 1}</TableCell>
                             <TableCell>{sinhVien.user?.code}</TableCell>
-                            <TableCell>{sinhVien.user && sinhVien.user.firstName! + sinhVien.user.lastName}</TableCell>
+                            <TableCell>{sinhVien.user && sinhVien.user.lastName! + " " + sinhVien.user.firstName}</TableCell>
                             <TableCell className={""}>
                                 <input
                                     checked={MentorConclusionOptions[sinhVien.mentorConclusion!] == "Agree_to_defense" ? true : false}

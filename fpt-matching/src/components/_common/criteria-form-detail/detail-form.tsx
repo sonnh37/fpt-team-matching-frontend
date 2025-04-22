@@ -40,13 +40,19 @@ import { CriteriaXCriteriaFormCreateCommand } from '@/types/models/commands/crit
 import { CriteriaXCriteriaFormGetAllQuery } from '@/types/models/queries/criteriaxcriteriaform/criteria-x-criteria-form-get-all-query'
 import { CriteriaValueType } from '@/types/enums/criteria'
 import { useConfirm } from '../formdelete/confirm-context'
+import { CriteriaGetAllQuery } from '@/types/models/queries/criteria-form/criteria-get-all-query'
+import { Criteria } from '@/types/criteria'
 type DetailFormCriteriaProps = {
     id: string;
 };
 const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
     const [valueQuestion, setValueQuestion] = useState<string | null>(null);
+    const [search, setSearch] = useState<string | null>("");
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
 
-    console.log(valueQuestion, "test")
+       
+    };
     const {
         data: form,
         refetch
@@ -55,11 +61,10 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
         queryFn: () => criteriaFormService.getById(id),
         refetchOnWindowFocus: false,
     });
-
-    
-
-
-
+    const safeSearch = search ?? ""; // nếu search là null thì dùng ""
+    const filteredData = form?.data?.criteriaXCriteriaForms?.filter(
+        (x) => x.criteria?.question?.toLowerCase().includes(safeSearch.toLowerCase())
+      );
     const {
         data: criteriaAll,
     } = useQuery({
@@ -73,26 +78,26 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
     const confirm = useConfirm()
     const handleDelete = async (id: string) => {
 
-     const check = await criteriaXCriteriaFormService.getById(id)
-     if(check){
-         // Gọi confirm để mở dialog
-         const confirmed = await confirm({
-            title: "Xóa yêu cầu gia nhập",
-            description: "Bạn có muốn xóa đơn này không?",
-            confirmText: "Có,xóa nó đi",
-            cancelText: "Không,cảm ơn",
-        })
-        if(confirmed){
-            const result = await criteriaXCriteriaFormService.delete(id)
-            if(result.status ===1){
-                toast.success("Xóa câu hỏi thành công!")
-                refetch();
-            }else{
-                toast.error("Đã có lỗi xảy ra!")
+        const check = await criteriaXCriteriaFormService.getById(id)
+        if (check) {
+            // Gọi confirm để mở dialog
+            const confirmed = await confirm({
+                title: "Xóa yêu cầu gia nhập",
+                description: "Bạn có muốn xóa đơn này không?",
+                confirmText: "Có,xóa nó đi",
+                cancelText: "Không,cảm ơn",
+            })
+            if (confirmed) {
+                const result = await criteriaXCriteriaFormService.delete(id)
+                if (result.status === 1) {
+                    toast.success("Xóa câu hỏi thành công!")
+                    refetch();
+                } else {
+                    toast.error("Đã có lỗi xảy ra!")
+                }
             }
+
         }
-       
-     }
 
     }
 
@@ -144,40 +149,43 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
                 <ModalContent>
                     <div className="flex flex-col h-[80vh]"> {/* Tổng chiều cao modal */}
 
-                        {/* HEADER - 15% */}
+                        {/* HEADER  */}
                         <div className="basis-[10%] flex justify-center items-center ">
                             <h1 className="text-2xl md:text-3xl">Đơn tiêu chí</h1>
                         </div>
 
-                        {/* INFO - 25% */}
-                        <div className="basis-[20%] px-4 mt-3 flex flex-col gap-4 overflow-auto">
+                        {/* INFO  */}
+                        <div className="basis-[20%] ">
                             {/* Nội dung info giữ nguyên */}
-                            <div className="flex items-center ">
-                                <div className="w-20 flex items-center">
-                                    <h3 className="text-nowrap"> Tiêu đề:</h3>
+                            <div className='p-4 mt-3 flex flex-col gap-4 overflow-auto border-2 shadow-md mx-5'>
+                                <div className="flex items-center ">
+                                    <div className="w-20 flex items-center">
+                                        <h3 className="text-nowrap"> Tiêu đề:</h3>
+                                    </div>
+                                    <div className="">{form?.data?.title}</div>
                                 </div>
-                                <div className="">{form?.data?.title}</div>
-                            </div>
-                            <div className="flex items-center ">
-                                <div className="w-20 flex items-center">
-                                    <h3 className="text-nowrap"> Người tạo: </h3>
+                                <div className="flex items-center ">
+                                    <div className="w-20 flex items-center">
+                                        <h3 className="text-nowrap"> Người tạo: </h3>
+                                    </div>
+                                    <div className="">{form?.data?.createdBy}</div>
                                 </div>
-                                <div className="">{form?.data?.createdBy}</div>
-                            </div>
-                            <div className="flex items-center ">
-                                <div className="w-20 flex items-center">
-                                    <h3 className="text-nowrap"> Ngày tạo: </h3>
-                                </div>
-                                <div className="">
-                                    {form?.data?.createdDate
-                                        ? new Date(form?.data?.createdDate).toLocaleString("vi-VN", {
-                                            day: "2-digit",
-                                            month: "2-digit",
-                                            year: "numeric",
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                        })
-                                        : "Không có ngày "}
+
+                                <div className="flex items-center ">
+                                    <div className="w-20 flex items-center">
+                                        <h3 className="text-nowrap"> Ngày tạo: </h3>
+                                    </div>
+                                    <div className="">
+                                        {form?.data?.createdDate
+                                            ? new Date(form?.data?.createdDate).toLocaleString("vi-VN", {
+                                                day: "2-digit",
+                                                month: "2-digit",
+                                                year: "numeric",
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                            })
+                                            : "Không có ngày "}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -187,6 +195,9 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
                             <div className="flex items-center gap-2">
                                 {/* Search Input */}
                                 <input
+                                id='search'
+                                name='search'
+                                onChange={(e) => setSearch(e.target.value)}
                                     type="text"
                                     placeholder="Tìm kiếm..."
                                     className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:border-blue-300"
@@ -249,7 +260,7 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
                         </div>
                         {/* CRITERIA - 60% */}
                         <div className="basis-[60%] overflow-auto p-2">
-                            {(form?.data?.criteriaXCriteriaForms?.length && form?.data?.criteriaXCriteriaForms?.length > 0) ? (
+                            {(filteredData?.length && filteredData.length > 0) ? (
                                 <div className="bg-slate-50 border-2 rounded-sm  p-4 h-full overflow-auto">
                                     <Table className="min-w-full">
                                         <TableCaption>Danh sách các đơn sẵn có.</TableCaption>
@@ -263,7 +274,7 @@ const DetailFormCriteria = ({ id }: DetailFormCriteriaProps) => {
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
-                                            {form.data.criteriaXCriteriaForms.filter(x=>x.isDeleted==false).map((formXCriteria, index) => (
+                                            {filteredData.filter(x => x.isDeleted == false).map((formXCriteria, index) => (
                                                 <TableRow key={formXCriteria.id}>
                                                     <TableCell>{index + 1}</TableCell>
                                                     <TableCell>

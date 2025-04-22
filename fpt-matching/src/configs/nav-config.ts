@@ -117,7 +117,7 @@ export const NAV_CONFIG = {
       title: "Quản lý review",
       url: "/manage-review",
       icon: SquareUserRound,
-      roles: ["Reviewer", "Manager"],
+      roles: ["Manager"],
     },
     {
       title: "Quản lý học kỳ",

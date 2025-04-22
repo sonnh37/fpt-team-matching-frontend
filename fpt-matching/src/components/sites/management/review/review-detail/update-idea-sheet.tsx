@@ -50,10 +50,10 @@ function CollapsibleFile({ideaHis}:{ideaHis:TopicVersion[]}) {
                     <div key={i} className={"items-center flex justify-between gap-4"}>
                         <div className="overflow-ellipsis overflow-hidden flex gap-2">
                             <p>CAPSTONE_REGISTER_{idea.fileUpdate?.split("CAPSTONE_REGISTER_")[1]}</p>
-                            {/*<Badge*/}
-                            {/*    variant={"default"}*/}
-                            {/*    className={`${idea.status == IdeaHistoryStatus.Pending ? "bg-amber-600" : idea.status == IdeaHistoryStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}*/}
-                            {/*>{IdeaHistoryStatus[idea.status!]}</Badge>*/}
+                            <Badge
+                                variant={"default"}
+                                className={`${idea.status == TopicVersionStatus.Pending ? "bg-amber-600" : idea.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
+                            >{IdeaHistoryStatus[idea.status!]}</Badge>
                         </div>
                         <Link className={""} href={idea.fileUpdate ? idea.fileUpdate : ""}><Download /></Link>
                     </div>
@@ -105,6 +105,7 @@ export function UpdateIdeaSheet({topicVersionId,ideaHis, ideaId, reviewStage}: {
             setFileChange(newFile)
         }
     }
+    console.log(ideaHis)
     return (
         <div className="grid grid-cols-2 gap-2">
             <Sheet >
