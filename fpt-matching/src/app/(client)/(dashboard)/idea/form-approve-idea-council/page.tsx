@@ -37,26 +37,46 @@ const FormCouncil = () => {
         }));
     };
 
-    const handleSubmitAnswers = async () => {
-        try {
-            const requests = result?.data?.criteriaXCriteriaForms
-                ?.filter(x => x.isDeleted === false)
-                .map(async (criteria) => {
-                    const payload: AnswerCriteriaCreateCommand = {
-                        ideaRequestId: idRequestId,
-                        criteriaId: criteria?.criteria?.id ?? "",
-                        value: answers[criteria.criteria?.id || ""] || "", // fallback rỗng nếu chưa nhập
-                    };
-                    return await answerCriteriaService.create(payload);
-                });
+    console.log("Answers hiện tại: ", answers);
+    console.log("Tổng số câu hỏi:", result?.data?.criteriaXCriteriaForms.filter(x=>x.isDeleted==false).length);
+    console.log("Số câu đã trả lời:", Object.keys(answers).length);
 
-            if (requests && requests.length > 0) {
-                await Promise.all(requests);
-                toast.success("Gửi đánh giá thành công!");
-            }
+    const handleSubmitAnswers = async () => {
+
+
+        let query: AnswerGet
+        const check = await answerCriteriaService.getAll({
+            ideaRequestId: "abc-xyz", // truyền ID đang cần kiểm
+            isDeleted: false
+        });
+        
+        if (check.data && check.data.length > 0) {
+            toast.error("Đơn này đã được trả lời trước đó.");
+            return;
+        }
+        const activeCriteriaCount = result?.data?.criteriaXCriteriaForms?.filter(x => x.isDeleted === false)?.length ?? 0;
+
+        if (Object.keys(answers).length < activeCriteriaCount) {
+            toast.error("Bạn cần trả lời tất cả các câu hỏi trước khi gửi.");
+            
+        }
+        try {
+            // Chuyển state answers thành mảng payloads
+            const payloads: AnswerCriteriaCreateCommand[] = Object.entries(answers).map(
+                ([criteriaId, value]) => ({
+                    ideaVersionRequestId: "ed1b5f52-7452-45b7-bb4a-414fb0c87660", // bạn có thể truyền động ở đây
+                    criteriaId,
+                    value,
+                })
+            );
+
+            // Gửi tất cả payloads qua API
+            const requests = payloads.map(payload => answerCriteriaService.create(payload));
+            await Promise.all(requests);
+            toast.success("Gửi đánh giá thành công!");
         } catch (error) {
-            toast.error("Có lỗi xảy ra khi gửi đánh giá.");
             console.error(error);
+            toast.error("Có lỗi xảy ra khi gửi đánh giá.");
         }
     };
 
@@ -81,14 +101,16 @@ const FormCouncil = () => {
                             {
                                 (criteria?.criteria?.valueType === CriteriaValueType.Boolean) ? (
                                     <RadioGroup defaultValue="comfortable"
-                                    onValueChange={(value) => handleAnswerChange(criteria?.criteria?.id ?? "", value)}
+                                        onValueChange={(value) => {
+                                            setAnswers(prev => ({ ...prev, [criteria.criteria?.id || ""]: value }));
+                                        }}
                                     >
                                         <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="default" id="r1" />
+                                            <RadioGroupItem value="yes" id="r1" />
                                             <Label htmlFor="r1">Có</Label>
                                         </div>
                                         <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="comfortable" id="r2" />
+                                            <RadioGroupItem value="no" id="r2" />
                                             <Label htmlFor="r2">Không</Label>
                                         </div>
 
@@ -105,9 +127,11 @@ const FormCouncil = () => {
                                         </div>
 
                                         <div className="flex gap-4 w-full h-full">
-                                            <Textarea 
-                                              placeholder="Nhập đánh giá"
-                                              onChange={(e) => handleAnswerChange(criteria.criteria?.id ?? "", e.target.value)}
+                                            <Textarea
+                                                placeholder="Nhập đánh giá"
+                                                onChange={(e) =>
+                                                    setAnswers(prev => ({ ...prev, [criteria.criteria?.id || ""]: e.target.value }))
+                                                }
                                             ></Textarea>
                                         </div>
                                     </div>
@@ -122,8 +146,8 @@ const FormCouncil = () => {
                     <button
                         type="submit"
                         className="bg-orange-600 text-white px-8 py-3 rounded-lg hover:bg-orange-700 transition-colors"
-                      onClick={() => handleSubmitAnswers()}
-                   >
+                        onClick={() => handleSubmitAnswers()}
+                    >
                         Gửi đánh giá
                     </button>
                 </div>
