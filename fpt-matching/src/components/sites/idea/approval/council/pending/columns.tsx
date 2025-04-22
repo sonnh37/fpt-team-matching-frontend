@@ -170,47 +170,26 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const idea = result?.data ?? ({} as Idea);
 
-  const handleApprove = async () => {
+  const handleStatusUpdate = async (status: IdeaVersionRequestStatus) => {
     try {
-      row.original.status = IdeaVersionRequestStatus.Approved;
-      const command: IdeaVersionRequestUpdateStatusCommand = {
-        status: IdeaVersionRequestStatus.Approved,
-        id: row.original.id,
-        content: feedback,
-      };
-      const res = await ideaVersionRequestService.updateStatusByLecturer(command);
-      if (res.status != 1) throw new Error(res.message);
-
-      toast.success("Feedback submitted successfully");
+      // row.original.status = status;
+      // const command: IdeaVersionRequestUpdateStatusCommand = {
+      //   status,
+      //   id: row.original.id,
+      //   content: feedback,
+      // };
+      
+      // const res = await ideaVersionRequestService.updateStatusByLecturer(command);
+      // if (res.status != 1) throw new Error(res.message);
   
-      queryClient.refetchQueries({ queryKey: ["data_ideaversionrequest_pending"] });
-     
-      setOpen(false);
+      // toast.success("Feedback submitted successfully");
+      // queryClient.refetchQueries({
+      //   queryKey: ["data_ideaversionrequest_pending"],
+      // });
+      // setOpen(false);
     } catch (error: any) {
-      toast.error(error);
+      toast.error(error?.message || "An unexpected error occurred");
       setOpen(false);
-      return;
-    }
-  };
-
-  const handleReject = async () => {
-    try {
-      row.original.status = IdeaVersionRequestStatus.Approved;
-      const command: IdeaVersionRequestUpdateStatusCommand = {
-        status: IdeaVersionRequestStatus.Rejected,
-        id: row.original.id,
-        content: feedback,
-      };
-      const res = await ideaVersionRequestService.updateStatusByLecturer(command);
-      if (res.status != 1) throw new Error(res.message);
-
-      toast.success("Feedback submitted successfully");
-      queryClient.refetchQueries({ queryKey: ["data_ideaversionrequest_pending"] });
-      setOpen(false);
-    } catch (error: any) {
-      toast.error(error || "An unexpected error occurred");
-      setOpen(false);
-      return;
     }
   };
 
@@ -244,19 +223,26 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                         onChange={(e) => setFeedback(e.target.value)}
                     />
                     <div className={"w-full flex flex-row gap-4 items-end"}>
-                      <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => handleApprove()}
+                    <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => handleStatusUpdate(IdeaVersionRequestStatus.Approved)}
                       >
-                        Approve
+                        Đồng ý
                       </Button>
                       <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleReject()}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleStatusUpdate(IdeaVersionRequestStatus.Consider)}
                       >
-                        Reject
+                        Yêu cầu chỉnh sửa
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleStatusUpdate(IdeaVersionRequestStatus.Rejected)}
+                      >
+                        Từ chối
                       </Button>
                     </div>
                   </div>

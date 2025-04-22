@@ -119,7 +119,7 @@ interface ActionsProps {
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
-  const ideaId = row.original.ideaId;
+  const ideaId = row.original.ideaVersion?.ideaId;
   const [open, setOpen] = useState(false);
 
   const user = useSelector((state: RootState) => state.user.user);

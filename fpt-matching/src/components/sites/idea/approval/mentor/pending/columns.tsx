@@ -170,21 +170,21 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const handleStatusUpdate = async (status: IdeaVersionRequestStatus) => {
     try {
-      row.original.status = status;
-      const command: IdeaVersionRequestUpdateStatusCommand = {
-        status,
-        id: row.original.id,
-        content: feedback,
-      };
+      // row.original.status = status;
+      // const command: IdeaVersionRequestUpdateStatusCommand = {
+      //   status,
+      //   id: row.original.id,
+      //   content: feedback,
+      // };
       
-      const res = await ideaVersionRequestService.updateStatusByLecturer(command);
-      if (res.status != 1) throw new Error(res.message);
+      // const res = await ideaVersionRequestService.updateStatusByLecturer(command);
+      // if (res.status != 1) throw new Error(res.message);
   
-      toast.success("Feedback submitted successfully");
-      queryClient.refetchQueries({
-        queryKey: ["data_ideaversionrequest_pending"],
-      });
-      setOpen(false);
+      // toast.success("Feedback submitted successfully");
+      // queryClient.refetchQueries({
+      //   queryKey: ["data_ideaversionrequest_pending"],
+      // });
+      // setOpen(false);
     } catch (error: any) {
       toast.error(error?.message || "An unexpected error occurred");
       setOpen(false);
