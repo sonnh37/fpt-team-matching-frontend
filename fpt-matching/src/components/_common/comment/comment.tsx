@@ -241,7 +241,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                     <div className="pl-2 relative w-full">
                         <textarea
                             className="w-full px-2 py-2 pr-10 border rounded-md resize-none"
-                            placeholder="Hãy làm người văn minh đi"
+                            placeholder="hãy ghi bình luận của bạn"
                             value={commentUser}
                             onChange={(e) => setComment(e.target.value)} // Cập nhật giá trị state
                         ></textarea>
