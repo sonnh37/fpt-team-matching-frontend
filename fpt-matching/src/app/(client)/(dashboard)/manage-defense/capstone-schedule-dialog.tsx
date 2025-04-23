@@ -7,10 +7,11 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import {Dispatch, SetStateAction} from "react";
 
-export function CapstoneScheduleDialog({handleSaveChange}: {handleSaveChange: Function}) {
+export function CapstoneScheduleDialog({handleSaveChange, open, setOpen}: {handleSaveChange: Function, open: boolean, setOpen: Dispatch<SetStateAction<boolean>>}) {
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
                 <Button className={"self-end mr-6"} variant="default">Lưu</Button>
             </DialogTrigger>

@@ -83,23 +83,23 @@ class IdeaVersionRequestService extends BaseService<IdeaVersionRequest> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-  public updateStatusByLecturer = (
+  public updateStatusWithCriteriaByMentorOrCouncil = (
       command: IdeaVersionRequestUpdateStatusCommand
   ): Promise<BusinessResult<IdeaVersionRequest>> => {
     return axiosInstance
-        .put<BusinessResult<IdeaVersionRequest>>(`${this.endpoint}/lecturer-response`, command)
+        .put<BusinessResult<IdeaVersionRequest>>(`${this.endpoint}/respond-by-mentor-or-council`, command)
         .then((response) => response.data)
         .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
   public createCouncilRequestsForIdea = (
-    ideaId: string
+    ideaVersionId?: string
   ): Promise<BusinessResult<IdeaVersionRequest>> => {
     return axiosInstance
       .post<BusinessResult<IdeaVersionRequest>>(
         `${this.endpoint}/create-council-requests`,
         {
-          ideaId,
+          ideaVersionId,
         }
       )
       .then((response) => response.data)

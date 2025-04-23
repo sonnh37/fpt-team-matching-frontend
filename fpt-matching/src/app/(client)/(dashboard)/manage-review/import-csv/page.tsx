@@ -1,5 +1,5 @@
 'use client'
-import React, {Dispatch, useEffect, useState} from 'react';
+import React, {Dispatch, SetStateAction, useEffect, useState} from 'react';
 import * as XLSX from "xlsx"
 import {FileData} from './FileData';
 import {InputFile} from './InputFile';
@@ -29,8 +29,19 @@ import {toast} from "sonner";
 import {Semester} from "@/types/semester";
 import {sheet2arr} from "@/lib/utils";
 import { Label } from '@/components/ui/label';
-import {Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
-
+import {Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
+import {ReviewExcelModels} from "@/types/review-excel-models";
+import {
+    Table,
+    TableBody,
+    TableCaption,
+    TableCell,
+    TableFooter,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import {DialogBody} from "next/dist/client/components/react-dev-overlay/internal/components/Dialog";
 export function DropdownReviewListMenu({review}: {
     review: string,
     setReview: Dispatch<React.SetStateAction<string>>
@@ -45,20 +56,6 @@ export function DropdownReviewListMenu({review}: {
                     <ChevronRight/>
                 </BreadcrumbSeparator>
                 <BreadcrumbItem>
-                    {/*<DropdownMenu>*/}
-                    {/*    <DropdownMenuTrigger className="flex items-center gap-1">*/}
-                    {/*        Review {review}*/}
-                    {/*        <ChevronDown className="h-4 w-4"/>*/}
-                    {/*    </DropdownMenuTrigger>*/}
-                    {/*    <DropdownMenuContent align="start">*/}
-                    {/*        <DropdownMenuLabel>Select review number</DropdownMenuLabel>*/}
-                    {/*        <DropdownMenuRadioGroup value={review} onValueChange={setReview}>*/}
-                    {/*            <DropdownMenuRadioItem value="1">Review 1</DropdownMenuRadioItem>*/}
-                    {/*            <DropdownMenuRadioItem value="2">Review 2</DropdownMenuRadioItem>*/}
-                    {/*            <DropdownMenuRadioItem value="3">Review 3</DropdownMenuRadioItem>*/}
-                    {/*        </DropdownMenuRadioGroup>*/}
-                    {/*    </DropdownMenuContent>*/}
-                    {/*</DropdownMenu>*/}
                     Review {review}
                 </BreadcrumbItem>
             </BreadcrumbList>
@@ -90,14 +87,12 @@ function AlertDialogImport({loading, setLoading, callApiPostXLSXFunction, open, 
     return (
         <Dialog open={open} onOpenChange={setOpen} >
             <DialogTrigger asChild>
-                <Button onClick={() => {setOpen(true)}} className={"px-6 py-4 mt-6"} variant="default"><Import/> Save to Database</Button>
+                <Button onClick={() => {setOpen(true)}} className={"px-6 py-4 mt-6"} variant="default"><Import/>Xác nhận lưu</Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Are you absolutely sure to import ?</DialogTitle>
-                    <DialogDescription>
-                        This action cannot be undone.
-                    </DialogDescription>
+                    <DialogTitle>Bạn có chắc chắn những thông tin trên là chính xác ?</DialogTitle>
+                    <DialogDescription>Hành động này không thể hoàn tác</DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
                     {
@@ -105,16 +100,65 @@ function AlertDialogImport({loading, setLoading, callApiPostXLSXFunction, open, 
                             ? (<div className={"flex gap-2"}>
                                 <Button variant={"outline"} onClick={() => {
                                     handleCancelClick()
-                                }}>Cancel</Button>
+                                }}>Huỷ</Button>
                                 <Button onClick={() => {
                                     handleClickContinueAction()
-                                }}>Continue</Button>
+                                }}>Tiếp tục</Button>
                             </div>)
                             : (<Button disabled>
                                 <Loader2 className="animate-spin"/>
                                 Please wait
                             </Button>)
                     }
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+function DialogFailReview({open, setOpen, reviewFails} :{open: boolean, setOpen: Dispatch<SetStateAction<boolean>>, reviewFails: ReviewExcelModels[]}){
+    return (
+        <Dialog open={open} onOpenChange={setOpen} >
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Danh sách những đề tài chưa được thêm</DialogTitle>
+                    <DialogDescription>
+                        Vui lòng kiểm tra lại
+                    </DialogDescription>
+                </DialogHeader>
+                <DialogBody>
+                    <Table>
+                        <TableCaption>Danh sách những đề tài chưa được thêm và lý do.</TableCaption>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[100px]">STT</TableHead>
+                                <TableHead>Mã đề tài</TableHead>
+                                <TableHead>Lý do</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {reviewFails.map((failReview) => (
+                                <TableRow key={failReview.stt}>
+                                    <TableCell className="font-medium">{failReview.stt}</TableCell>
+                                    <TableCell>{failReview.topicCode}</TableCell>
+                                    <TableCell>{failReview.reason}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TableCell colSpan={3}>Số lượng</TableCell>
+                                <TableCell className="text-right">{reviewFails.length}</TableCell>
+                            </TableRow>
+                        </TableFooter>
+                    </Table>
+                </DialogBody>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button type="button" variant="secondary">
+                            Close
+                        </Button>
+                    </DialogClose>
                 </DialogFooter>
             </DialogContent>
         </Dialog>
@@ -129,14 +173,20 @@ export default function Page() {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [open, setOpen] = useState<boolean>(false);
     const [currentSemester, setCurrentSemester] = useState<Semester | null>(null);
+    const [failReview, setFailReview] = useState<ReviewExcelModels[]>([])
+    const [openFailReview, setOpenFailReview] = useState<boolean>(false)
     const postFileXLSX = async () => {
         if (currentSemester) {
             const result = await reviewService.importReviewFromXLSX(file!, parseInt(review), currentSemester.id!)
             console.log(result)
             if (result.status == -1) {
                 toast.error(result.message)
-            } else {
+            } else if (result.status == 1) {
                 toast.success(result.message)
+            }
+            if (result.data && result.data.length > 0) {
+                setFailReview(result.data)
+                setOpenFailReview(true)
             }
         } else {
             toast.error("Not found semester")
@@ -212,54 +262,55 @@ export default function Page() {
     }, []);
 
     return (
-        <div className={" items-center gap-1.5 px-8 py-2"}>
-            <DropdownReviewListMenu setReview={setReview} review={review}/>
-
-
-            {
-                (data == null) && (header == null) ? (
-                    <div className={"w-full"}>
-                        <div className={"flex flex-row gap-2 w-full justify-center items-center mb-8"}>
-                            <Label className={"font-bold text-xl"}>Chọn giai đoạn: </Label>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger className="flex items-center gap-1">
-                                    <div className={"text-red-500 text-lg"}>Review {review}</div>
-                                    <ChevronDown className="h-4 w-4"/>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="start">
-                                    <DropdownMenuLabel>Select review number</DropdownMenuLabel>
-                                    <DropdownMenuRadioGroup value={review} onValueChange={setReview}>
-                                        <DropdownMenuRadioItem value="1">Review 1</DropdownMenuRadioItem>
-                                        <DropdownMenuRadioItem value="2">Review 2</DropdownMenuRadioItem>
-                                        <DropdownMenuRadioItem value="3">Review 3</DropdownMenuRadioItem>
-                                    </DropdownMenuRadioGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                        <div className={"w-full"}>
-                            <InputFile file={file} setFile={setFile}/>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="w-full">
-                        <div className={"flex flex-row gap-2 w-full justify-center items-center mb-8"}>
-                            <Label className={"font-bold text-xl"}>Giai đoạn: </Label>
-                            <div className={"text-red-500 text-lg"}>Review {review}</div>
-                        </div>
-                        <DataTable data={data!} columns={columnsFileCsv}/>
-                        <div>
-                            <AlertDialogImport
-                                callApiPostXLSXFunction={postFileXLSX}
-                                loading={isLoading}
-                                setLoading={setIsLoading}
-                                open={open}
-                                setOpen={setOpen}
-                            />
-                        </div>
-                    </div>
-                )
-            }
-        </div>
+       <>
+           {failReview.length > 0 && <DialogFailReview reviewFails={failReview} setOpen={setOpenFailReview} open={openFailReview} />}
+           <div className={" items-center gap-1.5 px-8 py-2"}>
+               <DropdownReviewListMenu setReview={setReview} review={review}/>
+               {
+                   (data == null) && (header == null) ? (
+                       <div className={"w-full"}>
+                           <div className={"flex flex-row gap-2 w-full justify-center items-center mb-8"}>
+                               <Label className={"font-bold text-xl"}>Chọn giai đoạn: </Label>
+                               <DropdownMenu>
+                                   <DropdownMenuTrigger className="flex items-center gap-1">
+                                       <div className={"text-red-500 text-lg"}>Review {review}</div>
+                                       <ChevronDown className="h-4 w-4"/>
+                                   </DropdownMenuTrigger>
+                                   <DropdownMenuContent align="start">
+                                       <DropdownMenuLabel>Select review number</DropdownMenuLabel>
+                                       <DropdownMenuRadioGroup value={review} onValueChange={setReview}>
+                                           <DropdownMenuRadioItem value="1">Review 1</DropdownMenuRadioItem>
+                                           <DropdownMenuRadioItem value="2">Review 2</DropdownMenuRadioItem>
+                                           <DropdownMenuRadioItem value="3">Review 3</DropdownMenuRadioItem>
+                                       </DropdownMenuRadioGroup>
+                                   </DropdownMenuContent>
+                               </DropdownMenu>
+                           </div>
+                           <div className={"w-full"}>
+                               <InputFile file={file} setFile={setFile}/>
+                           </div>
+                       </div>
+                   ) : (
+                       <div className="w-full">
+                           <div className={"flex flex-row gap-2 w-full justify-center items-center mb-8"}>
+                               <Label className={"font-bold text-xl"}>Giai đoạn: </Label>
+                               <div className={"text-red-500 text-lg"}>Review {review}</div>
+                           </div>
+                           <DataTable data={data!} columns={columnsFileCsv}/>
+                           <div>
+                               <AlertDialogImport
+                                   callApiPostXLSXFunction={postFileXLSX}
+                                   loading={isLoading}
+                                   setLoading={setIsLoading}
+                                   open={open}
+                                   setOpen={setOpen}
+                               />
+                           </div>
+                       </div>
+                   )
+               }
+           </div>
+       </>
     );
 }
 

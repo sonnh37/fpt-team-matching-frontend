@@ -236,11 +236,11 @@ export default function StageIdeaTable() {
 
   return (
     <>
-      <div className="container mx-auto space-y-8">
+      <div className="">
         <div className="">
-          <div className="space-y-4 p-4 mx-auto">
+          <div className="space-y-4 mx-auto">
             <Button type="button" onClick={handleCreateClick} variant="default">
-              Create New
+              Tạo mới đợt
             </Button>
 
             <DataTableComponent

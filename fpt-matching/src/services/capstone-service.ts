@@ -28,6 +28,28 @@ class CapstoneScheduleService extends BaseService<CapstoneSchedule>{
         const response = await axiosInstance.get<BusinessResult<CapstoneSchedule[]>>(`/${this.endpoint}/get-by-project-id/${projectId}`);
         return response.data;
     }
+
+    public async createCapstoneSchedule({projectId, stage,  time, date, hallName}: {projectId: string, stage: number, time: string, date: string, hallName: string}) : Promise<BusinessResult<void>> {
+        const response = await axiosInstance.post(`${this.endpoint}`, {
+            projectId,
+            time,
+            date,
+            hallName,
+            stage,
+        });
+        return response.data;
+    }
+    public async updateCapstoneSchedule({projectId, stage, id, time, date, hallName}: {projectId: string, stage: number, id: string, time: string, date: string, hallName: string}) : Promise<BusinessResult<void>> {
+        const response = await axiosInstance.put(`${this.endpoint}`, {
+            id,
+            projectId,
+            time,
+            date,
+            hallName,
+            stage,
+        });
+        return response.data;
+    }
 }
 
 export const capstoneService = new CapstoneScheduleService();

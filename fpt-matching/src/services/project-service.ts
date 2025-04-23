@@ -88,6 +88,11 @@ class ProjectSerivce extends BaseService<Project> {
     })
     return response.data
   }
+
+  public async getProjectBySemesterAndStage ({semester, stage} : {semester: string, stage: number}) : Promise<BusinessResult<Project[]>> {
+    const response = await axiosInstance.get<BusinessResult<Project[]>>(`${this.endpoint}/get-by-semester-and-stage?semester=${semester}&stage=${stage}`)
+    return response.data
+  }
 }
 
 export const projectService = new ProjectSerivce();

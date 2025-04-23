@@ -28,7 +28,7 @@ export class BaseService<T> {
     }
   };
 
-  public getById = async (id: string): Promise<BusinessResult<T>> => {
+  public getById = async (id?: string): Promise<BusinessResult<T>> => {
     try {
       const response = await axiosInstance.get<BusinessResult<T>>(
         `${this.endpoint}/${id}`

@@ -7,7 +7,7 @@ export interface IdeaVersionRequestUpdateStatusCommand extends UpdateCommand {
   answerCriteriaList?: AnswerCriteriaForLecturerRespond[];
 }
 
-interface AnswerCriteriaForLecturerRespond {
+export interface AnswerCriteriaForLecturerRespond {
   criteriaId?: string; 
   value?: string;
 }

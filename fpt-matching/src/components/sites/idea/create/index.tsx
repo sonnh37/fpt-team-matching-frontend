@@ -77,7 +77,7 @@ const formSchema = z.object({
   englishName: z
     .string()
     .min(2, { message: "English Title must be at least 2 characters." }),
-  maxTeamSize: z
+  teamSize: z
     .number({ invalid_type_error: "Team size must be a number." })
     .gte(4, { message: "Team size must be at least 4." }),
   abbreviations: z
@@ -139,7 +139,7 @@ export const CreateProjectForm = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      maxTeamSize: 4,
+      teamSize: 4,
     },
   });
 
@@ -172,7 +172,12 @@ export const CreateProjectForm = () => {
   });
 
   const invitationPendings = result_invitations?.data?.results ?? [];
-
+  const invitationPendingBySelfs = invitationPendings.filter(
+    (invitation) => invitation.type == InvitationType.SentByStudent
+  );
+  const invitationPendingByTeams = invitationPendings.filter(
+    (invitation) => invitation.type == InvitationType.SendByTeam
+  );
   const { data: result } = useQuery({
     queryKey: ["getUsersByRole", query],
     queryFn: () => userService.getAll(query),
@@ -236,20 +241,14 @@ export const CreateProjectForm = () => {
   if (isErrorProject || isErrorInvitations || isLoading) return <ErrorSystem />;
 
   if (isStudent) {
-    // * project is existed
     if (project) {
       // ** project has not idea
       const isProjectNoIdea =
-        project?.ideaId == undefined || project.ideaId == null;
+        project?.topicId == undefined || project.topicId == null;
 
       // ** if project has idea => not create idea
       if (!isProjectNoIdea) {
-        return (
-          <AlertMessage
-            message="You already have an idea associated with this project. Creating a new idea is not allowed."
-            messageType="error"
-          />
-        );
+        return <AlertMessage message="Bạn đã có đề tài." messageType="error" />;
       }
 
       // ** if project has no idea and the user login is not leader project => not create idea
@@ -258,23 +257,27 @@ export const CreateProjectForm = () => {
       );
       if (!isLeaderProject) {
         return (
-          <AlertMessage
-            message="You are not the leader of the project. Only the leader can create an idea."
-            messageType="error"
-          />
+          <AlertMessage message="Bạn đang trong dự án." messageType="error" />
+        );
+      }
+    } else {
+      const messages = [];
+      if (invitationPendingByTeams.length > 0) {
+        messages.push(
+          `Bạn có lời mời đang chờ cho ${invitationPendingByTeams.length} nhóm`
+        );
+      }
+      if (invitationPendingBySelfs.length > 0) {
+        messages.push(
+          `Bạn có ${invitationPendingBySelfs.length} lời mời đang chờ xử lý`
         );
       }
 
-      // ** if project has no idea and the user login is leader project => create idea
-    } else {
-      // * if project has not and request for some team => not create idea
-      if (invitationPendings.length > 0)
+      if (messages.length > 0) {
         return (
-          <AlertMessage
-            message="You have pending invitations for a team. Creating a new idea is not allowed."
-            messageType="error"
-          />
+          <AlertMessage message={messages.join(". ")} messageType="error" />
         );
+      }
     }
   }
 
@@ -550,7 +553,7 @@ export const CreateProjectForm = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="maxTeamSize"
+                  name="teamSize"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Số lượng thành viên</FormLabel>

@@ -89,7 +89,7 @@ export const capstoneScheduleSchemaColumns: ColumnDef<CapstoneSchedule>[] = [
         cell: ({row}) => {
             const project = row.original.project;
             return (
-                <div>{project!.idea?.ideaCode}</div>
+                <div>{project!.topic.topicCode}</div>
             )
         }
     },
@@ -102,7 +102,7 @@ export const capstoneScheduleSchemaColumns: ColumnDef<CapstoneSchedule>[] = [
         cell: ({row}) => {
             const project = row.original.project;
             return (
-                <div className={"flex justify-center"}>{project?.idea?.englishName}</div>
+                <div className={"flex justify-center"}>{project?.topic.ideaVersion?.englishName}</div>
             )
         }
     },
@@ -110,13 +110,13 @@ export const capstoneScheduleSchemaColumns: ColumnDef<CapstoneSchedule>[] = [
         header: "GVHD",
         id: "mentor-name",
         accessorFn: (row) => {
-          return   row.project?.idea?.mentor?.username + "" + row.project?.idea?.subMentor && " - " + row.project?.idea?.subMentor?.username
+          return   row.project?.topic.ideaVersion?.idea?.mentor?.username + "" + row.project?.topic.ideaVersion?.idea?.subMentor && " - " + row.project?.topic.ideaVersion?.idea?.subMentor?.username
         },
         cell: ({row}) => {
             const project = row.original.project;
             return (
                 <div>
-                    {project?.idea?.mentor?.username}{project?.idea?.subMentor && " - " + project?.idea?.subMentor?.username}
+                    {project?.topic.ideaVersion?.idea?.mentor?.username}{project?.topic.ideaVersion?.idea?.subMentor && " - " + project?.topic.ideaVersion?.idea?.subMentor?.username}
                 </div>
             )
         }

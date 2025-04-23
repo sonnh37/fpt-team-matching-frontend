@@ -29,27 +29,27 @@ import { useSelector } from "react-redux";
 
 export const columns: ColumnDef<IdeaVersionRequest>[] = [
   {
-    accessorKey: "idea.englishName",
+    accessorKey: "ideaVersion.englishName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Idea name" />
+      <DataTableColumnHeader column={column} title="Tên đề tài tiếng anh" />
     ),
   },
   {
-    accessorKey: "content",
+    accessorKey: "ideaVersion.version",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Content" />
+      <DataTableColumnHeader column={column} title="Phiên bản" />
     ),
   },
   {
     accessorKey: "processDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ProcessDate" />
+      <DataTableColumnHeader column={column} title="Ngày xử lí" />
     ),
   },
   {
     accessorKey: "createdDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Data created" />
+      <DataTableColumnHeader column={column} title="Ngày tạo" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
@@ -59,7 +59,7 @@ export const columns: ColumnDef<IdeaVersionRequest>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as IdeaVersionRequestStatus;
@@ -73,8 +73,8 @@ export const columns: ColumnDef<IdeaVersionRequest>[] = [
         | null = "default";
 
       switch (status) {
-        case IdeaVersionRequestStatus.Rejected:
-          badgeVariant = "destructive";
+        case IdeaVersionRequestStatus.Approved:
+          badgeVariant = "default";
           break;
         default:
           badgeVariant = "outline";
@@ -84,6 +84,13 @@ export const columns: ColumnDef<IdeaVersionRequest>[] = [
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "actions",
+    header: "Tùy chọn",
+    cell: ({ row }) => {
+      return <Actions row={row} />;
     },
   },
 ];

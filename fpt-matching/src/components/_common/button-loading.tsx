@@ -15,7 +15,7 @@ export const ButtonLoading: React.FC<ButtonLoadingProps> = ({
 }) => {
   return (
     <Button
-      className={cn("uppercase flex items-center gap-2", className)}
+      className={cn("flex items-center gap-2", className)}
       {...props}
     >
       {props["disabled"] ? (
