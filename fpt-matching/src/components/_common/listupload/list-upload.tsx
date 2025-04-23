@@ -103,7 +103,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {post?.data?.map((cv, index) => (
+                        {post?.data?.results?.map((cv, index) => (
                             <TableRow key={cv.id}>
                                 <TableCell className="font-medium">{index}</TableCell>
                                 <TableCell className="font-medium">{cv.createdDate ? new Date(cv.createdDate).toLocaleString("vi-VN", {

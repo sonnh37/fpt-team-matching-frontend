@@ -166,7 +166,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                 </Popover>
             </div>
 
-            {result?.data?.length === 0 ? (
+            {result?.data?.results?.length === 0 ? (
                 <div className="min-h-[300px] max-h-[600px] w-full px-3 pt-1 my-5 flex justify-center">
                     <p className="text-xl">Chưa có bình luận nào</p>
                 </div>
@@ -179,7 +179,7 @@ const CommentBlog: React.FC<CommentBlogProps> = ({ id }) => {
                         loader={<p>Đang tải thêm...</p>}
                         endMessage={<p className="text-center text-gray-500">Hết dữ liệu rồi 🫡</p>}
                     > */}
-                    {result?.data?.map((comment, index) => (
+                    {result?.data?.results?.map((comment, index) => (
                         <div key={index} className="comment-content w-full px-3 pt-1">
                             <div className="account flex p-2">
                                 <div className="img pr-1">

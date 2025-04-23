@@ -360,7 +360,7 @@ export default function TeamInfo() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-6">
-              {project.topic.ideaVersion != null ? (
+              {project.topic && project.topic.ideaVersion ? (
                 <>
                   {/* Team Description */}
                   {project?.topic.ideaVersion?.description && (
@@ -649,7 +649,7 @@ export default function TeamInfo() {
             <CardContent className="flex mt-4 flex-col justify-center items-center gap-1">
               <TypographyP>Nộp đăng ký đề tài</TypographyP>
               <TypographyMuted>
-                Lưu ý: Đề tài được nộp nên được thông qua bởi các thành viên trong nhóm
+                Lưu ý: Đề tài được nộp nên được thông qua bởi các thành viên trong nhóm,nếu nộp thì sẽ không còn chỉnh sửa nữa
               </TypographyMuted>
               <Button className={"mt-8 min-w-40"} asChild>
                 <Link href={"/team/submit"}>Nộp đề tài</Link>
@@ -658,6 +658,7 @@ export default function TeamInfo() {
           </Card>
         </div>
 
+        { }
         <div className="space-y-2">
           <TypographyH4>Xin đề tài từ giảng viên</TypographyH4>
           <Card>
@@ -674,6 +675,7 @@ export default function TeamInfo() {
           </Card>
         </div>
 
+   
         <div className="space-y-2">
           <TypographyH4>Đánh giá thành viên nhóm</TypographyH4>
           <Card>
@@ -683,7 +685,7 @@ export default function TeamInfo() {
                 Lưu ý: Chỉ được đánh giá sau ngày review 3, và phải nộp trước ngày bảo vệ 1 tuần
               </TypographyMuted>
               {
-
+                project.reviews.filter(x => x.number == 3)[0] &&
                 project.reviews.filter(x => x.number == 3)[0].reviewDate != null ?
                     new Date(new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTime()+new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTimezoneOffset()*60*1000) < new Date(Date.now()) ?
                         (

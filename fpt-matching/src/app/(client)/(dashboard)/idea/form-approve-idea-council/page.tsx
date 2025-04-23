@@ -44,16 +44,16 @@ const FormCouncil = () => {
     const handleSubmitAnswers = async () => {
 
 
-        let query: AnswerGet
-        const check = await answerCriteriaService.getAll({
-            ideaRequestId: "abc-xyz", // truyền ID đang cần kiểm
-            isDeleted: false
-        });
+        // let query: AnswerGet
+        // const check = await answerCriteriaService.getAll({
+        //     ideaRequestId: "abc-xyz", // truyền ID đang cần kiểm
+        //     isDeleted: false
+        // });
         
-        if (check.data && check.data.length > 0) {
-            toast.error("Đơn này đã được trả lời trước đó.");
-            return;
-        }
+        // if (check.data && check.data.length > 0) {
+        //     toast.error("Đơn này đã được trả lời trước đó.");
+        //     return;
+        // }
         const activeCriteriaCount = result?.data?.criteriaXCriteriaForms?.filter(x => x.isDeleted === false)?.length ?? 0;
 
         if (Object.keys(answers).length < activeCriteriaCount) {
