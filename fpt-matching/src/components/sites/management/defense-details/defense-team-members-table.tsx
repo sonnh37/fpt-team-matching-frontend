@@ -25,20 +25,30 @@ import {useCurrentRole} from "@/hooks/use-current-role";
 
 function DialogSaveChange({teamMemberUpdateDefense, stage} : {teamMemberUpdateDefense: TeamMemberUpdateDefenseCommand[], stage:number}) {
     const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState<boolean>(false);
     const handleSaveChange = async () => {
         setLoading(true)
-        const response = await teammemberService.updateDefenseByManager({teamMemberUpdate: teamMemberUpdateDefense, stage})
-        if (response && response.status == 1){
-            toast.success("Successfully updated");
-        } else{
-            toast.error(response.message);
+        try {
+            const response = await teammemberService.updateDefenseByManager({teamMemberUpdate: teamMemberUpdateDefense, stage})
+            if (response && response.status == 1){
+                toast.success("Successfully updated");
+            } else{
+                toast.error(response.message);
+            }
+        } catch (e) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            toast.error(e.message);
         }
-        setLoading(false)
+        finally {
+            setLoading(false);
+            setOpen(false);
+        }
     }
     return (
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className={"w-[10vw]"} variant="default">Lưu thông tin</Button>
+                <Button onClick={() => {setOpen(true)}} className={"w-[10vw]"} variant="default">Lưu thông tin</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
@@ -115,7 +125,7 @@ export default function DefenseTeamMembersTable({sinhViens, stage}: {sinhViens: 
                             <TableRow className={"items-center"} key={sinhVien.id}>
                                 <TableCell aria-readonly={true} className={"text-center"}>{index + 1}</TableCell>
                                 <TableCell aria-readonly={true} className={"text-center"}>{sinhVien.user?.code}</TableCell>
-                                <TableCell aria-readonly={true} className={"text-center"}>{sinhVien.user && sinhVien.user.firstName! + sinhVien.user.lastName}</TableCell>
+                                <TableCell aria-readonly={true} className={"text-center"}>{sinhVien.user && sinhVien.user.lastName! + " " + sinhVien.user.firstName}</TableCell>
                                 <TableCell aria-readonly={true} className="text-center">
                                     {MentorConclusionOptions[sinhVien.mentorConclusion!]?.replaceAll("_", " ")}
                                 </TableCell>
