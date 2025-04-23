@@ -123,15 +123,15 @@ function SkeletonCard() {
 function DialogFailCapstoneSchedules({open, setOpen, capstoneScheduleFails} :{open: boolean, setOpen: Dispatch<SetStateAction<boolean>>, capstoneScheduleFails: CapstoneScheduleExcelModels[]}){
     return (
         <Dialog open={open} onOpenChange={setOpen} >
-            <DialogContent>
+            <DialogContent className={"w-full"}>
                 <DialogHeader>
                     <DialogTitle>Danh sách những đề tài chưa được thêm</DialogTitle>
                     <DialogDescription>
                         Vui lòng kiểm tra lại
                     </DialogDescription>
                 </DialogHeader>
-                <DialogBody>
-                    <Table>
+                <DialogBody className={"w-full"}>
+                    <Table className={"w-full"}>
                         <TableCaption>Danh sách những đề tài chưa được thêm và lý do.</TableCaption>
                         <TableHeader>
                             <TableRow>
@@ -140,9 +140,9 @@ function DialogFailCapstoneSchedules({open, setOpen, capstoneScheduleFails} :{op
                                 <TableHead>Lý do</TableHead>
                             </TableRow>
                         </TableHeader>
-                        <TableBody>
+                        <TableBody className={"w-full"}>
                             {capstoneScheduleFails.map((failCapstone) => (
-                                <TableRow key={failCapstone.stt}>
+                                <TableRow className={"w-full"} key={failCapstone.stt}>
                                     <TableCell className="font-medium">{failCapstone.stt}</TableCell>
                                     <TableCell>{failCapstone.topicCode}</TableCell>
                                     <TableCell>{failCapstone.reason}</TableCell>
@@ -270,7 +270,7 @@ const Page = () => {
     }
 
     return !loading ? (
-        <div>
+        <div className={"w-full"}>
 
             {capstoneFails.length > 0 && <DialogFailCapstoneSchedules capstoneScheduleFails={capstoneFails} open={failOpen} setOpen={setFailOpen} />}
             {currentSemester && capstoneSchedule.length == 0 ? (

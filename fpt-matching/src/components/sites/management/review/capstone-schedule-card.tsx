@@ -10,13 +10,48 @@ export function CapstoneScheduleCard({capstoneSchedule} : {capstoneSchedule: Cap
     const pathName = usePathname()
     const router = useRouter()
     console.log(capstoneSchedule)
+    console.log(capstoneSchedule.project?.teamMembers.some(x => x.status == TeamMemberStatus.Pending || x.status == TeamMemberStatus.InProgress || TeamMemberStatus.Fail1 || TeamMemberStatus.Pass1))
     return (
         <Card className="w-[25vw]">
             <CardHeader className={"flex flex-row justify-between items-center"}>
                 <CardTitle>Defense {capstoneSchedule.stage}</CardTitle>
                 <div>
-                    {capstoneSchedule.project?.teamMembers.some(x => x.status == TeamMemberStatus.Fail1) || capstoneSchedule.project?.teamMembers.some(x => x.status == TeamMemberStatus.Fail2)
-                        ? <Badge variant={"destructive"}>Fail</Badge>  : capstoneSchedule.project?.teamMembers.some(x => x.status == TeamMemberStatus.Pass1 || x.status == TeamMemberStatus.Pass2) ? <Badge className={"bg-green-500"} variant={"outline"}>Pass</Badge> : <Badge  variant={"outline"}>Not yet</Badge>}
+                    {capstoneSchedule.stage === 1 ? (
+                        capstoneSchedule.project?.teamMembers.some(
+                            x =>
+                                x.status === TeamMemberStatus.Pending ||
+                                x.status === TeamMemberStatus.InProgress
+                        ) ? (
+                            <Badge variant="outline">Not yet</Badge>
+                        ) : capstoneSchedule.project?.teamMembers.some(
+                            x => x.status !== TeamMemberStatus.Pass1
+                        ) ? (
+                            <Badge variant="destructive">Fail</Badge>
+                        ) : (
+                            <Badge className="bg-green-500" variant="outline">Pass</Badge>
+                        )
+                    ) : capstoneSchedule.stage === 2 ? (
+                        capstoneSchedule.project?.teamMembers.some(
+                            x =>
+                                x.status === TeamMemberStatus.Pending ||
+                                x.status === TeamMemberStatus.InProgress ||
+                                x.status === TeamMemberStatus.Fail1 ||
+                                x.status === TeamMemberStatus.Pass1
+                        ) ? (
+                            <Badge variant="outline">Not yet</Badge>
+                        ) : capstoneSchedule.project?.teamMembers.some(
+                            x => x.status !== TeamMemberStatus.Pass2
+                        ) ? (
+                            <Badge variant="destructive">Fail</Badge>
+                        ) : (
+                            <Badge className="bg-green-500" variant="outline">Pass</Badge>
+                        )
+                    ) : (
+                        <div></div>
+                    )}
+
+                    {/*{capstoneSchedule.project?.teamMembers.some(x => x.status == TeamMemberStatus.Fail1) || capstoneSchedule.project?.teamMembers.some(x => x.status == TeamMemberStatus.Fail2)*/}
+                    {/*    ? <Badge variant={"destructive"}>Fail</Badge>  : capstoneSchedule.project?.teamMembers.some(x => x.status == TeamMemberStatus.Pass1 || x.status == TeamMemberStatus.Pass2) ? <Badge className={"bg-green-500"} variant={"outline"}>Pass</Badge> : <Badge  variant={"outline"}>Not yet</Badge>}*/}
                 </div>
             </CardHeader>
             <CardContent className={"flex flex-col gap-2"}>
