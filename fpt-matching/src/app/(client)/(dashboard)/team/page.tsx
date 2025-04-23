@@ -43,7 +43,7 @@ import { TeamMemberRole } from "@/types/enums/team-member";
 import { ProjectUpdateCommand } from "@/types/models/commands/projects/project-update-command";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {  useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Pencil, Save, Trash, Users, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -51,6 +51,7 @@ import { toast } from "sonner";
 import UpdateProjectTeam from "../idea/updateidea/page";
 import { TeamMember } from "@/types/team-member";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { ProjectStatus } from "@/types/enums/project";
 
 export default function TeamInfo() {
   //lay thong tin tu redux luc dang nhap
@@ -90,6 +91,14 @@ export default function TeamInfo() {
   const project = result?.data;
   if (!project) return <NoTeam />;
   const isLockProject = project.idea != undefined ? true : false;
+
+  //check xem có file không và lấy ra file mới nhất
+  const latestTopicVersion = (project.topic?.topicVersions ?? [])
+    .filter((x) => x.createdDate)
+    .sort(
+      (a, b) =>
+        new Date(b.createdDate!).getTime() - new Date(a.createdDate!).getTime()
+    )[0];
 
   const handleSave = async () => {
     // Gọi API để lưu tên mới ở đây
@@ -360,7 +369,7 @@ export default function TeamInfo() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-6">
-              {project.topic.ideaVersion != null ? (
+              {project.topic && project.topic.ideaVersion ? (
                 <>
                   {/* Team Description */}
                   {project?.topic.ideaVersion?.description && (
@@ -458,11 +467,11 @@ export default function TeamInfo() {
                               Tệp đính kèm
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.topic.ideaVersion.file ? (
+                              {project.topic?.topicVersions?.length > 0 && latestTopicVersion?.fileUpdate ? (
                                 <a
-                                  href={project.topic.ideaVersion.file}
                                   className="text-blue-500 underline"
                                   target="_blank"
+                                  href={latestTopicVersion.fileUpdate}
                                 >
                                   Xem file
                                 </a>
@@ -471,6 +480,7 @@ export default function TeamInfo() {
                               )}
                             </TypographyP>
                           </div>
+
 
                           {/* Enterprise */}
                           <div className="space-y-1">
@@ -563,9 +573,8 @@ export default function TeamInfo() {
                 </div>
                 <div className="space-y-3">
                   {sortedMembers.map((member: TeamMember, index) => {
-                    const initials = `${
-                      member.user?.lastName?.charAt(0).toUpperCase() || ""
-                    }`;
+                    const initials = `${member.user?.lastName?.charAt(0).toUpperCase() || ""
+                      }`;
                     const isLeaderInMembers =
                       member.role === TeamMemberRole.Leader;
 
@@ -649,7 +658,7 @@ export default function TeamInfo() {
             <CardContent className="flex mt-4 flex-col justify-center items-center gap-1">
               <TypographyP>Nộp đăng ký đề tài</TypographyP>
               <TypographyMuted>
-                Lưu ý: Đề tài được nộp nên được thông qua bởi các thành viên trong nhóm
+                Lưu ý: Đề tài được nộp nên được thông qua bởi các thành viên trong nhóm,nếu nộp thì sẽ không còn chỉnh sửa nữa
               </TypographyMuted>
               <Button className={"mt-8 min-w-40"} asChild>
                 <Link href={"/team/submit"}>Nộp đề tài</Link>
@@ -658,7 +667,10 @@ export default function TeamInfo() {
           </Card>
         </div>
 
-        <div className="space-y-2">
+       
+
+       {(result?.data?.status == ProjectStatus.Pending && result?.data?.topicId) &&   
+       <div className="space-y-2">
           <TypographyH4>Xin đề tài từ giảng viên</TypographyH4>
           <Card>
             <CardContent className="flex mt-4 flex-col justify-center items-center gap-4">
@@ -666,13 +678,15 @@ export default function TeamInfo() {
               <TypographyMuted>
                 Lưu ý: Khi nộp đơn xin đề tài nên có sự đồng ý của thành viên trong nhóm
               </TypographyMuted>
-              {}
+     
               <Button asChild>
                 <Link href={"/idea/supervisors"}>Xem danh sách đề tài</Link>
               </Button>
             </CardContent>
           </Card>
-        </div>
+        </div> }
+      
+
 
         <div className="space-y-2">
           <TypographyH4>Đánh giá thành viên nhóm</TypographyH4>
@@ -683,24 +697,24 @@ export default function TeamInfo() {
                 Lưu ý: Chỉ được đánh giá sau ngày review 3, và phải nộp trước ngày bảo vệ 1 tuần
               </TypographyMuted>
               {
-
-                project.reviews.filter(x => x.number == 3)[0].reviewDate != null ?
-                    new Date(new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTime()+new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTimezoneOffset()*60*1000) < new Date(Date.now()) ?
-                        (
-                            <Button>
-                              <Link href={"/team/rate"}>Đánh giá thành viên</Link>
-                            </Button>
-                        ):
-                        (
-                            <Button disabled={true}>
-                              Đánh giá thành viên
-                            </Button>
-                        ):
+                project.reviews.filter(x => x.number == 3)[0] &&
+                  project.reviews.filter(x => x.number == 3)[0].reviewDate != null ?
+                  new Date(new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTime() + new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTimezoneOffset() * 60 * 1000) < new Date(Date.now()) ?
                     (
-                        <Button disabled={true}>
-                          Đánh giá thành viên
-                        </Button>
-                    )
+                      <Button>
+                        <Link href={"/team/rate"}>Đánh giá thành viên</Link>
+                      </Button>
+                    ) :
+                    (
+                      <Button disabled={true}>
+                        Đánh giá thành viên
+                      </Button>
+                    ) :
+                  (
+                    <Button disabled={true}>
+                      Đánh giá thành viên
+                    </Button>
+                  )
               }
             </CardContent>
           </Card>
