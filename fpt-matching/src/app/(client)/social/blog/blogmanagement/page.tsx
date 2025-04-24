@@ -575,7 +575,7 @@ export default function Blogmanagement() {
                                                                                 hour: "2-digit",
                                                                                 minute: "2-digit"
                                                                             })
-                                                                            : "Không có ngày "}
+                                                                            : "Không có ngày "} <span> </span>
                                                                         <FontAwesomeIcon icon={faEarthAmericas} />
                                                                     </p>
 
