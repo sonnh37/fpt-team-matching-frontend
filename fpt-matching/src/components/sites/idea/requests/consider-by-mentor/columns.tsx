@@ -214,7 +214,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-row gap-2">
       <Dialog>
         <DialogTrigger asChild>
           <Button size="sm" variant="default">

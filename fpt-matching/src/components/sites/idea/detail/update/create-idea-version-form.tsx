@@ -1,35 +1,40 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { FileUpload } from "@/components/ui/file-upload";
-import { useState } from "react";
-import { toast } from "sonner";
+import { useCurrentRole } from "@/hooks/use-current-role";
+import { fileUploadService } from "@/services/file-upload-service";
+import { ideaVersionService } from "@/services/idea-version-service";
 import { Idea } from "@/types/idea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { IdeaVersion } from "@/types/idea-version";
+import { IdeaVersionCreateForResubmit } from "@/types/models/commands/idea-versions/idea-version-create-for-resubmit-command";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FileText, Upload, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const createVersionSchema = z.object({
   version: z.number().min(1, { message: "Version must be at least 1" }),
   vietNamName: z.string().min(1, { message: "Vietnamese name is required" }),
-  englishName: z.string().optional(),
-  abbreviations: z.string().optional(),
+  englishName: z.string(),
+  abbreviations: z.string(),
   enterpriseName: z.string().optional(),
-  teamSize: z.number().min(1, { message: "Team size must be at least 1" }).optional(),
+  teamSize: z.number().min(4, { message: "Team size must be at least 4" }),
+
   description: z.string().min(1, { message: "Description is required" }),
-  file: z.string().url().optional(),
+  file: z.instanceof(File).optional(),
 });
 
 type CreateVersionFormValues = z.infer<typeof createVersionSchema>;
@@ -38,8 +43,11 @@ interface CreateVersionFormProps {
   idea: Idea;
   onSuccess: () => void;
   onCancel?: () => void;
-  initialData?: Partial<IdeaVersion>;
+  initialData?: IdeaVersion;
 }
+
+const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export const CreateVersionForm = ({
   idea,
@@ -47,36 +55,95 @@ export const CreateVersionForm = ({
   onCancel,
   initialData,
 }: CreateVersionFormProps) => {
+  const currentRole = useCurrentRole();
+  const isStudent = currentRole === "Student";
   const [isLoading, setIsLoading] = useState(false);
+  const [currentFile, setCurrentFile] = useState<File | string | undefined>(
+    initialData?.file ? initialData.file : undefined
+  );
 
   const form = useForm<CreateVersionFormValues>({
     resolver: zodResolver(createVersionSchema),
     defaultValues: {
-      version: initialData?.version || idea.ideaVersions.length + 1,
+      version: (initialData?.version ?? 0) + 1,
       vietNamName: initialData?.vietNamName || "",
       englishName: initialData?.englishName || "",
       abbreviations: initialData?.abbreviations || "",
       enterpriseName: initialData?.enterpriseName || "",
       teamSize: initialData?.teamSize || undefined,
       description: initialData?.description || "",
-      file: initialData?.file || undefined,
+      file: undefined,
     },
   });
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(`.${fileExtension}`)) {
+      toast.error(`Chỉ chấp nhận file: ${ALLOWED_EXTENSIONS.join(", ")}`);
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error(`Dung lượng file tối đa ${MAX_FILE_SIZE / (1024 * 1024)}MB`);
+      return;
+    }
+
+    setCurrentFile(file);
+    form.setValue("file", file);
+  };
+
+  const removeFile = () => {
+    setCurrentFile(undefined);
+    form.setValue("file", undefined);
+  };
+
   const handleSubmit = async (values: CreateVersionFormValues) => {
     try {
+      if (idea.isEnterpriseTopic) {
+        values.enterpriseName = undefined;
+      }
+
       setIsLoading(true);
-      onSuccess();
-      toast.success("Idea version created successfully");
+
+      let fileUrl = "";
+      if (currentFile instanceof File) {
+        const res_ = await fileUploadService.uploadFile(
+          currentFile,
+          "IdeaVersion"
+        );
+        if (res_.status !== 1) return toast.error(res_.message);
+        fileUrl = res_.data ?? "";
+      } else if (typeof currentFile === "string") {
+        fileUrl = currentFile;
+      }
+
+      if (isStudent) {
+        const command: IdeaVersionCreateForResubmit = {
+          ...values,
+          ideaId: idea.id,
+          file: fileUrl,
+        };
+
+        const res = await ideaVersionService.createVersion(command);
+        if (res.status === 1) {
+          toast.success(res.message);
+          return onSuccess();
+        }
+        toast.error(res.message);
+      }
     } catch (error) {
       toast.error("Failed to create idea version", {
-        description: error instanceof Error ? error.message : "An unknown error occurred",
+        description:
+          error instanceof Error ? error.message : "An unknown error occurred",
       });
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -109,6 +176,8 @@ export const CreateVersionForm = ({
                 <FormControl>
                   <Input
                     {...field}
+                    max={6}
+                    min={4}
                     type="number"
                     onChange={(e) => field.onChange(parseInt(e.target.value))}
                     disabled={isLoading}
@@ -174,23 +243,25 @@ export const CreateVersionForm = ({
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="enterpriseName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Enterprise Name</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Enter enterprise name"
-                  disabled={isLoading}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {idea.isEnterpriseTopic && (
+          <FormField
+            control={form.control}
+            name="enterpriseName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Enterprise Name</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Enter enterprise name"
+                    disabled={isLoading}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}
@@ -216,21 +287,57 @@ export const CreateVersionForm = ({
           name="file"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Attachment</FormLabel>
+              <FormLabel>Tài liệu Dự án</FormLabel>
               <FormControl>
-                <FileUpload
-                  value={field.value}
-                  onChange={field.onChange}
-                  accept=".pdf,.doc,.docx,.ppt,.pptx"
-                  maxSize={5 * 1024 * 1024} // 5MB
-                  disabled={isLoading}
-                />
+                <div className="space-y-2">
+                  {currentFile ? (
+                    <div className="flex items-center justify-between p-3 border rounded-md bg-muted/50">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm font-medium">
+                          {typeof currentFile === "string"
+                            ? currentFile.split("/").pop()
+                            : currentFile.name}
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={removeFile}
+                        disabled={isLoading}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <label
+                        htmlFor="file-upload"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-md border border-dashed p-4 hover:bg-muted/50 cursor-pointer"
+                      >
+                        <Upload className="h-5 w-5 text-muted-foreground" />
+                        <span className="text-sm font-medium">Chọn tệp</span>
+                        <input
+                          id="file-upload"
+                          type="file"
+                          onChange={handleFileChange}
+                          className="hidden"
+                          accept={ALLOWED_EXTENSIONS.join(",")}
+                        />
+                      </label>
+                    </div>
+                  )}
+                </div>
               </FormControl>
+              <FormDescription>
+                Định dạng chấp nhận: {ALLOWED_EXTENSIONS.join(", ")} (tối đa
+                10MB)
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-
         <div className="flex justify-end gap-4">
           {onCancel && (
             <Button
@@ -239,11 +346,11 @@ export const CreateVersionForm = ({
               onClick={onCancel}
               disabled={isLoading}
             >
-              Cancel
+              Hủy
             </Button>
           )}
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Processing..." : "Create Version"}
+            {isLoading ? "Processing..." : "Xác nhận nộp lại"}
           </Button>
         </div>
       </form>

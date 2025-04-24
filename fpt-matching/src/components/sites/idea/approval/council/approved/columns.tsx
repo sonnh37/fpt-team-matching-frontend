@@ -16,6 +16,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -34,7 +39,7 @@ import { IdeaVersionRequestUpdateStatusCommand } from "@/types/models/commands/i
 import { User } from "@/types/user";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { ListChecks, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -43,6 +48,7 @@ import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
+import Link from "next/link";
 
 export const columns: ColumnDef<IdeaVersionRequest>[] = [
   {
@@ -120,6 +126,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
   const ideaId = row.original.ideaVersion?.ideaId;
+  const ideaVersionRequest = row.original;
   const [open, setOpen] = useState(false);
 
   const user = useSelector((state: RootState) => state.user.user);
@@ -146,15 +153,27 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   }
 
   const idea = result?.data ?? ({} as Idea);
+  const highestVersion =
+    idea.ideaVersions.length > 0
+      ? idea.ideaVersions.reduce((prev, current) =>
+          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+        )
+      : undefined;
+
+  const ideaVersionCurrent = idea.ideaVersions.find(
+    (m) => m.id == ideaVersionRequest.ideaVersionId
+  );
+  const hasCouncilRequests = ideaVersionCurrent?.ideaVersionRequests.some(
+    (request) => request.role == "Council"
+  );
   const handleSubmit = async () => {
     try {
-      if (!ideaId) throw new Error("Idea ID is required");
       const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
-        ideaId
+        highestVersion?.id
       );
-      if (res.status != 1) throw new Error(res.message);
+      if (res.status != 1) return toast.error(res.message);
 
-      toast.success("Submitted to council!");
+      toast.success(res.message);
 
       queryClient.refetchQueries({
         queryKey: ["getIdeaDetailWhenClick", ideaId],
@@ -171,26 +190,48 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     <div className="flex flex-col gap-2">
       <>
         <div className="flex gap-2">
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button
-                size="sm"
-                variant={"default"}
-                // disabled={hasCouncilRequests}
-              >
-                View
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Idea detail</DialogTitle>
-                <DialogDescription></DialogDescription>
-              </DialogHeader>
-              <div className="grid p-4 space-y-24">
-                <IdeaDetailForm idea={idea} />
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      variant={"default"}
+                      // disabled={hasCouncilRequests}
+                    >
+                      View 
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Idea detail</DialogTitle>
+                      <DialogDescription></DialogDescription>
+                    </DialogHeader>
+                    <div className="grid p-4 space-y-24">
+                      <IdeaDetailForm ideaId={idea.id} />
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
-            </DialogContent>
-          </Dialog>
+            </TooltipTrigger>
+
+            <TooltipContent>
+              <p>Xem nhanh</p>
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href={`/idea/reviews/council/${row.original.id}`} passHref>
+                <Button size="icon" variant="default">
+                  <ListChecks className="h-4 w-4" />
+                </Button>
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Xem lại đánh giá</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       </>
     </div>
