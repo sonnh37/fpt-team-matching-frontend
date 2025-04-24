@@ -91,7 +91,7 @@ export default function Page() {
                   <span className="flex items-center gap-2">
                     {tab_4}{" "}
                     {countIdeasByStatus(IdeaStatus.ConsiderByMentor) != 0 && (
-                      <Badge variant="secondary">
+                      <Badge >
                         {countIdeasByStatus(IdeaStatus.ConsiderByMentor)}
                       </Badge>
                     )}
@@ -101,7 +101,7 @@ export default function Page() {
                   <span className="flex items-center gap-2">
                     {tab_5}{" "}
                     {countIdeasByStatus(IdeaStatus.ConsiderByCouncil) != 0 && (
-                      <Badge variant="secondary">
+                      <Badge>
                         {countIdeasByStatus(IdeaStatus.ConsiderByCouncil)}
                       </Badge>
                     )}
@@ -111,7 +111,7 @@ export default function Page() {
                   <span className="flex items-center gap-2">
                     {tab_2}{" "}
                     {countIdeasByStatus(IdeaStatus.Approved) != 0 && (
-                      <Badge variant="default">
+                      <Badge>
                         {countIdeasByStatus(IdeaStatus.Approved)}
                       </Badge>
                     )}

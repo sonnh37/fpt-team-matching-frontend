@@ -111,13 +111,16 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   }
 
   const project = result?.data;
-  const IsExistedIdea = project?.idea ? true : false;
+ 
+  const isHasTopic = project?.topicId ? true : false;
+
   let availableSlots = 6;
-  if (!IsExistedIdea) {
+  if (!isHasTopic) {
     availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
   } else {
     availableSlots =
-      (project?.idea?.maxTeamSize ?? 0) - (project?.teamMembers.length ?? 0);
+      (project?.topic?.ideaVersion?.teamSize ?? 0) -
+      (project?.teamMembers?.length ?? 0);
   }
 
   const handleCancel = async () => {

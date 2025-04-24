@@ -11,11 +11,11 @@ export interface IdeaVersion extends BaseEntity {
   enterpriseName?: string;
   teamSize?: number;
   file?: string;
-  idea?: Idea;
   vietNamName?: string;
   description?: string;
   abbreviations?: string;
   englishName?: string;
+  idea?: Idea;
   stageIdea?: StageIdea;
   topic?: Topic;
   ideaVersionRequests: IdeaVersionRequest[];

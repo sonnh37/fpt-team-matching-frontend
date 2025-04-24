@@ -35,6 +35,7 @@ import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -44,12 +45,13 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
-      const highestVersion = idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
       return highestVersion ? `v${highestVersion.version}` : "-";
     },
   },
@@ -60,14 +62,14 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
+      if (!idea.ideaVersions) return;
       const highestVersion =
-      idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
-      return highestVersion?.englishName || "-"
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion?.englishName || "-";
     },
   },
   {
@@ -77,13 +79,14 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
-      const highestVersion = idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
-      
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+
       return highestVersion?.stageIdea?.semester?.semesterName || "-";
     },
   },
@@ -94,13 +97,14 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
-      const highestVersion = idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
-      
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+
       return highestVersion?.stageIdea?.stageNumber || "-";
     },
   },
@@ -110,9 +114,9 @@ export const columns: ColumnDef<Idea>[] = [
       <DataTableColumnHeader column={column} title="Date created" />
     ),
     cell: ({ row }) => {
-        const date = new Date(row.getValue("createdDate"));
-        return formatDate(date)
-      },
+      const date = new Date(row.getValue("createdDate"));
+      return formatDate(date);
+    },
   },
   {
     accessorKey: "status",
@@ -162,17 +166,18 @@ interface ActionsProps {
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
+  const router = useRouter();
   const initialFeedback = row.getValue("content") as string;
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const role = useCurrentRole();
   const idea = row.original;
   const highestVersion =
-      idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
+    idea.ideaVersions.length > 0
+      ? idea.ideaVersions.reduce((prev, current) =>
+          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+        )
+      : undefined;
   const hasMentorApproval = highestVersion?.ideaVersionRequests.some(
     (request) =>
       (request.status === IdeaVersionRequestStatus.Approved ||
@@ -207,14 +212,13 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       setIsDeleting(false);
     }
   };
-  
 
   return (
     <div className="flex flex-col gap-2">
       <Dialog>
         <DialogTrigger asChild>
           <Button size="sm" variant="default">
-            View
+            Xem nhanh
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
@@ -226,7 +230,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <HorizontalLinearStepper idea={idea} />
           </div>
           <div className="p-4 gap-4">
-            <IdeaDetailForm idea={idea} />
+            <IdeaDetailForm ideaId={idea.id} />
           </div>
           <DialogFooter>
             <Tooltip>
@@ -271,6 +275,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Button size="sm" onClick={() => router.push(`/idea/request/${idea.id}`)} variant="default">
+        Chi tiết
+      </Button>
     </div>
   );
 };

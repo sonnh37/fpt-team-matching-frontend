@@ -27,9 +27,9 @@ interface TableComponentProps<TData> {
   isEnableHeader?: boolean;
   isLoading?: boolean;
   className?: string;
+  height?: number;
   restore?: (command: UpdateCommand) => Promise<BusinessResult<any>>;
   deletePermanent?: (id: string) => Promise<BusinessResult<null>>;
-  offsetHeight?: number; // Thêm prop để điều chỉnh khoảng cách từ các phần tử khác trên trang
 }
 
 export function DataTableComponent<TData>({
@@ -39,7 +39,7 @@ export function DataTableComponent<TData>({
   restore,
   deletePermanent,
   isEnableHeader = true,
-  offsetHeight = 64, // Giá trị mặc định (tính bằng pixel)
+  height = 300,
 }: TableComponentProps<TData>) {
   const queryClient = useQueryClient();
   const tableRef = React.useRef<HTMLDivElement>(null);
@@ -60,22 +60,22 @@ export function DataTableComponent<TData>({
         // Tính toán chiều cao khả dụng
         const windowHeight = window.innerHeight;
         const spaceAbove = rect.top;
-        const marginBottom = 32; // Khoảng cách an toàn phía dưới
+        const marginBottom = 32; 
+        const offsetHeight = 64;
 
         const availableHeight =
           windowHeight - spaceAbove - offsetHeight - marginBottom;
 
         // Đặt chiều cao tối thiểu là 300px và tối đa là 90vh
-        const height = Math.min(
-          Math.max(availableHeight, 300),
+        const heightTable = Math.min(
+          Math.max(availableHeight, height),
           windowHeight * 0.9
         );
 
-        setTableHeight(`${height}px`);
+        setTableHeight(`${heightTable}px`);
       }
     };
 
-    // Sử dụng ResizeObserver để theo dõi thay đổi layout
     const resizeObserver = new ResizeObserver(() => {
       calculateHeight();
     });
@@ -85,7 +85,6 @@ export function DataTableComponent<TData>({
       resizeObserver.observe(tableRef.current);
     }
 
-    // Thêm event listener khi resize window
     window.addEventListener("resize", calculateHeight);
 
     return () => {
@@ -94,7 +93,7 @@ export function DataTableComponent<TData>({
         resizeObserver.unobserve(tableRef.current);
       }
     };
-  }, [offsetHeight]);
+  }, []);
 
   const handleRestore = async (model: any) => {
     if (restore) {
@@ -133,36 +132,36 @@ export function DataTableComponent<TData>({
     <div ref={tableRef} className="rounded-md border overflow-hidden relative">
       <ScrollArea style={{ height: tableHeight }} className="w-full">
         <Table className={cn("w-full", className)}>
-          {/* Sticky Header với border hoàn chỉnh */}
-          <TableHeader className="sticky top-0 z-10 bg-background border-b">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow
-                key={headerGroup.id}
-                style={{
-                  transformOrigin: "left",
-                }}
-              >
-                {headerGroup.headers.map((header) => (
-                  <TableHead
-                    key={header.id}
-                    style={{
-                      width: header.getSize(),
-                      minWidth: header.column.columnDef.minSize,
-                      maxWidth: header.column.columnDef.maxSize,
-                    }}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                  </TableHead>
-                ))}
-              </TableRow>
-            ))}
-          </TableHeader>
-
+          {isEnableHeader && (
+            <TableHeader className="sticky top-0 z-10 bg-background border-b">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow
+                  key={headerGroup.id}
+                  style={{
+                    transformOrigin: "left",
+                  }}
+                >
+                  {headerGroup.headers.map((header) => (
+                    <TableHead
+                      key={header.id}
+                      style={{
+                        width: header.getSize(),
+                        minWidth: header.column.columnDef.minSize,
+                        maxWidth: header.column.columnDef.maxSize,
+                      }}
+                    >
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
+                </TableRow>
+              ))}
+            </TableHeader>
+          )}
           <TableBody>
             {isLoading ? (
               <TableRow>

@@ -226,7 +226,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <HorizontalLinearStepper idea={idea} />
           </div>
           <div className="p-4 gap-4">
-            <IdeaDetailForm idea={idea} />
+            <IdeaDetailForm ideaId={idea.id}  />
           </div>
           <DialogFooter>
             <Tooltip>
