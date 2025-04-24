@@ -7,6 +7,9 @@ import ChatMessageInput from "@/components/chat/ChatMessageInput";
 import {ConversationMemberInfo} from "@/types/conversation-member-info";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {Badge} from "@/components/ui/badge";
+import {Minus} from "lucide-react";
 const ChatRoom = ({setLoadMessage, conn, messages, setMessages, chatRoom, loadMessage} : {setLoadMessage: Dispatch<SetStateAction<boolean>>, conn: HubConnection, messages: MessageModel[], setMessages: any, chatRoom: ConversationMemberInfo | undefined, loadMessage: boolean}) => {
     const [pageNumber, setPageNumber] = useState(1)
     const [hasMore, setHasMore] = useState(true);
@@ -66,17 +69,33 @@ const ChatRoom = ({setLoadMessage, conn, messages, setMessages, chatRoom, loadMe
             console.error(error);
         }
     }
+    const router = useRouter()
     return (
         <div className={""}>
-            <div className={"mt-2"}>
-                <div className={"w-full bg-white min-h-[10vh] leading-[5rem] font-bold text-lg pl-8 flex items-center gap-4"}>
-                    <Avatar>
-                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <Link className={"hover:bg-gray-100 rounded-md px-4"} href={`/social/blog/profile-social/${chatRoom?.partnerInfoResults.id}`}>{chatRoom?.partnerInfoResults.lastName + " " + chatRoom?.partnerInfoResults.firstName}</Link>
-                </div>
-            </div>
+            {
+                chatRoom && (
+                    <div className={"mt-2"}>
+                        <div className={"w-full bg-white min-h-[10vh] leading-[5rem] font-bold text-lg pl-8 flex items-center gap-4"}>
+                            <Avatar>
+                                <AvatarImage src={chatRoom.partnerInfoResults.avatarUrl.trim() != null && chatRoom.partnerInfoResults.avatarUrl.trim() != "" ? chatRoom.partnerInfoResults.avatarUrl : "https://github.com/shadcn.png"} alt="@shadcn" />
+                                <AvatarFallback>CN</AvatarFallback>
+                            </Avatar>
+                            <div onClick={() => {
+                                router.push(`/social/blog/profile-social/${chatRoom?.partnerInfoResults.id}`)
+                            }} className={"hover:bg-gray-100 rounded-md px-4 flex flex-col gap-2 py-2 hover:cursor-pointer"}>
+                                <div className={"flex flex-row gap-2 items-center"}>
+                                   <div className={"leading-6"}>
+                                       {chatRoom?.partnerInfoResults.lastName + " " + chatRoom?.partnerInfoResults.firstName}
+                                   </div >
+                                    <Minus className={"text-black"} />
+                                    <div className={"leading-6"}>{chatRoom?.partnerInfoResults.code}</div>
+                                </div>
+                                    {chatRoom.partnerInfoResults.role.filter(x => x == "Student")[0] ? <Badge className={"bg-white border-black border-[1px] text-black hover:bg-black hover:text-white max-w-[4.8rem]"} >Sinh viên</Badge>: <Badge>Giảng viên</Badge>}
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
             <div className={"flex flex-col justify-between border-gray-200 border-[1px] rounded-md p-4"}>
                 {/*<MessageContainer containerRef={containerRef} scrollHandler={scrollHandler} lastHeight={lastHeight}  messages={messages} refer={lasMessageElementRef} />*/}
                 {/*<SendMessageForm sendMessage={sendMessage}  />*/}
