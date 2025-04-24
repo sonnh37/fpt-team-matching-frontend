@@ -2,6 +2,7 @@
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import { TypographyH3 } from "@/components/_common/typography/typography-h3";
+import { TypographyH4 } from "@/components/_common/typography/typography-h4";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { TypographySmall } from "@/components/_common/typography/typography-small";
@@ -56,7 +57,7 @@ import { useState } from "react";
 import { TbUsersPlus } from "react-icons/tb";
 import { toast } from "sonner";
 
-export default function TeamInfoDetail() {
+export default function ProjectDetail() {
   const { teamId } = useParams();
   if (!teamId) return null;
   const user = useSelectorUser();
@@ -65,6 +66,7 @@ export default function TeamInfoDetail() {
 
   const query: IdeaGetCurrentByStatusQuery = {
     status: IdeaStatus.Pending,
+    isPagination: false,
   };
 
   const queryClient = useQueryClient();
@@ -82,7 +84,7 @@ export default function TeamInfoDetail() {
 
   // Query: Thông tin project
   const {
-    data: teamInfo,
+    data: project,
     isLoading: isLoadingTeam,
     isError: isErrorTeam,
   } = useQuery({
@@ -90,6 +92,16 @@ export default function TeamInfoDetail() {
     queryFn: () =>
       projectService.getById(teamId!.toString()).then((res) => res.data),
     enabled: !!teamId,
+  });
+
+  const { data: idea } = useQuery({
+    queryKey: ["project", project?.topic?.ideaVersion?.ideaId],
+    queryFn: () =>
+      ideaService
+        .getById(project?.topic?.ideaVersion?.ideaId)
+        .then((res) => res.data),
+    enabled: !!project?.topic?.ideaVersion?.ideaId,
+    refetchOnWindowFocus: false,
   });
 
   // Query: Thông tin user hiện tại đã có project chưa
@@ -100,15 +112,15 @@ export default function TeamInfoDetail() {
 
   // Query: Kiểm tra xem user đã gửi yêu cầu vào team chưa
   const { data: isInvited } = useQuery({
-    queryKey: ["checkInvite", teamInfo?.id],
+    queryKey: ["checkInvite", project?.id],
     queryFn: () =>
       invitationService
-        .checkMemberProject((teamInfo?.id ?? "").toString())
+        .checkMemberProject((project?.id ?? "").toString())
         .then((res) => res.data),
-    enabled: !!teamInfo?.id,
+    enabled: !!project?.id,
   });
 
-  const teamMembers = teamInfo?.teamMembers?.filter((x) => !x.isDeleted) ?? [];
+  const teamMembers = project?.teamMembers?.filter((x) => !x.isDeleted) ?? [];
   const isCurrentUserInTeam = teamMembers.some(
     (x) => x.user?.email === user?.email
   );
@@ -120,8 +132,12 @@ export default function TeamInfoDetail() {
       : 0
   );
 
-  const hasIdea = !!teamInfo?.idea;
-  const maxTeamSize = hasIdea ? teamInfo.idea?.maxTeamSize ?? 6 : 6;
+  const isHasTopic = !!project?.topic;
+  const topic = project?.topic;
+  const ideaVersion = project?.topic?.ideaVersion;
+  const maxTeamSize = isHasTopic
+    ? project.topic?.ideaVersion?.teamSize ?? 6
+    : 6;
   const currentTeamSize = teamMembers.length;
   const availableSlots = Math.max(0, maxTeamSize - currentTeamSize);
 
@@ -161,8 +177,8 @@ export default function TeamInfoDetail() {
     }
   };
 
-  const cancelRequest = async (teamInfoId: string) => {
-    const result = await invitationService.cancelInvite(teamInfoId);
+  const cancelRequest = async (projectId: string) => {
+    const result = await invitationService.cancelInvite(projectId);
     if (result.status === 1) {
       // Hiển thị loading page
       toast.success("Bạn đã hủy thành công");
@@ -179,7 +195,6 @@ export default function TeamInfoDetail() {
     <div className="container pt-4 max-w-4xl">
       <div className="space-y-3">
         <div className="flex gap-3 items-center">
-          <TypographyH3>Team Details</TypographyH3>
           {canJoinTeam && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -187,7 +202,7 @@ export default function TeamInfoDetail() {
                   {isInvited ? (
                     <Button
                       variant="destructive"
-                      onClick={() => cancelRequest(teamInfo?.id || "")}
+                      onClick={() => cancelRequest(project?.id || "")}
                       className="gap-2"
                     >
                       Cancel Request
@@ -197,42 +212,36 @@ export default function TeamInfoDetail() {
                       <DialogTrigger asChild>
                         <Button disabled={hasPendingIdea} className="gap-2">
                           <TbUsersPlus className="h-4 w-4" />
-                          Join Team
+                          Tham gia
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
                           <DialogTitle>
-                            Join {teamInfo?.teamName || "this team"}?
+                            Tham gia {project?.teamName || "this team"}?
                           </DialogTitle>
                           <DialogDescription>
-                            You're about to send a join request to this team
+                            Đây là yêu cầu về việc tham gia nhóm
                           </DialogDescription>
                         </DialogHeader>
 
                         <div className="space-y-4 py-4">
-                          {teamInfo?.leader && (
+                          {project?.leader && (
                             <div className="flex items-center gap-2 text-sm">
                               <UserIcon className="h-4 w-4 opacity-70" />
                               <span>
-                                Team Leader:{" "}
-                                {teamInfo.leader.firstName ||
-                                  teamInfo.leader.email}
+                                Nhóm trưởng:{" "}
+                                {project.leader.firstName ||
+                                  project.leader.email}
                               </span>
                             </div>
-                          )}
-
-                          {teamInfo?.description && (
-                            <TypographyMuted className="text-sm italic">
-                              "{teamInfo.description}"
-                            </TypographyMuted>
                           )}
 
                           <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-md">
                             <Info className="h-4 w-4 mt-0.5 text-blue-600" />
                             <TypographySmall className="text-blue-700">
-                              Your request needs approval from the team leader
-                              before you can join.
+                              Yêu cầu này sẽ được gửi đến nhóm trưởng của bạn.
+                              Họ sẽ xem xét lời yêu cầu này.
                             </TypographySmall>
                           </div>
                         </div>
@@ -240,12 +249,12 @@ export default function TeamInfoDetail() {
                         <DialogFooter>
                           <DialogClose asChild>
                             <Button type="button" variant="outline">
-                              Cancel
+                              Hủy
                             </Button>
                           </DialogClose>
                           <Button
                             type="submit"
-                            onClick={() => requestJoinTeam(teamInfo?.id || "")}
+                            onClick={() => requestJoinTeam(project?.id || "")}
                             className="gap-2"
                             disabled={isLoading}
                           >
@@ -257,7 +266,7 @@ export default function TeamInfoDetail() {
                             ) : (
                               <>
                                 <TbUsersPlus />
-                                Confirm Join
+                                Xác định tham gia
                               </>
                             )}
                           </Button>
@@ -270,8 +279,8 @@ export default function TeamInfoDetail() {
               {hasPendingIdea && (
                 <TooltipContent>
                   <p>
-                    You have a pending idea, so you cannot request to join a
-                    team.
+                    Bạn có một ý tưởng đang chờ xử lý nên không thể yêu cầu tham
+                    gia nhóm.
                   </p>
                 </TooltipContent>
               )}
@@ -283,34 +292,24 @@ export default function TeamInfoDetail() {
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="text-2xl">{teamInfo?.teamName}</CardTitle>
+                <CardTitle className="text-2xl">{project?.teamName}</CardTitle>
                 <CardDescription className="mt-1">
-                  Created on {formatDate(teamInfo?.createdDate)}
+                  Được tạo ngày: {formatDate(project?.createdDate)}
                 </CardDescription>
               </div>
               <Badge variant="outline" className="text-sm">
-                {availableSlots} slot{availableSlots !== 1 ? "s" : ""} available
+               Còn {availableSlots} slot{availableSlots !== 1 ? "s" : ""}
               </Badge>
             </div>
           </CardHeader>
 
           <CardContent className="  space-y-6">
-            {/* Team Description */}
-            {teamInfo?.description && (
-              <div>
-                <h4 className="text-sm font-medium text-gray-500 mb-2">
-                  Description
-                </h4>
-                <p className="text-gray-700">{teamInfo.description}</p>
-              </div>
-            )}
-
             {/* Idea Information */}
-            {teamInfo?.idea && (
+            {isHasTopic && ideaVersion && (
               <>
                 <Separator />
                 <div>
-                  <h4 className="text-lg font-semibold mb-4">Project Idea</h4>
+                  <h4 className="text-lg font-semibold mb-4">Đề tài</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Abbreviations */}
                     <div className="space-y-1">
@@ -318,7 +317,7 @@ export default function TeamInfoDetail() {
                         Viết tắt
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.abbreviations || "-"}
+                        {ideaVersion.abbreviations || "-"}
                       </TypographyP>
                     </div>
 
@@ -328,7 +327,7 @@ export default function TeamInfoDetail() {
                         Tiếng Việt
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.vietNamName || "-"}
+                        {ideaVersion.vietNamName || "-"}
                       </TypographyP>
                     </div>
 
@@ -338,7 +337,7 @@ export default function TeamInfoDetail() {
                         Tiếng Anh
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.englishName || "-"}
+                        {ideaVersion.englishName || "-"}
                       </TypographyP>
                     </div>
 
@@ -348,7 +347,7 @@ export default function TeamInfoDetail() {
                         Mã đề tài
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.ideaCode || "-"}
+                        {topic?.topicCode || "-"}
                       </TypographyP>
                     </div>
 
@@ -358,8 +357,7 @@ export default function TeamInfoDetail() {
                         Ngành
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.specialty?.profession?.professionName ||
-                          "-"}
+                        {idea?.specialty?.profession?.professionName || "-"}
                       </TypographyP>
                     </div>
 
@@ -369,7 +367,7 @@ export default function TeamInfoDetail() {
                         Chuyên ngành
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.specialty?.specialtyName || "-"}
+                        {idea?.specialty?.specialtyName || "-"}
                       </TypographyP>
                     </div>
 
@@ -379,7 +377,7 @@ export default function TeamInfoDetail() {
                         Mô tả
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.description || "-"}
+                        {ideaVersion.description || "-"}
                       </TypographyP>
                     </div>
 
@@ -389,9 +387,9 @@ export default function TeamInfoDetail() {
                         Tệp đính kèm
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.file ? (
+                        {ideaVersion.file ? (
                           <a
-                            href={teamInfo.idea.file}
+                            href={ideaVersion.file}
                             className="text-blue-500 underline"
                             target="_blank"
                           >
@@ -409,17 +407,17 @@ export default function TeamInfoDetail() {
                         Đề tài doanh nghiệp
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.isEnterpriseTopic ? "Có" : "Không"}
+                        {idea?.isEnterpriseTopic ? "Có" : "Không"}
                       </TypographyP>
                     </div>
 
-                    {teamInfo.idea.isEnterpriseTopic && (
+                    {idea?.isEnterpriseTopic && (
                       <div className="space-y-1">
                         <TypographySmall className="text-muted-foreground">
                           Tên doanh nghiệp
                         </TypographySmall>
                         <TypographyP className="p-0">
-                          {teamInfo.idea.enterpriseName || "-"}
+                          {ideaVersion.enterpriseName || "-"}
                         </TypographyP>
                       </div>
                     )}
@@ -430,7 +428,7 @@ export default function TeamInfoDetail() {
                         Mentor
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.mentor?.email || "-"}
+                        {idea?.mentor?.email || "-"}
                       </TypographyP>
                     </div>
 
@@ -439,7 +437,7 @@ export default function TeamInfoDetail() {
                         Mentor phụ
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.subMentor?.email || "-"}
+                        {idea?.subMentor?.email || "-"}
                       </TypographyP>
                     </div>
 
@@ -449,7 +447,7 @@ export default function TeamInfoDetail() {
                         Trạng thái
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {IdeaStatus[teamInfo.idea.status ?? 0] || "-"}
+                        {IdeaStatus[idea?.status ?? 0] || "-"}
                       </TypographyP>
                     </div>
 
@@ -459,7 +457,7 @@ export default function TeamInfoDetail() {
                         Số lượng thành viên tối đa
                       </TypographySmall>
                       <TypographyP className="p-0">
-                        {teamInfo.idea.maxTeamSize || "-"}
+                        {ideaVersion?.teamSize || "-"}
                       </TypographyP>
                     </div>
                   </div>
@@ -470,7 +468,7 @@ export default function TeamInfoDetail() {
             {/* Team Members */}
             <Separator />
             <div>
-              <h4 className="text-lg font-semibold mb-4">Team Members</h4>
+              <h4 className="text-lg font-semibold mb-4">Các thành viên nhóm</h4>
               <div className="space-y-3">
                 {sortedMembers.map((member, index) => {
                   const initials = `${
