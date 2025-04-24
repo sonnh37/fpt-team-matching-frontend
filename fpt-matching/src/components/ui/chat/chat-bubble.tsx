@@ -76,8 +76,8 @@ const chatBubbleMessageVariants = cva("p-4", {
   variants: {
     variant: {
       received:
-        "bg-secondary text-secondary-foreground rounded-r-lg rounded-tl-lg",
-      sent: "bg-primary text-primary-foreground rounded-l-lg rounded-tr-lg",
+        "bg-[#eadef7] ext-black font-medium rounded-r-lg rounded-tl-lg",
+      sent: "bg-[#f5efdb] text-black font-medium rounded-l-lg rounded-tr-lg",
     },
     layout: {
       default: "",
@@ -188,6 +188,7 @@ const ChatBubbleActionWrapper = React.forwardRef<
     {children}
   </div>
 ));
+
 ChatBubbleActionWrapper.displayName = "ChatBubbleActionWrapper";
 
 export {
