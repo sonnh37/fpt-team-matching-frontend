@@ -56,6 +56,7 @@ import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { CreateVersionForm } from "./create-idea-version-form";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
+import { useCurrentRole } from "@/hooks/use-current-role";
 
 interface IdeaUpdateFormProps {
   ideaId?: string;
@@ -70,6 +71,7 @@ const createVersionSchema = z.object({
 type CreateVersionFormValues = z.infer<typeof createVersionSchema>;
 
 export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
+  const roleCurrent = useCurrentRole();
   const {
     data: idea,
     isLoading,
@@ -144,10 +146,11 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
       );
     }
 
-    const requests = version.ideaVersionRequests.filter(
-      (m) => m.role === "Mentor"
-    );
-
+    const requests =
+      roleCurrent === "Student"
+        ? version.ideaVersionRequests.filter((m) => m.role === "Mentor")
+        : version.ideaVersionRequests;
+        
     return (
       <div className="space-y-6">
         {/* Version Information Section */}

@@ -33,12 +33,15 @@ import { useQuery } from "@tanstack/react-query";
 import { ideaService } from "@/services/idea-service";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
+import { useCurrentRole } from "@/hooks/use-current-role";
 
 interface IdeaDetailFormProps {
   ideaId?: string;
 }
 
 export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
+  const roleCurrent = useCurrentRole();
+
   const {
     data: idea,
     isLoading,
@@ -93,9 +96,10 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
       );
     }
 
-    const requests = version.ideaVersionRequests.filter(
-      (m) => m.role === "Mentor"
-    );
+    const requests =
+      roleCurrent === "Student"
+        ? version.ideaVersionRequests.filter((m) => m.role === "Mentor")
+        : version.ideaVersionRequests;
 
     return (
       <div className="space-y-6">
@@ -270,13 +274,13 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
 
   return (
     <div className="space-y-6">
-      
-
       {/* Team & Mentorship Section */}
       <div className="space-y-3">
         <div className="flex items-center gap-2 text-lg font-semibold">
           <Users className="h-5 w-5" />
-          <h3>Thông tin chung <StatusBadge status={idea.status} /></h3>
+          <h3>
+            Thông tin chung <StatusBadge status={idea.status} />
+          </h3>
         </div>
         <Separator />
 

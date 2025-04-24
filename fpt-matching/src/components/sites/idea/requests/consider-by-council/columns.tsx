@@ -35,6 +35,7 @@ import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -162,6 +163,8 @@ interface ActionsProps {
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
+  const router = useRouter();
+
   const initialFeedback = row.getValue("content") as string;
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -210,11 +213,11 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-row gap-2">
       <Dialog>
         <DialogTrigger asChild>
           <Button size="sm" variant="default">
-            View
+            Xem nhanh
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
@@ -271,6 +274,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Button size="sm" onClick={() => router.push(`/idea/request/${idea.id}`)} variant="default">
+        Chi tiết
+      </Button>
     </div>
   );
 };

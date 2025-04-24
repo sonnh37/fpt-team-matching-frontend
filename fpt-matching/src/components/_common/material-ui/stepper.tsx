@@ -168,9 +168,10 @@ function ColorlibStepIcon(props: StepIconProps) {
     </ColorlibStepIconRoot>
   );
 }
+
 interface StepperProps {
   label: string;
-  status?: "pending" | "approved" | "rejected" | "skipped";
+  status?: "pending" | "approved" | "rejected" | "consider";
   optionalLabel?: string;
 }
 
@@ -186,119 +187,137 @@ export default function HorizontalLinearStepper({
   const user = useSelectorUser();
   if (!user) return null;
 
-  // State management
   const [activeStep, setActiveStep] = React.useState(0);
   const [steps, setSteps] = React.useState<StepperProps[]>([]);
+  const [averageScore, setAverageScore] = React.useState<number>(0);
 
-  // Derived data calculation
+  const getTodayUtcMidnight = () => {
+    const now = new Date();
+    const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return new Date(localMidnight.toISOString()); // Chuyển sang UTC
+  };
+
   const calculateStepData = useCallback(() => {
-    const highestVersion =
-      idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
-    if (!highestVersion) return <>Không có verson hiện tại</>;
+    const highestVersion = idea.ideaVersions.length > 0
+      ? idea.ideaVersions.reduce((prev, current) =>
+          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+        )
+      : undefined;
+    
+    if (!highestVersion) return { newSteps: [], newActiveStep: 0, averageScore: 0 };
 
     const ideaVersionRequests = highestVersion?.ideaVersionRequests || [];
-    const isStudent = user.userXRoles?.some(
-      (m) => m.role?.roleName === "Student"
-    );
-    const isLecturer = user.userXRoles?.some(
-      (m) => m.role?.roleName === "Lecturer"
-    );
+    const isStudent = user.userXRoles?.some(m => m.role?.roleName === "Student");
+    const isLecturer = user.userXRoles?.some(m => m.role?.roleName === "Lecturer");
     const resultDate = highestVersion?.stageIdea?.resultDate
       ? new Date(highestVersion.stageIdea.resultDate)
       : null;
       
-    const isResultDay = resultDate ? resultDate.getTime() <= Date.now() : false;
+      const todayUtcMidnight = getTodayUtcMidnight();
+const isResultDay = resultDate 
+  ? resultDate.getUTCFullYear() === todayUtcMidnight.getUTCFullYear() &&
+    resultDate.getUTCMonth() === todayUtcMidnight.getUTCMonth() &&
+    resultDate.getUTCDate() === todayUtcMidnight.getUTCDate()
+  : false;
 
-    const mentorApproval = ideaVersionRequests.find(
-      (req) => req.role === "Mentor"
-    );
-    const councilApprovals = ideaVersionRequests.filter(
-      (req) => req.role === "Council"
-    );
+console.log("check_date_result", resultDate?.getUTCDate())      
+console.log("check_date_new", todayUtcMidnight.getUTCDate())      
+    const mentorApproval = ideaVersionRequests.find(req => req.role === "Mentor");
+    const councilApprovals = ideaVersionRequests.filter(req => req.role === "Council");
 
-    const isMentorApproved =
-      mentorApproval?.status === IdeaVersionRequestStatus.Approved;
-    const isMentorRejected =
-      mentorApproval?.status === IdeaVersionRequestStatus.Rejected;
+    const totalCouncils = councilApprovals.length;
+    const MIN_REVIEWERS = 1;
+    const requiredReviewers = highestVersion?.stageIdea?.numberReviewer ?? MIN_REVIEWERS;
+    
+    let averageScore = 0;
+    let councilStatus: 'approved' | 'rejected' | 'pending' | 'consider' = 'pending';
+    
+    if (totalCouncils >= requiredReviewers) {
+      const totalApproved = councilApprovals.filter(
+        req => req.status === IdeaVersionRequestStatus.Approved
+      ).length;
+      const totalConsider = councilApprovals.filter(
+        req => req.status === IdeaVersionRequestStatus.Consider
+      ).length;
+      
+      const totalScore = (totalApproved * 1.0) + (totalConsider * 0.5);
+      averageScore = totalCouncils > 0 ? totalScore / totalCouncils : 0;
+      const APPROVAL_THRESHOLD = 0.5;
 
-    const totalCouncilApproved = councilApprovals.filter(
-      (req) => req.status === IdeaVersionRequestStatus.Approved
-    ).length;
-
-    const isCouncilApproved = isResultDay && totalCouncilApproved >= 2;
-    const isCouncilRejected =
-      isResultDay && !isCouncilApproved && councilApprovals.length > 0;
-
-    // Step configuration
-    const newSteps: StepperProps[] = [
-      {
-        label: "Create Idea",
-        status: "approved",
-      },
-      {
-        label: "Mentor Approval",
-        status: isMentorRejected
-          ? "rejected"
-          : isMentorApproved
-          ? "approved"
-          : "pending",
-        optionalLabel: isMentorRejected ? "Rejected" : undefined,
-      },
-      {
-        label: "Council Approval",
-        status: isCouncilRejected
-          ? "rejected"
-          : isCouncilApproved
-          ? "approved"
-          : "pending",
-        optionalLabel: isCouncilRejected ? "Rejected" : undefined,
-      },
-    ];
-
-    // Active step calculation
-    let newActiveStep = 0;
-    if (isLecturer && councilApprovals.length === 0) {
-      newActiveStep = 1;
-    } else if (isStudent) {
-      if (isMentorApproved && !isCouncilApproved) newActiveStep = 1;
       if (isResultDay) {
-        if (isCouncilApproved) newActiveStep = 2;
+        councilStatus = averageScore > APPROVAL_THRESHOLD 
+          ? 'approved' 
+          : averageScore < APPROVAL_THRESHOLD 
+            ? 'rejected' 
+            : 'consider';
       }
     }
 
-    return { newSteps, newActiveStep };
+    const newSteps: StepperProps[] = [
+      {
+        label: "Tạo ý tưởng",
+        status: "approved",
+      },
+      {
+        label: "Duyệt bởi người hướng dẫn",
+        status: mentorApproval?.status === IdeaVersionRequestStatus.Rejected
+          ? "rejected"
+          : mentorApproval?.status === IdeaVersionRequestStatus.Approved
+          ? "approved"
+          : "pending",
+        optionalLabel: mentorApproval?.status === IdeaVersionRequestStatus.Rejected 
+          ? "Đã từ chối" 
+          : undefined,
+      },
+      {
+        label: "Duyệt bởi hội đồng",
+        status: councilStatus,
+        optionalLabel: councilStatus === 'rejected' 
+          ? "Đã từ chối" 
+          : councilStatus === 'consider'
+          ? `Cần xem xét (Điểm: ${averageScore.toFixed(2)})`
+          : undefined,
+      },
+    ];
+
+    let newActiveStep = 0;
+    if (isLecturer) {
+      if (mentorApproval?.status === IdeaVersionRequestStatus.Approved) {
+        newActiveStep = councilApprovals.length > 0 ? 2 : 1;
+      }
+    } else if (isStudent) {
+      if (mentorApproval?.status === IdeaVersionRequestStatus.Approved) {
+        newActiveStep = isResultDay ? 2 : 1;
+      }
+    }
+
+    return { newSteps, newActiveStep, averageScore };
   }, [idea, user]);
 
-  // Effect for updating steps and active step
   React.useEffect(() => {
-    const { newSteps, newActiveStep } = calculateStepData();
+    const { newSteps, newActiveStep, averageScore } = calculateStepData();
     setSteps(newSteps);
     setActiveStep(newActiveStep);
+    setAverageScore(averageScore);
   }, [calculateStepData]);
 
-  // Render function remains the same
   return (
     <Box sx={{ width: "100%" }}>
       <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map((step, index) => {
           const stepProps: { completed?: boolean } = {};
-          const labelProps: { optional?: React.ReactNode; error?: boolean } =
-            {};
+          const labelProps: { optional?: React.ReactNode; error?: boolean } = {};
 
-          if (step.status === "rejected") {
+          if (step.status === "rejected" || step.status === "consider") {
             labelProps.optional = (
-              <Typography variant="caption" color="error">
-                {step.optionalLabel || "Rejected"}
+              <Typography variant="caption" color={step.status === "rejected" ? "error" : "warning"}>
+                {step.optionalLabel}
               </Typography>
             );
-            labelProps.error = true;
+            labelProps.error = step.status === "rejected";
           }
 
-          if (step.status === "approved") {
+          if (step.status === "approved" || step.status === "consider") {
             stepProps.completed = true;
           }
 
@@ -306,12 +325,11 @@ export default function HorizontalLinearStepper({
             <Step key={`${step.label}-${index}`} {...stepProps}>
               <StepLabel {...labelProps}>
                 {step.label}
-                {/* {idea.stageIdea?.resultDate && index === steps.length - 1 && (
-                  <Typography variant="caption" display="block">
-                    Deadline:{" "}
-                    {new Date(idea.stageIdea.resultDate).toLocaleDateString()}
+                {step.status === "consider" && (
+                  <Typography variant="caption" display="block" color="warning.main">
+                    Điểm: {averageScore.toFixed(2)}
                   </Typography>
-                )} */}
+                )}
               </StepLabel>
             </Step>
           );

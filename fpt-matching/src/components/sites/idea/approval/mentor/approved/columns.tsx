@@ -126,6 +126,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
   const ideaId = row.original.ideaVersion?.ideaId;
+  const ideaVersionRequest = row.original;
   const [open, setOpen] = useState(false);
 
   const user = useSelector((state: RootState) => state.user.user);
@@ -158,8 +159,12 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
         )
       : undefined;
-  const hasCouncilRequests = highestVersion?.ideaVersionRequests?.some(
-    (req) => req.role === "Council"
+
+  const ideaVersionCurrent = idea.ideaVersions.find(
+    (m) => m.id == ideaVersionRequest.ideaVersionId
+  );
+  const hasCouncilRequests = ideaVersionCurrent?.ideaVersionRequests.some(
+    (request) => request.role == "Council"
   );
   const handleSubmit = async () => {
     try {
