@@ -49,7 +49,7 @@ export default function Page() {
   return (
       <main>
         <div className={"text-black p-0 m-0 flex gap-12 h-[82vh] w-full"}>
-          <ConversationList toggle={toggle} setLoadMessage={setLoadMessage} loadMessage={loadMessage} chatRoom={chatroom} setChatRoom={setChatroom} joinChatRoom={joinChatRoom} conn={conn} setConnection={setConnection} />
+          <ConversationList setToggle={setToggle} toggle={toggle} setLoadMessage={setLoadMessage} loadMessage={loadMessage} chatRoom={chatroom} setChatRoom={setChatroom} joinChatRoom={joinChatRoom} conn={conn} setConnection={setConnection} />
           <div className={"w-[90%]"}>
             {!conn
                 ?  <WaitingRoom />
