@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -45,6 +45,10 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Label } from "@/components/ui/label";
+import { TypographyH2 } from "@/components/_common/typography/typography-h2";
+import { TypographyH4 } from "@/components/_common/typography/typography-h4";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   englishTitle: z
@@ -65,6 +69,7 @@ const UpdateProjectTeam = () => {
   const [email, setEmailInvite] = useState<string>("");
   const [MessageInvite, setMessage] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [enableAddToTeam, setEnableAddToTeam] = useState(false);
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [open, setOpen] = useState(false);
   const query: UserGetAllQuery = {
@@ -73,6 +78,7 @@ const UpdateProjectTeam = () => {
     pageNumber: 1,
     isPagination: true,
   };
+  const inputRef = useRef(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -91,7 +97,6 @@ const UpdateProjectTeam = () => {
 
       try {
         const response = await userService.getAll(query);
-        // Kiểm tra nhiều cấp độ để đảm bảo không bị lỗi
         return response?.status === 1 ? response.data?.results ?? [] : [];
       } catch (error) {
         console.error("Search error:", error);
@@ -99,6 +104,7 @@ const UpdateProjectTeam = () => {
       }
     },
     enabled: debouncedSearchQuery.length > 0,
+    staleTime: 5000,
   });
 
   console.log("checking", matchingUsers);
@@ -113,10 +119,10 @@ const UpdateProjectTeam = () => {
   useEffect(() => {
     if (result?.data) {
       form.reset({
-        englishTitle: result.data?.idea?.englishName || "",
-        abbreviation: result.data?.idea?.abbreviations || "",
-        vietnameseTitle: result.data?.idea?.vietNamName || "",
-        description: result.data?.idea?.description || "",
+        englishTitle: result.data?.topic?.ideaVersion?.englishName || "",
+        abbreviation: result.data?.topic?.ideaVersion?.abbreviations || "",
+        vietnameseTitle: result.data?.topic?.ideaVersion?.vietNamName || "",
+        description: result.data?.topic?.ideaVersion?.description || "",
       });
     }
   }, [result?.data, form.reset]);
@@ -133,16 +139,16 @@ const UpdateProjectTeam = () => {
     );
 
   const project = result?.data;
-  const IsExistedIdea = project?.idea ? true : false;
+  const isHasTopic = project?.topicId ? true : false;
 
   let availableSlots = 6;
-  if (!IsExistedIdea) {
+  if (!isHasTopic) {
     availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
   } else {
     availableSlots =
-      (project?.idea?.maxTeamSize ?? 0) - (project?.teamMembers.length ?? 0);
+      (project?.topic?.ideaVersion?.teamSize ?? 0) -
+      (project?.teamMembers?.length ?? 0);
   }
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     const haha: IdeaUpdateCommand = {
       englishName: values?.englishTitle,
@@ -206,105 +212,15 @@ const UpdateProjectTeam = () => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="p-4">
-          <h2 className="text-2xl font-semibold text-center mb-6">
-            Update Group Detail
-          </h2>
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <p className="text-sm font-medium">Profession *</p>
-              <p className="text-gray-700 dark:text-primary-foreground">
-                {result?.data?.idea?.specialty?.profession?.professionName} (K15
-                trở đi)
-              </p>
-            </div>
-            <div>
-              <p className="text-sm font-medium">Specialty *</p>
-              <p className="text-gray-700 dark:text-primary-foreground">
-                {result?.data?.idea?.specialty?.specialtyName}
-              </p>
-            </div>
-          </div>
-
-          {/* English Title */}
-          <FormField
-            control={form.control}
-            name="englishTitle"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>English Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="What's your idea? " {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Abbreviation */}
-          <FormField
-            control={form.control}
-            name="abbreviation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Abbreviation</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter the abbreviations for your title"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Vietnamese Title */}
-          <FormField
-            control={form.control}
-            name="vietnameseTitle"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Vietnamese Title</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="What's your idea in Vietnamese"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Description */}
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className="h-40 mb-16">
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    className="h-full"
-                    placeholder="Describe your project"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        <div className="">
+         
 
           {/* Team Members */}
           <div className="mb-4 mt-4">
-            <p className="text-sm font-medium">
-              Team Members{" "}
+            <Label>
+              Những thành viên hiện tại
               <Badge variant={"secondary"}>{sortedMembers?.length}</Badge>
-            </p>
-            <p className="text-gray-500 dark:text-primary-foreground text-sm">
-              Existed Members
-            </p>
+            </Label>
             {sortedMembers?.map((member, index) => (
               <div
                 key={index}
@@ -326,74 +242,76 @@ const UpdateProjectTeam = () => {
 
           <div className="space-y-2">
             <FormItem>
-              <label className="text-sm font-medium">Invite Email</label>
-              <p className="text-gray-500 text-xs mb-2">
-                Start typing to search for matching users. You can only invite
-                students whose specialties are allowed to work on the same
-                thesis topic.
-              </p>
+              <Label>Tìm bằng email</Label>
               <FormControl>
                 <div className="flex flex-col space-y-2">
-                  <Popover open={open} onOpenChange={setOpen}>
+                  <Popover open={open} >
                     <PopoverTrigger asChild>
                       <div className="flex space-x-2">
-                        <Input
-                          placeholder="example@fpt.edu.vn"
-                          value={email}
-                          onChange={(e) => {
-                            setEmailInvite(e.target.value);
-                            setSearchQuery(e.target.value); // Đồng bộ giá trị tìm kiếm
-                            if (e.target.value.length > 0) setOpen(true);
-                          }}
-                          className="flex-1"
-                        />
+                        <div className="relative flex-1">
+                          <Input
+                            placeholder="Tìm email ví dụ: example@fpt.edu.vn"
+                            value={email}
+                            onChange={(e) => {
+                              setEmailInvite(e.target.value);
+                              setSearchQuery(e.target.value);
+                              if (e.target.value.length > 0) {
+                                setOpen(true);
+                              }
+                              setEnableAddToTeam(false);
+                            }}
+                            autoComplete="off"
+                            className="w-full"
+                            onClick={() => setOpen(true)}
+                            // onMouseLeave={() => setOpen(false)} // Mở popover khi click vào input
+                            // onCli
+                          />
+                          {isSearching && (
+                            <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin" />
+                          )}
+                        </div>
                         <Button
                           type="button"
                           onClick={() => handleInvite(email)}
-                          disabled={isSearching}
+                          disabled={!enableAddToTeam}
                         >
-                          Invite
+                          Thêm vào nhóm
                         </Button>
                       </div>
                     </PopoverTrigger>
                     <PopoverContent
-                      className="w-[--radix-popover-trigger-width] p-0 py-2"
-                      // align="start" // Căn chỉnh theo cạnh trigger
-                      side="top" // Luôn hiển thị phía trên
-                      sideOffset={8} // Khoảng cách với trigger
-                      avoidCollisions={true} // Tránh va chạm với các phần tử khác
-                      collisionPadding={0}
+                      className="w-[--radix-popover-trigger-width] p-0"
+                      align="start"
+                      side="bottom"
+                      sideOffset={4}
+                      onInteractOutside={(e) => {
+                        // Ngăn không cho đóng khi click bên ngoài
+                        e.preventDefault();
+                      }}
                     >
                       <Command shouldFilter={false}>
-                        {" "}
-                        {/* Tắt filter mặc định */}
-                        <CommandInput
-                          className="focus-visible:ring-0"
-                          value={searchQuery}
-                          onValueChange={setSearchQuery}
-                          placeholder="Search users..."
-                        />
                         <CommandList>
-                          <CommandEmpty>No users found</CommandEmpty>
+                          <CommandEmpty>
+                            {isSearching
+                              ? "Đang tìm kiếm..."
+                              : "Không tìm thấy kết quả"}
+                          </CommandEmpty>
                           <CommandGroup>
-                            {matchingUsers?.length > 0 ? (
-                              matchingUsers.map((user) => (
-                                <CommandItem
-                                  key={user.id}
-                                  value={user.email}
-                                  onSelect={() => {
-                                    setEmailInvite(user.email ?? "");
-                                    setOpen(false);
-                                  }}
-                                >
-                                  {user.email}
-                                </CommandItem>
-                              ))
-                            ) : (
-                              <CommandItem disabled>
-                                Start typing to search
+                            {matchingUsers.map((user) => (
+                              <CommandItem
+                                key={user.id}
+                                value={user.email ?? ""}
+                                onSelect={() => {
+                                  setEmailInvite(user.email ?? "");
+                                  setSearchQuery("");
+                                  setOpen(false);
+                                  setEnableAddToTeam(true);
+                                }}
+                                className="cursor-pointer"
+                              >
+                                {user.email}
                               </CommandItem>
-                            )}
+                            ))}
                           </CommandGroup>
                         </CommandList>
                       </Command>
@@ -410,9 +328,9 @@ const UpdateProjectTeam = () => {
           </div>
 
           {/* Submit Button */}
-          <Button type="submit" className="mt-8 text-center">
+          {/* <Button type="submit" className="mt-8 text-center">
             Update Idea
-          </Button>
+          </Button> */}
         </div>
       </form>
     </Form>

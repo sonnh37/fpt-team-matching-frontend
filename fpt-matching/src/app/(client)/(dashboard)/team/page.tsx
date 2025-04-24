@@ -43,14 +43,16 @@ import { TeamMemberRole } from "@/types/enums/team-member";
 import { ProjectUpdateCommand } from "@/types/models/commands/projects/project-update-command";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {  useQuery } from "@tanstack/react-query";
-import { Pencil, Save, Trash, Users, X } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Pencil, Save, Trash, UserRoundPlus, Users, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import UpdateProjectTeam from "../idea/updateidea/page";
 import { TeamMember } from "@/types/team-member";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { ideaService } from "@/services/idea-service";
+import { ProjectStatus } from "@/types/enums/project";
 
 export default function TeamInfo() {
   //lay thong tin tu redux luc dang nhap
@@ -68,8 +70,22 @@ export default function TeamInfo() {
     refetch,
   } = useQuery({
     queryKey: ["getTeamInfo"],
-    queryFn: projectService.getProjectInfo,
+    queryFn: async () => await projectService.getProjectInfo(),
     refetchOnWindowFocus: false,
+  });
+
+  const {
+    data: ressultIdea,
+    isLoading: isLoadingIdea,
+    isError: isErrorIdea,
+    error: errorIdea,
+    refetch: refetchIdea,
+  } = useQuery({
+    queryKey: ["getIdeaInTeam", result?.data?.topic?.ideaVersion?.ideaId],
+    queryFn: async () =>
+      await ideaService.getById(result?.data?.topic?.ideaVersion?.ideaId),
+    refetchOnWindowFocus: false,
+    enabled: !!result?.data?.topic?.ideaVersion?.ideaId,
   });
 
   useEffect(() => {
@@ -78,8 +94,8 @@ export default function TeamInfo() {
     }
   }, [result?.data?.teamName]);
 
-  if (isLoading) return <LoadingComponent />;
-  if (isError) {
+  if (isLoading || isLoadingIdea) return <LoadingComponent />;
+  if (isError || isErrorIdea) {
     console.error("Error fetching:", error);
     return <ErrorSystem />;
   }
@@ -88,8 +104,10 @@ export default function TeamInfo() {
   }
 
   const project = result?.data;
+  const idea = ressultIdea?.data;
   if (!project) return <NoTeam />;
-  const isLockProject = project.idea != undefined ? true : false;
+  const isLockProject =
+    project.status == ProjectStatus.InProgress ? true : false;
 
   const handleSave = async () => {
     // Gọi API để lưu tên mới ở đây
@@ -124,8 +142,9 @@ export default function TeamInfo() {
 
   //check xem thang dang nhap coi no phai member va la leader khong
   const isLeader =
-    result?.data?.teamMembers?.find((member: TeamMember) => member.userId === user?.id)
-      ?.role === TeamMemberRole.Leader;
+    result?.data?.teamMembers?.find(
+      (member: TeamMember) => member.userId === user?.id
+    )?.role === TeamMemberRole.Leader;
 
   const teamMembers = result?.data?.teamMembers ?? [];
   // Tách Leader ra trước
@@ -139,17 +158,19 @@ export default function TeamInfo() {
   // Ghép lại, đảm bảo Leader luôn ở đầu
   const sortedMembers = [...leaders, ...others];
 
-  const IsExistedIdea = project?.idea ? true : false;
+  const isHasTopic = project?.topicId ? true : false;
 
   let availableSlots = 6;
-  if (!IsExistedIdea) {
+  if (!isHasTopic) {
     availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
   } else {
     availableSlots =
-      (project?.topic.ideaVersion?.teamSize ?? 0) - (project?.teamMembers.length ?? 0);
+      (project?.topic?.ideaVersion?.teamSize ?? 0) -
+      (project?.teamMembers?.length ?? 0);
   }
 
-  const isLockListInviteRequest = availableSlots === 0;
+  const isLockTeamMember = availableSlots === 0;
+
   //Đây là form delete trả về true fa lse tái sử dụng được
   async function handleDelete() {
     // Gọi confirm để mở dialog
@@ -197,13 +218,6 @@ export default function TeamInfo() {
   }
 
   async function handleDeleteMember(id: string) {
-    // if (isLockProject) {
-    //   toast.warning("This project is locked and cannot be deleted member.");
-    // }
-    if (!id) {
-      toast("Invalid member ID!");
-      return;
-    }
     // Gọi confirm để mở dialog
     const confirmed = await confirm({
       title: "Delete Member",
@@ -265,7 +279,7 @@ export default function TeamInfo() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          disabled={isLockListInviteRequest}
+                          disabled={isLockProject}
                           onClick={() => setIsEditing(true)}
                           className="h-8 w-8"
                         >
@@ -290,7 +304,7 @@ export default function TeamInfo() {
                         <DialogTrigger asChild>
                           <Button
                             variant="ghost"
-                            disabled={isLockListInviteRequest}
+                            disabled={isLockTeamMember}
                             size="icon"
                             className="relative"
                           >
@@ -323,13 +337,19 @@ export default function TeamInfo() {
                         <DialogTrigger asChild>
                           <Button
                             variant="ghost"
-                            disabled={isLockListInviteRequest}
+                            disabled={isLockTeamMember}
                             size={"icon"}
                           >
-                            <Pencil />
+                            <UserRoundPlus />
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:min-w-[60%] pt-12 sm:max-w-fit h-[90vh] max-h-[90vh]">
+                        <DialogContent className="sm:min-w-[60%] sm:max-w-fit h-fit">
+                          <DialogHeader>
+                            <DialogTitle>Thêm thành viên</DialogTitle>
+                            <CardDescription>
+                              Thêm thành viên vào nhóm của bạn
+                            </CardDescription>
+                          </DialogHeader>
                           <div className="h-full overflow-y-auto">
                             <UpdateProjectTeam />
                           </div>
@@ -349,7 +369,7 @@ export default function TeamInfo() {
                 ) : (
                   <Button
                     variant="destructive"
-                    disabled={isLockProject}
+                    disabled={isLockTeamMember}
                     onClick={handleLeaveTeam}
                   >
                     Rời nhóm
@@ -360,18 +380,8 @@ export default function TeamInfo() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-6">
-              {project.topic.ideaVersion != null ? (
+              {project.topic?.ideaVersion != null ? (
                 <>
-                  {/* Team Description */}
-                  {project?.topic.ideaVersion?.description && (
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-500 mb-2">
-                        Description
-                      </h4>
-                      <p className="text-gray-700">{project.topic.ideaVersion.description}</p>
-                    </div>
-                  )}
-
                   {/* Idea Information */}
                   {project?.topic.ideaVersion.idea && (
                     <>
@@ -427,8 +437,8 @@ export default function TeamInfo() {
                               Ngành
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.topic.ideaVersion.idea.specialty?.profession
-                                ?.professionName || "-"}
+                              {idea?.specialty?.profession?.professionName ||
+                                "-"}
                             </TypographyP>
                           </div>
 
@@ -438,7 +448,7 @@ export default function TeamInfo() {
                               Chuyên ngành
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.topic.ideaVersion.idea.specialty?.specialtyName || "-"}
+                              {idea?.specialty?.specialtyName || "-"}
                             </TypographyP>
                           </div>
 
@@ -478,7 +488,9 @@ export default function TeamInfo() {
                               Đề tài doanh nghiệp
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.topic.ideaVersion.idea.isEnterpriseTopic ? "Có" : "Không"}
+                              {project.topic.ideaVersion.idea.isEnterpriseTopic
+                                ? "Có"
+                                : "Không"}
                             </TypographyP>
                           </div>
 
@@ -488,7 +500,8 @@ export default function TeamInfo() {
                                 Tên doanh nghiệp
                               </TypographySmall>
                               <TypographyP className="p-0">
-                                {project.topic.ideaVersion.enterpriseName || "-"}
+                                {project.topic.ideaVersion.enterpriseName ||
+                                  "-"}
                               </TypographyP>
                             </div>
                           )}
@@ -499,7 +512,7 @@ export default function TeamInfo() {
                               Mentor
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.topic.ideaVersion.idea.mentor?.email || "-"}
+                              {idea?.mentor?.email || "-"}
                             </TypographyP>
                           </div>
 
@@ -508,7 +521,7 @@ export default function TeamInfo() {
                               Mentor phụ
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.topic.ideaVersion.idea.subMentor?.email || "-"}
+                              {idea?.subMentor?.email || "-"}
                             </TypographyP>
                           </div>
 
@@ -518,7 +531,7 @@ export default function TeamInfo() {
                               Trạng thái
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {IdeaStatus[project.topic.ideaVersion.idea.status ?? 0] || "-"}
+                              {IdeaStatus[idea?.status ?? 0] || "-"}
                             </TypographyP>
                           </div>
 
@@ -649,7 +662,8 @@ export default function TeamInfo() {
             <CardContent className="flex mt-4 flex-col justify-center items-center gap-1">
               <TypographyP>Nộp đăng ký đề tài</TypographyP>
               <TypographyMuted>
-                Lưu ý: Đề tài được nộp nên được thông qua bởi các thành viên trong nhóm
+                Lưu ý: Đề tài được nộp nên được thông qua bởi các thành viên
+                trong nhóm
               </TypographyMuted>
               <Button className={"mt-8 min-w-40"} asChild>
                 <Link href={"/team/submit"}>Nộp đề tài</Link>
@@ -664,7 +678,8 @@ export default function TeamInfo() {
             <CardContent className="flex mt-4 flex-col justify-center items-center gap-4">
               <TypographyP>Xem những đề đang có của giảng viên</TypographyP>
               <TypographyMuted>
-                Lưu ý: Khi nộp đơn xin đề tài nên có sự đồng ý của thành viên trong nhóm
+                Lưu ý: Khi nộp đơn xin đề tài nên có sự đồng ý của thành viên
+                trong nhóm
               </TypographyMuted>
               {}
               <Button asChild>
@@ -680,28 +695,33 @@ export default function TeamInfo() {
             <CardContent className="flex mt-4 flex-col justify-center items-center gap-4">
               <TypographyP>Đánh giá quá trình làm thành viên</TypographyP>
               <TypographyMuted>
-                Lưu ý: Chỉ được đánh giá sau ngày review 3, và phải nộp trước ngày bảo vệ 1 tuần
+                Lưu ý: Chỉ được đánh giá sau ngày review 3, và phải nộp trước
+                ngày bảo vệ 1 tuần
               </TypographyMuted>
-              {
+              {(() => {
+                const review3 = project.reviews?.find((x) => x.number === 3);
 
-                project.reviews.filter(x => x.number == 3)[0].reviewDate != null ?
-                    new Date(new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTime()+new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTimezoneOffset()*60*1000) < new Date(Date.now()) ?
-                        (
-                            <Button>
-                              <Link href={"/team/rate"}>Đánh giá thành viên</Link>
-                            </Button>
-                        ):
-                        (
-                            <Button disabled={true}>
-                              Đánh giá thành viên
-                            </Button>
-                        ):
-                    (
-                        <Button disabled={true}>
-                          Đánh giá thành viên
-                        </Button>
-                    )
-              }
+                if (!review3?.reviewDate) {
+                  return <Button disabled={true}>Đánh giá thành viên</Button>;
+                }
+
+                const reviewDate = new Date(review3.reviewDate);
+                const adjustedReviewDate = new Date(
+                  reviewDate.getTime() +
+                    reviewDate.getTimezoneOffset() * 60 * 1000
+                );
+                const currentDate = new Date();
+
+                if (adjustedReviewDate < currentDate) {
+                  return (
+                    <Button>
+                      <Link href="/team/rate">Đánh giá thành viên</Link>
+                    </Button>
+                  );
+                }
+
+                return <Button disabled={true}>Đánh giá thành viên</Button>;
+              })()}
             </CardContent>
           </Card>
         </div>
