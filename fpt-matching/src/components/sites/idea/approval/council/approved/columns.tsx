@@ -187,7 +187,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 <DialogDescription></DialogDescription>
               </DialogHeader>
               <div className="grid p-4 space-y-24">
-                <IdeaDetailForm idea={idea} />
+                <IdeaDetailForm ideaId={idea.id} />
               </div>
             </DialogContent>
           </Dialog>

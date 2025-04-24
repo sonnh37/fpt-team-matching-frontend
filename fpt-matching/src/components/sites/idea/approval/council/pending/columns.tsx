@@ -137,7 +137,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 <DialogHeader>
                   <DialogTitle>Idea Preview</DialogTitle>
                 </DialogHeader>
-                {result?.data && <IdeaDetailForm idea={result.data} />}
+                {result?.data && <IdeaDetailForm ideaId={result.data.id} />}
               </DialogContent>
             </Dialog>
           </div>

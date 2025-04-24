@@ -326,7 +326,7 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Users className="h-5 w-5 text-primary" />
+              <Users className="h-5 w-5" />
               <h3 className="text-lg font-semibold">Thông tin chung</h3>
 
               <div>
@@ -470,6 +470,7 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
               setOpenCreate(false);
               setSelectedVersion(undefined);
             }}
+            initialData={highestVersion}
             onCancel={() => setOpenCreate(false)}
           />
         </DialogContent>
