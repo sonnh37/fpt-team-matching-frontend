@@ -7,10 +7,10 @@ import {Button} from "@/components/ui/button";
 import {Loader2} from "lucide-react";
 
 const ChatMessage = ({messages, loadMessage} : {messages:MessageModel[], loadMessage: boolean}) => {
-    const user = useSelectorUser()
     // const uniqueMessages = messages.filter((msg, index, self) =>
     //     index === self.findIndex((m) => m.id === msg.id)
     // );
+    const user = useSelectorUser()
     const distinctMessages = Array.from(
         new Map(messages.map(message => [message.id, message])).values()
     );
@@ -22,7 +22,7 @@ const ChatMessage = ({messages, loadMessage} : {messages:MessageModel[], loadMes
                     {!loadMessage ? messages && distinctMessages.map((message, index) => (
                         <div key={index} className={"flex flex-col"}>
                             <ChatBubble key={index} variant={user && user.id == message.sendById ? "sent" : "received"}>
-                                <ChatBubbleAvatar fallback="us" />
+                                {user && <ChatBubbleAvatar fallback="us" src={user.avatar ?? ""} />}
                                 <ChatBubbleMessage variant='sent'>
                                     {message.content}
                                 </ChatBubbleMessage>

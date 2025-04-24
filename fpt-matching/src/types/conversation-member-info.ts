@@ -9,6 +9,9 @@ export interface PartnerInfoResult {
     id: string,
     firstName: string,
     lastName: string,
+    avatarUrl: string,
+    role: string[],
+    code: string,
 }
 
 export interface LastMessageResult {

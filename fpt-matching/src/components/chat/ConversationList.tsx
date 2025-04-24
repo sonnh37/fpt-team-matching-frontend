@@ -3,7 +3,7 @@ import {conversationMemberService} from "@/services/conversation-member-service"
 import {useSelector} from "react-redux";
 import {RootState} from "@/lib/redux/store";
 import {ConversationMemberInfo} from "@/types/conversation-member-info";
-import { Pencil } from 'lucide-react';
+import {Minus, Pencil } from 'lucide-react';
 import {
     Avatar,
     AvatarFallback,
@@ -26,9 +26,10 @@ import {UserEmailSuggestions} from "@/types/models/UserEmailSuggestions";
 import {userService} from "@/services/user-service";
 import {toast} from "sonner";
 import {HubConnection, HubConnectionBuilder, LogLevel} from "@microsoft/signalr";
-import {MessageModel} from "@/types/message-model";
+import {Badge} from "@/components/ui/badge";
 
-function DialogAddConversation({userId, setConnection}:{userId: string,  setConnection: any}) {
+
+function DialogAddConversation({userId, setConnection, setToggle}:{userId: string,  setConnection: any, setToggle: Dispatch<SetStateAction<boolean>>}) {
     // joinChatRoom(user.id, null, chatRoom.conversationId)
     // await conn.invoke("JoinSpecificChatRoom", {UserId: username, PartnerId: partnerId, ConversationId: chatroom});
     const [emailTextSuggestion, setEmailTextSuggestion] = React.useState("");
@@ -88,6 +89,7 @@ function DialogAddConversation({userId, setConnection}:{userId: string,  setConn
                 setLoading(false);
             }
             setOpen(false);
+            setToggle((prev) => !prev)
             toast.success("Gửi tin nhắn thành công")
         } catch (error) {
             console.error(error);
@@ -178,7 +180,8 @@ const ConversationList = (
         setConnection,
         loadMessage,
         setLoadMessage,
-        toggle
+        toggle,
+        setToggle
     }:
     {
         joinChatRoom : any,
@@ -188,7 +191,8 @@ const ConversationList = (
         setConnection: Dispatch<SetStateAction<HubConnection | undefined>>,
         loadMessage: boolean,
         setLoadMessage: Dispatch<SetStateAction<boolean>>,
-        toggle: boolean
+        toggle: boolean,
+        setToggle: Dispatch<SetStateAction<boolean>>,
     }) => {
     const searchParams = useSearchParams();
     const conversationId = searchParams.get("conversationId");
@@ -235,7 +239,7 @@ const ConversationList = (
     return user && (
         <div className={"w-[20%] mt-8 ml-4 h-[82vh]  bg-white"}>
             <div className={"w-full flex flex-row items-start"}>
-                <DialogAddConversation setConnection={setConnection} userId={user.id!}  />
+                <DialogAddConversation setToggle={setToggle} setConnection={setConnection} userId={user.id!}  />
             </div>
             <div className={"mt-8"}>
                 <Label className={"text-xs font-bold text-gray-700"}>Tin nhắn của bạn</Label>
@@ -255,12 +259,21 @@ const ConversationList = (
                                 : "font-medium"}`}>
                             <div className={"flex items-center gap-4 mx-4"}>
                                 <Avatar>
-                                    <AvatarImage className={"rounded-full"} src="https://github.com/shadcn.png" alt="@shadcn" />
-                                    <AvatarFallback>CN</AvatarFallback>
+                                    <AvatarImage className={"rounded-full"} src={conversation.partnerInfoResults.avatarUrl.trim() != null && conversation.partnerInfoResults.avatarUrl.trim() != "" ? conversation.partnerInfoResults.avatarUrl : "https://github.com/shadcn.png"} alt="@shadcn" />
+                                    <AvatarFallback>{conversation.partnerInfoResults.firstName}</AvatarFallback>
                                 </Avatar>
-                                <div className={"h-full  flex flex-col justify-center text-left"}>
+                                <div className={"h-full flex flex-col justify-center gap-2 text-left"}>
                                     <div className={"w-[100%] font-bold text-sm text-black"}>
                                         {conversation.partnerInfoResults.lastName} {conversation.partnerInfoResults.firstName}
+                                    </div>
+                                    <div className={"w-[100%] font-bold text-[12px] text-black flex gap-2 items-center"}>
+                                        <div>
+                                            {conversation.partnerInfoResults.role.filter(x => x == "Student")[0] ? <Badge className={"bg-white border-black border-[1px] text-black hover:bg-black hover:text-white"} >Sinh viên</Badge>: <Badge>Giảng viên</Badge>}
+                                        </div>
+                                        <Minus className={"text-black"} size={10} />
+                                        <div>
+                                            {conversation.partnerInfoResults.code}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
