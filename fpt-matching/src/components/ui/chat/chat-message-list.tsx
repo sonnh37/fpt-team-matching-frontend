@@ -12,7 +12,6 @@ const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
     const {
       scrollRef,
       isAtBottom,
-      autoScrollEnabled,
       scrollToBottom,
       disableAutoScroll,
     } = useAutoScroll({
@@ -21,9 +20,9 @@ const ChatMessageList = React.forwardRef<HTMLDivElement, ChatMessageListProps>(
     });
 
     return (
-      <div className="relative w-full h-[83vh]">
+      <div className="relative w-full h-[67vh]">
         <div
-          className={`flex flex-col w-full h-[83vh] p-4 overflow-y-auto ${className}`}
+          className={`flex flex-col w-full h-full p-4 overflow-y-auto ${className}`}
           ref={scrollRef}
           onWheel={disableAutoScroll}
           onTouchMove={disableAutoScroll}

@@ -1,6 +1,5 @@
 import React from 'react';
 import {Button} from "@/components/ui/button";
-import {CornerDownLeft } from 'lucide-react';
 import { ChatInput } from '../ui/chat/chat-input';
 
 const ChatMessageInput = ({sendMessage} : {sendMessage: Function}) => {
@@ -27,10 +26,9 @@ const ChatMessageInput = ({sendMessage} : {sendMessage: Function}) => {
                 <Button
                     type="submit"
                     size="lg"
-                    className="ml-auto gap-1.5"
+                    className="ml-auto gap-1.5 bg-black text-white hover:bg-white hover:text-black transition-all border-black border-[1px]"
                 >
-                    Send Message
-                    <CornerDownLeft className="size-3.5" />
+                    Gửi
                 </Button>
             </div>
         </form>
