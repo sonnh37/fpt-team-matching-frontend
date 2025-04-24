@@ -321,7 +321,7 @@ export default function TeamInfo() {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-fit h-[80%] overflow-y-auto">
                           <DialogHeader>
-                            <DialogTitle>Request incoming</DialogTitle>
+                            <DialogTitle>Những yêu cầu tham gia vào nhóm</DialogTitle>
                           </DialogHeader>
                           <div className="grid gap-4 py-4">
                             {project.id != undefined && (

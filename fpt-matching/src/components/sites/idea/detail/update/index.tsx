@@ -14,9 +14,30 @@ import {
   GitCompare,
   ClipboardList,
   Building2,
+  Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   Select,
   SelectContent,
@@ -24,7 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatDate, getFileNameFromUrl, getPreviewUrl } from "@/lib/utils";
 import { format } from "date-fns";
 import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
@@ -33,18 +54,28 @@ import { useQuery } from "@tanstack/react-query";
 import { ideaService } from "@/services/idea-service";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
+import { CreateVersionForm } from "./create-idea-version-form";
+import { TypographyMuted } from "@/components/_common/typography/typography-muted";
 
-interface IdeaDetailFormProps {
+interface IdeaUpdateFormProps {
   ideaId?: string;
 }
 
-export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
+const createVersionSchema = z.object({
+  version: z.number().min(1, { message: "Phải lớn hơn 0" }),
+  description: z.string().optional(),
+  file: z.string().url().optional(),
+});
+
+type CreateVersionFormValues = z.infer<typeof createVersionSchema>;
+
+export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
   const {
     data: idea,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["ideaDetail", ideaId],
+    queryKey: ["ideaUpdate", ideaId],
     queryFn: async () =>
       await ideaService.getById(ideaId).then((res) => res.data),
   });
@@ -52,10 +83,30 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
   const [selectedVersion, setSelectedVersion] = useState<
     IdeaVersion | undefined
   >();
+  const [openCreate, setOpenCreate] = useState(false);
 
   if (isLoading) return <LoadingComponent />;
   if (error) return <ErrorSystem />;
   if (!idea) return <div>Idea not found</div>;
+
+  // Determine if can create new version
+  const sorted = [...idea.ideaVersions].sort(
+    (a, b) => (b.version || 0) - (a.version || 0)
+  );
+  const latest = sorted[0];
+  const canCreate =
+    (idea.status === IdeaStatus.ConsiderByMentor ||
+      idea.status === IdeaStatus.ConsiderByCouncil) &&
+    latest?.ideaVersionRequests.length > 0;
+
+  const handleSelect = (val: string) => {
+    if (val === "create-new") {
+      setOpenCreate(true);
+    } else {
+      const v = idea.ideaVersions.find((iv) => iv.version?.toString() === val);
+      setSelectedVersion(v);
+    }
+  };
 
   const highestVersion =
     idea.ideaVersions.length > 0
@@ -269,125 +320,161 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
   };
 
   return (
-    <div className="space-y-6">
-      
+    <>
+      <div className="space-y-6">
+        {/* Team & Mentorship Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Users className="h-5 w-5 text-primary" />
+              <h3 className="text-lg font-semibold">Thông tin chung</h3>
 
-      {/* Team & Mentorship Section */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-lg font-semibold">
-          <Users className="h-5 w-5" />
-          <h3>Thông tin chung <StatusBadge status={idea.status} /></h3>
-        </div>
-        <Separator />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-1">
-            <Label>Người sở hữu</Label>
-            <p className="text-sm font-medium">
-              {idea.owner?.email || "Unknown"}
-            </p>
+              <div>
+                <div className="flex items-center gap-2 mt-1">
+                  <StatusBadge status={idea.status} />
+                  {canCreate && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setOpenCreate(true)}
+                      className="h-7"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Nộp lại
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-1">
-            <Label>Người hướng dẫn</Label>
-            <p className="text-sm font-medium">
-              {idea.mentor?.email || "Not assigned"}
-            </p>
-          </div>
+          <Separator />
 
-          <div className="space-y-1">
-            <Label>Người hướng dẫn 2</Label>
-            <p className="text-sm font-medium">
-              {idea.subMentor?.email || "Not assigned"}
-            </p>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1">
+              <Label>Người sở hữu</Label>
+              <p className="text-sm font-medium">
+                {idea.owner?.email || "Unknown"}
+              </p>
+            </div>
 
-          <div className="space-y-1">
-            <Label>Thể loại đề tài</Label>
-            <p className="text-sm font-medium">
-              {IdeaType[idea.type ?? -1] || "-"}
-            </p>
-          </div>
+            <div className="space-y-1">
+              <Label>Người hướng dẫn</Label>
+              <p className="text-sm font-medium">
+                {idea.mentor?.email || "Not assigned"}
+              </p>
+            </div>
 
-          {/* <div className="space-y-1">
+            <div className="space-y-1">
+              <Label>Người hướng dẫn 2</Label>
+              <p className="text-sm font-medium">
+                {idea.subMentor?.email || "Not assigned"}
+              </p>
+            </div>
+
+            <div className="space-y-1">
+              <Label>Thể loại đề tài</Label>
+              <p className="text-sm font-medium">
+                {IdeaType[idea.type ?? -1] || "-"}
+              </p>
+            </div>
+
+            {/* <div className="space-y-1">
             <Label>Existing Team</Label>
             <p className="text-sm font-medium">
               {idea.isExistedTeam ? "Yes" : "No"}
             </p>
           </div> */}
 
-          <div className="space-y-1">
-            <Label>Chủ đề doanh nghiệp</Label>
-            <p className="text-sm font-medium">
-              {idea.isEnterpriseTopic ? "Yes" : "No"}
-            </p>
+            <div className="space-y-1">
+              <Label>Chủ đề doanh nghiệp</Label>
+              <p className="text-sm font-medium">
+                {idea.isEnterpriseTopic ? "Yes" : "No"}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Specialty Section */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2 text-lg font-semibold">
-          <UserCog className="h-5 w-5" />
-          <h3>Ngành và chuyên môn</h3>
+        {/* Specialty Section */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-lg font-semibold">
+            <UserCog className="h-5 w-5" />
+            <h3>Ngành và chuyên môn</h3>
+          </div>
+          <Separator />
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-1">
+              <Label>Ngành</Label>
+              <p className="text-sm font-medium">
+                {idea.specialty?.profession?.professionName || "-"}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <Label>Chuyên ngành</Label>
+              <p className="text-sm font-medium">
+                {idea.specialty?.specialtyName || "-"}
+              </p>
+            </div>
+          </div>
         </div>
+
         <Separator />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="space-y-1">
-            <Label>Ngành</Label>
-            <p className="text-sm font-medium">
-              {idea.specialty?.profession?.professionName || "-"}
-            </p>
+        {/* Version Selector */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <GitCompare className="h-5 w-5 text-muted-foreground" />
+            <Label>Phiên bản</Label>
           </div>
-          <div className="space-y-1">
-            <Label>Chuyên ngành</Label>
-            <p className="text-sm font-medium">
-              {idea.specialty?.specialtyName || "-"}
-            </p>
-          </div>
+
+          <Select
+            value={selectedVersion?.version?.toString()}
+            onValueChange={(value) => {
+              handleSelect(value);
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select version" />
+            </SelectTrigger>
+            <SelectContent>
+              {idea.ideaVersions
+                .sort((a, b) => (b.version || 0) - (a.version || 0))
+                .map((version) => (
+                  <SelectItem
+                    key={version.id}
+                    value={version.version?.toString() || ""}
+                  >
+                    Phiên bản {version.version}
+                  </SelectItem>
+                ))}
+            </SelectContent>
+          </Select>
         </div>
+
+        {/* Version-specific content */}
+        {renderVersionInfo(selectedVersion)}
       </div>
-
-      <Separator />
-
-      {/* Version Selector */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <GitCompare className="h-5 w-5 text-muted-foreground" />
-          <Label>Phiên bản</Label>
-        </div>
-
-        <Select
-          value={selectedVersion?.version?.toString()}
-          onValueChange={(value) => {
-            const version = idea.ideaVersions.find(
-              (v) => v.version?.toString() === value
-            );
-            setSelectedVersion(version);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select version" />
-          </SelectTrigger>
-          <SelectContent>
-            {idea.ideaVersions
-              .sort((a, b) => (b.version || 0) - (a.version || 0))
-              .map((version) => (
-                <SelectItem
-                  key={version.id}
-                  value={version.version?.toString() || ""}
-                >
-                  Phiên bản {version.version}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Version-specific content */}
-      {renderVersionInfo(selectedVersion)}
-    </div>
+      {/* Create Version Dialog */}
+      <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+        <DialogContent className="sm:max-h-[80%] sm:max-w-[600px] max-h-screen overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Tạo phiên bản mới</DialogTitle>
+            <DialogDescription>
+              Điền thông tin phiên bản để gửi duyệt.
+            </DialogDescription>
+          </DialogHeader>
+          <CreateVersionForm
+            idea={idea}
+            onSuccess={() => {
+              setOpenCreate(false);
+              setSelectedVersion(undefined);
+            }}
+            onCancel={() => setOpenCreate(false)}
+          />
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 

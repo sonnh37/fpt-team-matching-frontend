@@ -118,7 +118,7 @@ export default function MentorReviewPage() {
         </TabsList>
 
         <TabsContent value="detail" className="mt-6">
-          <IdeaDetailForm idea={idea} />
+          <IdeaDetailForm ideaId={idea.id}  />
         </TabsContent>
 
         <TabsContent value="evaluate" className="mt-6">
