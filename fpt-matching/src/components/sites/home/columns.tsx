@@ -1,5 +1,9 @@
 "use client";
 
+import { TypographyBlockquote } from "@/components/_common/typography/typography-blockquote";
+import { TypographyLarge } from "@/components/_common/typography/typography-large";
+import { TypographyP } from "@/components/_common/typography/typography-p";
+import { TypographySmall } from "@/components/_common/typography/typography-small";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -15,7 +19,7 @@ import Link from "next/link";
 export const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "projectInfo",
-    header: "Dự án tham khảo",
+    header: () => <></>,
     cell: ({ row }) => {
       const project = row.original;
       const ideaVersion = project.topic?.ideaVersion ?? {} as IdeaVersion;
@@ -48,12 +52,12 @@ export const columns: ColumnDef<Project>[] = [
         <Card className="hover:shadow-lg transition-shadow border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <Badge className={cn(
+              {/* <Badge className={cn(
                 "text-xs font-medium tracking-wide",
                 currentStatus.class
               )}>
                 {currentStatus.label}
-              </Badge>
+              </Badge> */}
               <div className="flex items-center space-x-1 text-sm text-zinc-500 dark:text-zinc-400">
                 <span className="text-orange-500">👥</span>
                 <span>{project.teamSize} thành viên</span>

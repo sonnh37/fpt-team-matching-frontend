@@ -319,7 +319,7 @@ export default function TeamInfo() {
                             )}
                           </Button>
                         </DialogTrigger>
-                        <DialogContent className="sm:max-w-fit">
+                        <DialogContent className="sm:max-w-fit h-[80%] overflow-y-auto">
                           <DialogHeader>
                             <DialogTitle>Request incoming</DialogTitle>
                           </DialogHeader>
