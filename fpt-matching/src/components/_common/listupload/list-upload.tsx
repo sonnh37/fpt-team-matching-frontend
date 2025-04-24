@@ -76,7 +76,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
 
     }
 
-    
+
     const handleInvite = async (email: string) => {
 
         // Gọi confirm để mở dialog
@@ -88,30 +88,30 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
         if (confirmed) {
             try {
                 const receiver = await userService.getByEmail(email);
-        
+
                 if (receiver.status === 1 && receiver.data) {
-                  const idReceiver = receiver.data.id;
-                  const prj = await projectService.getProjectInfo();
-        
-                  const invitation: TeamInvitationCommand = {
-                    receiverId: idReceiver,
-                    projectId: prj.data?.id ?? "",
-                    content: "Muốn mời bạn vào nhóm!",
-                  };
-        
-                  const result = await invitationService.sendByTeam(invitation);
-                  if (result.status == 1) {
-                    toast.success("Chúc mừng bạn đã gửi lời mời thành công");
-                  } else {
-                    toast.error(result.message || "Failed to send invitation");
-                  }
+                    const idReceiver = receiver.data.id;
+                    const prj = await projectService.getProjectInfo();
+
+                    const invitation: TeamInvitationCommand = {
+                        receiverId: idReceiver,
+                        projectId: prj.data?.id ?? "",
+                        content: "Muốn mời bạn vào nhóm!",
+                    };
+
+                    const result = await invitationService.sendByTeam(invitation);
+                    if (result.status == 1) {
+                        toast.success("Chúc mừng bạn đã gửi lời mời thành công");
+                    } else {
+                        toast.error(result.message || "Failed to send invitation");
+                    }
                 } else {
-                  toast("Nguời dùng không tồn tại");
+                    toast("Nguời dùng không tồn tại");
                 }
-              } catch (error) {
+            } catch (error) {
                 toast.error("An error occurred while sending the invitation");
                 console.error("Invitation error:", error);
-              }
+            }
         } else {
             return
         }
@@ -126,10 +126,17 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
             <DialogTrigger asChild>
                 <span className="flex items-center mr-3">
                     <i className="fas fa-image text-red-500"></i>
-                    <span className="ml-2 text-lg">{post?.data?.results?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip}/> </span>
+                    <span className="ml-2 text-lg">{post?.data?.results?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /> </span>
                 </span>
             </DialogTrigger>
             <DialogContent className="max-w-max min-w-[450px]">
+                <DialogHeader>
+                    <DialogTitle className="text-lg" >Một số gợi ý sinh viên đạt đủ chỉ tiêu</DialogTitle>
+                    <DialogDescription className="text-base">
+                        Đây là nơi bạn sẽ sẽ xem danh sách học sinh đã nộp ứng tuyển vào team
+                    </DialogDescription>
+                </DialogHeader>
+                
                 <DialogHeader>
                     <DialogTitle className="text-lg" >Danh sách nộp đơn ứng tuyển</DialogTitle>
                     <DialogDescription className="text-base">
@@ -170,9 +177,9 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                                     </a>
                                 )}</TableCell>
                                 <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`/social/blog/profile-social/${cv.user?.id}`}>Xem profile</a></button></TableCell>
-                                <TableCell > 
-                                      <button className="p-2 bg-red-600 ml-3 rounded-sm" onClick={() => handleDelete(cv.id ?? "")}> Xóa CV</button>
-                                      <button className="p-2 bg-blue-600 ml-3 rounded-sm" onClick={() => handleInvite(cv.user?.email ?? "")}> Mời Vô Nhóm</button>
+                                <TableCell >
+                                    <button className="p-2 bg-red-600 ml-3 rounded-sm" onClick={() => handleDelete(cv.id ?? "")}> Xóa CV</button>
+                                    <button className="p-2 bg-blue-600 ml-3 rounded-sm" onClick={() => handleInvite(cv.user?.email ?? "")}> Mời Vô Nhóm</button>
                                 </TableCell>
                             </TableRow>
                         ))}
