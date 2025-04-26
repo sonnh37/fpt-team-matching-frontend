@@ -347,7 +347,7 @@ export const CreateProjectForm = () => {
         <Card className="w-full max-w-4xl">
           <CardHeader className="text-center space-y-2">
             <CardTitle className="text-3xl font-bold tracking-tight">
-              Tạo Ý Tưởng Mới
+              Tạo ý tưởng mới
             </CardTitle>
             <CardDescription className="text-muted-foreground">
               Điền đầy đủ thông tin bên dưới để đăng ký ý tưởng dự án. Tất cả

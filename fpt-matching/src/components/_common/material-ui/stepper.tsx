@@ -215,9 +215,9 @@ export default function HorizontalLinearStepper({
       
       const todayUtcMidnight = getTodayUtcMidnight();
 const isResultDay = resultDate 
-  ? resultDate.getUTCFullYear() === todayUtcMidnight.getUTCFullYear() &&
-    resultDate.getUTCMonth() === todayUtcMidnight.getUTCMonth() &&
-    resultDate.getUTCDate() === todayUtcMidnight.getUTCDate()
+  ? resultDate.getUTCFullYear() <= todayUtcMidnight.getUTCFullYear() &&
+    resultDate.getUTCMonth() <= todayUtcMidnight.getUTCMonth() &&
+    resultDate.getUTCDate() <= todayUtcMidnight.getUTCDate()
   : false;
 
 console.log("check_date_result", resultDate?.getUTCDate())      
@@ -243,6 +243,7 @@ console.log("check_date_new", todayUtcMidnight.getUTCDate())
       const totalScore = (totalApproved * 1.0) + (totalConsider * 0.5);
       averageScore = totalCouncils > 0 ? totalScore / totalCouncils : 0;
       const APPROVAL_THRESHOLD = 0.5;
+      console.log("check_averageScore", averageScore);
 
       if (isResultDay) {
         councilStatus = averageScore > APPROVAL_THRESHOLD 

@@ -57,6 +57,7 @@ import ErrorSystem from "@/components/_common/errors/error-system";
 import { CreateVersionForm } from "./create-idea-version-form";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
 import { useCurrentRole } from "@/hooks/use-current-role";
+import { useSelectorUser } from "@/hooks/use-auth";
 
 interface IdeaUpdateFormProps {
   ideaId?: string;
@@ -72,6 +73,8 @@ type CreateVersionFormValues = z.infer<typeof createVersionSchema>;
 
 export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
   const roleCurrent = useCurrentRole();
+  const user = useSelectorUser();
+  if (!user) return;
   const {
     data: idea,
     isLoading,
@@ -149,8 +152,8 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
     const requests =
       roleCurrent === "Student"
         ? version.ideaVersionRequests.filter((m) => m.role === "Mentor")
-        : version.ideaVersionRequests;
-        
+        : version.ideaVersionRequests.filter((m) => m.reviewerId === user.id);
+
     return (
       <div className="space-y-6">
         {/* Version Information Section */}
@@ -284,7 +287,7 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <ClipboardList className="h-5 w-5" />
-              <h3>Đánh giá bởi Mentor</h3>
+              <h3>Đánh giá</h3>
             </div>
             <Separator />
 

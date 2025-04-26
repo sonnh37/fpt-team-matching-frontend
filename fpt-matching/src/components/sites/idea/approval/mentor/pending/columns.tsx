@@ -29,36 +29,103 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { Idea } from "@/types/idea";
+import { useSelectorUser } from "@/hooks/use-auth";
 
-export const columns: ColumnDef<IdeaVersionRequest>[] = [
+export const columns: ColumnDef<Idea>[] = [
   {
-    accessorKey: "ideaVersion.englishName",
+    accessorKey: "teamCode",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tên đề tài tiếng anh" />
+      <DataTableColumnHeader column={column} title="Mã nhóm" />
     ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion?.topic?.project?.teamCode || "-";
+    },
   },
   {
-    accessorKey: "ideaVersion.version",
+    accessorKey: "topicCode",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Mã topic" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion?.topic?.topicCode || "-";
+    },
+  },
+  // {
+  //   accessorKey: "vietNamName",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Tên đề tài (VN)" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const idea = row.original;
+  //     const highestVersion = idea.ideaVersions.length > 0
+  //       ? idea.ideaVersions.reduce((prev, current) =>
+  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //         )
+  //       : undefined;
+  //     return highestVersion?.vietNamName || "-";
+  //   },
+  // },
+  // {
+  //   accessorKey: "englishName",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Tên đề tài (EN)" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const idea = row.original;
+  //     const highestVersion = idea.ideaVersions.length > 0
+  //       ? idea.ideaVersions.reduce((prev, current) =>
+  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //         )
+  //       : undefined;
+  //     return highestVersion?.englishName || "-";
+  //   },
+  // },
+  {
+    accessorKey: "version",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Phiên bản" />
     ),
-  },
-  {
-    accessorKey: "processDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Ngày xử lí" />
-    ),
-  },
-  {
-    accessorKey: "createdDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Ngày tạo" />
-    ),
     cell: ({ row }) => {
-      const date = new Date(row.getValue("createdDate"));
-      return formatDate(date);
+      const idea = row.original;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion ? `v${highestVersion.version}` : "-";
     },
   },
+  // {
+  //   accessorKey: "enterpriseName",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Doanh nghiệp" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const idea = row.original;
+  //     const highestVersion = idea.ideaVersions.length > 0
+  //       ? idea.ideaVersions.reduce((prev, current) =>
+  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //         )
+  //       : undefined;
+  //     return highestVersion?.enterpriseName || "-";
+  //   },
+  // },
   {
     accessorKey: "status",
     header: ({ column }) => (
@@ -99,57 +166,49 @@ export const columns: ColumnDef<IdeaVersionRequest>[] = [
 ];
 
 interface ActionsProps {
-  row: Row<IdeaVersionRequest>;
+  row: Row<Idea>;
 }
-
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  const model = row.original;
-  const ideaVersion = row.original.ideaVersion;
-  const ideaId = row.original.ideaVersion?.ideaId;
+  const idea = row.original;
 
-  const {
-    data: result,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["getIdeaDetail", ideaId],
-    queryFn: async () => await ideaService.getById(ideaId as string),
-    refetchOnWindowFocus: false,
-    enabled: dialogOpen,
-  });
+  const user = useSelectorUser();
+  if (!user) return;
+
+  const highestVersion =
+    idea.ideaVersions.length > 0
+      ? idea.ideaVersions.reduce((prev, current) =>
+          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+        )
+      : undefined;
+
+  const mentorRequest = highestVersion?.ideaVersionRequests.find(
+    (m) =>
+      m.role === "Mentor" &&
+      m.status === IdeaVersionRequestStatus.Pending &&
+      m.reviewerId === user.id
+  );
 
   return (
     <div className="flex flex-row gap-2">
       {/* Nút xem nhanh trong dialog */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button size="icon" variant="outline">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Idea Preview</DialogTitle>
+          </DialogHeader>
+          {idea && <IdeaDetailForm ideaId={idea.id} />}
+        </DialogContent>
+      </Dialog>
       <Tooltip>
         <TooltipTrigger asChild>
-          <div>
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button size="icon" variant="outline">
-                  <Eye className="h-4 w-4" />
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
-                  <DialogTitle>Idea Preview</DialogTitle>
-                </DialogHeader>
-                {result?.data && <IdeaDetailForm ideaId={result.data.id} />}
-              </DialogContent>
-            </Dialog>
-          </div>
-        </TooltipTrigger>
-
-        <TooltipContent>
-          <p>Xem nhanh</p>
-        </TooltipContent>
-      </Tooltip>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Link href={`/idea/reviews/mentor/${row.original.id}`} passHref>
+          <Link href={`/idea/reviews/${mentorRequest?.id}`} passHref>
             <Button size="icon" variant="default">
               <ListChecks className="h-4 w-4" />
             </Button>

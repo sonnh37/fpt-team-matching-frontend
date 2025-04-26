@@ -14,6 +14,7 @@ import {
   GitCompare,
   ClipboardList,
   Building2,
+  ListChecks,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -34,6 +35,7 @@ import { ideaService } from "@/services/idea-service";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { useCurrentRole } from "@/hooks/use-current-role";
+import { useSelectorUser } from "@/hooks/use-auth";
 
 interface IdeaDetailFormProps {
   ideaId?: string;
@@ -41,7 +43,8 @@ interface IdeaDetailFormProps {
 
 export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
   const roleCurrent = useCurrentRole();
-
+  const user = useSelectorUser();
+  if (!user) return;
   const {
     data: idea,
     isLoading,
@@ -99,7 +102,7 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
     const requests =
       roleCurrent === "Student"
         ? version.ideaVersionRequests.filter((m) => m.role === "Mentor")
-        : version.ideaVersionRequests;
+        : version.ideaVersionRequests.filter((m) => m.reviewerId === user.id);
 
     return (
       <div className="space-y-6">
@@ -234,37 +237,59 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <ClipboardList className="h-5 w-5" />
-              <h3>Đánh giá bởi Mentor</h3>
+              <h3>Đánh giá</h3>
             </div>
             <Separator />
 
             <div className="space-y-4">
-              {requests.map((request) => (
-                <div key={request.id} className="border rounded-lg p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-1">
-                      <Label>Người đánh giá</Label>
-                      <p className="text-sm font-medium">
-                        {request.reviewer?.email || "Unknown"}
-                      </p>
-                    </div>
+              {requests.map((request) => {
+                const isRequestForCurrentUser = request.reviewerId == user.id;
+                const isRequestForCurrentUserHasAnswer = request?.answerCriterias?.length > 0 || false;
 
-                    <div className="space-y-1">
-                      <Label>Trạng thái</Label>
-                      <div>
-                        <RequestStatusBadge status={request.status} />
+                return (
+                  <div key={request.id} className="border rounded-lg p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="space-y-1">
+                        <Label>Người đánh giá</Label>
+                        <p className="text-sm font-medium">
+                          {request.reviewer?.email || "Unknown"}
+                        </p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label>Trạng thái</Label>
+                        <div>
+                          <RequestStatusBadge status={request.status} />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label>Ngày xử lí</Label>
+                        <p className="text-sm font-medium">
+                          {formatDate(request.processDate)}
+                        </p>
+                      </div>
+
+                      <div className="space-y-1">
+                        {/* <Label></Label> */}
+                        {isRequestForCurrentUser && (
+                          <Link href={`/idea/reviews/${request.id}`} passHref>
+                            <Button
+                              variant={
+                                isRequestForCurrentUserHasAnswer
+                                  ? "default"
+                                  : "outline"
+                              }
+                            >
+                              <ListChecks className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                     </div>
-
-                    <div className="space-y-1">
-                      <Label>Ngày xử lí</Label>
-                      <p className="text-sm font-medium">
-                        {formatDate(request.processDate)}
-                      </p>
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
