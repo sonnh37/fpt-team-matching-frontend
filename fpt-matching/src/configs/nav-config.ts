@@ -33,12 +33,7 @@ export const NAV_CONFIG = {
       icon: Globe,
       roles: ["*"],
     },
-    {
-      title: "Lời mời",
-      url: "/invitations",
-      icon: Send,
-      roles: ["*"],
-    },
+    
     {
       title: "Đội nhóm",
       url: "/team",
@@ -99,6 +94,12 @@ export const NAV_CONFIG = {
       ],
     },
     {
+      title: "Lời mời",
+      url: "/invitations",
+      icon: Send,
+      roles: ["*"],
+    },
+    {
       title: "Danh sách giảng viên",
       url: "/supervisors",
       icon: MdOutlineSupervisorAccount,
@@ -129,7 +130,7 @@ export const NAV_CONFIG = {
       title: "Quản lý các tiêu chí",
       url: "/manage-criteria",
       icon: ShieldHalf,
-      roles: ["*"],
+      roles: ["Manager"],
     },
     {
       title: "Quản lý dự án",

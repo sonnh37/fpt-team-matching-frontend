@@ -37,10 +37,11 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const styleCommon = " group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out"
   const pathName = usePathname();
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Platform</SidebarGroupLabel>
+      {/* <SidebarGroupLabel>Platform</SidebarGroupLabel> */}
       <SidebarMenu>
         {items.map((item) => {
           const isActive =
@@ -60,8 +61,9 @@ export function NavMain({
                     <SidebarMenuButton
                       tooltip={item.title}
                       className={cn(
-                        "text-md tracking-wide py-5 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out ",
-                        isActive ? "!bg-orange-500 !text-white" : ""
+                        styleCommon,
+                        isActive ? "!bg-orange-500 !text-white" : "",
+                        "py-4"
                       )}
                     >
                       <div className="flex aspect-square size-5 items-center justify-start">
@@ -79,8 +81,9 @@ export function NavMain({
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton
                               className={cn(
-                                "text-sm tracking-wide py-4 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out ",
-                                isActiveSub ? "!bg-orange-500 !text-white" : ""
+                                styleCommon,
+                                isActiveSub ? "!bg-orange-500 !text-white" : "",
+                                "py-3"
                               )}
                               asChild
                             >
@@ -100,7 +103,8 @@ export function NavMain({
               ) : (
                 <SidebarMenuButton
                   className={cn(
-                    "text-md tracking-wide py-5 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out ",
+                    styleCommon,
+                    "py-4",
                     isActive ? "!bg-orange-500 !text-white" : ""
                   )}
                   tooltip={item.title}
