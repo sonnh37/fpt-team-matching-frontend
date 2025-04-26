@@ -81,7 +81,7 @@ export default function IdeaVersionRequestApprovedByCouncilTable() {
      );
  
      params.status = IdeaVersionRequestStatus.Approved;
-     params.ideaStatus = IdeaStatus.Approved;
+     params.ideaStatus = IdeaStatus.Pending;
      params.roles = ["Council"];
  
      return { ...params };

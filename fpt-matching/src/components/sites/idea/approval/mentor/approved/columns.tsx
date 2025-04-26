@@ -213,7 +213,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       toast.success(res.message);
 
       queryClient.refetchQueries({
-        queryKey: ["getIdeaDetailWhenClick", ideaId],
+        queryKey: ["data"],
       });
       setOpen(false);
     } catch (error: any) {
@@ -225,7 +225,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button size="icon" variant="outline">
             <Eye className="h-4 w-4" />

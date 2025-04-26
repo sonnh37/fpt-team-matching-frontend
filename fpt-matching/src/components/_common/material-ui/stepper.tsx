@@ -4,174 +4,15 @@ import Stack from "@mui/material/Stack";
 import Stepper from "@mui/material/Stepper";
 import Step from "@mui/material/Step";
 import StepLabel from "@mui/material/StepLabel";
-import Check from "@mui/icons-material/Check";
-import SettingsIcon from "@mui/icons-material/Settings";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import VideoLabelIcon from "@mui/icons-material/VideoLabel";
-import StepConnector, {
-  stepConnectorClasses,
-} from "@mui/material/StepConnector";
-import { StepIconProps } from "@mui/material/StepIcon";
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
-import { Idea } from "@/types/idea";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useCallback } from "react";
-
-const QontoConnector = styled(StepConnector)(({ theme }) => ({
-  [`&.${stepConnectorClasses.alternativeLabel}`]: {
-    top: 10,
-    left: "calc(-50% + 16px)",
-    right: "calc(50% + 16px)",
-  },
-  [`&.${stepConnectorClasses.active}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      borderColor: "#784af4",
-    },
-  },
-  [`&.${stepConnectorClasses.completed}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      borderColor: "#784af4",
-    },
-  },
-  [`& .${stepConnectorClasses.line}`]: {
-    borderColor: "#eaeaf0",
-    borderTopWidth: 3,
-    borderRadius: 1,
-    ...theme.applyStyles("dark", {
-      borderColor: theme.palette.grey[800],
-    }),
-  },
-}));
-
-const QontoStepIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
-  ({ theme }) => ({
-    color: "#eaeaf0",
-    display: "flex",
-    height: 22,
-    alignItems: "center",
-    "& .QontoStepIcon-completedIcon": {
-      color: "#784af4",
-      zIndex: 1,
-      fontSize: 18,
-    },
-    "& .QontoStepIcon-circle": {
-      width: 8,
-      height: 8,
-      borderRadius: "50%",
-      backgroundColor: "currentColor",
-    },
-    ...theme.applyStyles("dark", {
-      color: theme.palette.grey[700],
-    }),
-    variants: [
-      {
-        props: ({ ownerState }) => ownerState.active,
-        style: {
-          color: "#784af4",
-        },
-      },
-    ],
-  })
-);
-
-function QontoStepIcon(props: StepIconProps) {
-  const { active, completed, className } = props;
-
-  return (
-    <QontoStepIconRoot ownerState={{ active }} className={className}>
-      {completed ? (
-        <Check className="QontoStepIcon-completedIcon" />
-      ) : (
-        <div className="QontoStepIcon-circle" />
-      )}
-    </QontoStepIconRoot>
-  );
-}
-
-const ColorlibConnector = styled(StepConnector)(({ theme }) => ({
-  [`&.${stepConnectorClasses.alternativeLabel}`]: {
-    top: 22,
-  },
-  [`&.${stepConnectorClasses.active}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      backgroundImage:
-        "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)",
-    },
-  },
-  [`&.${stepConnectorClasses.completed}`]: {
-    [`& .${stepConnectorClasses.line}`]: {
-      backgroundImage:
-        "linear-gradient( 95deg,rgb(242,113,33) 0%,rgb(233,64,87) 50%,rgb(138,35,135) 100%)",
-    },
-  },
-  [`& .${stepConnectorClasses.line}`]: {
-    height: 3,
-    border: 0,
-    backgroundColor: "#eaeaf0",
-    borderRadius: 1,
-    ...theme.applyStyles("dark", {
-      backgroundColor: theme.palette.grey[800],
-    }),
-  },
-}));
-
-const ColorlibStepIconRoot = styled("div")<{
-  ownerState: { completed?: boolean; active?: boolean };
-}>(({ theme }) => ({
-  backgroundColor: "#ccc",
-  zIndex: 1,
-  color: "#fff",
-  width: 50,
-  height: 50,
-  display: "flex",
-  borderRadius: "50%",
-  justifyContent: "center",
-  alignItems: "center",
-  ...theme.applyStyles("dark", {
-    backgroundColor: theme.palette.grey[700],
-  }),
-  variants: [
-    {
-      props: ({ ownerState }) => ownerState.active,
-      style: {
-        backgroundImage:
-          "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
-        boxShadow: "0 4px 10px 0 rgba(0,0,0,.25)",
-      },
-    },
-    {
-      props: ({ ownerState }) => ownerState.completed,
-      style: {
-        backgroundImage:
-          "linear-gradient( 136deg, rgb(242,113,33) 0%, rgb(233,64,87) 50%, rgb(138,35,135) 100%)",
-      },
-    },
-  ],
-}));
-
-function ColorlibStepIcon(props: StepIconProps) {
-  const { active, completed, className } = props;
-
-  const icons: { [index: string]: React.ReactElement<unknown> } = {
-    1: <SettingsIcon />,
-    2: <GroupAddIcon />,
-    3: <VideoLabelIcon />,
-  };
-
-  return (
-    <ColorlibStepIconRoot
-      ownerState={{ completed, active }}
-      className={className}
-    >
-      {icons[String(props.icon)]}
-    </ColorlibStepIconRoot>
-  );
-}
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
+import { Idea } from "@/types/idea";
 
 interface StepperProps {
   label: string;
-  status?: "pending" | "approved" | "rejected" | "consider";
+  status?: "pending" | "approved" | "rejected" | "consider-by-mentor" | "consider-by-council";
   optionalLabel?: string;
 }
 
@@ -194,7 +35,7 @@ export default function HorizontalLinearStepper({
   const getTodayUtcMidnight = () => {
     const now = new Date();
     const localMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    return new Date(localMidnight.toISOString()); // Chuyển sang UTC
+    return new Date(localMidnight.toISOString());
   };
 
   const calculateStepData = useCallback(() => {
@@ -213,15 +54,13 @@ export default function HorizontalLinearStepper({
       ? new Date(highestVersion.stageIdea.resultDate)
       : null;
       
-      const todayUtcMidnight = getTodayUtcMidnight();
-const isResultDay = resultDate 
-  ? resultDate.getUTCFullYear() <= todayUtcMidnight.getUTCFullYear() &&
-    resultDate.getUTCMonth() <= todayUtcMidnight.getUTCMonth() &&
-    resultDate.getUTCDate() <= todayUtcMidnight.getUTCDate()
-  : false;
+    const todayUtcMidnight = getTodayUtcMidnight();
+    const isResultDay = resultDate 
+      ? resultDate.getUTCFullYear() <= todayUtcMidnight.getUTCFullYear() &&
+        resultDate.getUTCMonth() <= todayUtcMidnight.getUTCMonth() &&
+        resultDate.getUTCDate() <= todayUtcMidnight.getUTCDate()
+      : false;
 
-console.log("check_date_result", resultDate?.getUTCDate())      
-console.log("check_date_new", todayUtcMidnight.getUTCDate())      
     const mentorApproval = ideaVersionRequests.find(req => req.role === "Mentor");
     const councilApprovals = ideaVersionRequests.filter(req => req.role === "Council");
 
@@ -230,7 +69,7 @@ console.log("check_date_new", todayUtcMidnight.getUTCDate())
     const requiredReviewers = highestVersion?.stageIdea?.numberReviewer ?? MIN_REVIEWERS;
     
     let averageScore = 0;
-    let councilStatus: 'approved' | 'rejected' | 'pending' | 'consider' = 'pending';
+    let councilStatus: 'approved' | 'rejected' | 'pending' | 'consider-by-council' = 'pending';
     
     if (totalCouncils >= requiredReviewers) {
       const totalApproved = councilApprovals.filter(
@@ -243,14 +82,13 @@ console.log("check_date_new", todayUtcMidnight.getUTCDate())
       const totalScore = (totalApproved * 1.0) + (totalConsider * 0.5);
       averageScore = totalCouncils > 0 ? totalScore / totalCouncils : 0;
       const APPROVAL_THRESHOLD = 0.5;
-      console.log("check_averageScore", averageScore);
 
       if (isResultDay) {
         councilStatus = averageScore > APPROVAL_THRESHOLD 
           ? 'approved' 
           : averageScore < APPROVAL_THRESHOLD 
             ? 'rejected' 
-            : 'consider';
+            : 'consider-by-council';
       }
     }
 
@@ -265,9 +103,13 @@ console.log("check_date_new", todayUtcMidnight.getUTCDate())
           ? "rejected"
           : mentorApproval?.status === IdeaVersionRequestStatus.Approved
           ? "approved"
+          : mentorApproval?.status === IdeaVersionRequestStatus.Consider
+          ? "consider-by-mentor"
           : "pending",
         optionalLabel: mentorApproval?.status === IdeaVersionRequestStatus.Rejected 
           ? "Đã từ chối" 
+          : mentorApproval?.status === IdeaVersionRequestStatus.Consider
+          ? "Cần xem xét"
           : undefined,
       },
       {
@@ -275,7 +117,7 @@ console.log("check_date_new", todayUtcMidnight.getUTCDate())
         status: councilStatus,
         optionalLabel: councilStatus === 'rejected' 
           ? "Đã từ chối" 
-          : councilStatus === 'consider'
+          : councilStatus === 'consider-by-council'
           ? `Cần xem xét (Điểm: ${averageScore.toFixed(2)})`
           : undefined,
       },
@@ -290,6 +132,7 @@ console.log("check_date_new", todayUtcMidnight.getUTCDate())
       if (mentorApproval?.status === IdeaVersionRequestStatus.Approved) {
         newActiveStep = isResultDay ? 2 : 1;
       }
+      
     }
 
     return { newSteps, newActiveStep, averageScore };
@@ -309,16 +152,24 @@ console.log("check_date_new", todayUtcMidnight.getUTCDate())
           const stepProps: { completed?: boolean } = {};
           const labelProps: { optional?: React.ReactNode; error?: boolean } = {};
 
-          if (step.status === "rejected" || step.status === "consider") {
+          if (step.status === "rejected" || 
+              step.status === "consider-by-mentor" || 
+              step.status === "consider-by-council") {
             labelProps.optional = (
-              <Typography variant="caption" color={step.status === "rejected" ? "error" : "warning"}>
+              <Typography variant="caption" color={
+                step.status === "rejected" ? "error" : 
+                step.status === "consider-by-mentor" ? "warning" :
+                "info"
+              }>
                 {step.optionalLabel}
               </Typography>
             );
             labelProps.error = step.status === "rejected";
           }
 
-          if (step.status === "approved" || step.status === "consider") {
+          if (step.status === "approved" || 
+              step.status === "consider-by-mentor" || 
+              step.status === "consider-by-council") {
             stepProps.completed = true;
           }
 
@@ -326,9 +177,11 @@ console.log("check_date_new", todayUtcMidnight.getUTCDate())
             <Step key={`${step.label}-${index}`} {...stepProps}>
               <StepLabel {...labelProps}>
                 {step.label}
-                {step.status === "consider" && (
-                  <Typography variant="caption" display="block" color="warning.main">
-                    Điểm: {averageScore.toFixed(2)}
+                {(step.status === "consider-by-mentor" || step.status === "consider-by-council") && (
+                  <Typography variant="caption" display="block" color={
+                    step.status === "consider-by-mentor" ? "warning.main" : "info.main"
+                  }>
+                    {step.status === "consider-by-council" ? `Điểm: ${averageScore.toFixed(2)}` : "Cần xem xét"}
                   </Typography>
                 )}
               </StepLabel>

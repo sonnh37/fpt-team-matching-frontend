@@ -185,7 +185,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const mentorRequest = highestVersion?.ideaVersionRequests.find(
     (m) =>
-      m.role === "Mentor" &&
+      m.role === "Council" &&
       m.status === IdeaVersionRequestStatus.Pending &&
       m.reviewerId === user.id
   );

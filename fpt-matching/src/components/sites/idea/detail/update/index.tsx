@@ -99,10 +99,13 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
     (a, b) => (b.version || 0) - (a.version || 0)
   );
   const latest = sorted[0];
-  const canCreate =
-    (idea.status === IdeaStatus.ConsiderByMentor ||
-      idea.status === IdeaStatus.ConsiderByCouncil) &&
-    latest?.ideaVersionRequests.length > 0;
+  let canCreate = false;
+
+  if ((roleCurrent === 'Mentor' || roleCurrent === 'Lecturer') && idea.status === IdeaStatus.ConsiderByCouncil) {
+    canCreate = true;
+  } else if (idea.status === IdeaStatus.ConsiderByMentor && latest?.ideaVersionRequests.length > 0) {
+    canCreate = true;
+  }
 
   const handleSelect = (val: string) => {
     if (val === "create-new") {

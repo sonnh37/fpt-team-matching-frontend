@@ -86,7 +86,7 @@ export default function IdeaVersionRequestApprovedByMentorTable() {
     );
 
     params.status = IdeaVersionRequestStatus.Approved;
-    params.ideaStatus = IdeaStatus.Approved;
+    params.ideaStatus = IdeaStatus.Pending;
     params.roles = ["Mentor"];
 
     return { ...params };

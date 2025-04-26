@@ -75,9 +75,9 @@ class IdeaService extends BaseService<Idea> {
 
   public updateStatus = (
     command: IdeaUpdateStatusCommand
-  ): Promise<BusinessResult<IdeaVersionRequest>> => {
+  ): Promise<BusinessResult<Idea>> => {
     return axiosInstance
-      .put<BusinessResult<IdeaVersionRequest>>(
+      .put<BusinessResult<Idea>>(
         `${this.endpoint}/status`,
         command
       )

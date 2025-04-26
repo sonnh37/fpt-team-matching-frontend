@@ -5,11 +5,10 @@ import { Project } from "./project";
 import { TopicVersion } from "./topic-version";
 
 export interface Topic extends BaseEntity {
-    ideaVersionId?: string;
-    topicCode?: string;
-    ideaVersion?: IdeaVersion;
-    project?: Project;
-    mentorTopicRequests: MentorTopicRequest[];
-    topicVersions: TopicVersion[];
+  ideaVersionId?: string;
+  topicCode?: string;
+  ideaVersion?: IdeaVersion;
+  project?: Project;
+  mentorTopicRequests: MentorTopicRequest[];
+  topicVersions: TopicVersion[];
 }
-
