@@ -180,7 +180,13 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       request.role === "Mentor"
   );
 
-  const isLock = role != "Lecturer" ? hasMentorApproval : false;
+  const isLock = idea.ideaVersions.some(version => 
+    version.ideaVersionRequests?.some(
+      request => (request.status === IdeaVersionRequestStatus.Approved || 
+                 request.status === IdeaVersionRequestStatus.Rejected) &&
+                 request.role === "Mentor"
+    )
+  );
 
   const handleDelete = async () => {
     setIsDeleting(true);

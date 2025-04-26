@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { IdeaStatus } from "@/types/enums/idea";
 import { ProjectStatus } from "@/types/enums/project";
 import { Project } from "@/types/project";
 import { ColumnDef, Row } from "@tanstack/react-table";
@@ -127,6 +128,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       console.error("Failed to copy: ", err);
     }
   };
+
   return (
     <>
       <DropdownMenu>

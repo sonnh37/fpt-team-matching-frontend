@@ -26,6 +26,9 @@ import { Idea } from "@/types/idea";
 import { IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-current-by-status-and-roles";
 import { RootState } from "@/lib/redux/store";
 import { useSelector } from "react-redux";
+import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
+import { ideaService } from "@/services/idea-service";
+import { IdeaStatus } from "@/types/enums/idea";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -73,23 +76,21 @@ export default function IdeaVersionRequestApprovedByMentorTable() {
   if (!user) {
     return null;
   }
-
-  const isCouncil = user.userXRoles.some((m) => m.role?.roleName === "Council");
-  const isLecturer = user.userXRoles.some(
-    (m) => m.role?.roleName === "Lecturer"
-  );
   // default field in table
-  const queryParams: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
-    useMemo(() => {
-      const params: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
-        useQueryParams(inputFields, columnFilters, pagination, sorting);
+  const queryParams: IdeaGetListByStatusAndRoleQuery = useMemo(() => {
+    const params: IdeaGetListByStatusAndRoleQuery = useQueryParams(
+      inputFields,
+      columnFilters,
+      pagination,
+      sorting
+    );
 
-      params.status = IdeaVersionRequestStatus.Approved;
+    params.status = IdeaVersionRequestStatus.Approved;
+    params.ideaStatus = IdeaStatus.Pending;
+    params.roles = ["Mentor"];
 
-      params.roles = ["Mentor"];
-
-      return { ...params };
-    }, [inputFields, columnFilters, pagination, sorting]);
+    return { ...params };
+  }, [inputFields, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
@@ -103,7 +104,7 @@ export default function IdeaVersionRequestApprovedByMentorTable() {
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: async () =>
-      await ideaVersionRequestService.GetIdeaVersionRequestsCurrentByStatusAndRoles(queryParams),
+      await ideaService.getIdeasOfReviewerByRolesAndStatus(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

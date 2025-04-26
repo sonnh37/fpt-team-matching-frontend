@@ -121,20 +121,18 @@ export const CreateVersionForm = ({
         fileUrl = currentFile;
       }
 
-      if (isStudent) {
-        const command: IdeaVersionCreateForResubmit = {
-          ...values,
-          ideaId: idea.id,
-          file: fileUrl,
-        };
+      const command: IdeaVersionCreateForResubmit = {
+        ...values,
+        ideaId: idea.id,
+        file: fileUrl,
+      };
 
-        const res = await ideaVersionService.createVersion(command);
-        if (res.status === 1) {
-          toast.success(res.message);
-          return onSuccess();
-        }
-        toast.error(res.message);
+      const res = await ideaVersionService.createVersion(command);
+      if (res.status === 1) {
+        toast.success(res.message);
+        return onSuccess();
       }
+      toast.error(res.message);
     } catch (error) {
       toast.error("Failed to create idea version", {
         description:

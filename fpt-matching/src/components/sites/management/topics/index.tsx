@@ -1,10 +1,28 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
+import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
+import { TypographyH2 } from "@/components/_common/typography/typography-h2";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { isExistedTeam_options } from "@/lib/filter-options";
-import { ideaVersionRequestService } from "@/services/idea-version-request-service";
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
-import { FilterEnum } from "@/types/models/filter-enum";
+import { professionService } from "@/services/profession-service";
+import { Profession } from "@/types/profession";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -16,33 +34,30 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
+import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
-import { Idea } from "@/types/idea";
-import { IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-current-by-status-and-roles";
-import { RootState } from "@/lib/redux/store";
-import { useSelector } from "react-redux";
-import { ideaService } from "@/services/idea-service";
-import { IdeaStatus } from "@/types/enums/idea";
-import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
+import { FilterEnum } from "@/types/models/filter-enum";
+import { isDeleted_options } from "@/lib/filter-options";
+import { TopicGetListForMentorQuery } from "@/types/models/queries/topics/topic-get-list-for-mentor-query";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import { topicService } from "@/services/topic-service";
 
 //#region INPUT
 const defaultSchema = z.object({
-  // englishName: z.string().optional(),
+  emailOrFullname: z.string().optional(),
 });
 //#endregion
-export default function IdeaVersionRequestApprovedByCouncilTable() {
+export default function TopicTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
-    {
-      columnId: "isExistedTeam",
-      title: "Slot register",
-      options: isExistedTeam_options,
-    },
+    { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
   ];
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -60,6 +75,7 @@ export default function IdeaVersionRequestApprovedByCouncilTable() {
     pageIndex: 0,
     pageSize: 10,
   });
+  const [isTyping, setIsTyping] = useState(false);
   //#endregion
 
   //#region CREATE TABLE
@@ -72,17 +88,13 @@ export default function IdeaVersionRequestApprovedByCouncilTable() {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaGetListByStatusAndRoleQuery = useMemo(() => {
-    const params: IdeaGetListByStatusAndRoleQuery = useQueryParams(
+  const queryParams = useMemo(() => {
+    const params: TopicGetListForMentorQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
       sorting
     );
-
-    params.status = IdeaVersionRequestStatus.Consider;
-    params.ideaStatus = IdeaStatus.ConsiderByCouncil;
-    params.roles = ["Council"];
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -98,8 +110,7 @@ export default function IdeaVersionRequestApprovedByCouncilTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: async () =>
-      await ideaService.getIdeasOfReviewerByRolesAndStatus(queryParams),
+    queryFn: () => topicService.getAllForMentor(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -128,11 +139,29 @@ export default function IdeaVersionRequestApprovedByCouncilTable() {
 
   return (
     <>
-      <div className="space-y-8">
-        <div className="">
-          <DataTableComponent table={table} />
+      <div className="container mx-auto space-y-8">
+        <TypographyH2>Đề tài</TypographyH2>
+        <Card className="space-y-4 p-4">
+          <DataTableToolbar
+            form={form}
+            table={table}
+            filterEnums={filterEnums}
+            isSelectColumns={false}
+            isSortColumns={false}
+            isCreateButton={false}
+            // columnSearch={columnSearch}
+            // handleSheetChange={handleSheetChange}
+            // formFilterAdvanceds={formFilterAdvanceds}
+          />
+
+          <DataTableComponent
+            isLoading={isFetching && !isTyping}
+            table={table}
+            restore={topicService.restore}
+            deletePermanent={topicService.deletePermanent}
+          />
           <DataTablePagination table={table} />
-        </div>
+        </Card>
       </div>
     </>
   );

@@ -16,6 +16,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -34,125 +39,178 @@ import { IdeaVersionRequestUpdateStatusCommand } from "@/types/models/commands/i
 import { User } from "@/types/user";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { Eye, ListChecks, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import {IdeaDetailForm} from "@/components/sites/idea/detail";
+import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
+import Link from "next/link";
 
-export const columns: ColumnDef<IdeaVersionRequest>[] = [
- {
-     accessorKey: "ideaVersion.englishName",
-     header: ({ column }) => (
-       <DataTableColumnHeader column={column} title="Tên đề tài tiếng anh" />
-     ),
-   },
-   {
-     accessorKey: "ideaVersion.version",
-     header: ({ column }) => (
-       <DataTableColumnHeader column={column} title="Phiên bản" />
-     ),
-   },
-   {
-     accessorKey: "processDate",
-     header: ({ column }) => (
-       <DataTableColumnHeader column={column} title="Ngày xử lí" />
-     ),
-   },
-   {
-     accessorKey: "createdDate",
-     header: ({ column }) => (
-       <DataTableColumnHeader column={column} title="Ngày tạo" />
-     ),
-     cell: ({ row }) => {
-       const date = new Date(row.getValue("createdDate"));
-       return formatDate(date);
-     },
-   },
-   {
-     accessorKey: "status",
-     header: ({ column }) => (
-       <DataTableColumnHeader column={column} title="Trạng thái" />
-     ),
-     cell: ({ row }) => {
-       const status = row.getValue("status") as IdeaVersionRequestStatus;
-       const statusText = IdeaVersionRequestStatus[status];
- 
-       let badgeVariant:
-         | "secondary"
-         | "destructive"
-         | "default"
-         | "outline"
-         | null = "default";
- 
-       switch (status) {
-         case IdeaVersionRequestStatus.Approved:
-           badgeVariant = "default";
-           break;
-         default:
-           badgeVariant = "outline";
-       }
- 
-       return <Badge variant={badgeVariant}>{statusText}</Badge>;
-     },
-     filterFn: (row, id, value) => {
-       return value.includes(row.getValue(id));
-     },
-   },
-   {
-     accessorKey: "actions",
-     header: "Tùy chọn",
-     cell: ({ row }) => {
-       return <Actions row={row} />;
-     },
-   },
+export const columns: ColumnDef<Idea>[] = [
+  {
+    accessorKey: "teamCode",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Mã nhóm" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion?.topic?.project?.teamCode || "-";
+    },
+  },
+  {
+    accessorKey: "topicCode",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Mã topic" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion?.topic?.topicCode || "-";
+    },
+  },
+  // {
+  //   accessorKey: "vietNamName",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Tên đề tài (VN)" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const idea = row.original;
+  //     const highestVersion = idea.ideaVersions.length > 0
+  //       ? idea.ideaVersions.reduce((prev, current) =>
+  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //         )
+  //       : undefined;
+  //     return highestVersion?.vietNamName || "-";
+  //   },
+  // },
+  // {
+  //   accessorKey: "englishName",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Tên đề tài (EN)" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const idea = row.original;
+  //     const highestVersion = idea.ideaVersions.length > 0
+  //       ? idea.ideaVersions.reduce((prev, current) =>
+  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //         )
+  //       : undefined;
+  //     return highestVersion?.englishName || "-";
+  //   },
+  // },
+  {
+    accessorKey: "version",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Phiên bản" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion ? `v${highestVersion.version}` : "-";
+    },
+  },
+  // {
+  //   accessorKey: "enterpriseName",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Doanh nghiệp" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const idea = row.original;
+  //     const highestVersion = idea.ideaVersions.length > 0
+  //       ? idea.ideaVersions.reduce((prev, current) =>
+  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //         )
+  //       : undefined;
+  //     return highestVersion?.enterpriseName || "-";
+  //   },
+  // },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Trạng thái" />
+    ),
+    cell: ({ row }) => {
+      const status = row.getValue("status") as IdeaVersionRequestStatus;
+      const statusText = IdeaVersionRequestStatus[status];
+
+      let badgeVariant:
+        | "secondary"
+        | "destructive"
+        | "default"
+        | "outline"
+        | null = "default";
+
+      switch (status) {
+        case IdeaVersionRequestStatus.Approved:
+          badgeVariant = "default";
+          break;
+        default:
+          badgeVariant = "outline";
+      }
+
+      return <Badge variant={badgeVariant}>{statusText}</Badge>;
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    accessorKey: "actions",
+    header: "Tùy chọn",
+    cell: ({ row }) => {
+      return <Actions row={row} />;
+    },
+  },
 ];
 
 interface ActionsProps {
-  row: Row<IdeaVersionRequest>;
+  row: Row<Idea>;
 }
 
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
-  const isEditing = row.getIsSelected();
-  const ideaId = row.original.ideaVersion?.ideaId;
+  const idea = row.original;
+  const ideaId = idea.id;
   const [open, setOpen] = useState(false);
 
-  const user = useSelector((state: RootState) => state.user.user);
+  const highestVersion =
+    idea.ideaVersions.length > 0
+      ? idea.ideaVersions.reduce((prev, current) =>
+          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+        )
+      : undefined;
 
-  if (!user) {
-    return null;
-  }
-
-  const {
-    data: result,
-    isLoading,
-    isError,
-    error,
-  } = useQuery({
-    queryKey: ["getIdeaDetailWhenClick", ideaId],
-    queryFn: () => ideaService.getById(ideaId as string),
-    refetchOnWindowFocus: false,
-  });
-
-  if (isLoading) return <LoadingComponent />;
-  if (isError) {
-    console.error("Error fetching:", error);
-    return <ErrorSystem />;
-  }
-
-  const idea = result?.data ?? ({} as Idea);
+  const hasCouncilRequests = highestVersion?.ideaVersionRequests.some(
+    (request) => request.role == "Council"
+  );
   const handleSubmit = async () => {
     try {
-      if (!ideaId) throw new Error("Idea ID is required");
-      const res = await ideaVersionRequestService.createCouncilRequestsForIdea(ideaId);
-      if (res.status != 1) throw new Error(res.message);
+      const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
+        highestVersion?.id
+      );
+      if (res.status != 1) return toast.error(res.message);
 
-      toast.success("Submitted to council!");
+      toast.success(res.message);
 
       queryClient.refetchQueries({
         queryKey: ["getIdeaDetailWhenClick", ideaId],
@@ -167,30 +225,19 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <>
-        <div className="flex gap-2">
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button
-                size="sm"
-                variant={"default"}
-                // disabled={hasCouncilRequests}
-              >
-                View
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Idea detail</DialogTitle>
-                <DialogDescription></DialogDescription>
-              </DialogHeader>
-              <div className="grid p-4 space-y-24">
-                <IdeaDetailForm ideaId={idea.id}/>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </>
+     <Dialog>
+        <DialogTrigger asChild>
+          <Button size="icon" variant="outline">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Idea Preview</DialogTitle>
+          </DialogHeader>
+          {idea && <IdeaDetailForm ideaId={idea.id} />}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

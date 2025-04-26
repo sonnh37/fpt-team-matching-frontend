@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
 import { ideaService } from "@/services/idea-service";
-import { IdeaType } from "@/types/enums/idea";
+import { IdeaStatus, IdeaType } from "@/types/enums/idea";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -46,6 +46,7 @@ import { IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/mo
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -95,17 +96,20 @@ export default function IdeaVersionRequestRejectedByMentorTable() {
   }
 
   // default field in table
-  const queryParams: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
-    useMemo(() => {
-      const params: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
-        useQueryParams(inputFields, columnFilters, pagination, sorting);
+  const queryParams: IdeaGetListByStatusAndRoleQuery = useMemo(() => {
+    const params: IdeaGetListByStatusAndRoleQuery = useQueryParams(
+      inputFields,
+      columnFilters,
+      pagination,
+      sorting
+    );
 
-      params.status = IdeaVersionRequestStatus.Rejected;
+    params.status = IdeaVersionRequestStatus.Rejected;
+    params.ideaStatus = IdeaStatus.Rejected;
+    params.roles = ["Mentor"];
 
-      params.roles = ["Mentor"];
-
-      return { ...params };
-    }, [inputFields, columnFilters, pagination, sorting]);
+    return { ...params };
+  }, [inputFields, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
@@ -119,7 +123,7 @@ export default function IdeaVersionRequestRejectedByMentorTable() {
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: async () =>
-      await ideaVersionRequestService.GetIdeaVersionRequestsCurrentByStatusAndRoles(queryParams),
+      await ideaService.getIdeasOfReviewerByRolesAndStatus(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
