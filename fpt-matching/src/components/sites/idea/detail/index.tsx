@@ -237,7 +237,7 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <ClipboardList className="h-5 w-5" />
-              <h3>Đánh giá</h3>
+              <h3>{roleCurrent == "Student" ? "Lịch sử đánh giá của các mentor" :  "Lịch sử đánh giá"}</h3>
             </div>
             <Separator />
 
