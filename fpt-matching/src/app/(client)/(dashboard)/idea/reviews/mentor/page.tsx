@@ -15,9 +15,9 @@ import { useCurrentRole } from "@/hooks/use-current-role";
 
 export default function Page() {
   const role = useCurrentRole();
-  const isLecturer = role === "Lecturer";
+  const isMentor = role === "Mentor";
 
-  if (!isLecturer) return <ErrorHttp statusCode={403} />;
+  if (!isMentor) return <ErrorHttp statusCode={403} />;
   return (
     <div className="container mx-auto py-6 px-4">
       <h1 className="text-2xl font-bold mb-6 text-center">

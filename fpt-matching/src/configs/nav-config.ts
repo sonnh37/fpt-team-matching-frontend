@@ -83,7 +83,7 @@ export const NAV_CONFIG = {
           title: "Duyệt ý tưởng",
           icon: MdOutlineRateReview,
           url: "/idea/reviews/mentor",
-          roles: ["Lecturer"],
+          roles: ["Mentor"],
         },
         {
           title: "Duyệt ý tưởng",
@@ -135,14 +135,14 @@ export const NAV_CONFIG = {
     {
       title: "Quản lý dự án",
       url: "/management/projects",
-      icon: RiTimeLine,
-      roles: ["Lecturer", "Mentor"],
+      icon: null,
+      roles: ["Mentor"],
     },
     {
       title: "Quản lý đề tài",
       url: "/management/topics",
-      icon: RiTimeLine,
-      roles: ["Lecturer", "Mentor"],
+      icon: null,
+      roles: ["Mentor"],
     },
     {
       title: "Quản lý bảo vệ",
