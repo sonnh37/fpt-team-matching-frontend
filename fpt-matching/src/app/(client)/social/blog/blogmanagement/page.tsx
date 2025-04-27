@@ -19,6 +19,14 @@ import {
     ModalClose,
 } from "@/components/ui/animated-modal";
 import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import {
     Popover,
     PopoverContent,
     PopoverTrigger,
@@ -283,7 +291,7 @@ export default function Blogmanagement() {
                                     <FontAwesomeIcon icon={faBriefcase} />
                                     <span className='ml-2'> {user?.address ? (
                                         <p className="flex">
-                                            Học tại <span className="font-semibold ml-1">{Department[user?.department ?? 5 ] }</span>
+                                            Học tại <span className="font-semibold ml-1">{Department[user?.department ?? 5]}</span>
                                         </p>
                                     ) : (
                                         <p>Người dùng chưa cập nhập</p>
@@ -304,17 +312,17 @@ export default function Blogmanagement() {
                                 <a
                                     className="inline-flex items-center text-gray-600 mt-2 hover:underline"
                                 >
-                                      <FontAwesomeIcon icon={faEnvelope} />
-                                      <span className='ml-2'> {user?.email ? (
+                                    <FontAwesomeIcon icon={faEnvelope} />
+                                    <span className='ml-2'> {user?.email ? (
                                         <p className="flex">
-                                             <span className="font-semibold ml-1">{user?.email}</span>
+                                            <span className="font-semibold ml-1">{user?.email}</span>
                                         </p>
                                     ) : (
                                         <p>Người dùng chưa cập nhập</p>
 
                                     )}   </span>
-                                  
-                                   
+
+
                                 </a>
 
                             </div>
@@ -586,7 +594,9 @@ export default function Blogmanagement() {
                                                                         <DropdownMenuContent>
                                                                             <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                                                             <DropdownMenuSeparator />
-                                                                            <DropdownMenuItem>Ghim blog</DropdownMenuItem>
+                                                                            <DropdownMenuItem>
+                                                                             
+                                                                            </DropdownMenuItem>
                                                                             <DropdownMenuItem onClick={() => handleDelete(post.id ?? "")}>Xóa blog</DropdownMenuItem>
                                                                         </DropdownMenuContent>
                                                                     </DropdownMenu>
@@ -639,10 +649,9 @@ export default function Blogmanagement() {
                                                                                             <DropdownMenuContent>
                                                                                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                                                                                                 <DropdownMenuSeparator />
-                                                                                                <DropdownMenuItem>Profile</DropdownMenuItem>
-                                                                                                <DropdownMenuItem>Billing</DropdownMenuItem>
-                                                                                                <DropdownMenuItem>Team</DropdownMenuItem>
-                                                                                                <DropdownMenuItem>Subscription</DropdownMenuItem>
+                                                                                                <DropdownMenuItem>
+                                                                                                </DropdownMenuItem>
+                                                                                                <DropdownMenuItem>Recommend</DropdownMenuItem>
                                                                                             </DropdownMenuContent>
                                                                                         </DropdownMenu>
 
