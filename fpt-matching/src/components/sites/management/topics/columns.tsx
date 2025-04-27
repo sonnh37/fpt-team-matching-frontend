@@ -125,8 +125,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   );
 
   // Điều kiện hiển thị các nút
-  const showEditAndReturnButtons =
-    idea?.status === IdeaStatus.ConsiderByCouncil;
+  const showEditButton = idea?.status === IdeaStatus.ConsiderByCouncil;
+  const showReturnButton = idea?.status === IdeaStatus.ConsiderByCouncil && (idea?.ownerId != idea?.mentorId);
+
   const showSubmitToCouncilButton =
     idea?.status === IdeaStatus.Pending &&
     allMentorApproved &&
@@ -285,34 +286,39 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           <IdeaDetailForm ideaId={ideaId} />
         </DialogContent>
       </Dialog>
-  
+
       {/* Nhóm nút khi trạng thái ConsiderByCouncil */}
-      {showEditAndReturnButtons && (
-        <>
+
+      <>
+        {showEditButton && (
           <Button variant="ghost" size="sm" asChild>
-            <Link href={`/idea/request/${ideaId}`} className="flex items-center">
+            <Link
+              href={`/idea/request/${ideaId}`}
+              className="flex items-center"
+            >
               <FaEdit className="h-4 w-4" />
               Sửa
             </Link>
           </Button>
-  
-          <Button 
-            variant="ghost" 
-            size="sm" 
+        )}
+        {showReturnButton && (
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={handleReturnToGroup}
             className="flex items-center"
           >
             <Undo2 className="h-4 w-4" />
             Trả về nhóm
           </Button>
-        </>
-      )}
-  
+        )}
+      </>
+
       {/* Nút nộp hội đồng */}
       {showSubmitToCouncilButton && (
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={handleSubmitToCouncil}
           className="flex items-center"
         >
@@ -320,13 +326,15 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           Nộp hội đồng
         </Button>
       )}
-  
+
       {/* Nút duyệt đề tài */}
       {showApproveButton && (
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => router.push(`/idea/reviews/${mentorReceiveRequest?.id}`)}
+          onClick={() =>
+            router.push(`/idea/reviews/${mentorReceiveRequest?.id}`)
+          }
           className="flex items-center"
         >
           <ListChecks className="h-4 w-4" />
@@ -335,4 +343,4 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       )}
     </div>
   );
-}
+};
