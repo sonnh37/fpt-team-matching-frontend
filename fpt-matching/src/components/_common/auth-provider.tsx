@@ -8,18 +8,24 @@ import { useDispatch } from "react-redux";
 import ErrorSystem from "./errors/error-system";
 import { LoadingPage } from "./loading-page";
 import { AnimatePresence, motion } from "framer-motion";
+import { is } from "date-fns/locale";
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export default function AuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const dispatch = useDispatch();
   const [isInitialized, setIsInitialized] = useState(false);
 
   const {
     data: result,
     isLoading,
+    isFetching,
     isError,
     error,
   } = useQuery({
@@ -29,30 +35,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     retry: false, // Không tự động retry khi fail
   });
 
-  useEffect(() => {
-    if (!isLoading && result) {
-      // Xử lý kết quả
-      if (result.status === 1) {
-        dispatch(setUser(result.data!));
-      } else {
-        dispatch(logout());
-      }
-      setIsInitialized(true);
-    }
-  }, [isLoading, result, dispatch]);
-
   if (isError) {
     console.error("Error fetching user info:", error);
     dispatch(logout()); // Đảm bảo logout nếu có lỗi
-    setIsInitialized(true); // Vẫn cho hiển thị content dù có lỗi
+    // setIsInitialized(true); // Vẫn cho hiển thị content dù có lỗi
     return <ErrorSystem />;
   }
 
-  // Chỉ hiển thị children khi đã khởi tạo xong
-  return (
-    <>
+  if (isFetching) {
+    return (
       <AnimatePresence mode="wait">
-        {(!isInitialized || isLoading) && (
+        {
           <motion.div
             key="loading"
             initial={{ opacity: 0 }}
@@ -63,10 +56,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           >
             <LoadingPage />
           </motion.div>
-        )}
+        }
       </AnimatePresence>
+    );
+  }
 
-      {isInitialized && !isLoading && (
+  if (result) {
+    if (result.status === 1) {
+      dispatch(setUser(result.data!));
+    } else {
+      dispatch(logout());
+    }
+  }
+
+  return (
+    <>
+      {
         <motion.div
           key="content"
           initial={{ opacity: 0 }}
@@ -75,7 +80,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         >
           {children}
         </motion.div>
-      )}
+      }
     </>
   );
-};
+}

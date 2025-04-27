@@ -37,16 +37,18 @@ export function NavManagement({
     }[];
   }[];
 }) {
+  const styleCommon =
+    " group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out";
+
   const pathName = usePathname();
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Management</SidebarGroupLabel>
+      <SidebarGroupLabel>Quản lí</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
           const isActive =
-            pathName === item.url ||
-            (pathName.startsWith(item.url + "/"));
-            
+            pathName === item.url || pathName.startsWith(item.url + "/");
+
           return (
             <Collapsible
               key={item.title}
@@ -60,8 +62,9 @@ export function NavManagement({
                     <SidebarMenuButton
                       tooltip={item.title}
                       className={cn(
-                        "text-md tracking-wide py-5 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out ",
-                        isActive ? "!bg-orange-500 !text-white" : ""
+                        styleCommon,
+                        isActive ? "!bg-orange-500 !text-white" : "",
+                        "py-4"
                       )}
                     >
                       <div className="flex aspect-square size-5 items-center justify-start">
@@ -79,8 +82,9 @@ export function NavManagement({
                           <SidebarMenuSubItem key={subItem.title}>
                             <SidebarMenuSubButton
                               className={cn(
-                                "text-sm tracking-wide py-4 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out ",
-                                isActiveSub ? "!bg-orange-500 !text-white" : ""
+                                styleCommon,
+                                isActiveSub ? "!bg-orange-500 !text-white" : "",
+                                "py-3"
                               )}
                               asChild
                             >
@@ -100,7 +104,8 @@ export function NavManagement({
               ) : (
                 <SidebarMenuButton
                   className={cn(
-                    "text-md tracking-wide py-5 group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out ",
+                    styleCommon,
+                    "py-4",
                     isActive ? "!bg-orange-500 !text-white" : ""
                   )}
                   tooltip={item.title}

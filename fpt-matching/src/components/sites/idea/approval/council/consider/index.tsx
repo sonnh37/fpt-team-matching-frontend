@@ -26,6 +26,9 @@ import { Idea } from "@/types/idea";
 import { IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-current-by-status-and-roles";
 import { RootState } from "@/lib/redux/store";
 import { useSelector } from "react-redux";
+import { ideaService } from "@/services/idea-service";
+import { IdeaStatus } from "@/types/enums/idea";
+import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -69,17 +72,20 @@ export default function IdeaVersionRequestApprovedByCouncilTable() {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
-    useMemo(() => {
-      const params: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
-        useQueryParams(inputFields, columnFilters, pagination, sorting);
+  const queryParams: IdeaGetListByStatusAndRoleQuery = useMemo(() => {
+    const params: IdeaGetListByStatusAndRoleQuery = useQueryParams(
+      inputFields,
+      columnFilters,
+      pagination,
+      sorting
+    );
 
-      params.status = IdeaVersionRequestStatus.Consider;
+    params.status = IdeaVersionRequestStatus.Consider;
+    params.ideaStatus = IdeaStatus.Pending;
+    params.roles = ["Council"];
 
-      params.roles = ["Council"];
-
-      return { ...params };
-    }, [inputFields, columnFilters, pagination, sorting]);
+    return { ...params };
+  }, [inputFields, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
@@ -93,7 +99,7 @@ export default function IdeaVersionRequestApprovedByCouncilTable() {
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: async () =>
-      await ideaVersionRequestService.GetIdeaVersionRequestsCurrentByStatusAndRoles(queryParams),
+      await ideaService.getIdeasOfReviewerByRolesAndStatus(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

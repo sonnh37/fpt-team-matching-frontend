@@ -23,6 +23,7 @@ export class Const {
   static readonly IDEAS = "ideas";
   static readonly IDEA_REQUESTS = "idea-requests";
   static readonly IDEA_VERSION_REQUESTS = "idea-version-requests";
+  static readonly IDEA_VERSIONS = "idea-versions";
   static readonly INVITATIONS = "invitations";
   static readonly SPECIALTIES = "specialties";
   static readonly PROFESSIONS = "professions";
@@ -36,6 +37,7 @@ export class Const {
   static readonly MENTOR_FEEDBACKS = "mentor-feedbacks";
   static readonly USER_X_ROLES = "user-x-roles";
   static readonly ROLES = "roles";
+  static readonly TOPICS = "topics";
   static readonly TOPIC_VERSIONS = "topic-versions";
   static readonly TOPIC_VERSIONS_REQUEST = "topic-version-requests";
 }

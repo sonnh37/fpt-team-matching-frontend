@@ -1,4 +1,4 @@
-﻿import React, {useEffect, useState} from "react";
+﻿import React, {Dispatch, SetStateAction, useEffect, useState} from "react";
 import {HubConnection} from "@microsoft/signalr";
 import {messageService} from "@/services/message-service";
 import {MessageModel} from "@/types/message-model";
@@ -6,9 +6,12 @@ import ChatMessage from "@/components/chat/ChatMessage";
 import ChatMessageInput from "@/components/chat/ChatMessageInput";
 import {ConversationMemberInfo} from "@/types/conversation-member-info";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-const ChatRoom = ({conn, messages, setMessages, chatRoom} : { conn: HubConnection, messages: MessageModel[], setMessages: any, chatRoom: ConversationMemberInfo | undefined}) => {
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {Badge} from "@/components/ui/badge";
+import {Minus} from "lucide-react";
+const ChatRoom = ({setLoadMessage, conn, messages, setMessages, chatRoom, loadMessage} : {setLoadMessage: Dispatch<SetStateAction<boolean>>, conn: HubConnection, messages: MessageModel[], setMessages: any, chatRoom: ConversationMemberInfo | undefined, loadMessage: boolean}) => {
     const [pageNumber, setPageNumber] = useState(1)
-    const [loading, setLoading] = useState(true);
     const [hasMore, setHasMore] = useState(true);
     // const [lastHeight, setLastHeight] = useState<number>(0);
     //
@@ -33,12 +36,14 @@ const ChatRoom = ({conn, messages, setMessages, chatRoom} : { conn: HubConnectio
                 setHasMore(false);
                 return;
             }
-            setMessages((messages: MessageModel[]) => [...messageConversation.data!, ...messages]);
+            // setMessages((messages: MessageModel[]) => [...messageConversation.data!, ...messages]);
+            setMessages(() => messageConversation.data!);
         }
     }
     useEffect(() => {
+        console.log("Fetch message at chat room")
         const fetchData = async () => {
-            setLoading(true);
+            setLoadMessage(true)
             try {
                 if (pageNumber === 1) {
                     await getMessageInDay();
@@ -48,12 +53,13 @@ const ChatRoom = ({conn, messages, setMessages, chatRoom} : { conn: HubConnectio
             } catch (error) {
                 console.error('Error fetching messages:', error);
             } finally {
-                setLoading(false);
+                setLoadMessage(false)
+
             }
         };
 
         fetchData();
-    }, [pageNumber])
+    }, [pageNumber, chatRoom])
 
 
     const sendMessage = async (message: string) => {
@@ -63,39 +69,37 @@ const ChatRoom = ({conn, messages, setMessages, chatRoom} : { conn: HubConnectio
             console.error(error);
         }
     }
-    // const lasMessageElementRef = (node:HTMLDivElement) => {
-    //     if (loading) return;
-    //     observer.current = new IntersectionObserver((entries) => {
-    //         if (entries[0].isIntersecting && hasMore) {
-    //             setPageNumber(prevState => prevState + 1);
-    //         }
-    //     });
-    //     if (node) observer.current.observe(node);
-    //     return () => observer.current?.disconnect();
-    // }
-    //
-    // const scrollHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     const chat = event.target;
-    //     if (chat.scrollTop === 0) {
-    //         const { scrollHeight } = containerRef.current!;
-    //         setLastHeight(scrollHeight);
-    //     }
-    // };
+    const router = useRouter()
     return (
-        <div className={"h-screen"}>
-            <div className={""}>
-                <div className={"w-full bg-white min-h-[10vh] leading-[5rem] font-bold text-lg pl-8 flex items-center gap-4"}>
-                    <Avatar>
-                        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                        <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    {chatRoom?.partnerInfoResults.firstName + " " + chatRoom?.partnerInfoResults.lastName}
-                </div>
-            </div>
-            <div className={"h-[90vh] flex flex-col justify-between"}>
+        <div className={""}>
+            {
+                chatRoom && (
+                    <div className={"mt-2"}>
+                        <div className={"w-full bg-white min-h-[10vh] leading-[5rem] font-bold text-lg pl-8 flex items-center gap-4"}>
+                            <Avatar>
+                                <AvatarImage src={chatRoom.partnerInfoResults.avatarUrl.trim() != null && chatRoom.partnerInfoResults.avatarUrl.trim() != "" ? chatRoom.partnerInfoResults.avatarUrl : "https://github.com/shadcn.png"} alt="@shadcn" />
+                                <AvatarFallback>CN</AvatarFallback>
+                            </Avatar>
+                            <div onClick={() => {
+                                router.push(`/social/blog/profile-social/${chatRoom?.partnerInfoResults.id}`)
+                            }} className={"hover:bg-gray-100 rounded-md px-4 flex flex-col gap-2 py-2 hover:cursor-pointer"}>
+                                <div className={"flex flex-row gap-2 items-center"}>
+                                   <div className={"leading-6"}>
+                                       {chatRoom?.partnerInfoResults.lastName + " " + chatRoom?.partnerInfoResults.firstName}
+                                   </div >
+                                    <Minus className={"text-black"} />
+                                    <div className={"leading-6"}>{chatRoom?.partnerInfoResults.code}</div>
+                                </div>
+                                    {chatRoom.partnerInfoResults.role.filter(x => x == "Student")[0] ? <Badge className={"bg-white border-black border-[1px] text-black hover:bg-black hover:text-white max-w-[4.8rem]"} >Sinh viên</Badge>: <Badge className={"max-w-[5.5rem]"}>Giảng viên</Badge>}
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+            <div className={"flex flex-col justify-between border-gray-200 border-[1px] rounded-md p-4"}>
                 {/*<MessageContainer containerRef={containerRef} scrollHandler={scrollHandler} lastHeight={lastHeight}  messages={messages} refer={lasMessageElementRef} />*/}
                 {/*<SendMessageForm sendMessage={sendMessage}  />*/}
-                <ChatMessage messages={messages}/>
+                <ChatMessage loadMessage={loadMessage} messages={messages}/>
                 <ChatMessageInput sendMessage={sendMessage} />
             </div>
             {/*<div>{loading && 'Loading...'}</div>*/}

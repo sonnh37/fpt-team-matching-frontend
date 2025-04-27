@@ -40,7 +40,7 @@ export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber}: 
             const data = new Uint8Array(e.target.result as ArrayBuffer);
             const workbook = XLSX.read(data, { type: "array" });
 
-            const sheetName = workbook.SheetNames[0]; // Get first sheet
+            const sheetName = workbook.SheetNames[reviewNumber - 1]; // Get first sheet
             const worksheet = workbook.Sheets[sheetName];
 
             const rows:string[][] = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: false });
@@ -92,31 +92,38 @@ export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber}: 
                             {currentRole && reviewDetailsRBAC.hasPermission(currentRole, "updateFile") && (
                                 <>
                                     <div className={"my-6"}>
-                                        {reviewNumber == 1 ? (
-                                            <Link
-                                                className="px-4 py-4 bg-amber-500 rounded-md"
-                                                download="Checklist_CapstoneProjectReview_1_Template.xlsx"
-                                                href="/Checklist_CapstoneProjectReview_1_Template.xlsx"
-                                            >
-                                                Tải template tại đây
-                                            </Link>
-                                        ) : reviewNumber == 2 ? (
-                                            <Link
-                                                className="px-4 py-4 bg-amber-500 rounded-md"
-                                                download="Checklist_CapstoneProjectReview_2_Template.xlsx"
-                                                href="/Checklist_CapstoneProjectReview_2_Template.xlsx"
-                                            >
-                                                Tải template tại đây
-                                            </Link>
-                                        ) : (
-                                            <Link
-                                                className="px-4 py-4 bg-amber-500 rounded-md"
-                                                download="Checklist_CapstoneProjectReview_3_Template.xlsx"
-                                                href="/Checklist_CapstoneProjectReview_3_Template.xlsx"
-                                            >
-                                                Tải template tại đây
-                                            </Link>
-                                        )}
+                                        {/*{reviewNumber == 1 ? (*/}
+                                        {/*    <Link*/}
+                                        {/*        className="px-4 py-4 bg-amber-500 rounded-md"*/}
+                                        {/*        download="Checklist_CapstoneProjectReview_1_Template.xlsx"*/}
+                                        {/*        href="/Checklist_CapstoneProjectReview_1_Template.xlsx"*/}
+                                        {/*    >*/}
+                                        {/*        Tải template tại đây*/}
+                                        {/*    </Link>*/}
+                                        {/*) : reviewNumber == 2 ? (*/}
+                                        {/*    <Link*/}
+                                        {/*        className="px-4 py-4 bg-amber-500 rounded-md"*/}
+                                        {/*        download="Checklist_CapstoneProjectReview_2_Template.xlsx"*/}
+                                        {/*        href="/Checklist_CapstoneProjectReview_2_Template.xlsx"*/}
+                                        {/*    >*/}
+                                        {/*        Tải template tại đây*/}
+                                        {/*    </Link>*/}
+                                        {/*) : (*/}
+                                        {/*    <Link*/}
+                                        {/*        className="px-4 py-4 bg-amber-500 rounded-md"*/}
+                                        {/*        download="Checklist_CapstoneProjectReview_3_Template.xlsx"*/}
+                                        {/*        href="/Checklist_CapstoneProjectReview_3_Template.xlsx"*/}
+                                        {/*    >*/}
+                                        {/*        Tải template tại đây*/}
+                                        {/*    </Link>*/}
+                                        {/*)}*/}
+                                        <Link
+                                            className="px-4 py-4 bg-amber-500 rounded-md"
+                                            download="Checklist_CapstoneProjectReview.xlsx"
+                                            href="/Checklist_CapstoneProjectReview.xlsx"
+                                        >
+                                            Tải template tại đây
+                                        </Link>
                                     </div>
                                     <div className="flex items-center justify-center w-full">
                                         <label htmlFor="dropzone-file"

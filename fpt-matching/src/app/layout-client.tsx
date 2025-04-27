@@ -3,7 +3,7 @@ import store from "@/lib/redux/store";
 import { ThemeProvider } from "next-themes";
 import NextTopLoader from "nextjs-toploader";
 import { Provider } from "react-redux";
-import { AuthProvider } from "@/components/_common/auth-provider";
+import AuthProvider from "@/components/_common/auth-provider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./globals.css";

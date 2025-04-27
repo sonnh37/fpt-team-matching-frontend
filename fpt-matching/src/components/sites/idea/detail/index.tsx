@@ -14,6 +14,7 @@ import {
   GitCompare,
   ClipboardList,
   Building2,
+  ListChecks,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -29,22 +30,54 @@ import { formatDate, getFileNameFromUrl, getPreviewUrl } from "@/lib/utils";
 import { format } from "date-fns";
 import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { IdeaVersion } from "@/types/idea-version";
+import { useQuery } from "@tanstack/react-query";
+import { ideaService } from "@/services/idea-service";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import ErrorSystem from "@/components/_common/errors/error-system";
+import { useCurrentRole } from "@/hooks/use-current-role";
+import { useSelectorUser } from "@/hooks/use-auth";
 
 interface IdeaDetailFormProps {
-  idea: Idea;
+  ideaId?: string;
 }
 
-export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
+export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
+  const roleCurrent = useCurrentRole();
+  const user = useSelectorUser();
+  if (!user) return;
+  const {
+    data: idea,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["ideaDetail", ideaId],
+    queryFn: async () =>
+      await ideaService.getById(ideaId).then((res) => res.data),
+  });
+
+  const [selectedVersion, setSelectedVersion] = useState<
+    IdeaVersion | undefined
+  >();
+
+  if (isLoading) return <LoadingComponent />;
+  if (error) return <ErrorSystem />;
+  if (!idea) return <div>Idea not found</div>;
+
   const highestVersion =
     idea.ideaVersions.length > 0
       ? idea.ideaVersions.reduce((prev, current) =>
           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
         )
       : undefined;
+
+  // Initialize selectedVersion with highestVersion if not set
+  if (!selectedVersion && highestVersion) {
+    setSelectedVersion(highestVersion);
+  }
   const resultDate = highestVersion?.stageIdea?.resultDate
     ? new Date(highestVersion.stageIdea.resultDate)
     : null;
-  const ideaVersionRequests = highestVersion?.ideaVersionRequests || [];
+  const ideaVersionRequests = selectedVersion?.ideaVersionRequests || [];
 
   const isResultDay = resultDate ? resultDate.getTime() <= Date.now() : false;
 
@@ -54,10 +87,6 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
   const councilApprovals = ideaVersionRequests.filter(
     (req) => req.role === "Council"
   );
-
-  const [selectedVersion, setSelectedVersion] = useState<
-    IdeaVersion | undefined
-  >(highestVersion);
 
   const renderVersionInfo = (version?: IdeaVersion) => {
     if (!version) {
@@ -70,8 +99,10 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
       );
     }
 
-    const requests = version.ideaVersionRequests.filter(m => m.role === "Mentor");
-
+    const requests =
+      roleCurrent === "Student"
+        ? version.ideaVersionRequests.filter((m) => m.role === "Mentor")
+        : version.ideaVersionRequests.filter((m) => m.reviewerId === user.id);
 
     return (
       <div className="space-y-6">
@@ -206,37 +237,59 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <ClipboardList className="h-5 w-5" />
-              <h3>Đánh giá bởi Mentor</h3>
+              <h3>{roleCurrent == "Student" ? "Lịch sử đánh giá của các mentor" :  "Lịch sử đánh giá"}</h3>
             </div>
             <Separator />
 
             <div className="space-y-4">
-              {requests.map((request) => (
-                <div key={request.id} className="border rounded-lg p-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-1">
-                      <Label>Người đánh giá</Label>
-                      <p className="text-sm font-medium">
-                        {request.reviewer?.email || "Unknown"}
-                      </p>
-                    </div>
+              {requests.map((request) => {
+                const isRequestForCurrentUser = request.reviewerId == user.id;
+                const isRequestForCurrentUserHasAnswer = request?.answerCriterias?.length > 0 || false;
 
-                    <div className="space-y-1">
-                      <Label>Trạng thái</Label>
-                      <div>
-                        <RequestStatusBadge status={request.status} />
+                return (
+                  <div key={request.id} className="border rounded-lg p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="space-y-1">
+                        <Label>Người đánh giá</Label>
+                        <p className="text-sm font-medium">
+                          {request.reviewer?.email || "Unknown"}
+                        </p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label>Trạng thái</Label>
+                        <div>
+                          <RequestStatusBadge status={request.status} />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label>Ngày xử lí</Label>
+                        <p className="text-sm font-medium">
+                          {formatDate(request.processDate)}
+                        </p>
+                      </div>
+
+                      <div className="space-y-1">
+                        {/* <Label></Label> */}
+                        {isRequestForCurrentUser && (
+                          <Link href={`/idea/reviews/${request.id}`} passHref>
+                            <Button
+                              variant={
+                                isRequestForCurrentUserHasAnswer
+                                  ? "default"
+                                  : "outline"
+                              }
+                            >
+                              <ListChecks className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        )}
                       </div>
                     </div>
-
-                    <div className="space-y-1">
-                      <Label>Ngày xử lí</Label>
-                      <p className="text-sm font-medium">
-                        {formatDate(request.processDate)}
-                      </p>
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -246,53 +299,13 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Version Selector */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <GitCompare className="h-5 w-5 text-muted-foreground" />
-          <Label>Phiên bản</Label>
-        </div>
-
-        <Select
-          value={selectedVersion?.version?.toString()}
-          onValueChange={(value) => {
-            const version = idea.ideaVersions.find(
-              (v) => v.version?.toString() === value
-            );
-            setSelectedVersion(version);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select version" />
-          </SelectTrigger>
-          <SelectContent>
-            {idea.ideaVersions
-              .sort((a, b) => (b.version || 0) - (a.version || 0))
-              .map((version) => (
-                <SelectItem
-                  key={version.id}
-                  value={version.version?.toString() || ""}
-                >
-                  Phiên bản {version.version}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Status Badge */}
-      <div className="space-y-1">
-        <Label>Trạng thái đề tài</Label>
-        <div>
-          <StatusBadge status={idea.status} />
-        </div>
-      </div>
-
       {/* Team & Mentorship Section */}
       <div className="space-y-3">
         <div className="flex items-center gap-2 text-lg font-semibold">
           <Users className="h-5 w-5" />
-          <h3>Thông tin chung</h3>
+          <h3>
+            Thông tin chung <StatusBadge status={idea.status} />
+          </h3>
         </div>
         <Separator />
 
@@ -363,6 +376,42 @@ export const IdeaDetailForm = ({ idea }: IdeaDetailFormProps) => {
             </p>
           </div>
         </div>
+      </div>
+
+      <Separator />
+
+      {/* Version Selector */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <GitCompare className="h-5 w-5 text-muted-foreground" />
+          <Label>Phiên bản</Label>
+        </div>
+
+        <Select
+          value={selectedVersion?.version?.toString()}
+          onValueChange={(value) => {
+            const version = idea.ideaVersions.find(
+              (v) => v.version?.toString() === value
+            );
+            setSelectedVersion(version);
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select version" />
+          </SelectTrigger>
+          <SelectContent>
+            {idea.ideaVersions
+              .sort((a, b) => (b.version || 0) - (a.version || 0))
+              .map((version) => (
+                <SelectItem
+                  key={version.id}
+                  value={version.version?.toString() || ""}
+                >
+                  Phiên bản {version.version}
+                </SelectItem>
+              ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Version-specific content */}

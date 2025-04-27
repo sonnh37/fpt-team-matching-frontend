@@ -22,7 +22,10 @@ import { NavMain } from "./nav-main";
 import { NavManagement } from "./nav-management";
 import { RoleSwitcher } from "./role-switcher";
 import { TypographyP } from "@/components/_common/typography/typography-p";
-import { initializeCache, updateUserCache } from "@/lib/redux/slices/cacheSlice";
+import {
+  initializeCache,
+  updateUserCache,
+} from "@/lib/redux/slices/cacheSlice";
 import { useTheme } from "next-themes";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -30,7 +33,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const user = useSelector((state: RootState) => state.user.user);
   const role = useCurrentRole();
   const currentCache = useSelector((state: RootState) => state.cache.cache); // Lấy toàn bộ cache
-  const {setTheme} = useTheme();
+  const { setTheme } = useTheme();
   const { data: semesterData } = useQuery({
     queryKey: ["getSemesterLatest_AppSidebar"],
     queryFn: () => semesterService.getCurrentSemester(),
@@ -40,13 +43,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   React.useEffect(() => {
     if (!user) return;
 
-    // Khởi tạo cache khi có user
     if (user.cache) {
       dispatch(initializeCache(user.cache));
-      
     } else {
-      // Nếu không có cache, khởi tạo với role đầu tiên
-      const primaryRole = user.userXRoles.find(role => role.isPrimary)?.role?.roleName;
+      const primaryRole = user.userXRoles.find((role) => role.isPrimary)?.role
+        ?.roleName;
       if (primaryRole) {
         setTheme("light");
         dispatch(updateUserCache({ role: primaryRole, theme: "light" }));
@@ -56,7 +57,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   if (!user) return null;
 
-  // Lọc navigation items theo role
   const filteredNavMain = filterNavItemsByRole(NAV_CONFIG.main, role as string);
   const filteredNavManage = filterNavItemsByRole(
     NAV_CONFIG.management,
@@ -82,23 +82,25 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </div>
           </Link>
         </SidebarMenuButton>
+        <Separator />
+        <div>
+          <RoleSwitcher currentSemester={semesterData?.data} />
 
-        <RoleSwitcher currentSemester={semesterData?.data} />
-
-        <SidebarMenuButton
-          className="flex items-center data-[state=open]:bg-sidebar-accent hover:cursor-default hover:bg-transparent data-[state=open]:text-sidebar-accent-foreground"
-          tooltip={semesterData?.data?.semesterName}
-        >
-          <div className="flex aspect-square size-4 items-center justify-center rounded-lg">
-            <Calendar className="dark:text-white text-black" />
-          </div>
-          <div>
-            <TypographyP className="truncate">
-              Học kì: 
-              {` ` + semesterData?.data?.semesterName + ""}
-            </TypographyP>
-          </div>
-        </SidebarMenuButton>
+          <SidebarMenuButton
+            className="flex py-4 items-center data-[state=open]:bg-sidebar-accent hover:cursor-default hover:bg-transparent data-[state=open]:text-sidebar-accent-foreground"
+            tooltip={semesterData?.data?.semesterName}
+          >
+            <div className="flex aspect-square size-4 items-center justify-center rounded-lg">
+              <Calendar className="dark:text-white text-black" />
+            </div>
+            <div>
+              <TypographyP className="truncate">
+                Học kì:
+                {` ` + semesterData?.data?.semesterName + ""}
+              </TypographyP>
+            </div>
+          </SidebarMenuButton>
+        </div>
       </SidebarHeader>
 
       <Separator />

@@ -96,7 +96,7 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+            <SidebarMenuButton className="py-4 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
               <div className="flex aspect-square size-4 items-center justify-center rounded-lg">
                 <UserRoundCog className="dark:text-white text-black" />
               </div>

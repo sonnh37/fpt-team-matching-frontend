@@ -52,6 +52,9 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { ideaService } from "@/services/idea-service";
+import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
+import { IdeaStatus } from "@/types/enums/idea";
 
 const defaultSchema = z.object({
   stageNumber: z.number().default(1).optional(),
@@ -85,14 +88,18 @@ export function IdeaVersionRequestPendingByMentorTable() {
 
   if (!user) return null;
 
-  const queryParams: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
-    useMemo(() => {
-      const params: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
-        useQueryParams(formValues, columnFilters, pagination, sorting);
-      params.status = IdeaVersionRequestStatus.Pending;
-      params.roles = ["Mentor"];
-      return { ...params };
-    }, [formValues, columnFilters, pagination, sorting]);
+  const queryParams: IdeaGetListByStatusAndRoleQuery = useMemo(() => {
+    const params: IdeaGetListByStatusAndRoleQuery = useQueryParams(
+      formValues,
+      columnFilters,
+      pagination,
+      sorting
+    );
+    params.status = IdeaVersionRequestStatus.Pending;
+    params.ideaStatus = IdeaStatus.Pending;
+    params.roles = ["Mentor"];
+    return { ...params };
+  }, [formValues, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || formValues) {
@@ -100,20 +107,24 @@ export function IdeaVersionRequestPendingByMentorTable() {
     }
   }, [columnFilters, formValues]);
 
-  const { data, isFetching, error } = useQuery({
-    queryKey: ["data_ideaversionrequest_pending", IdeaVersionRequestStatus.Pending],
+  const { data, isFetching, error, refetch } = useQuery({
+    queryKey: ["data", queryParams],
     queryFn: async () =>
-      await ideaVersionRequestService.GetIdeaVersionRequestsCurrentByStatusAndRoles(queryParams),
+      await ideaService.getIdeasOfReviewerByRolesAndStatus(queryParams),
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
-  if (error) return (
-    <Alert variant="destructive" className="my-4">
-      <Info className="h-4 w-4" />
-      <AlertTitle>Lỗi</AlertTitle>
-      <AlertDescription>Không thể tải dữ liệu. Vui lòng thử lại sau.</AlertDescription>
-    </Alert>
-  );
+  if (error)
+    return (
+      <Alert variant="destructive" className="my-4">
+        <Info className="h-4 w-4" />
+        <AlertTitle>Lỗi</AlertTitle>
+        <AlertDescription>
+          Không thể tải dữ liệu. Vui lòng thử lại sau.
+        </AlertDescription>
+      </Alert>
+    );
 
   const table = useReactTable({
     data: data?.data?.results ?? [],

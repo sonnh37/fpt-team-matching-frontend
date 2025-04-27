@@ -51,6 +51,9 @@ import { columns } from "./columns";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
+import { ideaService } from "@/services/idea-service";
+import { IdeaStatus } from "@/types/enums/idea";
+import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
 
 const defaultSchema = z.object({
   stageNumber: z.number().default(1).optional(),
@@ -84,36 +87,48 @@ export function IdeaVersionRequestPendingByCouncilTable() {
 
   if (!user) return null;
 
-  const queryParams: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
-    useMemo(() => {
-      const params: IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery =
-        useQueryParams(formValues, columnFilters, pagination, sorting);
-      params.status = IdeaVersionRequestStatus.Pending;
-      params.roles = ["Council"];
-      return { ...params };
-    }, [formValues, columnFilters, pagination, sorting]);
+  const queryParams: IdeaGetListByStatusAndRoleQuery = useMemo(() => {
+    const params: IdeaGetListByStatusAndRoleQuery = useQueryParams(
+      formValues,
+      columnFilters,
+      pagination,
+      sorting
+    );
+
+    params.status = IdeaVersionRequestStatus.Pending;
+    params.ideaStatus = IdeaStatus.Pending;
+    params.roles = ["Council"];
+
+    return { ...params };
+  }, [formValues, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || formValues) {
-      setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+      setPagination((prev) => ({
+        ...prev,
+        pageIndex: 0,
+      }));
     }
   }, [columnFilters, formValues]);
 
-  const { data, isFetching, error } = useQuery({
-    queryKey: ["data_ideaversionrequest_pending", formValues],
+  const { data, isFetching, error, refetch } = useQuery({
+    queryKey: ["data", queryParams],
     queryFn: async () =>
-      await ideaVersionRequestService.GetIdeaVersionRequestsCurrentByStatusAndRoles(queryParams),
+      await ideaService.getIdeasOfReviewerByRolesAndStatus(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
-  if (error) return (
-    <Alert variant="destructive" className="my-4">
-      <Info className="h-4 w-4" />
-      <AlertTitle>Lỗi</AlertTitle>
-      <AlertDescription>Không thể tải dữ liệu. Vui lòng thử lại sau.</AlertDescription>
-    </Alert>
-  );
+  if (error)
+    return (
+      <Alert variant="destructive" className="my-4">
+        <Info className="h-4 w-4" />
+        <AlertTitle>Lỗi</AlertTitle>
+        <AlertDescription>
+          Không thể tải dữ liệu. Vui lòng thử lại sau.
+        </AlertDescription>
+      </Alert>
+    );
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
@@ -129,12 +144,10 @@ export function IdeaVersionRequestPendingByCouncilTable() {
     debugTable: true,
   });
 
-  const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-  };
+  const onSubmit = (values: z.infer<typeof defaultSchema>) => {};
 
   return (
     <div className="space-y-6 py-4">
-
       {/* Bảng dữ liệu */}
       <div className="space-y-4">
         <Card>

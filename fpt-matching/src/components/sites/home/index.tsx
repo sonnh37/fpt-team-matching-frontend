@@ -115,6 +115,7 @@ export default function ProjectSearchList() {
     const params: ProjectGetAllQuery = {
       ...useQueryParams(inputFields, columnFilters, pagination, sorting),
       isHasTeam: true,
+      status: ProjectStatus.Pending,
     };
 
     return { ...params };
@@ -131,7 +132,7 @@ export default function ProjectSearchList() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => projectService.getAll(queryParams),
+    queryFn: async () => await projectService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -284,15 +285,16 @@ export default function ProjectSearchList() {
           </Form>
         </div>
 
-        <div className="space-y-4 h-full">
-        
-            <DataTableComponent
-              isLoading={isFetching}
-              deletePermanent={projectService.deletePermanent}
-              restore={projectService.restore}
-              table={table}
-            />
-        
+        <div className=" h-full">
+          <DataTableComponent
+            isLoading={isFetching}
+            deletePermanent={projectService.deletePermanent}
+            restore={projectService.restore}
+            table={table}
+            isEnableHeader={false}
+            height={500}
+          />
+
           <DataTablePagination table={table} />
         </div>
       </div>

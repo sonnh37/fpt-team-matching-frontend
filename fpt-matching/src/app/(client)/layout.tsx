@@ -13,15 +13,22 @@ export default function ClientLayout({
   const router = useRouter();
   const user = useSelector((state: RootState) => state.user.user);
 
+  
   useEffect(() => {
     if (!user) {
       router.replace("/login");
     }
   }, [user, router]);
 
+  if (!user) {
+    return;
+  }
+
   if (localStorage.getItem("showToast") === "true") {
     if (user) {
-      toast.success(`Chào mừng ${user.firstName} đến với hệ sinh thái kết nối tài năng FPT! 🌍`);
+      toast.success(
+        `Chào mừng ${user.firstName} đến với hệ sinh thái kết nối tài năng FPT! 🌍`
+      );
     }
     localStorage.removeItem("showToast");
   }

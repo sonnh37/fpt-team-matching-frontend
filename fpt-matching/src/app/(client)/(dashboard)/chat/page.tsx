@@ -1,7 +1,7 @@
 "use client";
 import ConversationList from '@/components/chat/ConversationList';
 import {HubConnection, HubConnectionBuilder, LogLevel} from '@microsoft/signalr';
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import WaitingRoom from "@/components/chat/WaitingRoom";
 import ChatRoom from '@/components/chat/ChatRoom';
 import {MessageModel} from "@/types/message-model";
@@ -10,7 +10,9 @@ import {ConversationMemberInfo} from "@/types/conversation-member-info";
 export default function Page() {
   const [conn, setConnection] = useState<HubConnection>();
   const [messages, setMessages] = useState<MessageModel[]>([]);
+  const [loadMessage, setLoadMessage] = useState<boolean>(false);
   const [chatroom, setChatroom] = useState<ConversationMemberInfo>();
+  const [toggle, setToggle] = useState<boolean>(false)
 
   const joinChatRoom = async (username: string,  partnerId: string , chatroom: string) => {
     try {
@@ -28,25 +30,30 @@ export default function Page() {
           sendById: username,
           id: "",
           conversationId: conversationId,
-          createdDate: Date.now().toString()
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          createdDate: Date.now()
         }
+        setToggle((prev) => !prev);
         setMessages(messages => [...messages, newMessage]);
       })
       await conn.start();
       await conn.invoke("JoinSpecificChatRoom", {UserId: username, PartnerId: partnerId, ConversationId: chatroom});
       setConnection(conn);
+
     } catch (e) {
       console.error(e);
     }
   }
+
   return (
       <main>
-        <div className={"bg-blue-100 text-black p-0 m-0 flex w-full"}>
-          <ConversationList chatRoom={chatroom} setChatRoom={setChatroom} joinChatRoom={joinChatRoom} />
-          <div className={"w-[75%] "}>
+        <div className={"text-black p-0 m-0 flex gap-12 h-[82vh] w-full"}>
+          <ConversationList setToggle={setToggle} toggle={toggle} setLoadMessage={setLoadMessage} loadMessage={loadMessage} chatRoom={chatroom} setChatRoom={setChatroom} joinChatRoom={joinChatRoom} conn={conn} setConnection={setConnection} />
+          <div className={"w-[90%]"}>
             {!conn
                 ?  <WaitingRoom />
-                : <ChatRoom chatRoom={chatroom} setMessages={setMessages} messages={messages} conn={conn}/>}
+                : <ChatRoom setLoadMessage={setLoadMessage} loadMessage={loadMessage} chatRoom={chatroom} setMessages={setMessages} messages={messages} conn={conn}/>}
           </div>
         </div>
       </main>

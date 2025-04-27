@@ -111,13 +111,12 @@ export default function InvitationsInComingToLeaderTable({
   //#endregion
 
   if (error) return <div>Error loading data</div>;
-  if (isLoading) return <LoadingComponent />;
 
   return (
     <>
       <div className="space-y-8">
         <div className="space-y-3">
-          <DataTableComponent table={table} />
+          <DataTableComponent table={table} isLoading={isFetching} />
           <DataTablePagination table={table} />
         </div>
       </div>

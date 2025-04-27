@@ -6,6 +6,20 @@ import { TypographyP } from "@/components/_common/typography/typography-p";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -20,42 +34,111 @@ import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { IdeaVersionRequest } from "@/types/idea-version-request";
 import { User } from "@/types/user";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { Eye, ListChecks, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { CiFolderOn, CiFolderOff } from "react-icons/ci";
 import { useSelector } from "react-redux";
+import { Idea } from "@/types/idea";
+import { IdeaDetailForm } from "../../../detail";
+import Link from "next/link";
+import { useSelectorUser } from "@/hooks/use-auth";
 
-export const columns: ColumnDef<IdeaVersionRequest>[] = [
+export const columns: ColumnDef<Idea>[] = [
   {
-    accessorKey: "ideaVersion.englishName",
+    accessorKey: "teamCode",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tên đề tài tiếng anh" />
+      <DataTableColumnHeader column={column} title="Mã nhóm" />
     ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion?.topic?.project?.teamCode || "-";
+    },
   },
   {
-    accessorKey: "ideaVersion.version",
+    accessorKey: "topicCode",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Mã topic" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion?.topic?.topicCode || "-";
+    },
+  },
+  // {
+  //   accessorKey: "vietNamName",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Tên đề tài (VN)" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const idea = row.original;
+  //     const highestVersion = idea.ideaVersions.length > 0
+  //       ? idea.ideaVersions.reduce((prev, current) =>
+  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //         )
+  //       : undefined;
+  //     return highestVersion?.vietNamName || "-";
+  //   },
+  // },
+  // {
+  //   accessorKey: "englishName",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Tên đề tài (EN)" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const idea = row.original;
+  //     const highestVersion = idea.ideaVersions.length > 0
+  //       ? idea.ideaVersions.reduce((prev, current) =>
+  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //         )
+  //       : undefined;
+  //     return highestVersion?.englishName || "-";
+  //   },
+  // },
+  {
+    accessorKey: "version",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Phiên bản" />
     ),
-  },
-  {
-    accessorKey: "processDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Ngày xử lí" />
-    ),
-  },
-  {
-    accessorKey: "createdDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Ngày tạo" />
-    ),
     cell: ({ row }) => {
-      const date = new Date(row.getValue("createdDate"));
-      return formatDate(date);
+      const idea = row.original;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion ? `v${highestVersion.version}` : "-";
     },
   },
+  // {
+  //   accessorKey: "enterpriseName",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Doanh nghiệp" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const idea = row.original;
+  //     const highestVersion = idea.ideaVersions.length > 0
+  //       ? idea.ideaVersions.reduce((prev, current) =>
+  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //         )
+  //       : undefined;
+  //     return highestVersion?.enterpriseName || "-";
+  //   },
+  // },
   {
     accessorKey: "status",
     header: ({ column }) => (
@@ -96,52 +179,39 @@ export const columns: ColumnDef<IdeaVersionRequest>[] = [
 ];
 
 interface ActionsProps {
-  row: Row<IdeaVersionRequest>;
+  row: Row<Idea>;
 }
 
 const Actions: React.FC<ActionsProps> = ({ row }) => {
-  const model = row.original;
-  const router = useRouter();
-  const pathName = usePathname();
-  const handleViewDetailsClick = () => {
-    // router.push(`${pathName}/${model.id}`);
-  };
-  const [showDeleteTaskDialog, setShowDeleteTaskDialog] = useState(false);
+  const idea = row.original;
 
+  const user = useSelectorUser();
+  if (!user) return;
+
+  const highestVersion =
+    idea.ideaVersions.length > 0
+      ? idea.ideaVersions.reduce((prev, current) =>
+          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+        )
+      : undefined;
+
+ 
   return (
-    <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
-            <MoreHorizontal className="h-4 w-4" />
+    <div className="flex flex-row gap-2">
+      {/* Nút xem nhanh trong dialog */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button size="icon" variant="outline">
+            <Eye className="h-4 w-4" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>
-            Cancel
-          </DropdownMenuItem>
-          {/*<DropdownMenuItem onClick={handleUsersClick}>*/}
-          {/*    View photos*/}
-          {/*</DropdownMenuItem>*/}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleViewDetailsClick}>
-            View details
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <DeleteBaseEntitysDialog
-        deleteById={ideaVersionRequestService.delete}
-        open={showDeleteTaskDialog}
-        buttonLeftMessage="Yes"
-        buttonRightMessage="No"
-        onOpenChange={setShowDeleteTaskDialog}
-        list={[model]}
-        showTrigger={false}
-        onSuccess={() => row.toggleSelected(false)}
-      />
-    </>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Idea Preview</DialogTitle>
+          </DialogHeader>
+          {idea && <IdeaDetailForm ideaId={idea.id} />}
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 };

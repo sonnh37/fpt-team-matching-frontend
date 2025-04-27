@@ -9,6 +9,7 @@ import { cleanQueryParams } from "@/lib/utils";
 import { IdeaUpdateStatusCommand } from "@/types/models/commands/idea/idea-update-status-command";
 import { IdeaVersionRequest } from "@/types/idea-version-request";
 import { IdeaGetListOfSupervisorsQuery } from "@/types/models/queries/ideas/idea-get-list-of-supervisor-query";
+import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
 
 class IdeaService extends BaseService<Idea> {
   constructor() {
@@ -24,6 +25,20 @@ class IdeaService extends BaseService<Idea> {
       )
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public getIdeasOfReviewerByRolesAndStatus = async (
+    query?: IdeaGetListByStatusAndRoleQuery
+  ): Promise<BusinessResult<QueryResult<Idea>>> => {
+    try {
+      const cleanedQuery = cleanQueryParams(query);
+      const response = await axiosInstance.get<
+        BusinessResult<QueryResult<Idea>>
+      >(`${this.endpoint}/me/by-status-and-roles?${cleanedQuery}`);
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
   };
 
   public createIdeaByLecturer = (
@@ -60,9 +75,12 @@ class IdeaService extends BaseService<Idea> {
 
   public updateStatus = (
     command: IdeaUpdateStatusCommand
-  ): Promise<BusinessResult<IdeaVersionRequest>> => {
+  ): Promise<BusinessResult<Idea>> => {
     return axiosInstance
-      .put<BusinessResult<IdeaVersionRequest>>(`${this.endpoint}/status`, command)
+      .put<BusinessResult<Idea>>(
+        `${this.endpoint}/status`,
+        command
+      )
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };

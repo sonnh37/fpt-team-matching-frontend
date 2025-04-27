@@ -101,6 +101,8 @@ const formSchema = z.object({
       }
     ),
   specialtyId: z.string().optional(),
+  mentorId: z.string().optional(),
+  subMentorId: z.string().optional(),
   enterpriseName: z
     .string()
     .min(2, { message: "Enterprise name must be at least 2 characters." })
@@ -115,7 +117,6 @@ export const CreateProjectForm = () => {
   const isLecturer = user?.userXRoles.some(
     (m) => m.role?.roleName == "Lecturer"
   );
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [selectedProfession, setSelectedProfession] =
     useState<Profession | null>(null);
   const [professions, setProfessions] = useState<Profession[]>([]);
@@ -185,12 +186,6 @@ export const CreateProjectForm = () => {
   });
 
   const users = result?.data?.results ?? [];
-
-  useEffect(() => {
-    if (users.length > 0 && users[0].id !== undefined) {
-      setSelectedUserId(users[0].id);
-    }
-  }, [users]);
 
   useEffect(() => {
     async function checkIdea() {
@@ -285,6 +280,9 @@ export const CreateProjectForm = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
+      // const res_bool_men = await CheckUserProjectSlotAvailability(values.mentorId, "Mentor");
+      // const res_bool_submen = await CheckUserProjectSlotAvailability(values.subMentorId, "Submentor");
+
       console.log("check_values", values);
       // submit file cloudinary
       const res_ = await fileUploadService.uploadFile(
@@ -297,7 +295,6 @@ export const CreateProjectForm = () => {
       if (isStudent) {
         const command: IdeaCreateCommand = {
           ...values,
-          mentorId: selectedUserId ?? undefined,
           isEnterpriseTopic: false,
           enterpriseName: undefined,
           file: res_.data,
@@ -347,7 +344,7 @@ export const CreateProjectForm = () => {
         <Card className="w-full max-w-4xl">
           <CardHeader className="text-center space-y-2">
             <CardTitle className="text-3xl font-bold tracking-tight">
-              Tạo Ý Tưởng Mới
+              Tạo ý tưởng mới
             </CardTitle>
             <CardDescription className="text-muted-foreground">
               Điền đầy đủ thông tin bên dưới để đăng ký ý tưởng dự án. Tất cả
@@ -550,67 +547,117 @@ export const CreateProjectForm = () => {
             <div className="space-y-4 rounded-lg border p-4">
               <h3 className="text-lg font-medium">Nhóm & Tài liệu</h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="teamSize"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Số lượng thành viên</FormLabel>
-                      <Select
-                        onValueChange={(value) => {
-                          field.onChange(Number(value));
-                        }}
-                        value={field.value?.toString()}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Chọn số lượng thành viên" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {[4, 5, 6].map((option) => (
-                            <SelectItem key={option} value={option.toString()}>
-                              {option} thành viên
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Bao gồm cả bạn với vai trò trưởng nhóm
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {isStudent && (
+              <FormField
+                control={form.control}
+                name="teamSize"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Giảng viên hướng dẫn</FormLabel>
+                    <FormLabel>Số lượng thành viên</FormLabel>
                     <Select
-                      onValueChange={(value) => setSelectedUserId(value)}
-                      value={selectedUserId ?? undefined}
+                      onValueChange={(value) => {
+                        field.onChange(Number(value));
+                      }}
+                      value={field.value?.toString()}
                     >
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Chọn giảng viên hướng dẫn" />
+                        <SelectValue placeholder="Chọn số lượng thành viên" />
                       </SelectTrigger>
                       <SelectContent>
-                        {users?.map((user) => (
-                          <SelectItem key={user.id} value={user.id!}>
-                            <div className="flex items-center gap-2">
-                              <span>
-                                {user.lastName} {user.firstName}
-                              </span>
-                              <span className="text-muted-foreground text-xs">
-                                {user.email}
-                              </span>
-                            </div>
+                        {[4, 5, 6].map((option) => (
+                          <SelectItem key={option} value={option.toString()}>
+                            {option} thành viên
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                     <FormDescription>
-                      Chọn giảng viên sẽ hướng dẫn dự án của bạn
+                      Bao gồm cả bạn với vai trò trưởng nhóm
                     </FormDescription>
+                    <FormMessage />
                   </FormItem>
+                )}
+              />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {isStudent && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="mentorId"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Giảng viên hướng dẫn</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                          >
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Chọn giảng viên" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {users?.map((user) => (
+                                <SelectItem key={user.id} value={user.id!}>
+                                  <div className="flex items-center gap-2">
+                                    <span>
+                                      {user.lastName} {user.firstName}
+                                    </span>
+                                    <span className="text-muted-foreground text-xs">
+                                      {user.email}
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Chọn giảng viên sẽ hướng dẫn dự án của bạn
+                          </FormDescription>
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="subMentorId"
+                      render={({ field }) => {
+                        const mentorId = form.watch("mentorId");
+                        
+                        const usersFilterMentor = users.filter(
+                          (m) => m.id != mentorId
+                        );
+                        return (
+                          <FormItem>
+                            <FormLabel>Giảng viên hướng dẫn 2</FormLabel>
+                            <Select
+                              onValueChange={field.onChange}
+                              value={field.value}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Chọn giảng viên 2" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {mentorId &&
+                                  usersFilterMentor?.map((user) => (
+                                    <SelectItem key={user.id} value={user.id!}>
+                                      <div className="flex items-center gap-2">
+                                        <span>
+                                          {user.lastName} {user.firstName}
+                                        </span>
+                                        <span className="text-muted-foreground text-xs">
+                                          {user.email}
+                                        </span>
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                            <FormDescription>
+                              Chọn giảng viên sẽ hướng dẫn dự án của bạn
+                            </FormDescription>
+                          </FormItem>
+                        );
+                      }}
+                    />
+                  </>
                 )}
               </div>
 

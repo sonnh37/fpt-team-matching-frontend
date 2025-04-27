@@ -33,17 +33,12 @@ export const NAV_CONFIG = {
       icon: Globe,
       roles: ["*"],
     },
-    {
-      title: "Lời mời",
-      url: "/invitations",
-      icon: Send,
-      roles: ["*"],
-    },
+    
     {
       title: "Đội nhóm",
       url: "/team",
       icon: UsersRound,
-      roles: ["Student", "Reviewer", "Council"],
+      roles: ["Student"],
       items: [
         {
           title: "Đội của tôi",
@@ -88,7 +83,7 @@ export const NAV_CONFIG = {
           title: "Duyệt ý tưởng",
           icon: MdOutlineRateReview,
           url: "/idea/reviews/mentor",
-          roles: ["Lecturer"],
+          roles: ["Mentor"],
         },
         {
           title: "Duyệt ý tưởng",
@@ -97,6 +92,12 @@ export const NAV_CONFIG = {
           roles: ["Council"],
         },
       ],
+    },
+    {
+      title: "Lời mời",
+      url: "/invitations",
+      icon: Send,
+      roles: ["*"],
     },
     {
       title: "Danh sách giảng viên",
@@ -129,13 +130,19 @@ export const NAV_CONFIG = {
       title: "Quản lý các tiêu chí",
       url: "/manage-criteria",
       icon: ShieldHalf,
-      roles: ["*"],
+      roles: ["Manager"],
     },
     {
       title: "Quản lý dự án",
       url: "/management/projects",
-      icon: RiTimeLine,
-      roles: ["Lecturer"],
+      icon: null,
+      roles: ["Mentor"],
+    },
+    {
+      title: "Quản lý đề tài",
+      url: "/management/topics",
+      icon: null,
+      roles: ["Mentor"],
     },
     {
       title: "Quản lý bảo vệ",

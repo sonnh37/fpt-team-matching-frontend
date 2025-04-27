@@ -180,7 +180,13 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       request.role === "Mentor"
   );
 
-  const isLock = role != "Lecturer" ? hasMentorApproval : false;
+  const isLock = idea.ideaVersions.some(version => 
+    version.ideaVersionRequests?.some(
+      request => (request.status === IdeaVersionRequestStatus.Approved || 
+                 request.status === IdeaVersionRequestStatus.Rejected) &&
+                 request.role === "Mentor"
+    )
+  );
 
   const handleDelete = async () => {
     setIsDeleting(true);
@@ -226,7 +232,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <HorizontalLinearStepper idea={idea} />
           </div>
           <div className="p-4 gap-4">
-            <IdeaDetailForm idea={idea} />
+            <IdeaDetailForm ideaId={idea.id}  />
           </div>
           <DialogFooter>
             <Tooltip>
