@@ -90,7 +90,7 @@ const ChatRoom = ({setLoadMessage, conn, messages, setMessages, chatRoom, loadMe
                                     <Minus className={"text-black"} />
                                     <div className={"leading-6"}>{chatRoom?.partnerInfoResults.code}</div>
                                 </div>
-                                    {chatRoom.partnerInfoResults.role.filter(x => x == "Student")[0] ? <Badge className={"bg-white border-black border-[1px] text-black hover:bg-black hover:text-white max-w-[4.8rem]"} >Sinh viên</Badge>: <Badge>Giảng viên</Badge>}
+                                    {chatRoom.partnerInfoResults.role.filter(x => x == "Student")[0] ? <Badge className={"bg-white border-black border-[1px] text-black hover:bg-black hover:text-white max-w-[4.8rem]"} >Sinh viên</Badge>: <Badge className={"max-w-[5.5rem]"}>Giảng viên</Badge>}
                             </div>
                         </div>
                     </div>
