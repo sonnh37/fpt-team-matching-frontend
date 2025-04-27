@@ -205,9 +205,9 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                                         <TableCell  className="max-h-[500px] overflow-x-auto whitespace-nowrap">{cv.full_skill}</TableCell>
                                         <TableCell>{} {cv.similarity.toFixed(2) * 100}%</TableCell>
                                         <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`/social/blog/profile-social/${cv.user_id}`}>Xem profile</a></button></TableCell>
-                                        {/* <TableCell >
+                                        <TableCell >
                                             <button className="p-2 bg-blue-600 ml-3 rounded-sm" onClick={() => handleInvite(cv.email ?? "")}> Mời Vô Nhóm</button>
-                                        </TableCell> */}
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

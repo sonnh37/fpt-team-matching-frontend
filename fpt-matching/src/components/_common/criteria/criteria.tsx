@@ -80,6 +80,12 @@ const Criteria = () => {
         queryFn: () => criteriaService.getAll(queryParams),
         refetchOnWindowFocus: false,
     });
+    useEffect(() => {
+        setQueryParams((prev) => ({
+            ...prev,
+            pageNumber: currentPage,
+        }));
+    }, [currentPage]);
 
     useEffect(() => {
         if (criteria?.data) {

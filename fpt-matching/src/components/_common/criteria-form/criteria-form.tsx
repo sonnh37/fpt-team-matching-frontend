@@ -60,6 +60,13 @@ const CriteriaFormTable = () => {
     });
 
     useEffect(() => {
+        setQueryParams((prev) => ({
+            ...prev,
+            pageNumber: currentPage,
+        }));
+    }, [currentPage]);
+
+    useEffect(() => {
         if (form?.data) {
             setTotalPages(form?.data?.totalPages || 1);
             // Chỉ reset về trang 1 nếu dữ liệu mới có số trang nhỏ hơn trang hiện tại
