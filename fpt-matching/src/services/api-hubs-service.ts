@@ -36,13 +36,13 @@ class ApiHubsService {
     return response.data.recommendations;
   }
 
-  // async getRecommendUsers(candidateInput: string) : Promise<[]> {
-  //   interface ResponseBlogRecommendations {
-  //     recommendations: BlogRecommendations[];
-  //   }
-  //   const response = await axiosInstance.post<ResponseBlogRecommendations>("api_hubs/get-recommend-blogs", {candidateInput})
-  //   return response.data.recommendations;
-  // }
+  async getRecommendUsers(candidateInput: string) : Promise<UserRecommendations[]> {
+    interface ResponseBlogRecommendations {
+      recommendations: UserRecommendations[];
+    }
+    const response = await axiosInstance.post<ResponseBlogRecommendations>("api_hubs/get-recommend-users", {candidateInput})
+    return response.data.recommendations;
+  }
 }
 
 export const apiHubsService = new ApiHubsService();
