@@ -564,20 +564,20 @@ export default function Blog() {
             <div className="flex mt-3 ">
 
               <div className="flex space-x-4 justify-center w-full">
-                <button className="text-red-500 hover:text-gray-800 w-1/4">
+                <button className="text-red-500 hover:text-gray-800 w-1/2">
                   <FontAwesomeIcon icon={faVideo} />
                   <span> </span>
-                  Video trực tiếp
+                  Bài tuyển thành viên
                 </button>
-                <button className="text-green-600 hover:text-gray-800 w-1/4">
+                {/* <button className=" hover:text-gray-800 w-1/4">
                   <FontAwesomeIcon icon={faPhotoFilm} />
                   <span> </span>
                   Ảnh/video
-                </button>
-                <button className="text-yellow-600 hover:text-gray-800 w-1/4">
+                </button> */}
+                <button className="text-green-600 hover:text-gray-800 w-1/2">
                   <FontAwesomeIcon icon={faFaceSmile} />
                   <span> </span>
-                  Cảm xúc/hoạt động
+                  Bài chia sẻ cảm xúc/hoạt động
                 </button>
               </div>
             </div>

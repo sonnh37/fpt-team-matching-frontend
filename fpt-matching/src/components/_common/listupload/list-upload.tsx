@@ -69,22 +69,15 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
         refetchOnWindowFocus: false,
     });
 
-    console.log(blog,"test0 ")
-
-
+    console.log(blog?.data?.skillRequired,"skill") 
 
     const {
         data: recommend,
     } = useQuery({
         queryKey: ["apiHubService", blog?.data?.skillRequired],
-        queryFn: () => apiHubsService.getRecommendUsers(blogId),
+        queryFn: () => apiHubsService.getRecommendUsers(blog?.data?.skillRequired ?? ""),
         refetchOnWindowFocus: false,
     });
-
-                
-    console.log(recommend,"test ")
-
-
 
     //Đây là form delete trả về true false tái sử dụng được
     const confirm = useConfirm()
@@ -118,6 +111,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
         // Gọi confirm để mở dialog
         const confirmed = await confirm({
             title: "Bạn có muốn mời thành viên này không?",
+            description: "Bạn sẽ mời thành viên này vào nhóm"  ,
             confirmText: "Có",
             cancelText: "Không,cảm ơn",
         })
@@ -194,20 +188,25 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                                     <TableHead className="max-h-[500px] overflow-x-auto whitespace-nowrap">Kỹ năng</TableHead>
                                     <TableHead className="text-center">Mức độ tương đồng </TableHead>
                                     <TableHead className="text-center">Hồ sơ </TableHead>
+                                    <TableHead className="text-center">Hành động </TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {recommend?.map((cv, index) => (
                                     <TableRow key={index}>
-                                        <TableCell className="font-medium">{index +1}</TableCell>
-                                        <TableCell>{cv.first_name } {cv.last_name} </TableCell>
+                                        <TableCell className="font-medium">{index + 1}</TableCell>
+                                        <TableCell>{cv.first_name} {cv.last_name} </TableCell>
                                         <TableCell >{cv.email}</TableCell>
-                                        <TableCell  className="max-h-[500px] overflow-x-auto whitespace-nowrap">{cv.full_skill}</TableCell>
-                                        <TableCell>{} {cv.similarity.toFixed(2) * 100}%</TableCell>
+                                        <TableCell>
+                                            <div className="max-w-[300px] overflow-x-auto whitespace-nowrap">
+                                                {cv.full_skill}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="flex justify-center items-center"> {cv.similarity.toFixed(2) * 100}%</TableCell>
                                         <TableCell >   <button className="p-2 bg-orange-400 ml-3 rounded-sm"><a href={`/social/blog/profile-social/${cv.user_id}`}>Xem profile</a></button></TableCell>
-                                        {/* <TableCell >
+                                        <TableCell >
                                             <button className="p-2 bg-blue-600 ml-3 rounded-sm" onClick={() => handleInvite(cv.email ?? "")}> Mời Vô Nhóm</button>
-                                        </TableCell> */}
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
