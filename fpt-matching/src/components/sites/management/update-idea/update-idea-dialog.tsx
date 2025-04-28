@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import {Button} from "@/components/ui/button";
 import {Loader2} from "lucide-react";
-import {TopicVersionStatus} from "@/types/enums/topic-version";
 import {topicVersionRequestService} from "@/services/topic-version-request-service";
 import {TopicVersionRequestStatus} from "@/types/enums/topic-version-request";
 
@@ -30,6 +29,7 @@ export function UpdateIdeaDialog(
             setLoading(true)
             //2. upload file
             // const result = await cloudinaryService.uploadFile(file)
+            console.log(comment)
             if (!comment) {
                 toast.error("Vui lòng điền nhận xét");
                 throw new Error("Comment is missing");

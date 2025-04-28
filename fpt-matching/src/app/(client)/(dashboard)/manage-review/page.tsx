@@ -122,13 +122,13 @@ export default function Page ()  {
                 </div>
                 {<div className={"w-2/3 flex justify-center items-center"}>
                     <div className={"font-bold text-2xl"}>
-                        Current term: {currentSemester?.semesterName} - {currentSemester?.semesterCode}
+                        Kì hiện tại: {currentSemester?.semesterName} - {currentSemester?.semesterCode}
                     </div>
                 </div>}
             </div>
             <div className={"mb-4 flex justify-center"}>
                 <div className={"flex items-center flex-col justify-center"}>
-                    <Label className={"text-sm text-gray-700  pb-2"}>Review number</Label>
+                    <Label className={"text-sm text-gray-700  pb-2"}>Giai đoạn review </Label>
                     <SelectReview setReviewNumber={setReviewNumber} />
                 </div>
             </div>

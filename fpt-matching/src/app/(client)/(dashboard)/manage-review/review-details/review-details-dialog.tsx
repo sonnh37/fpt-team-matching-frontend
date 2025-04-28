@@ -46,9 +46,9 @@ export function ReviewDetailsDialog(
             </AlertDialogTrigger>
             <AlertDialogContent  className="sm:max-w-[425px]">
                 <AlertDialogHeader>
-                    <AlertDialogTitle>Upload checklist</AlertDialogTitle>
+                    <AlertDialogTitle>Cập nhật file Checklist</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Are you sure want to upload this file ? <br /> It still available to edit after upload
+                        Bạn có chắc với những thông tin trong file ? <br /> Có thể chỉnh sửa sau khi cập nhật
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 

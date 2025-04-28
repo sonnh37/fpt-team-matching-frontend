@@ -4,11 +4,9 @@ import {MentorConclusionOptions, TeamMemberStatus} from "@/types/enums/team-memb
 import {RadioGroup, RadioGroupItem} from "@/components/ui/radio-group";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
-import {
-    TeamMemberUpdateDefenseCommand
-} from "@/types/models/commands/team-members/team-member-update-defense";
+import {TeamMemberUpdateDefenseCommand} from "@/types/models/commands/team-members/team-member-update-defense";
 import React, {useEffect, useState} from "react";
-import { Button } from "@/components/ui/button"
+import {Button} from "@/components/ui/button"
 import {
     Dialog,
     DialogContent,
@@ -20,7 +18,7 @@ import {
 } from "@/components/ui/dialog"
 import {Loader2} from "lucide-react";
 import {teammemberService} from "@/services/team-member-service";
-import { toast } from "sonner";
+import {toast} from "sonner";
 import {useCurrentRole} from "@/hooks/use-current-role";
 
 function DialogSaveChange({teamMemberUpdateDefense, stage} : {teamMemberUpdateDefense: TeamMemberUpdateDefenseCommand[], stage:number}) {
@@ -75,21 +73,22 @@ function DialogSaveChange({teamMemberUpdateDefense, stage} : {teamMemberUpdateDe
 export default function DefenseTeamMembersTable({sinhViens, stage}: {sinhViens: TeamMember[], stage: number}) {
     const [teamMemberUpdateDefense, setTeamMemberUpdateDefense] = useState<TeamMemberUpdateDefenseCommand[]>();
     const [dictionary, setDictionary] = useState<Record<string, TeamMemberUpdateDefenseCommand> | null>(null)
+    const [filterTeamMember, setFilterTeamMember] = useState<TeamMember[]>([]);
     const currentRole = useCurrentRole()
     useEffect(() => {
-        const listTeamMemberUpdateDefense :TeamMemberUpdateDefenseCommand[] = [] as TeamMemberUpdateDefenseCommand[];
-        sinhViens.map((x) => {
-            listTeamMemberUpdateDefense.push({
-                id: x.id,
-                commentDefense: stage == 1 ? x.commentDefense1 : x.commentDefense2,
-                status: x.status,
-            })
-        })
+        const filteredSinhViens = sinhViens.filter((x) => !(stage === 2 && x.status === TeamMemberStatus.Pass1));
 
+        const listTeamMemberUpdateDefense: TeamMemberUpdateDefenseCommand[] = filteredSinhViens.map((x) => ({
+            id: x.id,
+            commentDefense: stage === 1 ? x.commentDefense1 : x.commentDefense2,
+            status: x.status,
+        }));
+        setFilterTeamMember(filteredSinhViens)
 
         setTeamMemberUpdateDefense(listTeamMemberUpdateDefense)
     }, [sinhViens]);
-
+    console.log(teamMemberUpdateDefense)
+    console.log(dictionary)
     useEffect(() => {
        if (teamMemberUpdateDefense && teamMemberUpdateDefense.length > 0) {
            const newDictionary: Record<string, TeamMemberUpdateDefenseCommand> = teamMemberUpdateDefense.reduce(
@@ -121,7 +120,7 @@ export default function DefenseTeamMembersTable({sinhViens, stage}: {sinhViens: 
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {sinhViens.map((sinhVien, index) => (
+                        {filterTeamMember.map((sinhVien, index) => (
                             <TableRow className={"items-center"} key={sinhVien.id}>
                                 <TableCell aria-readonly={true} className={"text-center"}>{index + 1}</TableCell>
                                 <TableCell aria-readonly={true} className={"text-center"}>{sinhVien.user?.code}</TableCell>

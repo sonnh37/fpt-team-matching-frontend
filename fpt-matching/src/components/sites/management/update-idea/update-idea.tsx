@@ -63,7 +63,9 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
             // }
         }
     }, [selectedIdeaHistory]);
-
+    console.log(selectedIdeaHistory)
+    // console.log(managerComment)
+    // console.log(mentorComment)
     return selectedIdeaHistory && (
         <div className={"w-full flex flex-row  justify-between"}>
             <div className={"w-1/5 h-[85vh] "}>
@@ -162,7 +164,7 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                         <div className={"w-full flex flex-col gap-2"}>
                                             <Label className={"pl-2 mb-4 font-bold"}>Đánh giá của manager</Label>
                                             {
-                                                currentRole && (currentRole == "Student" || currentRole == "Lecturer") ? (
+                                                currentRole && (currentRole == "Student" || currentRole == "Mentor") ? (
                                                     <Badge
                                                         variant={"default"}
                                                         className={`text-center py-4 flex justify-center items-center ${
