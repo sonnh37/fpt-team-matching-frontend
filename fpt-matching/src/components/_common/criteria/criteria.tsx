@@ -253,7 +253,7 @@ const Criteria = () => {
                     <TableBody>
                         {criteria?.data?.results?.map((cv, index) => (
                             <TableRow key={cv.id}>
-                                <TableCell className="font-medium">{index}</TableCell>
+                                <TableCell className="font-medium">{index + 1}</TableCell>
                                 <TableCell className="font-medium">{cv.createdDate ? new Date(cv.createdDate).toLocaleString("vi-VN", {
                                     day: "2-digit",
                                     month: "2-digit",
