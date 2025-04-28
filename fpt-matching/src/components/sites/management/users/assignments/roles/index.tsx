@@ -32,7 +32,7 @@ import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { getEnumOptions } from "@/lib/utils";
 import { Department } from "@/types/enums/user";
@@ -51,6 +51,7 @@ const defaultSchema = z.object({
 //#endregion
 export default function UserAssignmentRolesTable() {
   const searchParams = useSearchParams();
+  const columnSearch = "emailOrFullname";
 
   const filterEnums: FilterEnum[] = [
     { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
@@ -85,6 +86,10 @@ export default function UserAssignmentRolesTable() {
     resolver: zodResolver(defaultSchema),
   });
 
+  const formValues = useWatch({
+    control: form.control,
+  });
+
   // input field
   const [inputFields, setInputFields] =
     useState<z.infer<typeof defaultSchema>>();
@@ -92,7 +97,7 @@ export default function UserAssignmentRolesTable() {
   // default field in table
   const queryParams = useMemo(() => {
     const params: UserGetAllQuery = useQueryParams(
-      inputFields,
+      formValues,
       columnFilters,
       pagination,
       sorting
@@ -101,7 +106,7 @@ export default function UserAssignmentRolesTable() {
     params.role = "Lecturer";
 
     return { ...params };
-  }, [inputFields, columnFilters, pagination, sorting]);
+  }, [formValues, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
@@ -111,6 +116,17 @@ export default function UserAssignmentRolesTable() {
       }));
     }
   }, [columnFilters, inputFields]);
+
+  useEffect(() => {
+    const field = formValues[columnSearch as keyof typeof formValues] as
+      | string
+      | undefined;
+    if (field && field.length > 0) {
+      setIsTyping(true);
+    } else {
+      setIsTyping(false);
+    }
+  }, [formValues[columnSearch as keyof typeof formValues]]);
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
@@ -159,7 +175,8 @@ export default function UserAssignmentRolesTable() {
               filterEnums={filterEnums}
               isSelectColumns={false}
               isSortColumns={false}
-              // columnSearch={columnSearch}
+              isCreateButton={false}
+              columnSearch={columnSearch}
               // handleSheetChange={handleSheetChange}
               // formFilterAdvanceds={formFilterAdvanceds}
             />

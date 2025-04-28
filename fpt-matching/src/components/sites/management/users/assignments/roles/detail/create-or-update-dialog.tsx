@@ -207,7 +207,7 @@ export function UserXRoleFormDialog({
               selectLabel={"roleName"}
               placeholder="Chọn vị trí"
             />
-            <FormSwitch form={form} name="isPrimary" label="Chức năng" />
+            <FormSwitch form={form} name="isPrimary" label="Chính" />
 
             {!isPrimary && (
               <FormSelectObject

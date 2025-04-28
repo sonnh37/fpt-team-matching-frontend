@@ -14,6 +14,8 @@ export interface Semester extends BaseEntity {
   publicTopicDate?: Date | string;
   startDate?: Date | string;
   endDate?: Date | string;
+  limitTopicMentorOnly: number;
+  limitTopicSubMentor: number;
   criteriaForm?: CriteriaForm;
   profileStudents: ProfileStudent[];
   stageIdeas: StageIdea[];

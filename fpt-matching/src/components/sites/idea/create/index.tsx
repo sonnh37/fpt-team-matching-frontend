@@ -69,6 +69,7 @@ import PageIsIdea from "@/app/(client)/(dashboard)/idea/idea-is-exist/page";
 import { TeamMemberRole } from "@/types/enums/team-member";
 import Link from "next/link";
 import { fileUploadService } from "@/services/file-upload-service";
+import { UserCheckMentorAndSubMentorQuery } from "@/types/models/queries/users/user-check-mentor-and-submentor-query";
 // Các đuôi file cho phép
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
@@ -280,10 +281,17 @@ export const CreateProjectForm = () => {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      // const res_bool_men = await CheckUserProjectSlotAvailability(values.mentorId, "Mentor");
-      // const res_bool_submen = await CheckUserProjectSlotAvailability(values.subMentorId, "Submentor");
+      const query: UserCheckMentorAndSubMentorQuery = {
+        mentorId: values.mentorId,
+        subMentorId: values.subMentorId,
+      };
+      const res_bool =
+        await userService.checkMentorAndSubMentorSlotAvailability(query);
+      if (res_bool.status != 1 || res_bool.data == undefined)
+        return toast.error(res_bool.message);
+      if (res_bool.data == false) return toast.warning(res_bool.message);
 
-      console.log("check_values", values);
+
       // submit file cloudinary
       const res_ = await fileUploadService.uploadFile(
         values.fileschema,
@@ -620,7 +628,7 @@ export const CreateProjectForm = () => {
                       name="subMentorId"
                       render={({ field }) => {
                         const mentorId = form.watch("mentorId");
-                        
+
                         const usersFilterMentor = users.filter(
                           (m) => m.id != mentorId
                         );

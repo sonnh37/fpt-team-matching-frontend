@@ -37,7 +37,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { getEnumOptions } from "@/lib/utils";
 import { Department } from "@/types/enums/user";
-import { columns } from "./column";
 import { userService } from "@/services/user-service";
 import { Icons } from "@/components/_common/icons";
 import { User } from "@/types/user";
@@ -57,6 +56,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
 import { userxroleService } from "@/services/user-x-role-service";
+import { useUserXRoleColumns } from "./column";
 interface UserXRoleAssignmentTableProps {
   userId: string;
 }
@@ -114,6 +114,8 @@ export default function UserXRoleAssignmentTable({
     setCurrentModel(userXRole);
     setIsFormDialogOpen(true);
   };
+  const { columns } = useUserXRoleColumns();
+
   const columns_: ColumnDef<UserXRole>[] = [
     ...columns,
     {
@@ -163,10 +165,17 @@ export default function UserXRoleAssignmentTable({
           <div className="space-y-4 p-4 mx-auto">
             <ProfileForm user={user} />
 
-            <Button type="button" onClick={handleCreateClick} variant="default">
-              Create New
-            </Button>
-            <DataOnlyTable columns={columns_} data={user.userXRoles} />
+            <div>
+              {" "}
+              <Button
+                type="button"
+                onClick={handleCreateClick}
+                variant="default"
+              >
+                Create New
+              </Button>
+              <DataOnlyTable columns={columns_} data={user.userXRoles} />
+            </div>
           </div>
           <UserXRoleFormDialog
             open={isFormDialogOpen}
