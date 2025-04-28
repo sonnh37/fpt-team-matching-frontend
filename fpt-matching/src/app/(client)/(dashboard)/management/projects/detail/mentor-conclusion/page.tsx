@@ -147,8 +147,12 @@ const Page = () => {
             setIsOpen(false)
         }
     };
+    // if (project) {
+    //     console.log()
+    //     console.log(new Date(Date.now()))
+    // }
 
-    console.log(project)
+
     return project && (
         <div className={"p-8"}>
             {/*Start 1*/}
@@ -161,14 +165,14 @@ const Page = () => {
                         <Label className={"text-sm mt-2 font-bold flex flex-row items-center gap-2"}>{<Plus className={"size-4"} />} Tiếng việt | Vietnamese: </Label>
                         <Input readOnly={true} className={"w-3/4"}
                                // value={project?.idea?.ideaVersions.sort(x => x.version) ?? ""}
-                            value={project?.topic.ideaVersion?.vietNamName ?? undefined}
+                            value={project?.topic?.ideaVersion?.vietNamName ?? undefined}
                         />
                     </div>
 
                     {/*1.1.2*/}
                     <div className={"mx-4 mt-2 flex flex-col gap-2"}>
                         <Label className={"text-sm mt-2 font-bold flex flex-row items-center gap-2"}>{<Plus className={"size-4"} />} Tiếng anh | English: </Label>
-                        <Input readOnly={true} className={"w-3/4"} value={project?.topic.ideaVersion?.englishName ?? undefined} />
+                        <Input readOnly={true} className={"w-3/4"} value={project?.topic?.ideaVersion?.englishName ?? undefined} />
                     </div>
                 </div>
 
@@ -311,7 +315,7 @@ const Page = () => {
                 {
 
                     project.reviews.filter(x => x.number == 3)[0].reviewDate != null ?
-                        new Date(new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTime()+new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTimezoneOffset()*60*1000) < new Date(Date.now()) ?
+                        new Date(new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTime()+new Date(Date.parse(project.reviews.filter(x => x.number == 3)[0].reviewDate!)).getTimezoneOffset()*60*1000+7*10*60*6000) < new Date(Date.now()) ?
                             (
                                 <ConfirmSaveChange isOpen={isOpen} setIsOpen={setIsOpen} loading={loading} handleSaveChange={handleSaveChange} />
                             ):

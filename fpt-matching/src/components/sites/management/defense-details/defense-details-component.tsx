@@ -47,13 +47,13 @@ const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: str
                         <div className={""}>
                             <BreadcumbCapstoneDetails
                                 semesterName={semester!.semesterName!}
-                                ideaCode={capstoneSchedule.project!.topic.topicCode!}
+                                ideaCode={capstoneSchedule!.project?.topic?.topicCode!}
                                 projectCode={capstoneSchedule.project!.teamCode!}
                                 stage={capstoneSchedule.stage ?? 0}
                             />
                             <div className={"font-bold text-xl mt-6"}>
                                 <div>
-                                    {capstoneSchedule.project?.topic.ideaVersion?.englishName}
+                                    {capstoneSchedule.project?.topic?.ideaVersion?.englishName}
                                 </div>
                                 {/*<div>*/}
                                 {/*    <Button variant={"default"}>Chỉnh sửa đề tài</Button>*/}
@@ -69,9 +69,9 @@ const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: str
                                                 </AccordionTrigger>
                                                 <AccordionContent>
                                                     <div className={"flex flex-col gap-1.5 font-bold"}>
-                                                        <div>Team Name: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.teamName}</span></div>
-                                                        <div>Team Code: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.teamCode}</span></div>
-                                                        <div>Team size: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.teamSize}</span></div>
+                                                        <div>Tên nhóm: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.teamName}</span></div>
+                                                        <div>Mã nhóm: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.teamCode}</span></div>
+                                                        <div>Số lượng thành viên: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.teamSize}</span></div>
                                                     </div>
                                                 </AccordionContent>
                                             </AccordionItem>
@@ -81,15 +81,15 @@ const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: str
                                                 </AccordionTrigger>
                                                 <AccordionContent>
                                                     <div className={"flex flex-col gap-1.5 font-bold"}>
-                                                        <div>Mã đề tài: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic.topicCode}</span></div>
-                                                        <div>Tên tiếng Anh: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic.ideaVersion?.englishName}</span></div>
-                                                        <div>Ten tiếng Việt: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic.ideaVersion?.vietNamName}</span></div>
-                                                        <div>Tên viết tắt: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic.ideaVersion?.abbreviations}</span></div>
-                                                        <div>Description: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic.ideaVersion?.description}</span></div>
-                                                        <div>Enterprise project:
+                                                        <div>Mã đề tài: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.topicCode}</span></div>
+                                                        <div>Tên tiếng Anh: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.ideaVersion?.englishName}</span></div>
+                                                        <div>Ten tiếng Việt: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.ideaVersion?.vietNamName}</span></div>
+                                                        <div>Tên viết tắt: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.ideaVersion?.abbreviations}</span></div>
+                                                        <div>Mô tả: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.ideaVersion?.description}</span></div>
+                                                        <div>Đề tài doanh nghiệp:
                                                             <Button
                                                                 className={"ml-4"}
-                                                                variant={capstoneSchedule.project?.idea?.status != null ? "destructive" : "ghost"}>{capstoneSchedule.project?.topic.ideaVersion?.idea?.isEnterpriseTopic != null ? "No" : capstoneSchedule.project?.topic.ideaVersion?.enterpriseName}</Button>
+                                                                variant={capstoneSchedule.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic != null ? "destructive" : "ghost"}>{capstoneSchedule.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic != null ? "No" : capstoneSchedule.project?.topic?.ideaVersion?.enterpriseName}</Button>
                                                         </div>
                                                     </div>
                                                 </AccordionContent>
