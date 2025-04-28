@@ -27,6 +27,7 @@ import {
   updateUserCache,
 } from "@/lib/redux/slices/cacheSlice";
 import { useTheme } from "next-themes";
+import { TypographySmall } from "@/components/_common/typography/typography-small";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch<AppDispatch>();
@@ -68,17 +69,20 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenuButton
           asChild
-          size={"lg"}
-          className="overflow-visible data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-3"
+          size="lg"
+          className="group overflow-visible data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground gap-3 hover:bg-accent/50 transition-colors"
         >
           <Link href="/">
-            <div className="flex aspect-square size-10 items-center justify-center rounded-lg text-sidebar-primary-foreground">
-              <Icons.logo />
+            <div className="flex aspect-square size-10 items-center justify-center rounded-lg bg-primary/10 hover:bg-primary/20 text-primary transition-colors">
+              <Icons.logo className="w-8" />
             </div>
             <div className="grid flex-1 text-left">
-              <TypographyLarge className="truncate text-base uppercase">
-                {"Team Matching"}
+              <TypographyLarge className="truncate text-base font-semibold tracking-wide">
+                Team Matching
               </TypographyLarge>
+              <TypographySmall className="text-muted-foreground truncate text-xs">
+                Đại học FPT
+              </TypographySmall>
             </div>
           </Link>
         </SidebarMenuButton>
