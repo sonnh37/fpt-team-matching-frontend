@@ -1,7 +1,7 @@
 "use client";
 import { useForm } from "react-hook-form";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { semesterService } from "@/services/semester-service";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,6 +16,7 @@ import ConfirmationDialog, {
   FormInput,
   FormInputDate,
   FormInputDateTimePicker,
+  FormInputNumber,
   FormSelectObject,
 } from "@/lib/form-custom-shadcn";
 import { SemesterCreateCommand } from "@/types/models/commands/semesters/semester-create-command";
@@ -30,6 +31,9 @@ import StageIdeaTable from "./stage-idea";
 import { criteriaFormService } from "@/services/criteria-form-service";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
+import { Button } from "@/components/ui/button";
+import { Icons } from "@/components/ui/icons";
+import { FileUpload } from "@/components/ui/file-upload";
 
 interface SemesterFormProps {
   initialData?: Semester | null;
@@ -37,10 +41,12 @@ interface SemesterFormProps {
 
 const formSchema = z.object({
   id: z.string().optional(),
-  semesterCode: z.string().nullable().optional(),
+  semesterCode: z.string().nullable(),
   criteriaFormId: z.string().nullable(),
-  semesterName: z.string().nullable().optional(),
-  semesterPrefixName: z.string().nullable().optional(),
+  semesterName: z.string().nullable(),
+  semesterPrefixName: z.string().nullable(),
+  limitTopicSubMentor: z.number(),
+  limitTopicMentorOnly: z.number(),
   startDate: z.date(),
   endDate: z.date(),
   publicTopicDate: z.date(),
@@ -174,86 +180,147 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
         cancelText="Không"
       />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <div className="grid gap-2">
-            <HeaderForm
-              previousPath={previousPath}
-              title={title}
-              initialData={initialData}
-              loading={loading}
-              action={action}
-            />
-          </div>
-          <div className="grid gap-4">
-            <div className="grid gap-4 lg:grid-cols-3">
-              <div className="grid gap-4 lg:col-span-2">
-                {/* main */}
-                <Card className="overflow-hidden">
-                  <CardContent className="p-6">
-                    <div className="grid gap-6">
-                      <div className="grid gap-3">
-                        <FormSelectObject
-                          form={form}
-                          name="criteriaFormId"
-                          label="Mẫu tiêu chí đánh giá"
-                          options={criteriaforms}
-                          selectValue={"id"}
-                          selectLabel={"title"}
-                          placeholder="Chọn mẫu tiêu chí đánh giá"
-                        />
-
-                        <FormInput
-                          form={form}
-                          name="semesterCode"
-                          label="Mã code kì"
-                          placeholder="Nhập mã code kì"
-                        />
-
-                        <FormInput
-                          form={form}
-                          name="semesterName"
-                          label="Tên kì"
-                          placeholder="Nhập tên kì"
-                        />
-
-                        <FormInput
-                          form={form}
-                          name="semesterPrefixName"
-                          label="Tên hậu kì"
-                          placeholder="Nhập tên hậu kì"
-                        />
-
-                        <FormInputDateTimePicker
-                          form={form}
-                          name="startDate"
-                          label="Ngày bắt đầu"
-                        />
-                        <FormInputDateTimePicker
-                          form={form}
-                          name="endDate"
-                          label="Ngày kết thúc"
-                        />
-
-                        <FormInputDateTimePicker
-                          form={form}
-                          name="publicTopicDate"
-                          label="Ngày công khai đề tài"
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* <div className="grid gap-4 h-fit">
-                <InformationBaseCard form={form} initialData={initialData} />
-              </div> */}
-            </div>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between gap-4 mb-6">
             <div>
-              {/* Button create */}
-              {initialData && <StageIdeaTable />}
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {title}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {initialData ? "Cập nhật thông tin học kỳ" : "Tạo học kỳ mới"}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => router.push(previousPath)}
+                disabled={loading}
+              >
+                Hủy
+              </Button>
+              <Button type="submit" disabled={loading}>
+                {loading && (
+                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                )}
+                {action}
+              </Button>
             </div>
           </div>
+
+          {/* Main form content */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left column - Main form */}
+            <div className="lg:col-span-2 space-y-6">
+              <Card>
+                <CardHeader className="border-b">
+                  <CardTitle className="text-lg">Thông tin chung</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 grid gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormSelectObject
+                      form={form}
+                      name="criteriaFormId"
+                      label="Mẫu tiêu chí đánh giá"
+                      options={criteriaforms}
+                      selectValue="id"
+                      selectLabel="title"
+                      placeholder="Chọn mẫu tiêu chí"
+                    />
+
+                    <FormInput
+                      form={form}
+                      name="semesterCode"
+                      label="Mã học kỳ"
+                      placeholder="VD: HK2024"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormInput
+                      form={form}
+                      name="semesterName"
+                      label="Tên học kỳ"
+                      placeholder="VD: Học kỳ 1 2024"
+                    />
+
+                    <FormInput
+                      form={form}
+                      name="semesterPrefixName"
+                      label="Tên hậu tố"
+                      placeholder="VD: Năm học 2023-2024"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="border-b">
+                  <CardTitle className="text-lg">Thời gian</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 grid gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <FormInputDateTimePicker
+                      form={form}
+                      name="startDate"
+                      label="Ngày bắt đầu"
+                    />
+                    <FormInputDateTimePicker
+                      form={form}
+                      name="endDate"
+                      label="Ngày kết thúc"
+                    />
+                    <FormInputDateTimePicker
+                      form={form}
+                      name="publicTopicDate"
+                      label="Công bố đề tài"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right column - Limits and actions */}
+            <div className="space-y-6">
+              <Card>
+                <CardHeader className="border-b">
+                  <CardTitle className="text-lg">Giới hạn đề tài</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6 grid gap-6">
+                  <FormInputNumber
+                    form={form}
+                    name="limitTopicMentorOnly"
+                    label="Mentor chính"
+                    placeholder="Nhập số lượng"
+                    min={0}
+                  />
+
+                  <FormInputNumber
+                    form={form}
+                    name="limitTopicSubMentor"
+                    label="Mentor phụ"
+                    placeholder="Nhập số lượng"
+                    min={0}
+                  />
+                </CardContent>
+              </Card>
+
+            </div>
+          </div>
+
+          {initialData && (
+            <div className="mt-6">
+              <Card>
+                <CardHeader className="border-b">
+                  <CardTitle className="text-lg">Danh sách đề tài</CardTitle>
+                </CardHeader>
+                <CardContent className="pt-6">
+                  <StageIdeaTable />
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </form>
       </Form>
     </>

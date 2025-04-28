@@ -1,213 +1,116 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
-import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ideaVersionRequestService } from "@/services/idea-version-request-service";
-import { IdeaVersionRequest } from "@/types/idea-version-request";
-import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
-import { useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { userService } from "@/services/user-service";
-import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
-import { IdeaVersionRequestUpdateCommand } from "@/types/models/commands/idea-version-requests/idea-version-request-update-command";
-import { BusinessResult } from "@/types/models/responses/business-result";
-import { User } from "@/types/user";
-import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
-import { formatDate } from "@/lib/utils";
-import { UserXRole } from "@/types/user-x-role";
-import { semesterService } from "@/services/semester-service";
-import { Semester } from "@/types/semester";
-import { LoadingComponent } from "@/components/_common/loading-page";
-import { userxroleService } from "@/services/user-x-role-service";
-import { UserXRoleUpdateCommand } from "@/types/models/commands/user-x-roles/user-x-role-update-command";
-import { roleService } from "@/services/role-service";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useQuery } from "@tanstack/react-query";
+import { ColumnDef } from "@tanstack/react-table";
+import { semesterService } from "@/services/semester-service";
+import { roleService } from "@/services/role-service";
+import { UserXRole } from "@/types/user-x-role";
+import { Semester } from "@/types/semester";
+import { Role } from "@/types/role";
+import { formatDate } from "@/lib/utils";
+import { LoadingComponent } from "@/components/_common/loading-page";
 
-export const columns: ColumnDef<UserXRole>[] = [
-  {
-    accessorKey: "isPrimary",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Is Primary" />
-    ),
-    cell: ({ row }) => {
-      const model = row.original;
-      return (
-        <Checkbox
-          checked={model.isPrimary}
-          disabled
-          className="cursor-default"
-        />
-      );
+export const useUserXRoleColumns = () => {
+  // Fetch all required data once
+  const { data: semestersData, isLoading: loadingSemesters } = useQuery({
+    queryKey: ['all-semesters'],
+    queryFn: () => semesterService.getAll(),
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: rolesData, isLoading: loadingRoles } = useQuery({
+    queryKey: ['all-roles'],
+    queryFn: () => roleService.getAll(),
+    refetchOnWindowFocus: false,
+  });
+
+  if (loadingSemesters || loadingRoles) {
+    return { columns: [], isLoading: true };
+  }
+
+  const semesters = semestersData?.data?.results || [];
+  const roles = rolesData?.data?.results || [];
+
+  const columns: ColumnDef<UserXRole>[] = [
+    {
+      accessorKey: "isPrimary",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Primary" />
+      ),
+      cell: ({ row }) => {
+        const isPrimary = row.getValue("isPrimary") as boolean;
+        return (
+          <Checkbox
+            checked={isPrimary}
+            disabled
+            className="cursor-default"
+          />
+        );
+      },
     },
-  },
-  {
-    accessorKey: "selectSemester",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Select Semester" />
-    ),
-    cell: ({ row }) => {
-      const model = row.original;
-      return model.isPrimary ? (
-        <span className="text-muted-foreground">Not applicable</span>
-      ) : (
-        <SelectSemester row={row} />
-      );
+    {
+      accessorKey: "semester",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Semester" />
+      ),
+      cell: ({ row }) => {
+        const model = row.original;
+        if (model.isPrimary) {
+          return <span className="text-muted-foreground">N/A</span>;
+        }
+        
+        const semester = semesters.find(s => s.id === model.semesterId);
+        return semester ? (
+          <span>{semester.semesterName || "Unknown"}</span>
+        ) : (
+          <span className="text-muted-foreground">Not selected</span>
+        );
+      },
     },
-  },
-  {
-    accessorKey: "selectRole",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Select Role" />
-    ),
-    cell: ({ row }) => <SelectRole row={row} />,
-  },
-  {
-    accessorKey: "createdDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date created" />
-    ),
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdDate"));
-      return formatDate(date);
+    {
+      accessorKey: "role",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Role" />
+      ),
+      cell: ({ row }) => {
+        const model = row.original;
+        const role = roles.find(r => r.id === model.roleId);
+        return role ? (
+          <span>{role.roleName || "Unknown"}</span>
+        ) : (
+          <span className="text-muted-foreground">Not selected</span>
+        );
+      },
     },
-  },
-  {
-    accessorKey: "actions",
-    header: "Actions",
-    cell: ({ row }) => <Actions row={row} />,
-  },
-];
+    {
+      accessorKey: "createdDate",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Created Date" />
+      ),
+      cell: ({ row }) => {
+        const date = new Date(row.getValue("createdDate"));
+        return formatDate(date);
+      },
+    },
+  ];
 
-interface ActionsProps {
-  row: Row<UserXRole>;
-}
-const Actions: React.FC<ActionsProps> = ({ row }) => {
-  const model = row.original;
-  const queryClient = useQueryClient();
-  const isEditing = row.getIsSelected();
-
-  const handleSave = async () => {
-    const command: UserXRoleUpdateCommand = {
-      ...model,
-    };
-
-    const res = await userxroleService.update(command);
-    if (res.status == 1) {
-      toast.success("Assigned!");
-      row.toggleSelected(false);
-    }
-  };
-
-  const handleCancel = () => {
-    row.toggleSelected(false);
-    if (!model.isPrimary) {
-      model.semesterId = undefined;
-    }
-    model.roleId = undefined;
-  };
-
-  return (
-    <div className="flex flex-col gap-2">
-      {isEditing && (
-        <>
-          <div className="flex gap-2">
-            <Button size="sm" variant="default" onClick={handleSave}>
-              Lưu
-            </Button>
-            <Button size="sm" variant="outline" onClick={handleCancel}>
-              Không lưu
-            </Button>
-          </div>
-        </>
-      )}
-    </div>
-  );
+  return { columns, isLoading: false };
 };
 
-const SelectSemester: React.FC<{ row: Row<UserXRole> }> = ({ row }) => {
-  const queryClient = useQueryClient();
-  const model = row.original;
-  const { data: result, isLoading } = useQuery({
-    queryKey: ["semesters", model],
-    queryFn: async () => await semesterService.getAll(),
-    refetchOnWindowFocus: false
-  });
+// Cách sử dụng trong component cha:
+/*
+const UserXRoleTable = ({ data }: { data: UserXRole[] }) => {
+  const { columns, isLoading } = useUserXRoleColumns();
 
   if (isLoading) return <LoadingComponent />;
 
-  const semesters = result?.data?.results;
-
   return (
-    <Select
-      value={model.semesterId ?? ""}
-      onValueChange={(semesterId) => {
-        model.semesterId = semesterId || undefined;
-        row.toggleSelected(true);
-      }}
-    >
-      <SelectTrigger>
-        <SelectValue
-          placeholder={isLoading ? "Loading..." : "Select semester"}
-        />
-      </SelectTrigger>
-      <SelectContent>
-        {semesters &&
-          semesters.map((semester) => (
-            <SelectItem key={semester.id} value={semester.id ?? ""}>
-              {semester.semesterName ?? "Unknown"}
-            </SelectItem>
-          ))}
-      </SelectContent>
-    </Select>
+    <DataTable
+      columns={columns}
+      data={data}
+    />
   );
 };
-
-const SelectRole: React.FC<{ row: Row<UserXRole> }> = ({ row }) => {
-  const queryClient = useQueryClient();
-  const model = row.original;
-  const { data: result, isLoading } = useQuery({
-    queryKey: ["roles", model],
-    queryFn: async () => await roleService.getAll(),
-    refetchOnWindowFocus: false
-  });
-
-  if (isLoading) return <LoadingComponent />;
-
-  const roles = result?.data?.results;
-
-  return (
-    <Select
-      value={model.roleId ?? ""}
-      onValueChange={(roleId) => {
-        model.roleId = roleId || undefined;
-        row.toggleSelected(true);
-      }}
-    >
-      <SelectTrigger>
-        <SelectValue
-          placeholder={isLoading ? "Loading..." : "Select role"}
-        />
-      </SelectTrigger>
-      <SelectContent>
-        {roles &&
-          roles.map((role) => (
-            <SelectItem key={role.id} value={role.id ?? ""}>
-              {role.roleName ?? "Unknown"}
-            </SelectItem>
-          ))}
-      </SelectContent>
-    </Select>
-  );
-};
+*/

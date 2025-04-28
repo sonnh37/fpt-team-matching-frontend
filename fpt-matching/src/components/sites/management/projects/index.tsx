@@ -141,7 +141,7 @@ export default function ProjectTable() {
   return (
     <>
       <div className="container mx-auto space-y-8">
-        <div className="w-fit mx-auto space-y-4">
+        {/* <div className="w-fit mx-auto space-y-4">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               <FormField
@@ -171,7 +171,7 @@ export default function ProjectTable() {
               />
             </form>
           </Form>
-        </div>
+        </div> */}
 
         <Card className="space-y-4 p-4">
           <DataTableToolbar

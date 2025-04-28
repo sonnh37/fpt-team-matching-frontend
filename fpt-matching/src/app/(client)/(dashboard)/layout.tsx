@@ -13,6 +13,10 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { ModeToggle } from "@/components/_common/mode-toggle";
 import { Card } from "@/components/ui/card"; // Thêm Card component
+import { stageideaService } from "@/services/stage-idea-service";
+import { useQuery } from "@tanstack/react-query";
+import { AlertMessage } from "@/components/_common/alert-message";
+import { useCurrentRole } from "@/hooks/use-current-role";
 
 const Header = dynamic(
   () => import("@/components/layouts/navbar/header").then((mod) => mod.Header),
@@ -25,7 +29,15 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = useSelector((state: RootState) => state.user.user);
-  
+  const currentRole = useCurrentRole();
+  const { data: res_stage } = useQuery({
+    queryKey: ["getStageIdeaCurrent"],
+    queryFn: () => stageideaService.getCurrentStageIdea(),
+    refetchOnWindowFocus: false,
+  });
+
+  const isLock = res_stage?.status != 1 ? ((currentRole == "Manager" || currentRole == "Admin") ? false : true) : false;
+
   return (
     <SidebarProvider className="h-screen overflow-hidden">
       <AppSidebar />
@@ -47,7 +59,18 @@ export default function DashboardLayout({
 
         <div className="flex flex-1 flex-col overflow-hidden gap-4 mt-4">
           <Card className="flex-1 overflow-hidden p-0">
-            <div className="p-4 h-full w-full overflow-auto">{children}</div>
+            <div className="p-4 h-full w-full overflow-auto">
+              {!isLock ? (
+                <>{children}</>
+              ) : (
+                <>
+                  <AlertMessage
+                    message="Chưa tới đợt. Vui lòng quay lại sau!"
+                    messageType="info"
+                  />
+                </>
+              )}
+            </div>
           </Card>
         </div>
       </SidebarInset>

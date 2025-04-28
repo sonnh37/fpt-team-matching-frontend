@@ -27,7 +27,7 @@ export default function ClientLayout({
   if (localStorage.getItem("showToast") === "true") {
     if (user) {
       toast.success(
-        `Chào mừng ${user.firstName} đến với hệ sinh thái kết nối tài năng FPT! 🌍`
+        `${user.firstName} ơi, hôm nay có dự định gì nào?`
       );
     }
     localStorage.removeItem("showToast");
