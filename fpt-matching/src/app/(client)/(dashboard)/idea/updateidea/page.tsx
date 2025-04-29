@@ -25,7 +25,7 @@ import { ideaService } from "@/services/idea-service";
 import { UpdateCommand } from "@/types/models/commands/_base/base-command";
 import { IdeaUpdateCommand } from "@/types/models/commands/idea/idae-update-command";
 import { toast } from "sonner";
-import { TeamInvitationCommand } from "@/types/models/commands/invitation/invitation-team-command";
+import { InvitationTeamCreatePendingCommand } from "@/types/models/commands/invitation/invitation-team-command";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { userService } from "@/services/user-service";
 import { Badge } from "@/components/ui/badge";
@@ -183,7 +183,7 @@ const UpdateProjectTeam = () => {
           const idReceiver = receiver.data.id;
           const prj = await projectService.getProjectInfo();
 
-          const invitation: TeamInvitationCommand = {
+          const invitation: InvitationTeamCreatePendingCommand = {
             receiverId: idReceiver,
             projectId: prj.data?.id ?? "",
             content: "Muốn mời bạn vào nhóm!",
