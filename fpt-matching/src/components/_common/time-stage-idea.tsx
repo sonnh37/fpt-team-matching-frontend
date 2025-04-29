@@ -15,8 +15,8 @@ interface StageIdeaProps {
 }
 const TimeStageIdea = ({ stageIdea }: StageIdeaProps) => {
   return (
-    <div>
-      <Card className="w-full max-w-2xl">
+    <div className="w-full max-w-6xl mx-auto">
+      <Card className="w-full max-w-6xl mx-auto">
         <CardHeader>
           <CardTitle className="text-xl font-semibold">
             Thông tin Giai đoạn Đánh giá

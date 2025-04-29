@@ -30,13 +30,13 @@ export default function DashboardLayout({
 }) {
   const user = useSelector((state: RootState) => state.user.user);
   const currentRole = useCurrentRole();
-  const { data: res_stage } = useQuery({
-    queryKey: ["getStageIdeaCurrent"],
-    queryFn: () => stageideaService.getCurrentStageIdea(),
-    refetchOnWindowFocus: false,
-  });
+  // const { data: res_stage } = useQuery({
+  //   queryKey: ["getStageIdeaCurrent"],
+  //   queryFn: () => stageideaService.getCurrentStageIdea(),
+  //   refetchOnWindowFocus: false,
+  // });
 
-  const isLock = res_stage?.status != 1 ? ((currentRole == "Manager" || currentRole == "Admin") ? false : true) : false;
+  // const isLock = res_stage?.status != 1 ? ((currentRole == "Manager" || currentRole == "Admin") ? false : true) : false;
 
   return (
     <SidebarProvider className="h-screen overflow-hidden">
@@ -60,7 +60,7 @@ export default function DashboardLayout({
         <div className="flex flex-1 flex-col overflow-hidden gap-4 mt-4">
           <Card className="flex-1 overflow-hidden p-0">
             <div className="p-4 h-full w-full overflow-auto">
-              {!isLock ? (
+              {/* {!isLock ? (
                 <>{children}</>
               ) : (
                 <>
@@ -70,6 +70,8 @@ export default function DashboardLayout({
                   />
                 </>
               )}
+               */}
+              {children}
             </div>
           </Card>
         </div>

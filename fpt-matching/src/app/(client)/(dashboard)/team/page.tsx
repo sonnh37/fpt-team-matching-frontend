@@ -53,6 +53,8 @@ import { TeamMember } from "@/types/team-member";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { ideaService } from "@/services/idea-service";
 import { ProjectStatus } from "@/types/enums/project";
+import { semesterService } from "@/services/semester-service";
+import { AlertMessage } from "@/components/_common/alert-message";
 
 export default function TeamInfo() {
   //lay thong tin tu redux luc dang nhap
@@ -60,6 +62,17 @@ export default function TeamInfo() {
   const [isEditing, setIsEditing] = useState(false);
   const [teamName, setTeamName] = useState("");
   const confirm = useConfirm();
+
+  const { data: res_stage } = useQuery({
+    queryKey: ["getBeforeSemester"],
+    queryFn: () => semesterService.getBeforeSemester(),
+    refetchOnWindowFocus: false,
+  });
+
+  const isLock =
+    res_stage && res_stage.data?.endDate
+      ? new Date() <= new Date(res_stage.data.endDate)
+      : false;
 
   //goi api bang tanstack
   const {
@@ -100,6 +113,8 @@ export default function TeamInfo() {
     return <ErrorSystem />;
   }
   if (result?.status == -1) {
+    if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
+
     return <NoTeam />;
   }
 
@@ -329,7 +344,9 @@ export default function TeamInfo() {
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-fit h-[80%] overflow-y-auto">
                           <DialogHeader>
-                            <DialogTitle>Những yêu cầu tham gia vào nhóm</DialogTitle>
+                            <DialogTitle>
+                              Những yêu cầu tham gia vào nhóm
+                            </DialogTitle>
                           </DialogHeader>
                           <div className="grid gap-4 py-4">
                             {project.id != undefined && (
@@ -476,7 +493,8 @@ export default function TeamInfo() {
                               Tệp đính kèm
                             </TypographySmall>
                             <TypographyP className="p-0">
-                              {project.topic?.topicVersions?.length > 0 && latestTopicVersion?.fileUpdate ? (
+                              {project.topic?.topicVersions?.length > 0 &&
+                              latestTopicVersion?.fileUpdate ? (
                                 <a
                                   className="text-blue-500 underline"
                                   target="_blank"
@@ -489,7 +507,6 @@ export default function TeamInfo() {
                               )}
                             </TypographyP>
                           </div>
-
 
                           {/* Enterprise */}
                           <div className="space-y-1">
@@ -585,8 +602,9 @@ export default function TeamInfo() {
                 </div>
                 <div className="space-y-3">
                   {sortedMembers.map((member: TeamMember, index) => {
-                    const initials = `${member.user?.lastName?.charAt(0).toUpperCase() || ""
-                      }`;
+                    const initials = `${
+                      member.user?.lastName?.charAt(0).toUpperCase() || ""
+                    }`;
                     const isLeaderInMembers =
                       member.role === TeamMemberRole.Leader;
 
@@ -670,8 +688,8 @@ export default function TeamInfo() {
             <CardContent className="flex mt-4 flex-col justify-center items-center gap-1">
               <TypographyP>Nộp đăng ký đề tài</TypographyP>
               <TypographyMuted>
-              Lưu ý: Đề tài được nộp nên được thông qua bởi các thành viên trong nhóm,nếu nộp thì sẽ không còn chỉnh sửa nữa
-
+                Lưu ý: Đề tài được nộp nên được thông qua bởi các thành viên
+                trong nhóm,nếu nộp thì sẽ không còn chỉnh sửa nữa
               </TypographyMuted>
               <Button className={"mt-8 min-w-40"} asChild>
                 <Link href={"/team/submit"}>Nộp đề tài</Link>
@@ -680,27 +698,25 @@ export default function TeamInfo() {
           </Card>
         </div>
 
-       
+        {result?.data?.status == ProjectStatus.Pending &&
+          result?.data?.topicId && (
+            <div className="space-y-2">
+              <TypographyH4>Xin đề tài từ giảng viên</TypographyH4>
+              <Card>
+                <CardContent className="flex mt-4 flex-col justify-center items-center gap-4">
+                  <TypographyP>Xem những đề đang có của giảng viên</TypographyP>
+                  <TypographyMuted>
+                    Lưu ý: Khi nộp đơn xin đề tài nên có sự đồng ý của thành
+                    viên trong nhóm
+                  </TypographyMuted>
 
-       {(result?.data?.status == ProjectStatus.Pending && result?.data?.topicId) &&   
-       <div className="space-y-2">
-          <TypographyH4>Xin đề tài từ giảng viên</TypographyH4>
-          <Card>
-            <CardContent className="flex mt-4 flex-col justify-center items-center gap-4">
-              <TypographyP>Xem những đề đang có của giảng viên</TypographyP>
-              <TypographyMuted>
-                Lưu ý: Khi nộp đơn xin đề tài nên có sự đồng ý của thành viên
-                trong nhóm
-              </TypographyMuted>
-     
-              <Button asChild>
-                <Link href={"/idea/supervisors"}>Xem danh sách đề tài</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div> }
-      
-
+                  <Button asChild>
+                    <Link href={"/idea/supervisors"}>Xem danh sách đề tài</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
         <div className="space-y-2">
           <TypographyH4>Đánh giá thành viên nhóm</TypographyH4>

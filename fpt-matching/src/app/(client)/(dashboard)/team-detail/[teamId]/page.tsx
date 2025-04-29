@@ -44,6 +44,7 @@ import { formatDate } from "@/lib/utils";
 import { ideaService } from "@/services/idea-service";
 import { invitationService } from "@/services/invitation-service";
 import { projectService } from "@/services/project-service";
+import { semesterService } from "@/services/semester-service";
 import { IdeaStatus } from "@/types/enums/idea";
 import { TeamMemberRole } from "@/types/enums/team-member";
 import { InvitationStudentCreatePendingCommand } from "@/types/models/commands/invitation/invitation-student-command";
@@ -51,9 +52,10 @@ import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-g
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { is } from "date-fns/locale";
 import { Info, LoaderCircle, User as UserIcon } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { TbUsersPlus } from "react-icons/tb";
 import { toast } from "sonner";
 
@@ -71,6 +73,44 @@ export default function ProjectDetail() {
 
   const queryClient = useQueryClient();
 
+  const { data: res_stage, isLoading: isLoadingSemester } = useQuery({
+    queryKey: ["getBeforeSemester"],
+    queryFn: () => semesterService.getBeforeSemester(),
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: res_current_semester, isLoading: isLoadingCurrent } = useQuery({
+    queryKey: ["getCurrentSemester"],
+    queryFn: () => semesterService.getCurrentSemester(),
+    refetchOnWindowFocus: false,
+  });
+
+  const isLock = useMemo(() => {
+    const now = new Date();
+
+    if (res_current_semester?.data && res_stage?.data) {
+      const beforeSemesterEndDate = new Date(res_stage.data.endDate ?? 0);
+      const currentSemesterStartDate = new Date(res_current_semester.data.startDate ?? 0);
+      
+      // Kiểm tra nếu hiện tại nằm giữa endDate của kì trước và startDate của kì hiện tại
+      return now > beforeSemesterEndDate && now < currentSemesterStartDate;
+    }
+
+    // Nếu có currentSemester → KHÔNG KHÓA (đang trong kì hiện tại)
+    if (res_current_semester?.data) {
+      return true;
+    }
+
+    // Nếu không có currentSemester nhưng có beforeSemester
+    if (res_stage?.data) {
+      const beforeSemesterEndDate = new Date(res_stage.data.endDate ?? 0);
+      return now > beforeSemesterEndDate; // KHÓA nếu đã qua endDate
+    }
+
+    // Nếu không có cả currentSemester và beforeSemester → KHÓA
+    return true;
+  }, [res_stage?.data, res_current_semester?.data]);
+
   // Query: Idea của user
   const {
     data: result_idea_current,
@@ -82,6 +122,7 @@ export default function ProjectDetail() {
     refetchOnWindowFocus: false,
   });
 
+  console.log("check_isLock", isLock)
   // Query: Thông tin project
   const {
     data: project,
@@ -188,7 +229,8 @@ export default function ProjectDetail() {
     }
   };
 
-  if (isLoadingIdeaCurrent || isLoadingTeam) return <LoadingComponent />;
+  if (isLoadingIdeaCurrent || isLoadingTeam || isLoadingSemester || isLoadingCurrent)
+    return <LoadingComponent />;
   if (isErrorIdeaCurrent || isErrorTeam) return <ErrorSystem />;
 
   return (
@@ -208,71 +250,77 @@ export default function ProjectDetail() {
                       Cancel Request
                     </Button>
                   ) : (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button disabled={hasPendingIdea} className="gap-2">
-                          <TbUsersPlus className="h-4 w-4" />
-                          Tham gia
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>
-                            Tham gia {project?.teamName || "this team"}?
-                          </DialogTitle>
-                          <DialogDescription>
-                            Đây là yêu cầu về việc tham gia nhóm
-                          </DialogDescription>
-                        </DialogHeader>
-
-                        <div className="space-y-4 py-4">
-                          {project?.leader && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <UserIcon className="h-4 w-4 opacity-70" />
-                              <span>
-                                Nhóm trưởng:{" "}
-                                {project.leader.firstName ||
-                                  project.leader.email}
-                              </span>
-                            </div>
-                          )}
-
-                          <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-md">
-                            <Info className="h-4 w-4 mt-0.5 text-blue-600" />
-                            <TypographySmall className="text-blue-700">
-                              Yêu cầu này sẽ được gửi đến nhóm trưởng của bạn.
-                              Họ sẽ xem xét lời yêu cầu này.
-                            </TypographySmall>
-                          </div>
-                        </div>
-
-                        <DialogFooter>
-                          <DialogClose asChild>
-                            <Button type="button" variant="outline">
-                              Hủy
+                    !isLock && (
+                      <>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button disabled={hasPendingIdea} className="gap-2">
+                              <TbUsersPlus className="h-4 w-4" />
+                              Tham gia
                             </Button>
-                          </DialogClose>
-                          <Button
-                            type="submit"
-                            onClick={() => requestJoinTeam(project?.id || "")}
-                            className="gap-2"
-                            disabled={isLoading}
-                          >
-                            {isLoading ? (
-                              <>
-                                <LoaderCircle className="animate-spin" />
-                                Đang xử lý...
-                              </>
-                            ) : (
-                              <>
-                                <TbUsersPlus />
-                                Xác định tham gia
-                              </>
-                            )}
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                Tham gia {project?.teamName || "this team"}?
+                              </DialogTitle>
+                              <DialogDescription>
+                                Đây là yêu cầu về việc tham gia nhóm
+                              </DialogDescription>
+                            </DialogHeader>
+
+                            <div className="space-y-4 py-4">
+                              {project?.leader && (
+                                <div className="flex items-center gap-2 text-sm">
+                                  <UserIcon className="h-4 w-4 opacity-70" />
+                                  <span>
+                                    Nhóm trưởng:{" "}
+                                    {project.leader.firstName ||
+                                      project.leader.email}
+                                  </span>
+                                </div>
+                              )}
+
+                              <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-md">
+                                <Info className="h-4 w-4 mt-0.5 text-blue-600" />
+                                <TypographySmall className="text-blue-700">
+                                  Yêu cầu này sẽ được gửi đến nhóm trưởng của
+                                  bạn. Họ sẽ xem xét lời yêu cầu này.
+                                </TypographySmall>
+                              </div>
+                            </div>
+
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button type="button" variant="outline">
+                                  Hủy
+                                </Button>
+                              </DialogClose>
+                              <Button
+                                type="submit"
+                                onClick={() =>
+                                  requestJoinTeam(project?.id || "")
+                                }
+                                className="gap-2"
+                                disabled={isLoading}
+                              >
+                                {isLoading ? (
+                                  <>
+                                    <LoaderCircle className="animate-spin" />
+                                    Đang xử lý...
+                                  </>
+                                ) : (
+                                  <>
+                                    <TbUsersPlus />
+                                    Xác định tham gia
+                                  </>
+                                )}
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </>
+                    )
                   )}
                 </div>
               </TooltipTrigger>
@@ -468,7 +516,9 @@ export default function ProjectDetail() {
             {/* Team Members */}
             <Separator />
             <div>
-              <h4 className="text-lg font-semibold mb-4">Các thành viên nhóm</h4>
+              <h4 className="text-lg font-semibold mb-4">
+                Các thành viên nhóm
+              </h4>
               <div className="space-y-3">
                 {sortedMembers.map((member, index) => {
                   const initials = `${member.user?.lastName?.charAt(0).toUpperCase() || ""

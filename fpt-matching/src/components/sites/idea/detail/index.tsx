@@ -116,34 +116,34 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
-              <Label>Tên tiếng việt</Label>
+              <Label className="italic">Tên tiếng việt</Label>
               <p className="text-sm font-medium">
                 {version.vietNamName || "-"}
               </p>
             </div>
 
             <div className="space-y-1">
-              <Label>Tên tiếng anh</Label>
+              <Label className="italic">Tên tiếng anh</Label>
               <p className="text-sm font-medium">
                 {version.englishName || "-"}
               </p>
             </div>
 
             <div className="space-y-1">
-              <Label>Viết tắt</Label>
+              <Label className="italic">Viết tắt</Label>
               <p className="text-sm font-medium">
                 {version.abbreviations || "-"}
               </p>
             </div>
 
             <div className="space-y-1">
-              <Label>Số lượng người tối đa</Label>
+              <Label className="italic">Số lượng người tối đa</Label>
               <p className="text-sm font-medium">{version.teamSize || "-"}</p>
             </div>
           </div>
 
           <div className="space-y-1">
-            <Label>Mô tả</Label>
+            <Label className="italic">Mô tả</Label>
             <p className="text-sm font-medium">
               {version.description || "No description provided"}
             </p>
@@ -152,7 +152,7 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
           {/* Enterprise Info */}
           {idea.isEnterpriseTopic && (
             <div className="space-y-1">
-              <Label>Tên doanh nghiệp</Label>
+              <Label className="italic">Tên doanh nghiệp</Label>
               <p className="text-sm font-medium">
                 {version.enterpriseName || "-"}
               </p>
@@ -168,7 +168,7 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
             <Separator />
 
             <div className="space-y-2">
-              <Label>Tệp</Label>
+              <Label className="italic">Tệp</Label>
               {version.file ? (
                 <div className="flex items-center gap-3">
                   <p className="text-sm font-medium flex-1 truncate">
@@ -222,9 +222,9 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
             <Separator />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <Label>Tên đề tài</Label>
+                <Label className="italic">Tên đề tài</Label>
                 <p className="text-sm font-medium">
-                  {version.enterpriseName || "-"}
+                  {version.topic.topicCode || "-"}
                 </p>
               </div>
               {/* Add more topic fields as needed */}
@@ -237,41 +237,46 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <ClipboardList className="h-5 w-5" />
-              <h3>{roleCurrent == "Student" ? "Lịch sử đánh giá của các mentor" :  "Lịch sử đánh giá"}</h3>
+              <h3>
+                {roleCurrent == "Student"
+                  ? "Lịch sử đánh giá của các mentor"
+                  : "Lịch sử đánh giá"}
+              </h3>
             </div>
             <Separator />
 
             <div className="space-y-4">
               {requests.map((request) => {
                 const isRequestForCurrentUser = request.reviewerId == user.id;
-                const isRequestForCurrentUserHasAnswer = request?.answerCriterias?.length > 0 || false;
+                const isRequestForCurrentUserHasAnswer =
+                  request?.answerCriterias?.length > 0 || false;
 
                 return (
                   <div key={request.id} className="border rounded-lg p-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div className="space-y-1">
-                        <Label>Người đánh giá</Label>
+                        <Label className="italic">Người đánh giá</Label>
                         <p className="text-sm font-medium">
                           {request.reviewer?.email || "Unknown"}
                         </p>
                       </div>
 
                       <div className="space-y-1">
-                        <Label>Trạng thái</Label>
+                        <Label className="italic">Trạng thái</Label>
                         <div>
                           <RequestStatusBadge status={request.status} />
                         </div>
                       </div>
 
                       <div className="space-y-1">
-                        <Label>Ngày xử lí</Label>
+                        <Label className="italic">Ngày xử lí</Label>
                         <p className="text-sm font-medium">
                           {formatDate(request.processDate)}
                         </p>
                       </div>
 
                       <div className="space-y-1">
-                        {/* <Label></Label> */}
+                        {/* <Label className="italic"></Label> */}
                         {isRequestForCurrentUser && (
                           <Link href={`/idea/reviews/${request.id}`} passHref>
                             <Button
@@ -293,6 +298,12 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
             </div>
           </div>
         )}
+
+        <div>
+          <Button variant={"outline"} asChild>
+            <Link href={`/idea/request/${idea.id ?? ""}`}>Chi tiết</Link>
+          </Button>
+        </div>
       </div>
     );
   };
@@ -311,42 +322,42 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1">
-            <Label>Người sở hữu</Label>
+            <Label className="italic">Người sở hữu</Label>
             <p className="text-sm font-medium">
               {idea.owner?.email || "Unknown"}
             </p>
           </div>
 
           <div className="space-y-1">
-            <Label>Người hướng dẫn</Label>
+            <Label className="italic">Người hướng dẫn</Label>
             <p className="text-sm font-medium">
               {idea.mentor?.email || "Not assigned"}
             </p>
           </div>
 
           <div className="space-y-1">
-            <Label>Người hướng dẫn 2</Label>
+            <Label className="italic">Người hướng dẫn 2</Label>
             <p className="text-sm font-medium">
               {idea.subMentor?.email || "Not assigned"}
             </p>
           </div>
 
           <div className="space-y-1">
-            <Label>Thể loại đề tài</Label>
+            <Label className="italic">Thể loại đề tài</Label>
             <p className="text-sm font-medium">
               {IdeaType[idea.type ?? -1] || "-"}
             </p>
           </div>
 
           {/* <div className="space-y-1">
-            <Label>Existing Team</Label>
+            <Label className="italic">Existing Team</Label>
             <p className="text-sm font-medium">
               {idea.isExistedTeam ? "Yes" : "No"}
             </p>
           </div> */}
 
           <div className="space-y-1">
-            <Label>Chủ đề doanh nghiệp</Label>
+            <Label className="italic">Chủ đề doanh nghiệp</Label>
             <p className="text-sm font-medium">
               {idea.isEnterpriseTopic ? "Yes" : "No"}
             </p>
@@ -364,13 +375,13 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-1">
-            <Label>Ngành</Label>
+            <Label className="italic">Ngành</Label>
             <p className="text-sm font-medium">
               {idea.specialty?.profession?.professionName || "-"}
             </p>
           </div>
           <div className="space-y-1">
-            <Label>Chuyên ngành</Label>
+            <Label className="italic">Chuyên ngành</Label>
             <p className="text-sm font-medium">
               {idea.specialty?.specialtyName || "-"}
             </p>
@@ -384,7 +395,7 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <GitCompare className="h-5 w-5 text-muted-foreground" />
-          <Label>Phiên bản</Label>
+          <Label className="italic">Phiên bản</Label>
         </div>
 
         <Select

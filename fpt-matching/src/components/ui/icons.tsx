@@ -8,7 +8,7 @@ export const Icons = {
     logo: ({className = "", ...props}: IconProps) => (
         <>
         <Image
-            src="/FPT_logo.png"
+            src="/logo_web.png"
             width={9999}
             height={9999}
             alt="Nhu My Studio"
