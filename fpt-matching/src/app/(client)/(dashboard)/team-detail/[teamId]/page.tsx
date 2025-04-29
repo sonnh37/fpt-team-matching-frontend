@@ -46,7 +46,7 @@ import { invitationService } from "@/services/invitation-service";
 import { projectService } from "@/services/project-service";
 import { IdeaStatus } from "@/types/enums/idea";
 import { TeamMemberRole } from "@/types/enums/team-member";
-import { StudentInvitationCommand } from "@/types/models/commands/invitation/invitation-student-command";
+import { InvitationStudentCreatePendingCommand } from "@/types/models/commands/invitation/invitation-student-command";
 import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-get-current-by-status";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -128,8 +128,8 @@ export default function ProjectDetail() {
     a.role === TeamMemberRole.Leader
       ? -1
       : b.role === TeamMemberRole.Leader
-      ? 1
-      : 0
+        ? 1
+        : 0
   );
 
   const isHasTopic = !!project?.topic;
@@ -158,7 +158,7 @@ export default function ProjectDetail() {
         return;
       }
 
-      const ideacreate: StudentInvitationCommand = {
+      const ideacreate: InvitationStudentCreatePendingCommand = {
         projectId: id,
         content: "Muốn tham gia vào nhóm bạn",
       };
@@ -298,7 +298,7 @@ export default function ProjectDetail() {
                 </CardDescription>
               </div>
               <Badge variant="outline" className="text-sm">
-               Còn {availableSlots} slot{availableSlots !== 1 ? "s" : ""}
+                Còn {availableSlots} slot{availableSlots !== 1 ? "s" : ""}
               </Badge>
             </div>
           </CardHeader>
@@ -471,9 +471,8 @@ export default function ProjectDetail() {
               <h4 className="text-lg font-semibold mb-4">Các thành viên nhóm</h4>
               <div className="space-y-3">
                 {sortedMembers.map((member, index) => {
-                  const initials = `${
-                    member.user?.lastName?.charAt(0).toUpperCase() || ""
-                  }`;
+                  const initials = `${member.user?.lastName?.charAt(0).toUpperCase() || ""
+                    }`;
                   const isLeader = member.role === TeamMemberRole.Leader;
 
                   return (

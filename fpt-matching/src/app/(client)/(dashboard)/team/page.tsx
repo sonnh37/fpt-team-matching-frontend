@@ -728,13 +728,13 @@ export default function TeamInfo() {
                 if (adjustedReviewDate < currentDate) {
                   return (
                     <Button>
-                      <Link href="/team/rate">Đánh giá thành viên</Link>
+                      <Link href={`/team/rate/${project.id}`}>Đánh giá thành viên</Link>
                     </Button>
                   );
                 }
 
                 return <Button disabled={true}>Đánh giá thành viên</Button>;
-              })()}
+              })()} 
             </CardContent>
           </Card>
         </div>

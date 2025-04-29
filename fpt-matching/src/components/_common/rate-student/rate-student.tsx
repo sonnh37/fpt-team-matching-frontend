@@ -13,8 +13,7 @@ import { teammemberService } from '@/services/team-member-service';
 import { RateCreateCommand } from '@/types/models/commands/rate/rate-create-command';
 import { toast } from 'sonner';
 import { ideaHistoryService } from '@/services/idea-history-service';
-
-const RateStudent = ({ id }: { id: string }) => {
+const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
     const [rated, setRated] = React.useState(4);
     const [rated1, setRated1] = React.useState(4);
     const [rated2, setRated2] = React.useState(4);
@@ -67,20 +66,20 @@ const RateStudent = ({ id }: { id: string }) => {
         let query: RateCreateCommand = {
             rateById: formData.rateById ?? "",
             rateForId: formData.rateForId,
-            numbOfStar: formData.numbOfStar,
+            percentContribution: formData.numbOfStar,
             content: formData.content
         }
 
         const result1 = await rateService.create(query)
         if (result1?.status == 1) {
-            toast.success("Bạn đã đánh giá thành công!")
+            toast.success("Đã gửi form đánh giá đề tài thành công!")
             setFormData({
                 rateById: user?.teamMembers.find(x => x.userId === user?.id)?.id ?? "", // hoặc x.id nếu đó là teamMemberId
                 rateForId: id,
                 numbOfStar: 1,
                 content: ""
             })
-            window.location.href = `/team/rate`;
+            window.location.href = `/team/rate/${projectId}`;
         } else {
             toast.error("Đánh giá thất bại!")
         }

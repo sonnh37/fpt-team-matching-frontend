@@ -35,7 +35,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { invitationService } from "@/services/invitation-service";
 import { userService } from "@/services/user-service";
 import { projectService } from "@/services/project-service";
-import { TeamInvitationCommand } from "@/types/models/commands/invitation/invitation-team-command";
+import { InvitationTeamCreatePendingCommand } from "@/types/models/commands/invitation/invitation-team-command";
 import { apiHubsService } from "@/services/api-hubs-service";
 
 const ListUploadCv = ({ blogId }: { blogId: string }) => {
@@ -123,7 +123,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                     const idReceiver = receiver.data.id;
                     const prj = await projectService.getProjectInfo();
 
-                    const invitation: TeamInvitationCommand = {
+                    const invitation: InvitationTeamCreatePendingCommand = {
                         receiverId: idReceiver,
                         projectId: prj.data?.id ?? "",
                         content: "Muốn mời bạn vào nhóm!",
