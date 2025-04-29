@@ -21,21 +21,23 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useState } from "react";
 import { useSelector } from "react-redux";
+import { IdeaDetailForm } from "../../detail";
 
 export const columns: ColumnDef<Idea>[] = [
- {
+  {
     accessorKey: "latestVersion",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Latest Version" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
-      const highestVersion = idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
       return highestVersion ? `v${highestVersion.version}` : "-";
     },
   },
@@ -46,14 +48,14 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
+      if (!idea.ideaVersions) return;
       const highestVersion =
-      idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
-      return highestVersion?.englishName || "-"
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion?.englishName || "-";
     },
   },
   {
@@ -63,13 +65,14 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
-      const highestVersion = idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
-      
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+
       return highestVersion?.stageIdea?.semester?.semesterName || "-";
     },
   },
@@ -80,13 +83,14 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
-      const highestVersion = idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
-      
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+
       return highestVersion?.stageIdea?.stageNumber || "-";
     },
   },
@@ -96,9 +100,9 @@ export const columns: ColumnDef<Idea>[] = [
       <DataTableColumnHeader column={column} title="Date created" />
     ),
     cell: ({ row }) => {
-        const date = new Date(row.getValue("createdDate"));
-        return formatDate(date)
-      },
+      const date = new Date(row.getValue("createdDate"));
+      return formatDate(date);
+    },
   },
   {
     accessorKey: "status",
@@ -153,11 +157,11 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const idea = row.original;
   const highestVersion =
-  idea.ideaVersions.length > 0
-    ? idea.ideaVersions.reduce((prev, current) =>
-        (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-      )
-    : undefined;
+    idea.ideaVersions.length > 0
+      ? idea.ideaVersions.reduce((prev, current) =>
+          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+        )
+      : undefined;
   return (
     <div className="flex flex-col gap-2">
       {/* Hiển thị trạng thái Mentor Approve */}
@@ -175,7 +179,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           </DialogHeader>
           <div className="flex justify-between p-4 gap-4">
             <TimeStageIdea stageIdea={highestVersion?.stageIdea} />
-            <HorizontalLinearStepper idea={idea} />
+            {/* <HorizontalLinearStepper idea={idea} /> */}
+          </div>
+          <div className="p-4 gap-4">
+            <IdeaDetailForm ideaId={idea.id} />
           </div>
         </DialogContent>
       </Dialog>

@@ -19,6 +19,17 @@ class SemesterService extends BaseService<Semester> {
       return this.handleError(error);
     }
   }
+
+  public async getBeforeSemester(): Promise<BusinessResult<Semester>> {
+    try {
+      const response = await axiosInstance.get<BusinessResult<Semester>>(
+        `${this.endpoint}/before`
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  }
 }
 
 export const semesterService = new SemesterService();
