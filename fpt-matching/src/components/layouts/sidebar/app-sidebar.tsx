@@ -100,7 +100,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <div>
               <TypographyP className="truncate">
                 Học kì:
-                {` ` + semesterData?.data?.semesterName + ""}
+                {` ` + (semesterData?.data?.semesterName ?? "Chưa vô kì") + ""}
               </TypographyP>
             </div>
           </SidebarMenuButton>
