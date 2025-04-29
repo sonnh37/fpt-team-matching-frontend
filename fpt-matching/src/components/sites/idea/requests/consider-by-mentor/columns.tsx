@@ -227,7 +227,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           </DialogHeader>
           <div className="flex justify-between p-4 gap-4">
             <TimeStageIdea stageIdea={highestVersion?.stageIdea} />
-            <HorizontalLinearStepper idea={idea} />
+            {/* <HorizontalLinearStepper idea={idea} /> */}
           </div>
           <div className="p-4 gap-4">
             <IdeaDetailForm ideaId={idea.id} />

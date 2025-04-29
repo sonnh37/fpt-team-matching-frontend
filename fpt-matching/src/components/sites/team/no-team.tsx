@@ -34,10 +34,12 @@ export const NoTeam = () => {
 
   const query: IdeaGetCurrentByStatusQuery = {
     status: IdeaStatus.Approved,
+    isPagination: false,
   };
 
   const query_invitations: InvitationGetByStatudQuery = {
     status: InvitationStatus.Pending,
+    isPagination: true,
     pageNumber: 1,
     pageSize: 100,
   };

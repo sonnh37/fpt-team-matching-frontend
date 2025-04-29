@@ -131,6 +131,16 @@ export const CreateProjectForm = () => {
     isPagination: false,
   };
 
+  const { data: res_stage } = useQuery({
+    queryKey: ["getBeforeSemester"],
+    queryFn: () => semesterService.getBeforeSemester(),
+    refetchOnWindowFocus: false,
+  });
+  
+  const isLock = res_stage && res_stage.data?.endDate 
+    ? new Date() <= new Date(res_stage.data.endDate) 
+    : false;
+
   const query_invitations: InvitationGetByStatudQuery = {
     status: InvitationStatus.Pending,
     pageNumber: 1,
@@ -194,6 +204,7 @@ export const CreateProjectForm = () => {
         const [profileRes, professionsRes] = await Promise.all([
           profilestudentService.getProfileByCurrentUser(),
           professionService.getAll(),
+
         ]);
         setProfessions(professionsRes.data?.results ?? []);
 
@@ -208,14 +219,17 @@ export const CreateProjectForm = () => {
         setSelectedProfession(profess ?? null);
 
         // Lấy tất cả idea các kì của user đã tạo
+        const semesterCurrent = await semesterService.getCurrentSemester();
         const ideaExists = await ideaService.getIdeaByUser();
+        const ideas = ideaExists.data ?? []
+        const ideasCurrentSemester = ideas.filter(m => m.ideaVersions.filter(iv => iv.stageIdea?.semesterId == semesterCurrent.data?.id))       
+
         //check xem user co idea nao dang pending or Done khong
-        const isPendingOrDone = ideaExists.data?.some(
-          (m) =>
-            m.status === IdeaStatus.Pending || m.status === IdeaStatus.Approved
+        const isIdeasActiving = ideasCurrentSemester?.some(
+          (m) => m.status != IdeaStatus.Rejected
         );
 
-        if (isPendingOrDone) {
+        if (isIdeasActiving) {
           if (isStudent) {
             setShowPageIsIdea(true);
           }
@@ -278,6 +292,8 @@ export const CreateProjectForm = () => {
   }
 
   if (showPageIsIdea) return <PageIsIdea />;
+
+  if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!"/>
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
