@@ -220,6 +220,7 @@ export const CreateProjectForm = () => {
 
         // Lấy tất cả idea các kì của user đã tạo
         const semesterCurrent = await semesterService.getCurrentSemester();
+        if(semesterCurrent.status != 1) return;
         const ideaExists = await ideaService.getIdeaByUser();
         const ideas = ideaExists.data ?? []
         const ideasCurrentSemester = ideas.filter(m => m.ideaVersions.filter(iv => iv.stageIdea?.semesterId == semesterCurrent.data?.id))       
