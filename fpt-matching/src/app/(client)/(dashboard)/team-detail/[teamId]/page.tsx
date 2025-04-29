@@ -52,9 +52,10 @@ import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-g
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { is } from "date-fns/locale";
 import { Info, LoaderCircle, User as UserIcon } from "lucide-react";
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { TbUsersPlus } from "react-icons/tb";
 import { toast } from "sonner";
 
@@ -72,16 +73,43 @@ export default function ProjectDetail() {
 
   const queryClient = useQueryClient();
 
-  const { data: res_stage } = useQuery({
+  const { data: res_stage, isLoading: isLoadingSemester } = useQuery({
     queryKey: ["getBeforeSemester"],
     queryFn: () => semesterService.getBeforeSemester(),
     refetchOnWindowFocus: false,
   });
 
-  const isLock =
-    res_stage && res_stage.data?.endDate
-      ? new Date() <= new Date(res_stage.data.endDate)
-      : false;
+  const { data: res_current_semester, isLoading: isLoadingCurrent } = useQuery({
+    queryKey: ["getCurrentSemester"],
+    queryFn: () => semesterService.getCurrentSemester(),
+    refetchOnWindowFocus: false,
+  });
+
+  const isLock = useMemo(() => {
+    const now = new Date();
+
+    if (res_current_semester?.data && res_stage?.data) {
+      const beforeSemesterEndDate = new Date(res_stage.data.endDate ?? 0);
+      const currentSemesterStartDate = new Date(res_current_semester.data.startDate ?? 0);
+      
+      // Kiểm tra nếu hiện tại nằm giữa endDate của kì trước và startDate của kì hiện tại
+      return now > beforeSemesterEndDate && now < currentSemesterStartDate;
+    }
+
+    // Nếu có currentSemester → KHÔNG KHÓA (đang trong kì hiện tại)
+    if (res_current_semester?.data) {
+      return true;
+    }
+
+    // Nếu không có currentSemester nhưng có beforeSemester
+    if (res_stage?.data) {
+      const beforeSemesterEndDate = new Date(res_stage.data.endDate ?? 0);
+      return now > beforeSemesterEndDate; // KHÓA nếu đã qua endDate
+    }
+
+    // Nếu không có cả currentSemester và beforeSemester → KHÓA
+    return true;
+  }, [res_stage?.data, res_current_semester?.data]);
 
   // Query: Idea của user
   const {
@@ -94,6 +122,7 @@ export default function ProjectDetail() {
     refetchOnWindowFocus: false,
   });
 
+  console.log("check_isLock", isLock)
   // Query: Thông tin project
   const {
     data: project,
@@ -200,7 +229,8 @@ export default function ProjectDetail() {
     }
   };
 
-  if (isLoadingIdeaCurrent || isLoadingTeam) return <LoadingComponent />;
+  if (isLoadingIdeaCurrent || isLoadingTeam || isLoadingSemester || isLoadingCurrent)
+    return <LoadingComponent />;
   if (isErrorIdeaCurrent || isErrorTeam) return <ErrorSystem />;
 
   return (

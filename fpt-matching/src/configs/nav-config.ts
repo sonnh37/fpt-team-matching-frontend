@@ -1,13 +1,20 @@
 import {
   Calendar,
+  CircleHelp,
+  CircleUser,
+  FileUser,
   Globe,
+  History,
   Home,
   Lightbulb,
   MessageCircleQuestion,
   Pencil,
+  PencilRuler,
   Send,
   ShieldHalf,
   SquareUserRound,
+  Telescope,
+  UserPlus,
   Users,
   UsersRound,
 } from "lucide-react";
@@ -30,19 +37,19 @@ export const NAV_CONFIG = {
     {
       title: "Mạng xã hội",
       url: "/social/blog",
-      icon: Globe,
+      icon: CircleUser,
       roles: ["*"],
     },
     
     {
-      title: "Đội nhóm",
+      title: "Nhóm",
       url: "/team",
       icon: UsersRound,
       roles: ["Student"],
       items: [
         {
-          title: "Đội của tôi",
-          icon: Pencil,
+          title: "Nhóm của tôi",
+          icon: UsersRound,
           url: "/team",
           roles: ["Student"],
         },
@@ -58,24 +65,24 @@ export const NAV_CONFIG = {
     {
       title: "Ý tưởng",
       url: "/idea",
-      icon: Lightbulb,
+      icon: Telescope,
       roles: ["*"],
       items: [
         {
           title: "Tạo ý tưởng",
-          icon: Pencil,
+          icon: PencilRuler,
           url: "/idea/create",
           roles: ["Student", "Lecturer"],
         },
         {
-          title: "Yêu cầu ý tưởng",
-          icon: GiWideArrowDunk,
+          title: "Lịch sử duyệt ý tưởng",
+          icon: History,
           url: "/idea/request",
           roles: ["Student", "Lecturer"],
         },
         {
-          title: "Ý tưởng của giảng viên",
-          icon: PiUserList,
+          title: "Đề xuất từ giảng viên",
+          icon: FileUser,
           url: "/idea/supervisors",
           roles: ["*"],
         },
@@ -96,19 +103,19 @@ export const NAV_CONFIG = {
     {
       title: "Lời mời",
       url: "/invitations",
-      icon: Send,
+      icon: UserPlus,
       roles: ["*"],
     },
     {
       title: "Danh sách giảng viên",
       url: "/supervisors",
-      icon: MdOutlineSupervisorAccount,
+      icon: UsersRound,
       roles: ["*"],
     },
     {
       title: "Hỗ trợ",
       url: "/#",
-      icon: MessageCircleQuestion,
+      icon: CircleHelp,
       roles: ["*"],
     },
   ],

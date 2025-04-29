@@ -42,22 +42,11 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
       );
     },
   },
-
   {
-    accessorKey: "idea.englishName",
+    accessorKey: "topic.topicCode",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Idea" />
     ),
-    cell: ({ row }) => {
-      const englishName = row.original.idea?.englishName ?? "Unknown"; // Tránh lỗi undefined
-      const ideaId = row.original.idea?.id ?? "#";
-
-      return (
-        <Button variant="link" className="p-0 m-0" asChild>
-          <Link href={`/idea-detail/${ideaId}`}>{englishName}</Link>
-        </Button>
-      );
-    },
   },
   {
     accessorKey: "status",
@@ -65,7 +54,7 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
       <DataTableColumnHeader column={column} title="Status" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as MentorTopicRequestStatus;
+      const status = row.original.status as MentorTopicRequestStatus;
       const statusText = MentorTopicRequestStatus[status];
 
       let badgeVariant:
@@ -94,11 +83,6 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
-  },
-  {
-    accessorKey: "createdDate",
-    header: ({ column }) => null,
-    cell: ({ row }) => null,
   },
   {
     accessorKey: "actions",
@@ -134,7 +118,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: model.id,
         status: MentorTopicRequestStatus.Rejected,
         projectId: model.projectId,
-        ideaId: model.ideaId,
+        ideaId: model.topic?.ideaVersion?.ideaId,
       };
       const res = await mentortopicrequestService.update(command);
       if (res.status != 1) {
@@ -156,7 +140,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: model.id,
         status: MentorTopicRequestStatus.Approved,
         projectId: model.projectId,
-        ideaId: model.ideaId,
+        ideaId: model.topic?.ideaVersion?.ideaId,
       };
       const res = await mentortopicrequestService.update(command);
       if (res.status != 1) {

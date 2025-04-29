@@ -1,21 +1,28 @@
 "use client";
 
 import { AlertMessage } from "@/components/_common/alert-message";
+import { LoadingComponent } from "@/components/_common/loading-page";
 import IdeasOfSupervisorsTableTable from "@/components/sites/idea/supervisors";
 import { formatDate } from "@/lib/utils";
 import { semesterService } from "@/services/semester-service";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Page() {
-  const { data: res_semes } = useQuery({
+  const { data: res_semes, isLoading } = useQuery({
     queryKey: ["getCurrentSemester"],
     queryFn: () => semesterService.getCurrentSemester(),
     refetchOnWindowFocus: false,
   });
 
+  if (isLoading) {
+    return <LoadingComponent />;
+  }
+
   // Nếu không có kì học hiện tại
   if (!res_semes?.data) {
-    return <AlertMessage message="Chưa tới kì để xem các đề tài từ các mentor" />;
+    return (
+      <AlertMessage message="Chưa tới kì để xem các đề tài từ các mentor" />
+    );
   }
 
   const currentSemester = res_semes.data;
@@ -25,13 +32,15 @@ export default function Page() {
     const publicDate = new Date(currentSemester.publicTopicDate);
     const now = new Date();
 
+    console.log("check_publicDate", publicDate);
+    console.log("check_now", now);
     if (now < publicDate) {
       // Format ngày hiển thị cho đẹp
       const formattedDate = formatDate(publicDate);
-      
+
       return (
-        <AlertMessage 
-          message={`Chưa tới thời gian công bố đề tài. Ngày công bố: ${formattedDate}`} 
+        <AlertMessage
+          message={`Chưa tới thời gian công bố đề tài. Ngày công bố: ${formattedDate}`}
         />
       );
     }
