@@ -123,7 +123,6 @@ export default function TeamInfo() {
   if (!project) return <NoTeam />;
   const isLockProject =
     project.status == ProjectStatus.InProgress ? true : false;
-
   //check xem có file không và lấy ra file mới nhất
   const latestTopicVersion = (project.topic?.topicVersions ?? [])
     .filter((x) => x.createdDate)
