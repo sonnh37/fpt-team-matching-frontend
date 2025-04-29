@@ -177,6 +177,10 @@ export default function Page() {
     const [openFailReview, setOpenFailReview] = useState<boolean>(false)
     const postFileXLSX = async () => {
         if (currentSemester) {
+            if (data?.length == 0) {
+                toast.error("File không đúng format hoặc không tồn tại bất cứ record nào")
+                return;
+            }
             const result = await reviewService.importReviewFromXLSX(file!, parseInt(review), currentSemester.id!)
             console.log(result)
             if (result.status == -1) {
