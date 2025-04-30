@@ -74,80 +74,61 @@ import { UserCheckMentorAndSubMentorQuery } from "@/types/models/queries/users/u
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
 const formSchema = z.object({
-  //  inviteEmail: z.string().email({ message: "Invalid email format." }),
   englishName: z
-    .string()
-    .min(2, { message: "English Title must be at least 2 characters." }),
+    .string({ required_error: "Vui lòng nhập tên tiếng Anh" })
+    .min(2, { message: "Tên tiếng Anh phải có ít nhất 2 ký tự" }),
+
   teamSize: z
-    .number({ invalid_type_error: "Team size must be a number." })
-    .gte(4, { message: "Team size must be at least 4." }),
+    .number({
+      required_error: "Vui lòng chọn số lượng thành viên",
+      invalid_type_error: "Số lượng thành viên phải là số",
+    })
+    .gte(4, { message: "Số lượng thành viên tối thiểu là 4" }),
+
   abbreviations: z
-    .string()
-    .max(20, { message: "Abbreviation must be less than 20 characters." }),
+    .string({ required_error: "Vui lòng nhập tên viết tắt" })
+    .max(20, { message: "Tên viết tắt không được quá 20 ký tự" }),
+
   vietNamName: z
-    .string()
-    .min(2, { message: "Vietnamese Title must be at least 2 characters." }),
+    .string({ required_error: "Vui lòng nhập tên tiếng Việt" })
+    .min(2, { message: "Tên tiếng Việt phải có ít nhất 2 ký tự" }),
+
   description: z
-    .string()
-    .min(10, { message: "Description must be at least 10 characters." }),
+    .string({ required_error: "Vui lòng nhập mô tả" })
+    .min(10, { message: "Mô tả phải có ít nhất 10 ký tự" }),
+
   fileschema: z
-    .custom<File>((val) => val instanceof File) // Xác định đây là kiểu File
+    .custom<File>((val) => val instanceof File, {
+      message: "Vui lòng chọn tệp đính kèm",
+    })
     .refine(
       (file) => {
         const fileName = file.name.toLowerCase();
         return ALLOWED_EXTENSIONS.some((ext) => fileName.endsWith(ext));
       },
       {
-        message: "File must be .doc, .docx, or .pdf",
+        message: "Chỉ chấp nhận tệp .doc, .docx hoặc .pdf",
       }
     ),
+
   specialtyId: z.string().optional(),
-  mentorId: z.string().optional(),
+
+  mentorId: z
+    .string({ required_error: "Vui lòng chọn giảng viên hướng dẫn" })
+    .optional(),
+
   subMentorId: z.string().optional(),
+
   enterpriseName: z
     .string()
-    .min(2, { message: "Enterprise name must be at least 2 characters." })
+    .min(2, { message: "Tên doanh nghiệp phải có ít nhất 2 ký tự" })
     .optional(),
+
   isEnterpriseTopic: z.boolean().default(false),
 });
-
 export const CreateProjectForm = () => {
   const user = useSelectorUser();
-  if (!user) return;
-  const isStudent = user?.userXRoles.some((m) => m.role?.roleName == "Student");
-  const isLecturer = user?.userXRoles.some(
-    (m) => m.role?.roleName == "Lecturer"
-  );
-  const [selectedProfession, setSelectedProfession] =
-    useState<Profession | null>(null);
-  const [professions, setProfessions] = useState<Profession[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-  const [isNotUpdateSettingYet, setIsNotUpdateSettingYet] = useState(false);
-  const [showPageIsIdea, setShowPageIsIdea] = useState(false);
   const router = useRouter();
-  const query: UserGetAllQuery = {
-    role: "Lecturer",
-    isPagination: false,
-  };
-
-  const { data: res_stage } = useQuery({
-    queryKey: ["getBeforeSemester"],
-    queryFn: () => semesterService.getBeforeSemester(),
-    refetchOnWindowFocus: false,
-  });
-  
-  const isLock = res_stage && res_stage.data?.endDate 
-    ? new Date() <= new Date(res_stage.data.endDate) 
-    : false;
-
-  const query_invitations: InvitationGetByStatudQuery = {
-    status: InvitationStatus.Pending,
-    pageNumber: 1,
-    pageSize: 100,
-    isPagination: true,
-  };
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -157,114 +138,214 @@ export const CreateProjectForm = () => {
 
   const isEnterpriseIdea = form.watch("isEnterpriseTopic");
 
+  // Check user role
+  const isStudent = user?.userXRoles.some(
+    (m) => m.role?.roleName === "Student"
+  );
+  const isLecturer = user?.userXRoles.some(
+    (m) => m.role?.roleName === "Lecturer"
+  );
+
+  // Fetch all necessary data in parallel
+  const {
+    data: res_stage,
+    isLoading: isLoadingStage,
+    error: errorStage,
+  } = useQuery({
+    queryKey: ["getBeforeSemester"],
+    queryFn: () => semesterService.getBeforeSemester(),
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    data: resStage,
+    isLoading: isLoadingCurrentStage,
+    error: errorCurrentStage,
+  } = useQuery({
+    queryKey: ["getCurrentStageIdea"],
+    queryFn: () => stageideaService.getCurrentStageIdea(),
+    refetchOnWindowFocus: false,
+  });
+
   const {
     data: result_project,
     isLoading: isLoadingProject,
-    isError: isErrorProject,
-    error,
-    refetch,
+    error: errorProject,
   } = useQuery({
     queryKey: ["getProjectInfo"],
-    queryFn: projectService.getProjectInfo,
+    queryFn: () => projectService.getProjectInfo(),
+    enabled: !!isStudent, // Only fetch if student
     refetchOnWindowFocus: false,
   });
-
-  const project = result_project?.data;
 
   const {
-    data: result_invitations,
-    isLoading: isLoadingInvitations,
-    isError: isErrorInvitations,
-    error: error_invitations,
+    data: profileData,
+    isLoading: isLoadingProfile,
+    error: errorProfile,
   } = useQuery({
-    queryKey: ["getUserInvitationsByType", query_invitations],
-    queryFn: async () =>
-      await invitationService.getUserInvitationsStatus(query_invitations),
+    queryKey: ["getProfileByCurrentUser"],
+    queryFn: () => profilestudentService.getProfileByCurrentUser(),
     refetchOnWindowFocus: false,
   });
 
-  const invitationPendings = result_invitations?.data?.results ?? [];
+  const {
+    data: professionsData,
+    isLoading: isLoadingProfessions,
+    error: errorProfessions,
+  } = useQuery({
+    queryKey: ["getAllProfessions"],
+    queryFn: () => professionService.getAll(),
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    data: ideasData,
+    isLoading: isLoadingIdeas,
+    error: errorIdeas,
+  } = useQuery({
+    queryKey: ["getIdeaByUser"],
+    queryFn: () => ideaService.getIdeaByUser(),
+    enabled: !!isStudent, // Only fetch if student
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    data: currentSemesterData,
+    isLoading: isLoadingCurrentSemester,
+    error: errorCurrentSemester,
+  } = useQuery({
+    queryKey: ["getCurrentSemester"],
+    queryFn: () => semesterService.getCurrentSemester(),
+    refetchOnWindowFocus: false,
+  });
+
+  const query: UserGetAllQuery = {
+    role: "Mentor",
+    isPagination: false,
+  };
+
+  const { data: usersData, isLoading: isLoadingUsers } = useQuery({
+    queryKey: ["getUsersByRole", query],
+    queryFn: () => userService.getAll(query),
+    refetchOnWindowFocus: false,
+  });
+
+  const query_invitations: InvitationGetByStatudQuery = {
+    status: InvitationStatus.Pending,
+    pageNumber: 1,
+    pageSize: 100,
+    isPagination: true,
+  };
+
+  const {
+    data: invitationsData,
+    isLoading: isLoadingInvitations,
+    error: errorInvitations,
+  } = useQuery({
+    queryKey: ["getUserInvitationsByType", query_invitations],
+    queryFn: () =>
+      invitationService.getUserInvitationsStatus(query_invitations),
+    enabled: !!isStudent, // Only fetch if student
+    refetchOnWindowFocus: false,
+  });
+
+  // Derived state
+  const isLockStageIdea = !resStage?.data;
+  const isLock = res_stage?.data?.endDate
+    ? new Date() <= new Date(res_stage.data.endDate)
+    : false;
+
+  const project = result_project?.data;
+  const teamMembers = project?.teamMembers;
+
+  const invitationPendings = invitationsData?.data?.results ?? [];
   const invitationPendingBySelfs = invitationPendings.filter(
     (invitation) => invitation.type == InvitationType.SentByStudent
   );
   const invitationPendingByTeams = invitationPendings.filter(
     (invitation) => invitation.type == InvitationType.SendByTeam
   );
-  const { data: result } = useQuery({
-    queryKey: ["getUsersByRole", query],
-    queryFn: () => userService.getAll(query),
+
+  // Set form values when profile data is loaded
+  useQuery({
+    queryKey: ["setSpecialtyId"],
+    queryFn: async () => {
+      if (profileData?.data?.specialtyId) {
+        form.setValue("specialtyId", profileData.data.specialtyId);
+      }
+      return null;
+    },
+    enabled: !!profileData?.data,
+  });
+
+  // Check for active ideas
+  const { data: hasActiveIdeas } = useQuery({
+    queryKey: ["checkActiveIdeas"],
+    queryFn: async () => {
+      if (!ideasData?.data || !currentSemesterData?.data) return false;
+
+      const ideasCurrentSemester = ideasData.data.filter((m) =>
+        m.ideaVersions.some(
+          (iv) => iv.stageIdea?.semesterId === currentSemesterData.data?.id
+        )
+      );
+
+      return ideasCurrentSemester.some((m) => m.status !== IdeaStatus.Rejected);
+    },
+    enabled: !!ideasData?.data && !!currentSemesterData?.data,
     refetchOnWindowFocus: false,
   });
 
-  const users = result?.data?.results ?? [];
+  // Loading and error states
+  const isLoading =
+    isLoadingStage ||
+    isLoadingCurrentStage ||
+    isLoadingProject ||
+    isLoadingProfile ||
+    isLoadingProfessions ||
+    isLoadingIdeas ||
+    isLoadingCurrentSemester ||
+    isLoadingUsers ||
+    isLoadingInvitations;
 
-  useEffect(() => {
-    async function checkIdea() {
-      try {
-        const [profileRes, professionsRes] = await Promise.all([
-          profilestudentService.getProfileByCurrentUser(),
-          professionService.getAll(),
+  console.log(
+    "check_error",
+    errorStage ||
+      errorCurrentStage ||
+      errorProject ||
+      errorProfile ||
+      errorProfessions ||
+      errorIdeas ||
+      errorCurrentSemester ||
+      errorInvitations
+  );
 
-        ]);
-        setProfessions(professionsRes.data?.results ?? []);
-
-        form.setValue("specialtyId", profileRes.data?.specialtyId);
-
-        const profess = professionsRes.data?.results?.find(
-          (m) => m.id === profileRes.data?.specialty?.professionId
-        );
-        if (!profess) {
-          setIsNotUpdateSettingYet(true);
-        }
-        setSelectedProfession(profess ?? null);
-
-        // Lấy tất cả idea các kì của user đã tạo
-        const semesterCurrent = await semesterService.getCurrentSemester();
-        const ideaExists = await ideaService.getIdeaByUser();
-        const ideas = ideaExists.data ?? []
-        const ideasCurrentSemester = ideas.filter(m => m.ideaVersions.filter(iv => iv.stageIdea?.semesterId == semesterCurrent.data?.id))       
-
-        //check xem user co idea nao dang pending or Done khong
-        const isIdeasActiving = ideasCurrentSemester?.some(
-          (m) => m.status != IdeaStatus.Rejected
-        );
-
-        if (isIdeasActiving) {
-          if (isStudent) {
-            setShowPageIsIdea(true);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setIsError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    checkIdea();
-  }, []);
+  const isError =
+    errorStage ||
+    errorCurrentStage ||
+    errorProject ||
+    errorProfile ||
+    errorProfessions ||
+    errorIdeas ||
+    errorCurrentSemester ||
+    errorInvitations;
 
   if (!user) return null;
-  if (isLoadingProject || isLoadingInvitations || isLoading)
-    return <LoadingComponent />;
-  if (isErrorProject || isErrorInvitations || isLoading) return <ErrorSystem />;
+  if (isLoading) return <LoadingComponent />;
+  if (isError) return <ErrorSystem />;
 
+  // Student-specific checks
   if (isStudent) {
     if (project) {
-      // ** project has not idea
-      const isProjectNoIdea =
-        project?.topicId == undefined || project.topicId == null;
+      const isProjectNoIdea = !project?.topicId;
+      const isLeaderProject = project?.teamMembers.some(
+        (m) => m.userId == user.id && m.role == TeamMemberRole.Leader
+      );
 
-      // ** if project has idea => not create idea
       if (!isProjectNoIdea) {
         return <AlertMessage message="Bạn đã có đề tài." messageType="error" />;
       }
 
-      // ** if project has no idea and the user login is not leader project => not create idea
-      const isLeaderProject = project?.teamMembers.some(
-        (m) => m.userId == user.id && m.role == TeamMemberRole.Leader
-      );
       if (!isLeaderProject) {
         return (
           <AlertMessage message="Bạn đang trong dự án." messageType="error" />
@@ -291,71 +372,52 @@ export const CreateProjectForm = () => {
     }
   }
 
-  if (showPageIsIdea) return <PageIsIdea />;
-
-  if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!"/>
+  if (hasActiveIdeas && isStudent) return <PageIsIdea />;
+  if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
+  if (isLockStageIdea) return <AlertMessage message="Chưa tới đợt!" />;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
-      const query: UserCheckMentorAndSubMentorQuery = {
-        mentorId: values.mentorId,
-        subMentorId: values.subMentorId,
-      };
-      const res_bool =
-        await userService.checkMentorAndSubMentorSlotAvailability(query);
-      if (res_bool.status != 1 || res_bool.data == undefined)
-        return toast.error(res_bool.message);
-      if (res_bool.data == false) return toast.warning(res_bool.message);
+      // Check mentor availability
+      const mentorCheck =
+        await userService.checkMentorAndSubMentorSlotAvailability({
+          mentorId: isStudent ? values.mentorId : user?.id,
+          subMentorId: values.subMentorId,
+        });
 
+      if (!mentorCheck.data) {
+        return toast.error(mentorCheck.message);
+      }
 
-      // submit file cloudinary
-      const res_ = await fileUploadService.uploadFile(
+      // Upload file
+      const fileUpload = await fileUploadService.uploadFile(
         values.fileschema,
         "Idea"
       );
-      if (res_.status != 1) return toast.error(res_.message);
-      // end
+      if (fileUpload.status != 1) return toast.error(fileUpload.message);
 
-      if (isStudent) {
-        const command: IdeaCreateCommand = {
-          ...values,
-          isEnterpriseTopic: false,
-          enterpriseName: undefined,
-          file: res_.data,
-        };
+      // Create idea based on user role
+      const command: IdeaCreateCommand = {
+        ...values,
+        isEnterpriseTopic: isStudent ? false : values.isEnterpriseTopic,
+        enterpriseName: isStudent ? undefined : values.enterpriseName,
+        mentorId: isLecturer ? undefined : values.mentorId,
+        file: fileUpload.data,
+      };
 
-        const res = await ideaService.createIdeaByStudent(command);
-        if (res.status == 1) {
-          toast.success(res.message);
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          setShowPageIsIdea(true);
-          return;
-        }
-        toast.error(res.message);
+      const res = isStudent
+        ? await ideaService.createIdeaByStudent(command)
+        : await ideaService.createIdeaByLecturer(command);
+
+      if (res.status == 1) {
+        toast.success(res.message);
+        setTimeout(() => router.push("/idea/request"), 2000);
         return;
       }
 
-      if (isLecturer) {
-        const ideacreate: IdeaCreateCommand = {
-          ...values,
-          mentorId: undefined,
-          file: res_.data,
-        };
-
-        const res = await ideaService.createIdeaByLecturer(ideacreate);
-        if (res.status == 1) {
-          toast.success(res.message);
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          setShowPageIsIdea(true);
-          return;
-        }
-        toast.error(res.message);
-        return;
-      }
-
-      toast.error("You have not access for create Idea");
-    } catch (e: any) {
-      toast.error(e.toString());
+      toast.error(res.message);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "An error occurred");
     }
   }
 
@@ -377,8 +439,8 @@ export const CreateProjectForm = () => {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {/* Enterprise Toggle */}
-            {!isStudent && (
+            {/* Enterprise Toggle - Only for Lecturers */}
+            {isLecturer && (
               <div className="space-y-4 rounded-lg border p-4">
                 <FormSwitch
                   form={form}
@@ -393,7 +455,7 @@ export const CreateProjectForm = () => {
             <div className="space-y-4 rounded-lg border p-4">
               <h3 className="text-lg font-medium">Thông tin Học thuật</h3>
 
-              {isNotUpdateSettingYet ? (
+              {!profileData?.data?.specialtyId ? (
                 <div className="space-y-2 rounded-md bg-destructive/10 p-4">
                   <Label className="text-sm font-medium">
                     Yêu cầu cập nhật Ngành và Chuyên ngành
@@ -416,22 +478,14 @@ export const CreateProjectForm = () => {
                   <FormItem>
                     <FormLabel>Ngành học</FormLabel>
                     <Select
-                      onValueChange={(value) => {
-                        const selectedProfession = professions?.find(
-                          (cat) => cat.id === value
-                        );
-                        setSelectedProfession(selectedProfession ?? null);
-                      }}
-                      value={
-                        selectedProfession ? selectedProfession.id : undefined
-                      }
-                      disabled={true}
+                      value={profileData.data.specialty?.professionId}
+                      disabled
                     >
                       <SelectTrigger className="w-full">
                         <SelectValue placeholder="Chọn ngành học" />
                       </SelectTrigger>
                       <SelectContent>
-                        {professions?.map((pro) => (
+                        {professionsData?.data?.results?.map((pro) => (
                           <SelectItem key={pro.id} value={pro.id!}>
                             {pro.professionName}
                           </SelectItem>
@@ -446,20 +500,22 @@ export const CreateProjectForm = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Chuyên ngành</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                          disabled={true}
-                        >
+                        <Select value={field.value} disabled>
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Chọn chuyên ngành" />
                           </SelectTrigger>
                           <SelectContent>
-                            {selectedProfession?.specialties?.map((spec) => (
-                              <SelectItem key={spec.id} value={spec.id!}>
-                                {spec.specialtyName}
-                              </SelectItem>
-                            ))}
+                            {professionsData?.data?.results
+                              ?.find(
+                                (p) =>
+                                  p.id ===
+                                  profileData?.data?.specialty?.professionId
+                              )
+                              ?.specialties?.map((spec) => (
+                                <SelectItem key={spec.id} value={spec.id!}>
+                                  {spec.specialtyName}
+                                </SelectItem>
+                              ))}
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -578,9 +634,7 @@ export const CreateProjectForm = () => {
                   <FormItem>
                     <FormLabel>Số lượng thành viên</FormLabel>
                     <Select
-                      onValueChange={(value) => {
-                        field.onChange(Number(value));
-                      }}
+                      onValueChange={(value) => field.onChange(Number(value))}
                       value={field.value?.toString()}
                     >
                       <SelectTrigger className="w-full">
@@ -602,24 +656,66 @@ export const CreateProjectForm = () => {
                 )}
               />
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {isStudent && (
-                  <>
-                    <FormField
-                      control={form.control}
-                      name="mentorId"
-                      render={({ field }) => (
+              {/* Mentor Selection - Only for Students */}
+              {isStudent && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="mentorId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Giảng viên hướng dẫn</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Chọn giảng viên" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {usersData?.data?.results?.map((user) => (
+                              <SelectItem key={user.id} value={user.id!}>
+                                <div className="flex items-center gap-2">
+                                  <span>
+                                    {user.lastName} {user.firstName}
+                                  </span>
+                                  <span className="text-muted-foreground text-xs">
+                                    {user.email}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Chọn giảng viên sẽ hướng dẫn dự án của bạn
+                        </FormDescription>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="subMentorId"
+                    render={({ field }) => {
+                      const mentorId = form.watch("mentorId");
+                      const filteredUsers = usersData?.data?.results?.filter(
+                        (user) => user.id !== mentorId
+                      );
+
+                      return (
                         <FormItem>
-                          <FormLabel>Giảng viên hướng dẫn</FormLabel>
+                          <FormLabel>Giảng viên hướng dẫn 2</FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             value={field.value}
+                            disabled={!mentorId}
                           >
                             <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Chọn giảng viên" />
+                              <SelectValue placeholder="Chọn giảng viên 2" />
                             </SelectTrigger>
                             <SelectContent>
-                              {users?.map((user) => (
+                              {filteredUsers?.map((user) => (
                                 <SelectItem key={user.id} value={user.id!}>
                                   <div className="flex items-center gap-2">
                                     <span>
@@ -637,54 +733,13 @@ export const CreateProjectForm = () => {
                             Chọn giảng viên sẽ hướng dẫn dự án của bạn
                           </FormDescription>
                         </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="subMentorId"
-                      render={({ field }) => {
-                        const mentorId = form.watch("mentorId");
+                      );
+                    }}
+                  />
+                </div>
+              )}
 
-                        const usersFilterMentor = users.filter(
-                          (m) => m.id != mentorId
-                        );
-                        return (
-                          <FormItem>
-                            <FormLabel>Giảng viên hướng dẫn 2</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              value={field.value}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Chọn giảng viên 2" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {mentorId &&
-                                  usersFilterMentor?.map((user) => (
-                                    <SelectItem key={user.id} value={user.id!}>
-                                      <div className="flex items-center gap-2">
-                                        <span>
-                                          {user.lastName} {user.firstName}
-                                        </span>
-                                        <span className="text-muted-foreground text-xs">
-                                          {user.email}
-                                        </span>
-                                      </div>
-                                    </SelectItem>
-                                  ))}
-                              </SelectContent>
-                            </Select>
-                            <FormDescription>
-                              Chọn giảng viên sẽ hướng dẫn dự án của bạn
-                            </FormDescription>
-                          </FormItem>
-                        );
-                      }}
-                    />
-                  </>
-                )}
-              </div>
-
+              {/* File Upload */}
               <FormField
                 control={form.control}
                 name="fileschema"
@@ -697,6 +752,7 @@ export const CreateProjectForm = () => {
                           type="file"
                           onChange={(e) => field.onChange(e.target.files?.[0])}
                           className="dark:bg-muted/50"
+                          accept={ALLOWED_EXTENSIONS.join(",")}
                         />
                       </div>
                     </FormControl>
@@ -710,26 +766,54 @@ export const CreateProjectForm = () => {
               />
             </div>
 
-            {/* Current User Info */}
-            <div className="rounded-lg border p-4 space-y-2">
-              <h3 className="text-lg font-medium">Thành viên Nhóm</h3>
-              <p className="text-sm text-muted-foreground">
-                Bạn sẽ là trưởng nhóm của dự án này
-              </p>
-              <div className="flex items-center justify-between p-3 rounded-md bg-muted/50">
-                <div className="flex items-center gap-3">
-                  <div className="flex flex-col">
-                    <span className="font-medium">{user?.email}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {user?.lastName} {user?.firstName}
+            {/* Current User Info - Only for Students */}
+            {isStudent && (
+              <div className="rounded-lg border p-4 space-y-2">
+                <h3 className="text-lg font-medium">Thành viên Nhóm</h3>
+                <p className="text-sm text-muted-foreground">
+                  Bạn sẽ là trưởng nhóm của dự án này
+                </p>
+                {(teamMembers?.length ?? 0) > 0 ? (
+                  <>
+                    {teamMembers?.map((member) => {
+                      const userInTeam = member.user;
+                      if (!userInTeam) return null;
+                      return (
+                        <div className="flex items-center justify-between p-3 rounded-md bg-muted/50">
+                          <div className="flex items-center gap-3">
+                            <div className="flex flex-col">
+                              <span className="font-medium">
+                                {userInTeam.email}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {userInTeam.lastName} {userInTeam.firstName}
+                              </span>
+                            </div>
+                          </div>
+                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                            {TeamMemberRole[member.role ?? 0]}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </>
+                ) : (
+                  <div className="flex items-center justify-between p-3 rounded-md bg-muted/50">
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{user.email}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {user.lastName} {user.firstName}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                      Trưởng nhóm
                     </span>
                   </div>
-                </div>
-                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                  Trưởng nhóm
-                </span>
+                )}
               </div>
-            </div>
+            )}
           </CardContent>
 
           <CardFooter className="flex justify-end">

@@ -23,6 +23,18 @@ class ProjectSerivce extends BaseService<Project> {
     }
   };
 
+  public getProjectInSemesterCurrentInfo = async (): Promise<BusinessResult<Project>> => {
+    try {
+      const response = await axiosInstance.get<BusinessResult<Project>>(
+        `${this.endpoint}/semester-current/get-by-user-id`
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      return Promise.reject(error);
+    }
+  };
+
   public getAllForMentor = (
       query?: ProjectGetListForMentorQuery
     ): Promise<BusinessResult<QueryResult<Project>>> => {

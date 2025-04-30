@@ -57,99 +57,116 @@ import { semesterService } from "@/services/semester-service";
 import { AlertMessage } from "@/components/_common/alert-message";
 
 export default function TeamInfo() {
-  //lay thong tin tu redux luc dang nhap
   const user = useSelectorUser();
   const [isEditing, setIsEditing] = useState(false);
   const [teamName, setTeamName] = useState("");
   const confirm = useConfirm();
 
-  const { data: res_stage } = useQuery({
+  // Fetch all data in parallel
+  const {
+    data: res_stage,
+    isLoading: isLoadingStage,
+    isError: isErrorStage,
+    error: errorStage,
+  } = useQuery({
     queryKey: ["getBeforeSemester"],
     queryFn: () => semesterService.getBeforeSemester(),
     refetchOnWindowFocus: false,
   });
 
-  const isLock =
-    res_stage && res_stage.data?.endDate
-      ? new Date() <= new Date(res_stage.data.endDate)
-      : false;
+  const isLock = res_stage?.data?.endDate
+    ? new Date() <= new Date(res_stage.data.endDate)
+    : false;
 
-  //goi api bang tanstack
   const {
-    data: result,
-    isLoading,
-    isError,
-    error,
-    refetch,
+    data: teamInfo,
+    isLoading: isLoadingTeam,
+    isError: isErrorTeam,
+    error: errorTeam,
+    refetch: refetchTeam,
   } = useQuery({
     queryKey: ["getTeamInfo"],
-    queryFn: async () => await projectService.getProjectInfo(),
+    queryFn: () => projectService.getProjectInfo(),
     refetchOnWindowFocus: false,
   });
 
   const {
-    data: ressultIdea,
-    isLoading: isLoadingIdea,
-    isError: isErrorIdea,
-    error: errorIdea,
-    refetch: refetchIdea,
+    data: currentSemesterTeam,
+    isLoading: isLoadingCurrentSemester,
+    isError: isErrorCurrentSemester,
   } = useQuery({
-    queryKey: ["getIdeaInTeam", result?.data?.topic?.ideaVersion?.ideaId],
-    queryFn: async () =>
-      await ideaService.getById(result?.data?.topic?.ideaVersion?.ideaId),
+    queryKey: ["getTeamInfoCurrentSemester"],
+    queryFn: () => projectService.getProjectInSemesterCurrentInfo(),
     refetchOnWindowFocus: false,
-    enabled: !!result?.data?.topic?.ideaVersion?.ideaId,
+    enabled: !!teamInfo?.data,
   });
 
-  useEffect(() => {
-    if (result?.data?.teamName) {
-      setTeamName(result.data.teamName);
-    }
-  }, [result?.data?.teamName]);
+  const ideaId = teamInfo?.data?.topic?.ideaVersion?.ideaId;
+  const {
+    data: idea,
+    isLoading: isLoadingIdea,
+    isError: isErrorIdea,
+  } = useQuery({
+    queryKey: ["getIdeaInTeam", ideaId],
+    queryFn: () => ideaService.getById(ideaId).then((res) => res.data),
+    refetchOnWindowFocus: false,
+    enabled: !!ideaId,
+  });
 
-  if (isLoading || isLoadingIdea) return <LoadingComponent />;
-  if (isError || isErrorIdea) {
-    console.error("Error fetching:", error);
+  // Combine loading and error states
+  const isLoading =
+    isLoadingStage ||
+    isLoadingTeam ||
+    isLoadingIdea ||
+    isLoadingCurrentSemester;
+  const isError =
+    isErrorStage || isErrorTeam || isErrorIdea || isErrorCurrentSemester;
+
+  useEffect(() => {
+    if (teamInfo?.data?.teamName) {
+      setTeamName(teamInfo.data.teamName);
+    }
+  }, [teamInfo?.data?.teamName]);
+
+  if (isLoading) return <LoadingComponent />;
+  if (isError) {
+    console.error("Error fetching:", errorTeam || errorStage);
     return <ErrorSystem />;
   }
-  if (result?.status == -1) {
-    if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
 
+  if (teamInfo?.status === -1) {
+    if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
     return <NoTeam />;
   }
 
-  const project = result?.data;
-  const idea = ressultIdea?.data;
+  const project = currentSemesterTeam?.data ?? teamInfo?.data;
   if (!project) return <NoTeam />;
-  const isLockProject =
-    project.status == ProjectStatus.InProgress ? true : false;
 
-  //check xem có file không và lấy ra file mới nhất
-  const latestTopicVersion = (project.topic?.topicVersions ?? [])
-    .filter((x) => x.createdDate)
-    .sort(
-      (a, b) =>
-        new Date(b.createdDate!).getTime() - new Date(a.createdDate!).getTime()
-    )[0];
+  const isLockProject = project.status === ProjectStatus.InProgress;
+  const latestTopicVersion = (project.topic?.topicVersions ?? []).sort(
+    (a, b) =>
+      new Date(b.createdDate!).getTime() - new Date(a.createdDate!).getTime()
+  )[0];
 
   const handleSave = async () => {
-    // Gọi API để lưu tên mới ở đây
     try {
       const command: ProjectUpdateCommand = {
         ...project,
         teamName: teamName,
       };
       const res = await projectService.update(command);
-      if (res.status != 1) {
+
+      if (res.status !== 1) {
         toast.error(res.message);
-        setIsEditing(false);
         return;
       }
+
       toast.success(res.message);
       setIsEditing(false);
-      refetch();
-    } catch (ex) {
-      toast.error(ex as string);
+      refetchTeam();
+    } catch (error) {
+      toast.error(error as string);
+    } finally {
       setIsEditing(false);
     }
   };
@@ -159,86 +176,53 @@ export default function TeamInfo() {
     setIsEditing(false);
   };
 
-  const infoMember = project?.teamMembers?.find(
+  const currentUserMember = project.teamMembers?.find(
     (member: TeamMember) => member.userId === user?.id
   );
+  const isLeader = currentUserMember?.role === TeamMemberRole.Leader;
 
-  //check xem thang dang nhap coi no phai member va la leader khong
-  const isLeader =
-    result?.data?.teamMembers?.find(
-      (member: TeamMember) => member.userId === user?.id
-    )?.role === TeamMemberRole.Leader;
-
-  const teamMembers = result?.data?.teamMembers ?? [];
-  // Tách Leader ra trước
-  const leaders = teamMembers.filter(
-    (member: TeamMember) => member.role === TeamMemberRole.Leader
-  );
-  const others = teamMembers.filter(
-    (member: TeamMember) => member.role !== TeamMemberRole.Leader
+  // Sort members with leaders first
+  const sortedMembers = [...(project.teamMembers ?? [])].sort((a, b) =>
+    a.role === TeamMemberRole.Leader
+      ? -1
+      : b.role === TeamMemberRole.Leader
+      ? 1
+      : 0
   );
 
-  // Ghép lại, đảm bảo Leader luôn ở đầu
-  const sortedMembers = [...leaders, ...others];
-
-  const isHasTopic = project?.topicId ? true : false;
-
-  let availableSlots = 6;
-  if (!isHasTopic) {
-    availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
-  } else {
-    availableSlots =
-      (project?.topic?.ideaVersion?.teamSize ?? 0) -
-      (project?.teamMembers?.length ?? 0);
-  }
+  const isHasTopic = !!project.topicId;
+  const availableSlots = isHasTopic
+    ? (project.topic?.ideaVersion?.teamSize ?? 0) -
+      (project.teamMembers?.length ?? 0)
+    : 6 - (project.teamMembers?.length ?? 0);
 
   const isLockTeamMember = availableSlots === 0;
 
-  //Đây là form delete trả về true fa lse tái sử dụng được
-  async function handleDelete() {
-    // Gọi confirm để mở dialog
+  const handleAction = async (
+    action: () => Promise<any>,
+    successMessage: string
+  ) => {
     const confirmed = await confirm({
-      title: "Delete Item",
-      description: "Are you sure you want to delete this item?",
-      confirmText: "Yes, delete it",
-      cancelText: "No",
+      title: "Xác nhận",
+      description: "Bạn có chắc chắn muốn thực hiện hành động này?",
+      confirmText: "Xác nhận",
+      cancelText: "Hủy",
     });
 
     if (confirmed) {
-      // Người dùng chọn Yes
-      const data_ = await projectService.deletePermanent(project?.id as string);
-      if (data_.status === 1) {
-        refetch();
-        toast.success("Bạn đã xóa nhóm");
-      } else {
-        toast.error("Fail");
+      try {
+        const res = await action();
+        if (res.status === 1) {
+          toast.success(successMessage);
+          refetchTeam();
+        } else {
+          toast.error(res.message || "Thao tác thất bại");
+        }
+      } catch (error) {
+        toast.error("Đã xảy ra lỗi");
       }
     }
-  }
-
-  async function handleLeaveTeam() {
-    if (isLockProject) {
-      toast.warning("This project is locked and cannot be leave.");
-      return;
-    }
-    // Gọi confirm để mở dialog
-    const confirmed = await confirm({
-      title: "Delete Item",
-      description: "Bạn có muốn rời nhóm không ?",
-      confirmText: "Có,tôi muốn",
-      cancelText: "Không",
-    });
-
-    if (confirmed) {
-      const data = await teammemberService.leaveTeam();
-      if (data.status === 1) {
-        toast.success("Bạn đã rời nhóm");
-        refetch();
-      } else {
-        toast.error("Rời nhóm thất bại");
-      }
-    }
-  }
+  };
 
   async function handleDeleteMember(id: string) {
     // Gọi confirm để mở dialog
@@ -256,16 +240,18 @@ export default function TeamInfo() {
       }
 
       toast.success(res.message);
-      refetch();
+      refetchTeam();
     } else {
     }
   }
 
-  const invitationFromPersonalize = project.invitations.filter(
-    (m) =>
-      m.type == InvitationType.SentByStudent &&
-      m.status == InvitationStatus.Pending
-  );
+  const pendingInvitations =
+    project.invitations?.filter(
+      (m) =>
+        m.type === InvitationType.SentByStudent &&
+        m.status === InvitationStatus.Pending
+    ) ?? [];
+
   return (
     <div className="grid grid-cols-4 p-4 gap-4">
       <div className="col-span-3 space-y-2">
@@ -320,82 +306,94 @@ export default function TeamInfo() {
               </div>
 
               <div className="flex gap-3 items-center">
-                {infoMember && infoMember?.role === TeamMemberRole.Leader ? (
-                  <>
-                    <div className="flex items-center">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            disabled={isLockTeamMember}
-                            size="icon"
-                            className="relative"
-                          >
-                            <Users />
-                            {invitationFromPersonalize.length > 0 && (
-                              <Badge
-                                variant="destructive"
-                                className="absolute right-1 top-1 h-4 w-4 translate-x-1/2 -translate-y-1/2 p-0 flex items-center justify-center"
-                              >
-                                {invitationFromPersonalize.length}
-                              </Badge>
-                            )}
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-fit h-[80%] overflow-y-auto">
-                          <DialogHeader>
-                            <DialogTitle>
-                              Những yêu cầu tham gia vào nhóm
-                            </DialogTitle>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            {project.id != undefined && (
-                              <InvitationsInComingToLeaderTable
-                                projectId={project.id}
-                              />
-                            )}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                {currentUserMember?.role === TeamMemberRole.Leader ? (
+                  <div className="flex items-center gap-1">
+                    {/* Invitations Dialog */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          disabled={isLockTeamMember}
+                          size="icon"
+                          className="relative"
+                        >
+                          <Users />
+                          {pendingInvitations.length > 0 && (
+                            <Badge
+                              variant="destructive"
+                              className="absolute right-1 top-1 h-4 w-4 translate-x-1/2 -translate-y-1/2 p-0 flex items-center justify-center"
+                            >
+                              {pendingInvitations.length}
+                            </Badge>
+                          )}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-fit h-[80%] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle>
+                            Những yêu cầu tham gia vào nhóm
+                          </DialogTitle>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          {project.id && (
+                            <InvitationsInComingToLeaderTable
+                              projectId={project.id}
+                            />
+                          )}
+                        </div>
+                      </DialogContent>
+                    </Dialog>
 
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            disabled={isLockTeamMember}
-                            size={"icon"}
-                          >
-                            <UserRoundPlus />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:min-w-[60%] sm:max-w-fit h-fit">
-                          <DialogHeader>
-                            <DialogTitle>Thêm thành viên</DialogTitle>
-                            <CardDescription>
-                              Thêm thành viên vào nhóm của bạn
-                            </CardDescription>
-                          </DialogHeader>
-                          <div className="h-full overflow-y-auto">
-                            <UpdateProjectTeam />
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                    {/* Add Member Dialog */}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          disabled={isLockTeamMember}
+                          size="icon"
+                        >
+                          <UserRoundPlus />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:min-w-[60%] sm:max-w-fit h-fit">
+                        <DialogHeader>
+                          <DialogTitle>Thêm thành viên</DialogTitle>
+                          <CardDescription>
+                            Thêm thành viên vào nhóm của bạn
+                          </CardDescription>
+                        </DialogHeader>
+                        <div className="h-full overflow-y-auto">
+                          <UpdateProjectTeam />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
 
-                      <Button
-                        variant="ghost"
-                        disabled={isLockProject}
-                        size={"icon"}
-                        onClick={handleDelete}
-                      >
-                        <Trash />
-                      </Button>
-                    </div>
-                  </>
+                    {/* Delete Team Button */}
+                    <Button
+                      variant="ghost"
+                      disabled={isLockProject}
+                      size="icon"
+                      onClick={() =>
+                        handleAction(
+                          () =>
+                            projectService.deletePermanent(project.id ?? ""),
+                          "Bạn đã xóa nhóm"
+                        )
+                      }
+                    >
+                      <Trash />
+                    </Button>
+                  </div>
                 ) : (
                   <Button
                     variant="destructive"
-                    disabled={isLockTeamMember}
-                    onClick={handleLeaveTeam}
+                    disabled={isLockProject}
+                    onClick={() =>
+                      handleAction(
+                        teammemberService.leaveTeam,
+                        "Bạn đã rời nhóm"
+                      )
+                    }
                   >
                     Rời nhóm
                   </Button>
@@ -663,7 +661,13 @@ export default function TeamInfo() {
                               {isLeader && !isLeaderInMembers && (
                                 <DropdownMenuItem
                                   onClick={() =>
-                                    handleDeleteMember(member?.id ?? "")
+                                    handleAction(
+                                      () =>
+                                        teammemberService.deletePermanent(
+                                          member.id ?? ""
+                                        ),
+                                      "Đã xóa thành viên"
+                                    )
                                   }
                                 >
                                   Xóa thành viên
@@ -698,9 +702,9 @@ export default function TeamInfo() {
           </Card>
         </div>
 
-        {result?.data?.status == ProjectStatus.Pending &&
-          result?.data?.topicId && (
-            <div className="space-y-2">
+        {teamInfo?.data?.status === ProjectStatus.Pending &&
+          teamInfo?.data?.topicId && (
+            <div className="space-y-2 mt-4">
               <TypographyH4>Xin đề tài từ giảng viên</TypographyH4>
               <Card>
                 <CardContent className="flex mt-4 flex-col justify-center items-center gap-4">
@@ -709,9 +713,8 @@ export default function TeamInfo() {
                     Lưu ý: Khi nộp đơn xin đề tài nên có sự đồng ý của thành
                     viên trong nhóm
                   </TypographyMuted>
-
                   <Button asChild>
-                    <Link href={"/idea/supervisors"}>Xem danh sách đề tài</Link>
+                    <Link href="/idea/supervisors">Xem danh sách đề tài</Link>
                   </Button>
                 </CardContent>
               </Card>

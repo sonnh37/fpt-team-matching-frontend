@@ -72,12 +72,12 @@ export const TeamForm = () => {
           <FormInput
             form={form}
             name="teamName"
-            label="Team Name"
-            placeholder="Enter name"
+            label="Tên nhóm"
+            placeholder="Nhập tên nhóm"
           />
 
           <Button className="w-fit" type="submit">
-            Create
+            Tạo mới
           </Button>
         </form>
       </Form>

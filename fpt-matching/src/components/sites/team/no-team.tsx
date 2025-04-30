@@ -79,17 +79,11 @@ export const NoTeam = () => {
   if (invitationPendings.length > 0)
     return (
       <AlertMessage
-        message="You already have a request for some team"
+        message="Bạn đã có yêu cầu cho một số đội"
         messageType="error"
       />
     );
 
-  const hasAcceptedIdea = (result?.data?.length ?? 0) > 0;
-
-  if (hasAcceptedIdea) {
-    showCreateModal = false;
-    router.replace("/team");
-  }
 
   const handleOpenChange = (open: boolean) => {
     if (open) {
@@ -103,52 +97,32 @@ export const NoTeam = () => {
     <div className="absolute inset-0 flex justify-center items-center">
       <div className="flex flex-col gap-4">
         <div className="text-3xl text-red-500 pb-4 text-center">
-          Bạn chưa có nhóm.Hãy tìm nhóm bạn đi nào.
+          Bạn chưa có nhóm.
         </div>
 
         <div className="w-full flex justify-center">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <Dialog open={showCreateModal} onOpenChange={handleOpenChange}>
-                  <DialogTrigger asChild>
-                    <Button disabled={hasAcceptedIdea}>
-                      <TbUsersPlus /> Tạo nhóm
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="">
-                    <DialogHeader>
-                      <DialogTitle>Đề tài mới</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid gap-4 py-4">
-                      <TeamForm />
-                    </div>
-                  </DialogContent>
-                </Dialog>
+          <Dialog open={showCreateModal} onOpenChange={handleOpenChange}>
+            <DialogTrigger asChild>
+              <Button>
+                <TbUsersPlus /> Tạo nhóm
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="">
+              <DialogHeader>
+                <DialogTitle>Đề tài mới</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <TeamForm />
               </div>
-            </TooltipTrigger>
-            {hasAcceptedIdea && (
-              <TooltipContent>
-                <p>Bạn đang trong quá trình kiểm duyệt idea,bạn không có quyền tạo nhóm lúc này.</p>
-              </TooltipContent>
-            )}
-          </Tooltip>
+            </DialogContent>
+          </Dialog>
         </div>
         <div className="w-full flex justify-center">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div>
-                <Button variant={"default"} disabled={hasAcceptedIdea}>
-                  <LuUsersRound /> Tìm thành viên
-                </Button>
-              </div>
-            </TooltipTrigger>
-            {hasAcceptedIdea && (
-              <TooltipContent>
-                <p>Bạn đang trong quá trình kiểm duyệt idea,bạn không có quyền thêm thành viên lúc này.</p>
-              </TooltipContent>
-            )}
-          </Tooltip>
+          <div>
+            <Button variant={"default"} onClick={() => router.push("/")}>
+              <LuUsersRound /> Tìm nhóm
+            </Button>
+          </div>
         </div>
       </div>
     </div>
