@@ -39,39 +39,32 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelectorUser();
 
+  console.log("check_user", user);
   if (!user) {
     return null;
   }
 
   // Lọc và map roles
-  const filteredRoles = user.userXRoles
-    .filter((userRole) =>
-      currentSemesterId
-        ? userRole.semesterId === currentSemesterId || userRole.isPrimary
-        : true
-    )
-    .map((userRole) => ({
-      ...userRole,
-      roleInfo: getRoleInfo(userRole.role?.roleName || ""),
-      isCurrentSemester: userRole.semesterId === currentSemesterId,
-    }));
+  const filteredRoles = (user.userXRoles || [])
+  .filter(userRole => userRole?.role) // Thêm kiểm tra role tồn tại
+  .map((userRole) => ({
+    ...userRole,
+    roleInfo: getRoleInfo(userRole.role?.roleName || ""),
+  }));
 
   // Sắp xếp roles: primary trước, current semester trước
-  const sortedRoles = [...filteredRoles].sort((a, b) => {
-    // Primary roles first
-    if (a.isPrimary !== b.isPrimary) {
-      return a.isPrimary ? -1 : 1;
-    }
-    // Then current semester roles
-    if (a.isCurrentSemester !== b.isCurrentSemester) {
-      return a.isCurrentSemester ? -1 : 1;
-    }
-    // Finally by role name
-    return (a.role?.roleName || "").localeCompare(b.role?.roleName || "");
-  });
+  const sortedRoles = React.useMemo(() => {
+    return [...filteredRoles].sort((a, b) => {
+      if (a.isPrimary !== b.isPrimary) return a.isPrimary ? -1 : 1;
+      return (a.role?.roleName || "").localeCompare(b.role?.roleName || "");
+    });
+  }, [filteredRoles]);
+  
+  console.log("check_user", sortedRoles)
 
   // Active role logic
   const activeRolePlan = useCurrentRole();
+  console.log("check_activeRolePlan", activeRolePlan);
   const activeRole =
     sortedRoles.find((role) => role.role?.roleName === activeRolePlan) ||
     sortedRoles.find((role) => role.isPrimary);
@@ -80,16 +73,16 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
     return null;
   }
 
-//  React.useEffect(() => {
-//   const shouldUpdate = activeRole?.role?.roleName && 
-//                      activeRole.role.roleName !== activeRolePlan;
-  
-//   if (shouldUpdate) {
-//     const newRole = activeRole.role?.roleName;
-//     dispatch(updateLocalCache({ role: newRole }));
-//     dispatch(updateUserCache({ role: newRole }));
-//   }
-// }, [activeRole?.role?.roleName, activeRolePlan, dispatch]);
+  //  React.useEffect(() => {
+  //   const shouldUpdate = activeRole?.role?.roleName &&
+  //                      activeRole.role.roleName !== activeRolePlan;
+
+  //   if (shouldUpdate) {
+  //     const newRole = activeRole.role?.roleName;
+  //     dispatch(updateLocalCache({ role: newRole }));
+  //     dispatch(updateUserCache({ role: newRole }));
+  //   }
+  // }, [activeRole?.role?.roleName, activeRolePlan, dispatch]);
 
   return (
     <SidebarMenu>
@@ -120,7 +113,7 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              {currentSemesterId ? "Vai trò trong kỳ này" : "Vai trò hệ thống"}
+              Vai trò hệ thống
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
 
@@ -147,9 +140,9 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
                         <Star className="size-3 text-yellow-500 fill-yellow-500" />
                       )}
                     </div>
-                    {role.semesterId && (
+                    {role.semester && (
                       <div className="text-xs text-muted-foreground">
-                        Kỳ: {currentSemester?.semesterName || "N/A"}
+                        Kỳ: {role.semester?.semesterName || "-"}
                       </div>
                     )}
                   </div>

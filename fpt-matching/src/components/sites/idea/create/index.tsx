@@ -113,7 +113,9 @@ const formSchema = z.object({
 
   specialtyId: z.string().optional(),
 
-  mentorId: z.string({ required_error: "Vui lòng chọn giảng viên hướng dẫn" }),
+  mentorId: z
+    .string({ required_error: "Vui lòng chọn giảng viên hướng dẫn" })
+    .optional(),
 
   subMentorId: z.string().optional(),
 
@@ -183,7 +185,6 @@ export const CreateProjectForm = () => {
   } = useQuery({
     queryKey: ["getProfileByCurrentUser"],
     queryFn: () => profilestudentService.getProfileByCurrentUser(),
-    enabled: !!isStudent, // Only fetch if student
     refetchOnWindowFocus: false,
   });
 
@@ -380,7 +381,7 @@ export const CreateProjectForm = () => {
       // Check mentor availability
       const mentorCheck =
         await userService.checkMentorAndSubMentorSlotAvailability({
-          mentorId: values.mentorId,
+          mentorId: isStudent ? values.mentorId : user?.id,
           subMentorId: values.subMentorId,
         });
 
@@ -410,7 +411,7 @@ export const CreateProjectForm = () => {
 
       if (res.status == 1) {
         toast.success(res.message);
-        setTimeout(() => router.push("/ideas"), 2000);
+        setTimeout(() => router.push("/idea/request"), 2000);
         return;
       }
 
