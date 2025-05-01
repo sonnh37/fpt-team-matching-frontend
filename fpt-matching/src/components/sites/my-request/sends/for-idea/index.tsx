@@ -29,7 +29,7 @@ import { columns } from "./columns";
 import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
 import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
 import { MentorTopicRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
-import { mentortopicrequestService } from "@/services/mentor-idea-request-service";
+import { mentortopicrequestService } from "@/services/mentor-topic-request-service";
 
 //#region INPUT
 const defaultSchema = z.object({});

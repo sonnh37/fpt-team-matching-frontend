@@ -12,7 +12,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 export function InivitationReceive() {
   const tabs = {
     joinTeam: "Tham gia nhóm",
-    studentRequests: "Yêu cầu từ SV"
+    // studentRequests: "Yêu cầu từ SV"
   };
 
   return (
@@ -29,21 +29,21 @@ export function InivitationReceive() {
             >
               {tabs.joinTeam}
             </TabsTrigger>
-            <TabsTrigger 
+            {/* <TabsTrigger 
               value={tabs.studentRequests}
               className="data-[state=active]:bg-primary data-[state=active]:text-white"
             >
               {tabs.studentRequests}
-            </TabsTrigger>
+            </TabsTrigger> */}
           </TabsList>
           
           <TabsContent value={tabs.joinTeam}>
             <InvitationReceiveByTeamTable />
           </TabsContent>
           
-          <TabsContent value={tabs.studentRequests}>
+          {/* <TabsContent value={tabs.studentRequests}>
             <InvitationReceiveToGetIdeaByStudentTable />
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
       </CardContent>
     </Card>

@@ -26,7 +26,7 @@ import { useQueryParams } from "@/hooks/use-query-params";
 import { professionService } from "@/services/profession-service";
 import { projectService } from "@/services/project-service";
 import { ProjectStatus } from "@/types/enums/project";
-import { ProjectGetAllQuery } from "@/types/models/queries/projects/project-get-all-query";
+import { ProjectSearchQuery } from "@/types/models/queries/projects/project-search-query";
 import { Profession } from "@/types/profession";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -95,7 +95,7 @@ export default function ProjectSearchList() {
     useState<z.infer<typeof defaultSchema>>();
 
   const queryParams = useMemo(() => {
-    const params: ProjectGetAllQuery = {
+    const params: ProjectSearchQuery = {
       ...useQueryParams(inputFields, columnFilters, pagination, sorting),
       isHasTeam: true,
       status: ProjectStatus.Pending,
@@ -114,7 +114,7 @@ export default function ProjectSearchList() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: async () => await projectService.getAll(queryParams),
+    queryFn: () => projectService.searchProjects(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -282,7 +282,7 @@ export default function ProjectSearchList() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <TypographyH2 className="text-2xl font-semibold">
-            Dự án có sẵn
+              Dự án có sẵn
             </TypographyH2>
             <Badge variant="secondary" className="px-3 py-1">
               {data?.data?.totalRecords ?? 0} dự án được tìm thấy

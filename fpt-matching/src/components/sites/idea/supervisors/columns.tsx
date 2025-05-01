@@ -19,7 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { mentortopicrequestService } from "@/services/mentor-idea-request-service";
+import { mentortopicrequestService } from "@/services/mentor-topic-request-service";
 import { projectService } from "@/services/project-service";
 import { Idea } from "@/types/idea";
 import { MentorTopicRequestCreateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-create-command";

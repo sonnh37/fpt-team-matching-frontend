@@ -81,8 +81,7 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
     error,
   } = useQuery({
     queryKey: ["ideaUpdate", ideaId],
-    queryFn: async () =>
-      await ideaService.getById(ideaId).then((res) => res.data),
+    queryFn: () => ideaService.getById(ideaId).then((res) => res.data),
   });
 
   const [selectedVersion, setSelectedVersion] = useState<
@@ -101,9 +100,15 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
   const latest = sorted[0];
   let canCreate = false;
 
-  if ((roleCurrent === 'Mentor' || roleCurrent === 'Lecturer') && idea.status === IdeaStatus.ConsiderByCouncil) {
+  if (
+    (roleCurrent === "Mentor" || roleCurrent === "Lecturer") &&
+    idea.status === IdeaStatus.ConsiderByCouncil
+  ) {
     canCreate = true;
-  } else if (idea.status === IdeaStatus.ConsiderByMentor && latest?.ideaVersionRequests.length > 0) {
+  } else if (
+    idea.status === IdeaStatus.ConsiderByMentor &&
+    latest?.ideaVersionRequests.length > 0
+  ) {
     canCreate = true;
   }
 
@@ -196,12 +201,16 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
 
             <div className="space-y-1">
               <Label className="italic">Đợt</Label>
-              <p className="text-sm font-medium">{version.stageIdea?.stageNumber || "-"}</p>
+              <p className="text-sm font-medium">
+                {version.stageIdea?.stageNumber || "-"}
+              </p>
             </div>
 
             <div className="space-y-1">
               <Label className="italic">Kì:</Label>
-              <p className="text-sm">{version.stageIdea?.semester?.semesterName || "-"}</p>
+              <p className="text-sm">
+                {version.stageIdea?.semester?.semesterName || "-"}
+              </p>
             </div>
 
             <div className="space-y-1">
@@ -305,7 +314,11 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
           <div className="space-y-3">
             <div className="flex items-center gap-2 text-lg font-semibold">
               <ClipboardList className="h-5 w-5" />
-              <h3>{roleCurrent == "Student" ? "Đánh giá bởi mentor" :  "Lịch sử đánh giá"}</h3>
+              <h3>
+                {roleCurrent == "Student"
+                  ? "Đánh giá bởi mentor"
+                  : "Lịch sử đánh giá"}
+              </h3>
             </div>
             <Separator />
 
