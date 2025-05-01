@@ -1,6 +1,7 @@
+"use client";
+
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
 import { TypographyH2 } from "@/components/_common/typography/typography-h2";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,16 +14,10 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { professionService } from "@/services/profession-service";
-import { Profession } from "@/types/profession";
+import { userService } from "@/services/user-service";
+import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -37,29 +32,23 @@ import {
 import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
-import { userService } from "@/services/user-service";
-import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
-import { LoadingComponent } from "@/components/_common/loading-page";
-import PageContainer from "@/components/layouts/page-container";
+import { semesterService } from "@/services/semester-service";
+import { Badge } from "@/components/ui/badge";
 
-//#region INPUT
-const defaultSchema = z.object({
-  emailOrFullname: z.string().optional(),
+const formSchema = z.object({
+  searchTerm: z.string().optional(),
 });
-//#endregion
-export default function SupervisorsTable() {
+
+export default function DanhSachGiangVien() {
   const searchParams = useSearchParams();
-  //#region DEFAULT
+
+  //#region Table State
   const [sorting, setSorting] = React.useState<SortingState>([
-    {
-      id: "createdDate",
-      desc: true,
-    },
+    { id: "createdDate", desc: true },
   ]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -70,49 +59,52 @@ export default function SupervisorsTable() {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [isTyping, setIsTyping] = useState(false);
   //#endregion
 
-  //#region CREATE TABLE
-  const form = useForm<z.infer<typeof defaultSchema>>({
-    resolver: zodResolver(defaultSchema),
+  //#region Form
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
   });
 
-  // input field
-  const [inputFields, setInputFields] =
-    useState<z.infer<typeof defaultSchema>>();
+  const [searchTerm, setSearchTerm] = useState<string>();
 
-  // default field in table
   const queryParams = useMemo(() => {
     const params: UserGetAllQuery = useQueryParams(
-      inputFields,
+      { emailOrFullname: searchTerm },
       columnFilters,
       pagination,
       sorting
     );
-
     params.role = "Lecturer";
+    return params;
+  }, [searchTerm, columnFilters, pagination, sorting]);
 
-    return { ...params };
-  }, [inputFields, columnFilters, pagination, sorting]);
-
-  useEffect(() => {
-    if (columnFilters.length > 0 || inputFields) {
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex: 0,
-      }));
-    }
-  }, [columnFilters, inputFields]);
-
-  const { data, isFetching, error, refetch } = useQuery({
-    queryKey: ["data", queryParams],
+  const { data, isFetching, error } = useQuery({
+    queryKey: ["giang-vien", queryParams],
     queryFn: () => userService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
-  if (error) return <div>Error loading data</div>;
+  const { data: res_semester } = useQuery({
+    queryKey: ["get-current-semester"],
+    queryFn: () => semesterService.getCurrentSemester(),
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+  //#endregion
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    setSearchTerm(values.searchTerm);
+  };
+
+  if (error) {
+    return (
+      <Card className="p-4 text-center text-destructive">
+        Đã xảy ra lỗi khi tải danh sách giảng viên
+      </Card>
+    );
+  }
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
@@ -124,61 +116,62 @@ export default function SupervisorsTable() {
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     manualPagination: true,
-    debugTable: true,
   });
 
-  //#endregion
-
-  const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-    setInputFields(values);
-  };
-
   return (
-      <div className="container mx-auto space-y-8">
-        <div className="w-fit mx-auto space-y-4">
-          <TypographyH2 className="text-center tracking-wide">
-            The list of Supervisor in this Semester
-          </TypographyH2>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="emailOrFullname"
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>Search email or name</FormLabel>
-                      <div className="flex items-center gap-2">
+    <div className="container mx-auto space-y-6 py-6">
+      <Card className="p-6">
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <TypographyH2 className="text-primary">
+              Danh Sách Giảng Viên Hướng Dẫn
+            </TypographyH2>
+            <Badge variant="outline" className="text-sm font-normal">
+              Học kỳ hiện tại: {res_semester?.data?.semesterName || "N/A"}
+            </Badge>
+          </div>
+
+          <Separator />
+
+          <Card className="mx-auto max-w-2xl p-6 shadow-sm">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="searchTerm"
+                  render={({ field }) => (
+                    <FormItem className="">
+                      <FormLabel className="font-medium">Tìm kiếm giảng viên</FormLabel>
+                      <div className="flex gap-2">
                         <FormControl>
                           <Input
-                            placeholder=""
-                            className="focus-visible:ring-none"
-                            type="text"
+                            placeholder="Nhập tên hoặc email..."
                             {...field}
+                            className="focus-visible:ring-1"
                           />
                         </FormControl>
-                        <Button type="submit" variant="default" size="icon">
-                          <Search />
+                        <Button type="submit" variant="default">
+                          <Search className="h-4 w-4" />
+                          Tìm kiếm
                         </Button>
                       </div>
                       <FormMessage />
                     </FormItem>
-                  );
-                }}
-              />
-            </form>
-          </Form>
+                  )}
+                />
+              </form>
+            </Form>
+          </Card>
+          <div className="rounded-md border">
+            <DataTableComponent isLoading={isFetching} table={table} />
+            <DataTablePagination table={table} />
+          </div>
         </div>
-
-        <div className="">
-          <DataTableComponent
-            isLoading={isFetching && !isTyping}
-            table={table}
-          />
-          <DataTablePagination table={table} />
-        </div>
-      </div>
+      </Card>
+    </div>
   );
 }
