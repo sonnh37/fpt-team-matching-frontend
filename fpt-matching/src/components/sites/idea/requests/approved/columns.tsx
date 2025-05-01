@@ -131,7 +131,7 @@ export const columns: ColumnDef<Idea>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Công cụ",
+    header: "Thao tác",
     cell: ({ row }) => {
       return <Actions row={row} />;
     },

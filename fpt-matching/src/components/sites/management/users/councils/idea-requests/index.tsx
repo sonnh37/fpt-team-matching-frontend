@@ -1,8 +1,10 @@
+"use client";
+
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import { LoadingComponent } from "@/components/_common/loading-page";
+import { TypographyH2 } from "@/components/_common/typography/typography-h2";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -12,10 +14,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { isDeleted_options } from "@/lib/filter-options";
 import { userService } from "@/services/user-service";
-import { FilterEnum } from "@/types/models/filter-enum";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -31,27 +32,24 @@ import {
 import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { columns } from "./columns";
+import { semesterService } from "@/services/semester-service";
+import { Badge } from "@/components/ui/badge";
+import { UserGetAllInSemesterQuery } from "@/types/models/queries/users/user-get-all-in-semester-query";
 import { getEnumOptions } from "@/lib/utils";
 import { Department } from "@/types/enums/user";
+import { FilterEnum } from "@/types/models/filter-enum";
+import { z } from "zod";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 
-const role_options = [
-  { label: "Student", value: "Student" },
-  { label: "Council", value: "Council" },
-  { label: "Lecturer", value: "Lecturer" },
-  { label: "Reviewer", value: "Reviewer" },
-];
-//#region INPUT
-const defaultSchema = z.object({
-  emailOrFullname: z.string().optional(),
+const formSchema = z.object({
+  searchTerm: z.string().optional(),
 });
-//#endregion
+
 export default function CouncilIdeaVersionRequestPendingTable() {
   const searchParams = useSearchParams();
-
   const filterEnums: FilterEnum[] = [
     {
       columnId: "department",
@@ -60,12 +58,9 @@ export default function CouncilIdeaVersionRequestPendingTable() {
       type: "single",
     },
   ];
-  //#region DEFAULT
+  //#region Table State
   const [sorting, setSorting] = React.useState<SortingState>([
-    {
-      id: "createdDate",
-      desc: true,
-    },
+    { id: "createdDate", desc: true },
   ]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -76,53 +71,56 @@ export default function CouncilIdeaVersionRequestPendingTable() {
     pageIndex: 0,
     pageSize: 10,
   });
-  const [isTyping, setIsTyping] = useState(false);
   //#endregion
 
-  //#region CREATE TABLE
-  const form = useForm<z.infer<typeof defaultSchema>>({
-    resolver: zodResolver(defaultSchema),
+  //#region Form
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
   });
 
-  // input field
-  const [inputFields, setInputFields] =
-    useState<z.infer<typeof defaultSchema>>();
+  const [searchTerm, setSearchTerm] = useState<string>();
 
-  // default field in table
   const queryParams = useMemo(() => {
     const params: UserGetAllQuery = useQueryParams(
-      inputFields,
+      { emailOrFullname: searchTerm },
       columnFilters,
       pagination,
       sorting
     );
+    return params;
+  }, [searchTerm, columnFilters, pagination, sorting]);
 
-    return { ...params };
-  }, [inputFields, columnFilters, pagination, sorting]);
-
-  useEffect(() => {
-    if (columnFilters.length > 0 || inputFields) {
-      setPagination((prev) => ({
-        ...prev,
-        pageIndex: 0,
-      }));
-    }
-  }, [columnFilters, inputFields]);
-
-  const { data, isFetching, error, refetch } = useQuery({
-    queryKey: ["data", queryParams],
-    queryFn: () =>
-      userService.getAllByCouncilWithIdeaVersionRequestPending(queryParams),
+  const { data, isFetching, error } = useQuery({
+    queryKey: ["get-all-user", queryParams],
+    queryFn: () => userService.getAllByCouncilWithIdeaVersionRequestPending(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
-  if (error) return <div>Error loading data</div>;
+  const { data: res_semester } = useQuery({
+    queryKey: ["get-current-semester"],
+    queryFn: () => semesterService.getCurrentSemester(),
+    placeholderData: keepPreviousData,
+    refetchOnWindowFocus: false,
+  });
+  //#endregion
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    setSearchTerm(values.searchTerm);
+  };
+
+  if (error) {
+    return (
+      <Card className="p-4 text-center text-destructive">
+        Đã xảy ra lỗi khi tải danh sách giảng viên
+      </Card>
+    );
+  }
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
-    pageCount: data?.data?.totalPages ?? 0,
+    pageCount: data?.data?.totalPages ?? -1,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
     onSortingChange: setSorting,
@@ -130,51 +128,57 @@ export default function CouncilIdeaVersionRequestPendingTable() {
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    debugTable: true,
   });
 
-  //#endregion
-
-  const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-    setInputFields(values);
-  };
-
   return (
-    <>
-      <div className="container mx-auto space-y-8">
-        <div className="w-fit mx-auto space-y-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="emailOrFullname"
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>Search name or code</FormLabel>
-                      <div className="flex items-center gap-2">
+    <div className="container mx-auto space-y-6 py-6">
+      <Card className="p-6">
+        <div className="space-y-6">
+          <div className="text-center space-y-2">
+            <TypographyH2 className="text-primary">
+              Danh sách hội đồng đang chấm
+            </TypographyH2>
+            <Badge variant="outline" className="text-sm font-normal">
+              Học kỳ hiện tại: {res_semester?.data?.semesterName || "N/A"}
+            </Badge>
+          </div>
+
+          <Separator />
+
+          <Card className="mx-auto max-w-2xl p-6 shadow-sm">
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="searchTerm"
+                  render={({ field }) => (
+                    <FormItem className="">
+                      <FormLabel className="font-medium">
+                        Tìm kiếm tên hội đồng
+                      </FormLabel>
+                      <div className="flex gap-2">
                         <FormControl>
                           <Input
-                            placeholder=""
-                            className="focus-visible:ring-none"
-                            type="text"
+                            placeholder="Nhập tên hoặc email..."
                             {...field}
+                            className="focus-visible:ring-1"
                           />
                         </FormControl>
-                        <Button type="submit" variant="default" size="icon">
-                          <Search />
+                        <Button type="submit" variant="default">
+                          <Search className="h-4 w-4" />
+                          Tìm kiếm
                         </Button>
                       </div>
                       <FormMessage />
                     </FormItem>
-                  );
-                }}
-              />
-            </form>
-          </Form>
-        </div>
-
-        <div className="">
+                  )}
+                />
+              </form>
+            </Form>
+          </Card>
           <div className="space-y-4 p-4 mx-auto">
             <DataTableToolbar
               form={form}
@@ -182,21 +186,13 @@ export default function CouncilIdeaVersionRequestPendingTable() {
               filterEnums={filterEnums}
               isSelectColumns={false}
               isSortColumns={false}
-              // columnSearch={columnSearch}
-              // handleSheetChange={handleSheetChange}
-              // formFilterAdvanceds={formFilterAdvanceds}
+              isCreateButton={false}
             />
-
-            <DataTableComponent
-              isLoading={isFetching && !isTyping}
-              table={table}
-              restore={userService.restore}
-              deletePermanent={userService.deletePermanent}
-            />
+            <DataTableComponent isLoading={isFetching} table={table} />
             <DataTablePagination table={table} />
           </div>
         </div>
-      </div>
-    </>
+      </Card>
+    </div>
   );
 }

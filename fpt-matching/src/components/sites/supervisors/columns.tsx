@@ -37,7 +37,7 @@ export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "department",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Khoa/Bộ môn" />
+      <DataTableColumnHeader column={column} title="Khu vực" />
     ),
     cell: ({ row }) => {
       const status = row.getValue("department") as Department | undefined;

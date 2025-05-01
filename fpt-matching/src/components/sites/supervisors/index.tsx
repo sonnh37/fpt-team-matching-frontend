@@ -34,10 +34,15 @@ import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { columns } from "./columns";
 import { semesterService } from "@/services/semester-service";
 import { Badge } from "@/components/ui/badge";
+import { UserGetAllInSemesterQuery } from "@/types/models/queries/users/user-get-all-in-semester-query";
+import { getEnumOptions } from "@/lib/utils";
+import { Department } from "@/types/enums/user";
+import { FilterEnum } from "@/types/models/filter-enum";
+import { z } from "zod";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 
 const formSchema = z.object({
   searchTerm: z.string().optional(),
@@ -45,7 +50,14 @@ const formSchema = z.object({
 
 export default function DanhSachGiangVien() {
   const searchParams = useSearchParams();
-
+  const filterEnums: FilterEnum[] = [
+    {
+      columnId: "department",
+      title: "Department",
+      options: getEnumOptions(Department),
+      type: "single",
+    },
+  ];
   //#region Table State
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "createdDate", desc: true },
@@ -69,19 +81,19 @@ export default function DanhSachGiangVien() {
   const [searchTerm, setSearchTerm] = useState<string>();
 
   const queryParams = useMemo(() => {
-    const params: UserGetAllQuery = useQueryParams(
+    const params: UserGetAllInSemesterQuery = useQueryParams(
       { emailOrFullname: searchTerm },
       columnFilters,
       pagination,
       sorting
     );
-    params.role = "Lecturer";
+    params.role = "Mentor";
     return params;
   }, [searchTerm, columnFilters, pagination, sorting]);
 
   const { data, isFetching, error } = useQuery({
     queryKey: ["giang-vien", queryParams],
-    queryFn: () => userService.getAll(queryParams),
+    queryFn: () => userService.getUsersInSemester(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -145,7 +157,9 @@ export default function DanhSachGiangVien() {
                   name="searchTerm"
                   render={({ field }) => (
                     <FormItem className="">
-                      <FormLabel className="font-medium">Tìm kiếm giảng viên</FormLabel>
+                      <FormLabel className="font-medium">
+                        Tìm kiếm giảng viên
+                      </FormLabel>
                       <div className="flex gap-2">
                         <FormControl>
                           <Input
@@ -166,7 +180,15 @@ export default function DanhSachGiangVien() {
               </form>
             </Form>
           </Card>
-          <div className="rounded-md border">
+          <div className="space-y-4 p-4 mx-auto">
+            <DataTableToolbar
+              form={form}
+              table={table}
+              filterEnums={filterEnums}
+              isSelectColumns={false}
+              isSortColumns={false}
+              isCreateButton={false}
+            />
             <DataTableComponent isLoading={isFetching} table={table} />
             <DataTablePagination table={table} />
           </div>

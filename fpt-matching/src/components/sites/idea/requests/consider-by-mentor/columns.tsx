@@ -143,7 +143,7 @@ export const columns: ColumnDef<Idea>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Công cụ",
+    header: "Thao tác",
     cell: ({ row }) => {
       return <Actions row={row} />;
     },
@@ -264,7 +264,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       </Dialog>
       <Button
         size="sm"
-        onClick={() => router.push(`/idea/request/${idea.id}`)}
+        onClick={() => router.push(`/idea/detail/${idea.id}`)}
         variant="default"
       >
         Chi tiết

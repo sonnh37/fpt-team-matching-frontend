@@ -130,7 +130,7 @@ export function MenuAction({ ideaId }: { ideaId: string }) {
           {idea?.status === IdeaStatus.ConsiderByCouncil && (
             <>
               <DropdownMenuItem>
-                <Link href={`/idea/request/${ideaId}`}>Sửa</Link>
+                <Link href={`/idea/detail/${ideaId}`}>Sửa</Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleReturnToGroup}>
                 Trả về nhóm

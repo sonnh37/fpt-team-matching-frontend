@@ -182,6 +182,7 @@ export default function UserTable() {
               table={table}
               filterEnums={filterEnums}
               isSelectColumns={false}
+              isCreateButton={false}
               isSortColumns={false}
               // columnSearch={columnSearch}
               // handleSheetChange={handleSheetChange}

@@ -48,7 +48,7 @@ import { Pencil, Save, Trash, UserRoundPlus, Users, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import UpdateProjectTeam from "../idea/updateidea/page";
+import InviteUsersForm from "../idea/updateidea/page";
 import { TeamMember } from "@/types/team-member";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { ideaService } from "@/services/idea-service";
@@ -94,11 +94,11 @@ export default function TeamInfo() {
     data: currentSemesterTeam,
     isLoading: isLoadingCurrentSemester,
     isError: isErrorCurrentSemester,
+    refetch: refetchTeamInCurrentSemester,
   } = useQuery({
     queryKey: ["getTeamInfoCurrentSemester"],
     queryFn: () => projectService.getProjectInSemesterCurrentInfo(),
     refetchOnWindowFocus: false,
-    enabled: !!teamInfo?.data,
   });
 
   const ideaId = teamInfo?.data?.topic?.ideaVersion?.ideaId;
@@ -164,6 +164,7 @@ export default function TeamInfo() {
       toast.success(res.message);
       setIsEditing(false);
       refetchTeam();
+      refetchTeamInCurrentSemester();
     } catch (error) {
       toast.error(error as string);
     } finally {
@@ -215,6 +216,7 @@ export default function TeamInfo() {
         if (res.status === 1) {
           toast.success(successMessage);
           refetchTeam();
+          refetchTeamInCurrentSemester();
         } else {
           toast.error(res.message || "Thao tác thất bại");
         }
@@ -362,8 +364,8 @@ export default function TeamInfo() {
                             Thêm thành viên vào nhóm của bạn
                           </CardDescription>
                         </DialogHeader>
-                        <div className="h-full overflow-y-auto">
-                          <UpdateProjectTeam />
+                        <div className="h-full p-2 overflow-y-auto overflow-visible">
+                          <InviteUsersForm />
                         </div>
                       </DialogContent>
                     </Dialog>

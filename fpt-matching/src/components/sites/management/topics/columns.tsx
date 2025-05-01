@@ -293,7 +293,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         {showEditButton && (
           <Button variant="ghost" size="sm" asChild>
             <Link
-              href={`/idea/request/${ideaId}`}
+              href={`/idea/detail/${ideaId}`}
               className="flex items-center"
             >
               <FaEdit className="h-4 w-4" />
