@@ -194,6 +194,13 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       m.reviewerId === user.id
   );
 
+  const councilRequest = highestVersion?.ideaVersionRequests.find(
+    (m) =>
+      m.role === "Council" &&
+      m.status === IdeaVersionRequestStatus.Pending &&
+      m.reviewerId === user.id
+  );
+
   const [loadingAI, setLoadingAI] = useState<boolean>(false);
   const [samilaritiesProject, setSamilaritiesProject] = useState<
     SamilaritiesProjectModels[]
@@ -283,7 +290,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       </Dialog>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Link href={`/idea/reviews/${mentorRequest?.id}`} passHref>
+          <Link href={`/idea/reviews/${councilRequest?.id}`} passHref>
             <Button size="icon" variant="default">
               <ListChecks className="h-4 w-4" />
             </Button>
