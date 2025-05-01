@@ -23,7 +23,7 @@ import { formatDate } from "@/lib/utils";
 import SamilaritiesProjectModels from "@/types/models/samilarities-project-models";
 import { Eye, ListChecks } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -31,6 +31,19 @@ import {
 } from "@/components/ui/tooltip";
 import { Idea } from "@/types/idea";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { LoadingComponent } from "@/components/_common/loading-page";
+import ErrorSystem from "@/components/_common/errors/error-system";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { apiHubsService } from "@/services/api-hubs-service";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
+import { Label } from "@radix-ui/react-label";
+import { useParams } from "next/navigation";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -190,6 +203,38 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       m.reviewerId === user.id
   );
 
+  const [loadingAI, setLoadingAI] = useState<boolean>(false);
+  const [samilaritiesProject, setSamilaritiesProject] = useState<
+    SamilaritiesProjectModels[]
+  >([]);
+
+  // Load similar projects khi tab active
+  useEffect(() => {
+    const loadSimilarProjects = async () => {
+      if (highestVersion?.description) {
+        setLoadingAI(true);
+        try {
+          const response = await apiHubsService.getSimilaritiesProject(
+            highestVersion.description
+          );
+          if (response) {
+            setSamilaritiesProject(
+              (response as { similar_capstone: SamilaritiesProjectModels[] })
+                .similar_capstone
+            );
+          }
+          setLoadingAI(false);
+        } catch (error) {
+          console.error("Failed to load similar projects", error);
+        } finally {
+          setLoadingAI(false);
+        }
+      }
+    };
+
+    loadSimilarProjects();
+  }, [highestVersion]);
+
   return (
     <div className="flex flex-row gap-2">
       {/* Nút xem nhanh trong dialog */}
@@ -199,11 +244,50 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <Eye className="h-4 w-4" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Idea Preview</DialogTitle>
           </DialogHeader>
-          {idea && <IdeaDetailForm ideaId={idea.id} />}
+          <div className="grid gap-4 grid-cols-3">
+            {idea && (
+              <div className="col-span-2">
+                <IdeaDetailForm ideaId={idea.id} />
+              </div>
+            )}
+            {loadingAI ? (
+              <LoadingComponent />
+            ) : (
+              <div className="flex flex-col gap-10">
+                {samilaritiesProject && samilaritiesProject.length > 0 ? (
+                  samilaritiesProject.map((project, index) => (
+                    <Card key={index}>
+                      <CardHeader>
+                        <CardTitle>{project.name}</CardTitle>
+                        <CardDescription>
+                          Độ tương đồng:{" "}
+                          {(Number(project.similarity.toFixed(2)) ?? 0) * 100}%
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <div>
+                            <Label className="font-bold">Project Code:</Label>
+                            <p>{project.project_code}</p>
+                          </div>
+                          <div>
+                            <Label>Context:</Label>
+                            <p>{project.context}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <p>No similar projects found</p>
+                )}
+              </div>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
       <Tooltip>
