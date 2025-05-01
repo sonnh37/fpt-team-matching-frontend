@@ -168,11 +168,11 @@ const UpdateProjectTeam = () => {
   const handleInvite = useCallback(
     async (emailToInvite: string) => {
       if (!emailToInvite) {
-        toast.error("Please enter a user email to invite");
+        toast.error("Hiện tại không thấy email này, hãy nhập lại.");
         return;
       }
       if (availableSlots === 0) {
-        toast.error("The team currently has enough members");
+        toast.error("Nhóm hiện tại đã đủ thành viên");
         return;
       }
 
