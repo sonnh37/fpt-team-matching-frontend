@@ -266,7 +266,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       </Dialog>
       <Button
         size="sm"
-        onClick={() => router.push(`/idea/request/${idea.id}`)}
+        onClick={() => router.push(`/idea/detail/${idea.id}`)}
         variant="default"
       >
         Chi tiết

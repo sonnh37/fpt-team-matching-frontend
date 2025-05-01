@@ -301,7 +301,7 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
 
         <div>
           <Button variant={"outline"} asChild>
-            <Link href={`/idea/request/${idea.id ?? ""}`}>Chi tiết</Link>
+            <Link href={`/idea/detail/${idea.id ?? ""}`}>Chi tiết</Link>
           </Button>
         </div>
       </div>

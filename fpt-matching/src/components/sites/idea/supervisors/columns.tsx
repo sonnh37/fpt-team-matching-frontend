@@ -41,7 +41,7 @@ export const columns: ColumnDef<Idea>[] = [
       const highestVersion = getHighestVersion(row.original);
       return (
         <Button variant="link" className="p-0" asChild>
-          <Link href={`/idea/request/${row.original.id || "#"}`}>
+          <Link href={`/idea/detail/${row.original.id || "#"}`}>
             {highestVersion?.englishName || "-"}
           </Link>
         </Button>
