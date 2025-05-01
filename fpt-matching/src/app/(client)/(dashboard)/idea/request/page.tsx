@@ -66,7 +66,7 @@ export default function QuanLyYTuongPage() {
       <Card className="border-none shadow-none">
         <CardHeader>
           <CardTitle className="text-2xl font-bold text-primary">
-            Quản lý Ý tưởng
+            Quản lý ý tưởng
           </CardTitle>
           <Separator />
         </CardHeader>

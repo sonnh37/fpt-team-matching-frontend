@@ -232,9 +232,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Idea Preview</DialogTitle>
-          </DialogHeader>
           {idea && <IdeaDetailForm ideaId={idea.id} />}
         </DialogContent>
       </Dialog>

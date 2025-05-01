@@ -243,9 +243,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Idea Preview</DialogTitle>
-          </DialogHeader>
           <div className="grid gap-4 grid-cols-3">
             {idea && (
               <div className="col-span-2">

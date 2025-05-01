@@ -148,16 +148,6 @@ export const CreateProjectForm = () => {
 
   // Fetch all necessary data in parallel
   const {
-    data: res_stage,
-    isLoading: isLoadingStage,
-    error: errorStage,
-  } = useQuery({
-    queryKey: ["getBeforeSemester"],
-    queryFn: () => semesterService.getBeforeSemester(),
-    refetchOnWindowFocus: false,
-  });
-
-  const {
     data: resStage,
     isLoading: isLoadingCurrentStage,
     error: errorCurrentStage,
@@ -251,9 +241,9 @@ export const CreateProjectForm = () => {
 
   // Derived state
   const isLockStageIdea = !resStage?.data;
-  const isLock = res_stage?.data?.endDate
-    ? new Date() <= new Date(res_stage.data.endDate)
-    : false;
+  // const isLock = resStage?.data?.endDate
+  //   ? new Date() <= new Date(resStage.data.endDate)
+  //   : false;
 
   const project = result_project?.data;
   const teamMembers = project?.teamMembers;
@@ -298,7 +288,7 @@ export const CreateProjectForm = () => {
 
   // Loading and error states
   const isLoading =
-    isLoadingStage ||
+    // isLoadingStage ||
     isLoadingCurrentStage ||
     isLoadingProject ||
     isLoadingProfile ||
@@ -310,7 +300,7 @@ export const CreateProjectForm = () => {
 
   console.log(
     "check_error",
-    errorStage ||
+    // errorStage ||
       errorCurrentStage ||
       errorProject ||
       errorProfile ||
@@ -321,7 +311,7 @@ export const CreateProjectForm = () => {
   );
 
   const isError =
-    errorStage ||
+    // errorStage ||
     errorCurrentStage ||
     errorProject ||
     errorProfile ||
@@ -373,7 +363,7 @@ export const CreateProjectForm = () => {
   }
 
   if (hasActiveIdeas && isStudent) return <PageIsIdea />;
-  if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
+  // if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
   if (isLockStageIdea) return <AlertMessage message="Chưa tới đợt!" />;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
