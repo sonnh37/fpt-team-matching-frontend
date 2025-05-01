@@ -1,8 +1,17 @@
 "use client";
-import { useState, useEffect } from "react";
-import { boolean, string, z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
+import PageIsIdea from "@/app/(client)/(dashboard)/idea/idea-is-exist/page";
+import { AlertMessage } from "@/components/_common/alert-message";
+import ErrorSystem from "@/components/_common/errors/error-system";
+import { LoadingComponent } from "@/components/_common/loading-page";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -12,26 +21,8 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { useForm } from "react-hook-form";
-import { IdeaCreateCommand } from "@/types/models/commands/idea/idea-create-command";
-import { ideaService } from "@/services/idea-service";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/redux/store";
-import { userService } from "@/services/user-service";
-import { User } from "@/types/user";
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
-import { useRouter } from "next/navigation";
-import { LoadingComponent } from "@/components/_common/loading-page";
-import { resolve } from "path";
-import { projectService } from "@/services/project-service";
-import { IdeaStatus } from "@/types/enums/idea";
-import { Profession } from "@/types/profession";
-import { professionService } from "@/services/profession-service";
-import { profilestudentService } from "@/services/profile-student-service";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -39,37 +30,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import ErrorSystem from "@/components/_common/errors/error-system";
-import { Label } from "@/components/ui/label";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import {
-  FormInput,
-  FormSelectObject,
-  FormSwitch,
-} from "@/lib/form-custom-shadcn";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { FormInput, FormSwitch } from "@/lib/form-custom-shadcn";
+import { fileUploadService } from "@/services/file-upload-service";
+import { ideaService } from "@/services/idea-service";
+import { invitationService } from "@/services/invitation-service";
+import { professionService } from "@/services/profession-service";
+import { profilestudentService } from "@/services/profile-student-service";
+import { projectService } from "@/services/project-service";
 import { semesterService } from "@/services/semester-service";
 import { stageideaService } from "@/services/stage-idea-service";
-import { NoTeam } from "@/components/sites/team/no-team";
-import { HasTeam } from "@/components/sites/team/has-team";
-import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
+import { userService } from "@/services/user-service";
+import { IdeaStatus } from "@/types/enums/idea";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
-import { invitationService } from "@/services/invitation-service";
-import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/invitation-get-by-status-query";
-import { AlertMessage } from "@/components/_common/alert-message";
-import PageIsIdea from "@/app/(client)/(dashboard)/idea/idea-is-exist/page";
 import { TeamMemberRole } from "@/types/enums/team-member";
+import { IdeaCreateCommand } from "@/types/models/commands/idea/idea-create-command";
+import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/invitation-get-by-status-query";
+import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery } from "@tanstack/react-query";
+import { AlertCircle, FileText, Send } from "lucide-react";
 import Link from "next/link";
-import { fileUploadService } from "@/services/file-upload-service";
-import { UserCheckMentorAndSubMentorQuery } from "@/types/models/queries/users/user-check-mentor-and-submentor-query";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 // Các đuôi file cho phép
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
@@ -200,12 +186,12 @@ export const CreateProjectForm = () => {
   });
 
   const {
-    data: currentSemesterData,
-    isLoading: isLoadingCurrentSemester,
-    error: errorCurrentSemester,
+    data: upcomingSemesterData,
+    isLoading: isLoadingUpComingSemester,
+    error: errorUpComingSemester,
   } = useQuery({
-    queryKey: ["getCurrentSemester"],
-    queryFn: () => semesterService.getCurrentSemester(),
+    queryKey: ["getUpComingSemester"],
+    queryFn: () => semesterService.getUpComingSemester(),
     refetchOnWindowFocus: false,
   });
 
@@ -272,17 +258,17 @@ export const CreateProjectForm = () => {
   const { data: hasActiveIdeas } = useQuery({
     queryKey: ["checkActiveIdeas"],
     queryFn: async () => {
-      if (!ideasData?.data || !currentSemesterData?.data) return false;
+      if (!ideasData?.data || !upcomingSemesterData?.data) return false;
 
       const ideasCurrentSemester = ideasData.data.filter((m) =>
         m.ideaVersions.some(
-          (iv) => iv.stageIdea?.semesterId === currentSemesterData.data?.id
+          (iv) => iv.stageIdea?.semesterId === upcomingSemesterData.data?.id
         )
       );
 
       return ideasCurrentSemester.some((m) => m.status !== IdeaStatus.Rejected);
     },
-    enabled: !!ideasData?.data && !!currentSemesterData?.data,
+    enabled: !!ideasData?.data && !!upcomingSemesterData?.data,
     refetchOnWindowFocus: false,
   });
 
@@ -294,19 +280,19 @@ export const CreateProjectForm = () => {
     isLoadingProfile ||
     isLoadingProfessions ||
     isLoadingIdeas ||
-    isLoadingCurrentSemester ||
+    isLoadingUpComingSemester ||
     isLoadingUsers ||
     isLoadingInvitations;
 
   console.log(
     "check_error",
     // errorStage ||
-      errorCurrentStage ||
+    errorCurrentStage ||
       errorProject ||
       errorProfile ||
       errorProfessions ||
       errorIdeas ||
-      errorCurrentSemester ||
+      errorUpComingSemester ||
       errorInvitations
   );
 
@@ -317,7 +303,7 @@ export const CreateProjectForm = () => {
     errorProfile ||
     errorProfessions ||
     errorIdeas ||
-    errorCurrentSemester ||
+    errorUpComingSemester ||
     errorInvitations;
 
   if (!user) return null;
@@ -367,7 +353,57 @@ export const CreateProjectForm = () => {
   if (isLockStageIdea) return <AlertMessage message="Chưa tới đợt!" />;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    // Hiển thị confirm dialog trước khi submit
+    const confirmSubmit = await new Promise((resolve) => {
+      toast.custom(
+        (t) => (
+          <Card className="w-[380px]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-yellow-500" />
+                <span>Xác nhận gửi ý tưởng</span>
+              </CardTitle>
+              <CardDescription className="pt-2">
+                Bạn có chắc chắn muốn gửi ý tưởng này không?
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resolve(false);
+                  toast.dismiss(t);
+                }}
+              >
+                Hủy
+              </Button>
+              <Button
+                onClick={() => {
+                  resolve(true);
+                  toast.dismiss(t);
+                }}
+                className="gap-2"
+              >
+                <Send className="h-4 w-4" />
+                Chắc chắn
+              </Button>
+            </CardFooter>
+          </Card>
+        ),
+        {
+          duration: Infinity, // Không tự động đóng
+        }
+      );
+    });
+
+    if (!confirmSubmit) return;
+
     try {
+      // Hiển thị loading khi bắt đầu xử lý
+      const loadingToastId = toast.loading("Đang xử lý yêu cầu...", {
+        duration: Infinity,
+      });
+
       // Check mentor availability
       const mentorCheck =
         await userService.checkMentorAndSubMentorSlotAvailability({
@@ -376,6 +412,7 @@ export const CreateProjectForm = () => {
         });
 
       if (!mentorCheck.data) {
+        toast.dismiss(loadingToastId);
         return toast.error(mentorCheck.message);
       }
 
@@ -384,7 +421,10 @@ export const CreateProjectForm = () => {
         values.fileschema,
         "Idea"
       );
-      if (fileUpload.status != 1) return toast.error(fileUpload.message);
+      if (fileUpload.status != 1) {
+        toast.dismiss(loadingToastId);
+        return toast.error(fileUpload.message);
+      }
 
       // Create idea based on user role
       const command: IdeaCreateCommand = {
@@ -399,15 +439,23 @@ export const CreateProjectForm = () => {
         ? await ideaService.createIdeaByStudent(command)
         : await ideaService.createIdeaByLecturer(command);
 
+      // Cập nhật trạng thái loading
+      toast.dismiss(loadingToastId);
+
       if (res.status == 1) {
-        toast.success(res.message);
+        toast.success(res.message, {
+          action: {
+            label: "Xem danh sách",
+            onClick: () => router.push("/idea/request"),
+          },
+        });
         setTimeout(() => router.push("/idea/request"), 2000);
         return;
       }
 
       toast.error(res.message);
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "An error occurred");
+      toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi");
     }
   }
 

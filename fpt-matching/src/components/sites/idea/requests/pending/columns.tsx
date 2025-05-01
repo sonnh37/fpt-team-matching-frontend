@@ -192,7 +192,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
       toast.success(res.message);
       await queryClient.refetchQueries({ queryKey: ["data"] });
-      await queryClient.refetchQueries({ queryKey: ["data_ideas"] });
       setIsDeleteDialogOpen(false);
     } catch (error) {
       console.error("Error deleting idea:", error);
@@ -203,7 +202,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Dialog>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogTrigger asChild>
           <Button size="sm" variant="default">
             Xem nhanh

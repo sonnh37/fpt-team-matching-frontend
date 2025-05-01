@@ -57,6 +57,23 @@ class UserService extends BaseService<User> {
       });
   };
 
+  public getStudentsNoTeam = (
+    query?: UserGetAllQuery
+  ): Promise<BusinessResult<QueryResult<User>>> => {
+    const cleanedQuery = cleanQueryParams(query);
+
+    return axiosInstance
+      .get<BusinessResult<QueryResult<User>>>(
+        `${this.endpoint}/student/no-team?${cleanedQuery}`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
+
   public getUserByUsernameOrEmail = async (
     keyword: string
   ): Promise<BusinessResult<User>> => {
