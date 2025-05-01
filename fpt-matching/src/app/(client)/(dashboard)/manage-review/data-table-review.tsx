@@ -318,7 +318,7 @@ export function ReviewDataTable<TData, TValue>({
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length} className="h-24 text-center">
-                                    No results.
+                                    Không có kết quả.
                                 </TableCell>
                             </TableRow>
                         )}

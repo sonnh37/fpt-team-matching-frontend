@@ -62,6 +62,7 @@ export const CreateVersionForm = ({
     initialData?.file ? initialData.file : undefined
   );
 
+  const hadTopic = initialData?.topic != null;
   const form = useForm<CreateVersionFormValues>({
     resolver: zodResolver(createVersionSchema),
     defaultValues: {
@@ -170,7 +171,7 @@ export const CreateVersionForm = ({
             name="teamSize"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Team Size</FormLabel>
+                <FormLabel>Kích cỡ nhóm</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
@@ -178,7 +179,7 @@ export const CreateVersionForm = ({
                     min={4}
                     type="number"
                     onChange={(e) => field.onChange(parseInt(e.target.value))}
-                    disabled={isLoading}
+                    disabled={isLoading || hadTopic}
                   />
                 </FormControl>
                 <FormMessage />
@@ -192,12 +193,12 @@ export const CreateVersionForm = ({
           name="vietNamName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Vietnamese Name *</FormLabel>
+              <FormLabel>Tên tiếng việt *</FormLabel>
               <FormControl>
                 <Input
                   {...field}
-                  placeholder="Enter Vietnamese name"
-                  disabled={isLoading}
+                  placeholder="Nhập tên tiếng việt"
+                  disabled={isLoading || hadTopic}
                 />
               </FormControl>
               <FormMessage />
@@ -210,12 +211,12 @@ export const CreateVersionForm = ({
           name="englishName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>English Name</FormLabel>
+              <FormLabel>Tên tiếng anh</FormLabel>
               <FormControl>
                 <Input
                   {...field}
-                  placeholder="Enter English name"
-                  disabled={isLoading}
+                  placeholder="Nhập tên tiếng anh"
+                  disabled={isLoading || hadTopic}
                 />
               </FormControl>
               <FormMessage />
@@ -228,12 +229,12 @@ export const CreateVersionForm = ({
           name="abbreviations"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Abbreviations</FormLabel>
+              <FormLabel>Viết tắt</FormLabel>
               <FormControl>
                 <Input
                   {...field}
-                  placeholder="Enter abbreviations"
-                  disabled={isLoading}
+                  placeholder="Nhập tên viết tắt"
+                  disabled={isLoading || hadTopic}
                 />
               </FormControl>
               <FormMessage />
@@ -247,12 +248,12 @@ export const CreateVersionForm = ({
             name="enterpriseName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Enterprise Name</FormLabel>
+                <FormLabel>Tên doanh nghiệp</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
-                    placeholder="Enter enterprise name"
-                    disabled={isLoading}
+                    placeholder="Nhập tên doanh nghiệp"
+                    disabled={isLoading || hadTopic}
                   />
                 </FormControl>
                 <FormMessage />
@@ -266,12 +267,12 @@ export const CreateVersionForm = ({
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description *</FormLabel>
+              <FormLabel>Mô tả *</FormLabel>
               <FormControl>
                 <Textarea
                   {...field}
-                  placeholder="Describe the changes in this version..."
-                  disabled={isLoading}
+                  placeholder="Mô tả những thay đổi trong phiên bản này..."
+                  disabled={isLoading || hadTopic}
                   className="min-h-[120px]"
                 />
               </FormControl>
@@ -348,7 +349,7 @@ export const CreateVersionForm = ({
             </Button>
           )}
           <Button type="submit" disabled={isLoading}>
-            {isLoading ? "Processing..." : "Xác nhận nộp lại"}
+            {isLoading ? "Đang xử lí..." : "Xác nhận nộp lại"}
           </Button>
         </div>
       </form>

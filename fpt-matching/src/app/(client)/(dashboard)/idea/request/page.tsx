@@ -1,13 +1,4 @@
 "use client";
-import IdeaVersionRequestApprovedTable from "@/components/sites/idea/requests/approved";
-import IdeaVersionRequestRejectedTable from "@/components/sites/idea/requests/rejected";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Tabs,
   TabsContent,
@@ -16,35 +7,36 @@ import {
 } from "@/components/ui/tabs-shadcn";
 import { useDispatch } from "react-redux";
 
+// Components
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
-import HorizontalLinearStepper from "@/components/_common/material-ui/stepper";
-import { IdeaVersionRequestPendingTable } from "@/components/sites/idea/requests/pending";
-import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
-import { stageideaService } from "@/services/stage-idea-service";
-import { StageIdea } from "@/types/stage-idea";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { ideaService } from "@/services/idea-service";
-import { useSelectorUser } from "@/hooks/use-auth";
-import { IdeaStatus } from "@/types/enums/idea";
-import { Idea } from "@/types/idea";
-import { Badge } from "@/components/ui/badge";
-import TimeStageIdea from "@/components/_common/time-stage-idea";
-import { useCurrentRole } from "@/hooks/use-current-role";
 import { IdeaVersionRequestConsiderByCouncilTable } from "@/components/sites/idea/requests/consider-by-council";
 import { IdeaVersionRequestConsiderByMentorTable } from "@/components/sites/idea/requests/consider-by-mentor";
-export default function Page() {
+import { IdeaVersionRequestPendingTable } from "@/components/sites/idea/requests/pending";
+
+// UI Components
+import { Badge } from "@/components/ui/badge";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+
+// Hooks
+import { useSelectorUser } from "@/hooks/use-auth";
+import { useCurrentRole } from "@/hooks/use-current-role";
+import { ideaService } from "@/services/idea-service";
+import { IdeaStatus } from "@/types/enums/idea";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import IdeaVersionRequestApprovedTable from "@/components/sites/idea/requests/approved";
+import IdeaVersionRequestRejectedTable from "@/components/sites/idea/requests/rejected";
+
+export default function QuanLyYTuongPage() {
   const user = useSelectorUser();
   const role = useCurrentRole();
 
-  const dispatch = useDispatch();
-
   const {
     data: res_ideas,
-    isLoading: isLoadingAnother,
-    error: errorAnother,
-    isError: isErrorAnother,
+    isLoading,
+    error,
+    isError,
   } = useQuery({
     queryKey: ["data_ideas"],
     queryFn: async () => await ideaService.getIdeaByUser(),
@@ -52,109 +44,114 @@ export default function Page() {
     refetchOnWindowFocus: false,
   });
 
-  if (!role) return;
-  if (!user) return;
+  if (!role || !user) return null;
+  if (isLoading) return <LoadingComponent />;
+  if (isError) return <ErrorSystem />;
 
-  if (isLoadingAnother) return <LoadingComponent />;
-  if (isErrorAnother) {
-    return <ErrorSystem />;
-  }
+  // Định nghĩa các tab
+  const TABS = {
+    PENDING: "Chờ duyệt",
+    CONSIDER: "Đang xem xét",
+    APPROVED: "Đã phê duyệt",
+    REJECTED: "Đã từ chối",
+  };
 
-  const tab_1 = "Pending";
-  const tab_2 = "Approved";
-  const tab_3 = "Rejected";
-  const tab_4 = "Consider";
-
+  // Đếm số lượng ý tưởng theo trạng thái
   const countIdeasByStatus = (status: IdeaStatus) => {
-    return res_ideas?.data?.filter((m) => m.status == status).length ?? 0;
+    return res_ideas?.data?.filter((m) => m.status === status).length ?? 0;
   };
 
   return (
-    <>
-      <Tabs defaultValue={tab_1} className="w-full container mx-auto">
-        <div className="flex justify-between">
-          <TabsList>
-            {/* Student sẽ thấy tất cả các tab */}
-
-            <>
-              <TabsTrigger value={tab_1}>
-                <span className="flex items-center gap-2">
-                  {tab_1}{" "}
-                  {countIdeasByStatus(IdeaStatus.Pending) != 0 && (
-                    <Badge>{countIdeasByStatus(IdeaStatus.Pending)}</Badge>
+    <div className="container mx-auto px-4 py-8">
+      <Card className="border-none shadow-none">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-primary">
+            Quản lý Ý tưởng
+          </CardTitle>
+          <Separator />
+        </CardHeader>
+        
+        <CardContent>
+          <Tabs defaultValue={TABS.PENDING} className="w-full">
+            <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+              <TabsTrigger value={TABS.PENDING}>
+                <div className="flex items-center gap-2">
+                  {TABS.PENDING}
+                  {countIdeasByStatus(IdeaStatus.Pending) > 0 && (
+                    <Badge variant="secondary">
+                      {countIdeasByStatus(IdeaStatus.Pending)}
+                    </Badge>
                   )}
-                </span>
+                </div>
               </TabsTrigger>
-              {role == "Student" ? (
-                <TabsTrigger value={tab_4}>
-                  <span className="flex items-center gap-2">
-                    {tab_4}{" "}
-                    {countIdeasByStatus(IdeaStatus.ConsiderByMentor) != 0 && (
-                      <Badge>
+
+              <TabsTrigger value={TABS.CONSIDER}>
+                <div className="flex items-center gap-2">
+                  {TABS.CONSIDER}
+                  {role === "Student" ? (
+                    countIdeasByStatus(IdeaStatus.ConsiderByMentor) > 0 && (
+                      <Badge variant="secondary">
                         {countIdeasByStatus(IdeaStatus.ConsiderByMentor)}
                       </Badge>
-                    )}
-                  </span>
-                </TabsTrigger>
-              ) : (
-                <TabsTrigger value={tab_4}>
-                  <span className="flex items-center gap-2">
-                    {tab_4}{" "}
-                    {countIdeasByStatus(IdeaStatus.ConsiderByCouncil) != 0 && (
-                      <Badge>
+                    )
+                  ) : (
+                    countIdeasByStatus(IdeaStatus.ConsiderByCouncil) > 0 && (
+                      <Badge variant="secondary">
                         {countIdeasByStatus(IdeaStatus.ConsiderByCouncil)}
                       </Badge>
-                    )}
-                  </span>
-                </TabsTrigger>
-              )}
-
-              <TabsTrigger value={tab_2}>
-                <span className="flex items-center gap-2">
-                  {tab_2}{" "}
-                  {countIdeasByStatus(IdeaStatus.Approved) != 0 && (
-                    <Badge>{countIdeasByStatus(IdeaStatus.Approved)}</Badge>
+                    )
                   )}
-                </span>
+                </div>
               </TabsTrigger>
-              <TabsTrigger value={tab_3}>
-                <span className="flex items-center gap-2">
-                  {tab_3}{" "}
-                  {countIdeasByStatus(IdeaStatus.Rejected) != 0 && (
+
+              <TabsTrigger value={TABS.APPROVED}>
+                <div className="flex items-center gap-2">
+                  {TABS.APPROVED}
+                  {countIdeasByStatus(IdeaStatus.Approved) > 0 && (
+                    <Badge variant="default">
+                      {countIdeasByStatus(IdeaStatus.Approved)}
+                    </Badge>
+                  )}
+                </div>
+              </TabsTrigger>
+
+              <TabsTrigger value={TABS.REJECTED}>
+                <div className="flex items-center gap-2">
+                  {TABS.REJECTED}
+                  {countIdeasByStatus(IdeaStatus.Rejected) > 0 && (
                     <Badge variant="destructive">
                       {countIdeasByStatus(IdeaStatus.Rejected)}
                     </Badge>
                   )}
-                </span>
+                </div>
               </TabsTrigger>
-            </>
-          </TabsList>
-        </div>
+            </TabsList>
 
-        {/* Student tabs */}
+            {/* Nội dung các tab */}
+            <div className="mt-6">
+              <TabsContent value={TABS.PENDING}>
+                <IdeaVersionRequestPendingTable />
+              </TabsContent>
 
-        <>
-          <TabsContent value={tab_1}>
-            <IdeaVersionRequestPendingTable />
-          </TabsContent>
-          {role == "Student" ? (
-            <TabsContent value={tab_4}>
-              <IdeaVersionRequestConsiderByMentorTable />
-            </TabsContent>
-          ) : (
-            <TabsContent value={tab_4}>
-              <IdeaVersionRequestConsiderByCouncilTable />
-            </TabsContent>
-          )}
+              <TabsContent value={TABS.CONSIDER}>
+                {role === "Student" ? (
+                  <IdeaVersionRequestConsiderByMentorTable />
+                ) : (
+                  <IdeaVersionRequestConsiderByCouncilTable />
+                )}
+              </TabsContent>
 
-          <TabsContent value={tab_2}>
-            <IdeaVersionRequestApprovedTable />
-          </TabsContent>
-          <TabsContent value={tab_3}>
-            <IdeaVersionRequestRejectedTable />
-          </TabsContent>
-        </>
-      </Tabs>
-    </>
+              <TabsContent value={TABS.APPROVED}>
+                <IdeaVersionRequestApprovedTable />
+              </TabsContent>
+
+              <TabsContent value={TABS.REJECTED}>
+                <IdeaVersionRequestRejectedTable />
+              </TabsContent>
+            </div>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

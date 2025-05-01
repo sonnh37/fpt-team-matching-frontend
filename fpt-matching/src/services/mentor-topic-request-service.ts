@@ -14,7 +14,7 @@ import {CreateCommand} from "@/types/models/commands/_base/base-command";
 
 class MentorTopicRequestService extends BaseService<MentorTopicRequest> {
   constructor() {
-    super(Const.MENTOR_IDEA_REQUESTS);
+    super(Const.MENTOR_TOPIC_REQUESTS);
   }
   public getUserMentorTopicRequests = (
     query?: MentorTopicRequestGetAllQuery
@@ -22,7 +22,7 @@ class MentorTopicRequestService extends BaseService<MentorTopicRequest> {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
       .get<BusinessResult<QueryResult<MentorTopicRequest>>>(
-        `${this.endpoint}/get-user-mentor-idea-requests?isPagination=true&${cleanedQuery}`
+        `${this.endpoint}/get-user-mentor-topic-requests?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {
         return response.data;
@@ -38,7 +38,7 @@ class MentorTopicRequestService extends BaseService<MentorTopicRequest> {
     const cleanedQuery = cleanQueryParams(query!);
     return axiosInstance
       .get<BusinessResult<QueryResult<MentorTopicRequest>>>(
-        `${this.endpoint}/get-mentor-mentor-idea-requests?isPagination=true&${cleanedQuery}`
+        `${this.endpoint}/get-mentor-mentor-topic-requests?isPagination=true&${cleanedQuery}`
       )
       .then((response) => {
         return response.data;
@@ -57,7 +57,7 @@ class MentorTopicRequestService extends BaseService<MentorTopicRequest> {
 
   public sendRequestIdeaByStudent = (command: CreateCommand): Promise<BusinessResult<null>> => {
     return axiosInstance
-        .post<BusinessResult<null>>(`${this.endpoint}/student-request-idea`, command)
+        .post<BusinessResult<null>>(`${this.endpoint}/student-request-topic`, command)
         .then((response) => response.data)
         .catch((error) => this.handleError(error)); // Xử lý lỗi
   };

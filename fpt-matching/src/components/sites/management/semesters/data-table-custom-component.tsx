@@ -235,7 +235,7 @@ export function DataTableSemesterComponent<TData>({
           );
         })
       ) : (
-        <TypographyP>No results.</TypographyP>
+        <TypographyP>Không có kết quả.</TypographyP>
       )}
 
       {selectedModel && (

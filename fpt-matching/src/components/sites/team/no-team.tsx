@@ -109,7 +109,7 @@ export const NoTeam = () => {
             </DialogTrigger>
             <DialogContent className="">
               <DialogHeader>
-                <DialogTitle>Đề tài mới</DialogTitle>
+                <DialogTitle>Nhóm mới</DialogTitle>
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <TeamForm />
