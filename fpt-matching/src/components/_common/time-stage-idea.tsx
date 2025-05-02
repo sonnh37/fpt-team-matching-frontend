@@ -1,7 +1,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -9,67 +8,83 @@ import { cn, formatDate } from "@/lib/utils";
 import { StageIdea } from "@/types/stage-idea";
 import { Badge } from "../ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { Info } from "lucide-react";
+import { Info, CalendarDays, Clock, Award } from "lucide-react";
+import { Separator } from "../ui/separator";
+
 interface StageIdeaProps {
   stageIdea?: StageIdea | undefined;
 }
+
 const TimeStageIdea = ({ stageIdea }: StageIdeaProps) => {
   return (
-    <div className="w-full max-w-6xl mx-auto">
-      <Card className="w-full max-w-6xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Thông tin Giai đoạn Đánh giá
+    <div className="w-full max-w-4xl mx-auto">
+      <Card className="shadow-sm">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-xl font-semibold flex items-center gap-2">
+            <CalendarDays className="h-5 w-5 text-primary" />
+            <span>Thông tin Giai đoạn Đánh giá Ý tưởng</span>
           </CardTitle>
-          <CardDescription>
-            Các yêu cầu ý tưởng đang chờ phê duyệt
-          </CardDescription>
+          <Separator />
         </CardHeader>
+        
         <CardContent className="space-y-4">
           {stageIdea ? (
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="flex flex-col items-center pt-1">
-                  <div className="h-2 w-2 rounded-full bg-primary" />
-                  <div className="h-full w-px bg-border" />
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Timeline Item 1 */}
+              <div className="flex items-start gap-4 p-4 rounded-lg border bg-muted/50">
+                <div className="flex flex-col items-center">
+                  <div className="p-2 rounded-full bg-primary/10 text-primary">
+                    <Clock className="h-5 w-5" />
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium">
-                    Thời gian đánh giá:{" "}
-                    <Badge variant="outline" className="ml-2">
-                      {formatDate(stageIdea.startDate)} -{" "}
+                <div className="flex-1">
+                  <h3 className="font-medium">Thời gian đánh giá</h3>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    <Badge variant="secondary" className="text-sm font-normal">
+                      {formatDate(stageIdea.startDate)}
+                    </Badge>
+                    <span className="text-muted-foreground">đến</span>
+                    <Badge variant="secondary" className="text-sm font-normal">
                       {formatDate(stageIdea.endDate)}
                     </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Thời gian nộp và đánh giá ý tưởng
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3">
-                <div className="flex flex-col items-center pt-1">
-                  <div className="h-2 w-2 rounded-full bg-primary" />
+              {/* Timeline Item 2 */}
+              <div className="flex items-start gap-4 p-4 rounded-lg border bg-muted/50">
+                <div className="flex flex-col items-center">
+                  <div className="p-2 rounded-full bg-primary/10 text-primary">
+                    <Award className="h-5 w-5" />
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-medium">
-                    Ngày công bố kết quả:{" "}
-                    <Badge variant="outline" className="ml-2">
+                <div className="flex-1">
+                  <h3 className="font-medium">Công bố kết quả</h3>
+                  <div className="mt-1">
+                    <Badge variant="secondary" className="text-sm font-normal">
                       {formatDate(stageIdea.resultDate)}
                     </Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Ngày công bố kết quả đánh giá cuối cùng
                   </p>
                 </div>
               </div>
             </div>
           ) : (
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>Không có thông tin</AlertTitle>
+            <Alert variant="default" className="border-primary/20 bg-primary/5">
+              <Info className="h-5 w-5 text-primary" />
+              <AlertTitle>Không có giai đoạn đánh giá</AlertTitle>
               <AlertDescription>
-                Hiện không có giai đoạn đánh giá nào đang diễn ra.
+                Hiện tại không có giai đoạn đánh giá nào đang diễn ra. Vui lòng kiểm tra lại sau.
               </AlertDescription>
             </Alert>
           )}
         </CardContent>
       </Card>
-   
     </div>
   );
 };

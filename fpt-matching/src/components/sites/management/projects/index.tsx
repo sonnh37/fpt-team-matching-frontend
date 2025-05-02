@@ -1,64 +1,42 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
-import { TypographyH2 } from "@/components/_common/typography/typography-h2";
-import { Button } from "@/components/ui/button";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 import { Card } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { professionService } from "@/services/profession-service";
-import { Profession } from "@/types/profession";
+import { projectService } from "@/services/project-service";
+import { FilterEnum } from "@/types/models/filter-enum";
+import { ProjectGetListForMentorQuery } from "@/types/models/queries/projects/project-get-list-for-mentor-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ColumnFiltersState,
   getCoreRowModel,
-  getFilteredRowModel,
   PaginationState,
   SortingState,
   useReactTable,
-  VisibilityState,
+  VisibilityState
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
-import { projectService } from "@/services/project-service";
-import { ProjectGetAllQuery } from "@/types/models/queries/projects/project-get-all-query";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import { FilterEnum } from "@/types/models/filter-enum";
-import { isDeleted_options } from "@/lib/filter-options";
-import { ProjectGetListForMentorQuery } from "@/types/models/queries/projects/project-get-list-for-mentor-query";
-import { LoadingComponent } from "@/components/_common/loading-page";
 
 //#region INPUT
 const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
 });
+
+const roles_options = [
+  { label: "Người hướng dẫn", value: "Mentor" },
+  { label: "Người hướng dẫn 2", value: "SubMentor" },
+];
 //#endregion
 export default function ProjectTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
-    { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
+    { columnId: "roles", title: "Phân loại vị trí", options: roles_options },
   ];
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([

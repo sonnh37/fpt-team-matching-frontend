@@ -27,26 +27,9 @@ import { IdeaDetailForm } from "../../detail";
 
 export const columns: ColumnDef<Idea>[] = [
   {
-    accessorKey: "latestVersion",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Latest Version" />
-    ),
-    cell: ({ row }) => {
-      const idea = row.original;
-      if (!idea.ideaVersions) return;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion ? `v${highestVersion.version}` : "-";
-    },
-  },
-  {
     accessorKey: "englishName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Idea name" />
+      <DataTableColumnHeader column={column} title="Tên tiếng anh" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -61,9 +44,27 @@ export const columns: ColumnDef<Idea>[] = [
     },
   },
   {
+    accessorKey: "latestVersion",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Phiên bản mới nhất" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion ? `v${highestVersion.version}` : "-";
+    },
+  },
+
+  {
     accessorKey: "semester",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Semester" />
+      <DataTableColumnHeader column={column} title="Kì" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -81,7 +82,7 @@ export const columns: ColumnDef<Idea>[] = [
   {
     accessorKey: "stage",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Current Stage" />
+      <DataTableColumnHeader column={column} title="Giai đoạn" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -97,23 +98,13 @@ export const columns: ColumnDef<Idea>[] = [
     },
   },
   {
-    accessorKey: "createdDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date created" />
-    ),
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdDate"));
-      return formatDate(date);
-    },
-  },
-  {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as IdeaStatus | undefined;
-      const statusText = status !== undefined ? IdeaStatus[status] : "Unknown";
+      const statusText = status !== undefined ? IdeaStatus[status] : "-";
 
       let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
         "default";
@@ -140,7 +131,7 @@ export const columns: ColumnDef<Idea>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       return <Actions row={row} />;
     },
@@ -172,13 +163,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       <Dialog>
         <DialogTrigger asChild>
           <Button size="sm" variant="default">
-            View
+            Xem nhanh
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Idea detail</DialogTitle>
-          </DialogHeader>
           <div className="flex justify-between p-4 gap-4">
             <TimeStageIdea stageIdea={highestVersion?.stageIdea} />
             {/* <HorizontalLinearStepper idea={idea} /> */}

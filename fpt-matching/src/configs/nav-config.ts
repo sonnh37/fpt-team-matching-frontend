@@ -1,30 +1,21 @@
 import {
-  Calendar,
   CircleHelp,
   CircleUser,
   FileUser,
-  Globe,
   History,
   Home,
-  Lightbulb,
-  MessageCircleQuestion,
   Pencil,
   PencilRuler,
-  Send,
   ShieldHalf,
   SquareUserRound,
   Telescope,
   UserPlus,
   Users,
-  UsersRound,
+  UsersRound
 } from "lucide-react";
-import { GiWideArrowDunk } from "react-icons/gi";
 import {
-  MdOutlineRateReview,
-  MdOutlineSupervisorAccount,
+  MdOutlineRateReview
 } from "react-icons/md";
-import { PiUserList } from "react-icons/pi";
-import { RiTimeLine } from "react-icons/ri";
 
 export const NAV_CONFIG = {
   main: [
@@ -40,7 +31,7 @@ export const NAV_CONFIG = {
       icon: CircleUser,
       roles: ["*"],
     },
-    
+
     {
       title: "Nhóm",
       url: "/team",
@@ -93,6 +84,12 @@ export const NAV_CONFIG = {
           roles: ["Mentor"],
         },
         {
+          title: "Duyệt ý tưởng bởi submentor",
+          icon: MdOutlineRateReview,
+          url: "/idea/reviews/submentor",
+          roles: ["Mentor"],
+        },
+        {
           title: "Duyệt ý tưởng",
           icon: MdOutlineRateReview,
           url: "/idea/reviews/council",
@@ -104,7 +101,13 @@ export const NAV_CONFIG = {
       title: "Lời mời",
       url: "/invitations",
       icon: UserPlus,
-      roles: ["*"],
+      roles: ["Student"],
+    },
+    {
+      title: "Yêu cầu nhận ý tưởng từ sinh viên",
+      url: "/student-requests",
+      icon: UserPlus,
+      roles: ["Mentor"],
     },
     {
       title: "Danh sách giảng viên",

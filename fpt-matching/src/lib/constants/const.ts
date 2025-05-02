@@ -31,7 +31,7 @@ export class Const {
   static readonly PROFILE_STUDENTS = "profile-students";
   static readonly STAGE_IDEAS = "stage-ideas";
   static readonly AUTH = "auth";
-  static readonly MENTOR_IDEA_REQUESTS = "mentor-idea-requests";
+  static readonly MENTOR_TOPIC_REQUESTS = "mentor-topic-requests";
   static readonly IDEA_HISTORIES = "idea-histories";
   static readonly CAPSTONE_SCHEDULES = "capstone-schedules";
   static readonly MENTOR_FEEDBACKS = "mentor-feedbacks";

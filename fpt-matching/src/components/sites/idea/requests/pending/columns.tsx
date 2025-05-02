@@ -3,7 +3,7 @@
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import TimeStageIdea from "@/components/_common/time-stage-idea";
 import { TypographyP } from "@/components/_common/typography/typography-p";
-import HorizontalLinearStepper from "@/components/_common/material-ui/stepper";
+import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,107 +21,95 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useCurrentRole } from "@/hooks/use-current-role";
-import { RootState } from "@/lib/redux/store";
 import { ideaService } from "@/services/idea-service";
-import { stageideaService } from "@/services/stage-idea-service";
 import { IdeaStatus } from "@/types/enums/idea";
 import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { Idea } from "@/types/idea";
-import { IdeaVersionRequest } from "@/types/idea-version-request";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import { IdeaDetailForm } from "@/components/sites/idea/detail";
-import { formatDate } from "@/lib/utils";
 
 export const columns: ColumnDef<Idea>[] = [
   {
-    accessorKey: "latestVersion",
+    accessorKey: "englishName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Latest Version" />
+      <DataTableColumnHeader column={column} title="Tên tiếng anh" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
-      const highestVersion = idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion?.englishName || "-";
+    },
+  },
+  {
+    accessorKey: "latestVersion",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Phiên bản mới nhất" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
       return highestVersion ? `v${highestVersion.version}` : "-";
     },
   },
-  {
-    accessorKey: "englishName",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Idea name" />
-    ),
-    cell: ({ row }) => {
-      const idea = row.original;
-      if(!idea.ideaVersions) return;
-      const highestVersion =
-      idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
-      return highestVersion?.englishName || "-"
-    },
-  },
+
   {
     accessorKey: "semester",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Semester" />
+      <DataTableColumnHeader column={column} title="Kì" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
-      const highestVersion = idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
-      
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+
       return highestVersion?.stageIdea?.semester?.semesterName || "-";
     },
   },
   {
     accessorKey: "stage",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Current Stage" />
+      <DataTableColumnHeader column={column} title="Giai đoạn" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      if(!idea.ideaVersions) return;
-      const highestVersion = idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
-      
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+
       return highestVersion?.stageIdea?.stageNumber || "-";
     },
   },
   {
-    accessorKey: "createdDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date created" />
-    ),
-    cell: ({ row }) => {
-        const date = new Date(row.getValue("createdDate"));
-        return formatDate(date)
-      },
-  },
-  {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as IdeaStatus | undefined;
-      const statusText = status !== undefined ? IdeaStatus[status] : "Unknown";
+      const statusText = status !== undefined ? IdeaStatus[status] : "-";
 
       let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
         "default";
@@ -148,7 +136,7 @@ export const columns: ColumnDef<Idea>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       return <Actions row={row} />;
     },
@@ -161,18 +149,16 @@ interface ActionsProps {
 
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
-  const isEditing = row.getIsSelected();
-  const initialFeedback = row.getValue("content") as string;
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const role = useCurrentRole();
   const idea = row.original;
   const highestVersion =
-      idea.ideaVersions.length > 0
-        ? idea.ideaVersions.reduce((prev, current) =>
-            (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-          )
-        : undefined;
+    idea.ideaVersions.length > 0
+      ? idea.ideaVersions.reduce((prev, current) =>
+          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+        )
+      : undefined;
   const hasMentorApproval = highestVersion?.ideaVersionRequests.some(
     (request) =>
       (request.status === IdeaVersionRequestStatus.Approved ||
@@ -180,11 +166,12 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       request.role === "Mentor"
   );
 
-  const isLock = idea.ideaVersions.some(version => 
+  const isLock = idea.ideaVersions.some((version) =>
     version.ideaVersionRequests?.some(
-      request => (request.status === IdeaVersionRequestStatus.Approved || 
-                 request.status === IdeaVersionRequestStatus.Rejected) &&
-                 request.role === "Mentor"
+      (request) =>
+        (request.status === IdeaVersionRequestStatus.Approved ||
+          request.status === IdeaVersionRequestStatus.Rejected) &&
+        request.role === "Mentor"
     )
   );
 
@@ -205,7 +192,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
       toast.success(res.message);
       await queryClient.refetchQueries({ queryKey: ["data"] });
-      await queryClient.refetchQueries({ queryKey: ["data_ideas"] });
       setIsDeleteDialogOpen(false);
     } catch (error) {
       console.error("Error deleting idea:", error);
@@ -213,26 +199,22 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       setIsDeleting(false);
     }
   };
-  
 
   return (
     <div className="flex flex-col gap-2">
-      <Dialog>
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogTrigger asChild>
           <Button size="sm" variant="default">
-            View
+            Xem nhanh
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Idea detail</DialogTitle>
-          </DialogHeader>
           <div className="flex justify-between p-4 gap-4">
             <TimeStageIdea stageIdea={highestVersion?.stageIdea} />
             {/* <HorizontalLinearStepper idea={idea} /> */}
           </div>
           <div className="p-4 gap-4">
-            <IdeaDetailForm ideaId={idea.id}  />
+            <IdeaDetailForm ideaId={idea.id} />
           </div>
           <DialogFooter>
             <Tooltip>
@@ -241,27 +223,27 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button size="sm" variant="destructive" disabled={isLock}>
-                        Delete idea
+                        Xóa ý tưởng
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Confirm Deletion</DialogTitle>
+                        <DialogTitle>Xác nhận xóa</DialogTitle>
                       </DialogHeader>
                       <TypographyP>
-                        Are you sure you want to delete this idea? This action
-                        cannot be undone.
+                        Bạn có chắc chắn muốn xóa ý tưởng này không? Hành động
+                        này không thể hoàn tác.
                       </TypographyP>
                       <DialogFooter>
                         <DialogClose asChild>
-                          <Button variant="outline">Cancel</Button>
+                          <Button variant="outline">Hủy</Button>
                         </DialogClose>
                         <Button
                           variant="destructive"
                           onClick={handleDelete}
                           disabled={isDeleting}
                         >
-                          {isDeleting ? "Deleting..." : "Confirm Delete"}
+                          {isDeleting ? "Đang xử lí..." : "Xác nhận xóa"}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
@@ -270,7 +252,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
               </TooltipTrigger>
               {isLock && (
                 <TooltipContent>
-                  <p>Mentor approval has been granted for this idea.</p>
+                  <p>Ý tưởng này đã được người cố vấn chấp thuận.</p>
                 </TooltipContent>
               )}
             </Tooltip>

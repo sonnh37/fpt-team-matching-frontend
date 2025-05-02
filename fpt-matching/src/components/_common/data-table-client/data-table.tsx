@@ -19,6 +19,7 @@ import {
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 import {DataOnlyTableToolbar} from "./data-table-toolbar";
 import {DataOnlyTablePagination} from "./data-table-pagination";
+import { DataTablePagination } from "../data-table-api/data-table-pagination";
 
 interface DataTableProps<TData> {
     columns: ColumnDef<TData>[];
@@ -98,14 +99,14 @@ export function DataOnlyTable<TData>({
                         ) : (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    No results.
+                                    Không có kết quả.
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
                 </Table>
             </div>
-            <DataOnlyTablePagination table={table}/>
+            <DataTablePagination table={table}/>
         </div>
     )
 }

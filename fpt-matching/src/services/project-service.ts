@@ -6,6 +6,7 @@ import axiosInstance from "@/lib/interceptors/axios-instance";
 import { TeamCreateCommand } from "@/types/models/commands/projects/team-create-command";
 import { ProjectGetListForMentorQuery } from "@/types/models/queries/projects/project-get-list-for-mentor-query";
 import { cleanQueryParams } from "@/lib/utils";
+import { ProjectSearchQuery } from "@/types/models/queries/projects/project-search-query";
 
 class ProjectSerivce extends BaseService<Project> {
   constructor() {
@@ -23,24 +24,54 @@ class ProjectSerivce extends BaseService<Project> {
     }
   };
 
-  public getAllForMentor = (
-      query?: ProjectGetListForMentorQuery
-    ): Promise<BusinessResult<QueryResult<Project>>> => {
-      const cleanedQuery = cleanQueryParams(query);
-  
-      return axiosInstance
-        .get<BusinessResult<QueryResult<Project>>>(
-          `${this.endpoint}/me/mentor-projects?${cleanedQuery}`
-        )
-        .then((response) => {
-          return response.data;
-        })
-        .catch((error) => {
-          return this.handleError(error);
-        });
-    };
+  public getProjectInSemesterCurrentInfo = async (): Promise<
+    BusinessResult<Project>
+  > => {
+    try {
+      const response = await axiosInstance.get<BusinessResult<Project>>(
+        `${this.endpoint}/semester-current/get-by-user-id`
+      );
+      return response.data;
+    } catch (error) {
+      this.handleError(error);
+      return Promise.reject(error);
+    }
+  };
 
-  public getProjectInfoCheckLeader = async (): Promise<BusinessResult<Project>> => {
+  public searchProjects = async (
+    query?: ProjectSearchQuery
+  ): Promise<BusinessResult<QueryResult<Project>>> => {
+    try {
+      const cleanedQuery = cleanQueryParams(query);
+      const response = await axiosInstance.get<
+        BusinessResult<QueryResult<Project>>
+      >(`${this.endpoint}/search?${cleanedQuery}`);
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  };
+
+  public getAllForMentor = (
+    query?: ProjectGetListForMentorQuery
+  ): Promise<BusinessResult<QueryResult<Project>>> => {
+    const cleanedQuery = cleanQueryParams(query);
+
+    return axiosInstance
+      .get<BusinessResult<QueryResult<Project>>>(
+        `${this.endpoint}/me/mentor-projects?${cleanedQuery}`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
+
+  public getProjectInfoCheckLeader = async (): Promise<
+    BusinessResult<Project>
+  > => {
     try {
       const response = await axiosInstance.get<BusinessResult<Project>>(
         `${this.endpoint}/get-of-user-login`
@@ -53,21 +84,21 @@ class ProjectSerivce extends BaseService<Project> {
   };
 
   public getAvailableTeamDefense = async (stage: number): Promise<File> => {
-      try {
-        const response = await axiosInstance.get<Blob>(
-            `${this.endpoint}/export-excel/${stage}`, {responseType: "blob"}
-        );
+    try {
+      const response = await axiosInstance.get<Blob>(
+        `${this.endpoint}/export-excel/${stage}`,
+        { responseType: "blob" }
+      );
 
-        const blob = response.data
-        const fileName = "DanhSachRaHoiDong.xlsx"
-        const file = new File([blob!], fileName, {type: blob!.type || ".xlsx"} )
-        return file;
-      }
-      catch (error) {
-        this.handleError(error);
-        return Promise.reject(error);
-      }
-  }
+      const blob = response.data;
+      const fileName = "DanhSachRaHoiDong.xlsx";
+      const file = new File([blob!], fileName, { type: blob!.type || ".xlsx" });
+      return file;
+    } catch (error) {
+      this.handleError(error);
+      return Promise.reject(error);
+    }
+  };
 
   public createTeam = (
     command: TeamCreateCommand
@@ -81,17 +112,34 @@ class ProjectSerivce extends BaseService<Project> {
       .catch((error) => this.handleError(error));
   };
 
-  public async updateDefenseStage ({projectId, defenseStage}:{projectId:string, defenseStage: number}) {
-    const response = await axiosInstance.put<BusinessResult<void>>(`${this.endpoint}/update-defense-stage`, {
-      id: projectId,
-      defenseStage: defenseStage,
-    })
-    return response.data
+  public async updateDefenseStage({
+    projectId,
+    defenseStage,
+  }: {
+    projectId: string;
+    defenseStage: number;
+  }) {
+    const response = await axiosInstance.put<BusinessResult<void>>(
+      `${this.endpoint}/update-defense-stage`,
+      {
+        id: projectId,
+        defenseStage: defenseStage,
+      }
+    );
+    return response.data;
   }
 
-  public async getProjectBySemesterAndStage ({semester, stage} : {semester: string, stage: number}) : Promise<BusinessResult<Project[]>> {
-    const response = await axiosInstance.get<BusinessResult<Project[]>>(`${this.endpoint}/get-by-semester-and-stage?semester=${semester}&stage=${stage}`)
-    return response.data
+  public async getProjectBySemesterAndStage({
+    semester,
+    stage,
+  }: {
+    semester: string;
+    stage: number;
+  }): Promise<BusinessResult<Project[]>> {
+    const response = await axiosInstance.get<BusinessResult<Project[]>>(
+      `${this.endpoint}/get-by-semester-and-stage?semester=${semester}&stage=${stage}`
+    );
+    return response.data;
   }
 }
 

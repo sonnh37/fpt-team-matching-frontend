@@ -248,7 +248,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                     <FormInput
                       form={form}
                       name="semesterPrefixName"
-                      label="Tên hậu tố"
+                      label="Tên tiền tố"
                       placeholder="VD: Năm học 2023-2024"
                     />
                   </div>

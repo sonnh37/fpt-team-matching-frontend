@@ -45,6 +45,7 @@ import { ideaService } from "@/services/idea-service";
 import { invitationService } from "@/services/invitation-service";
 import { projectService } from "@/services/project-service";
 import { semesterService } from "@/services/semester-service";
+import { stageideaService } from "@/services/stage-idea-service";
 import { IdeaStatus } from "@/types/enums/idea";
 import { TeamMemberRole } from "@/types/enums/team-member";
 import { InvitationStudentCreatePendingCommand } from "@/types/models/commands/invitation/invitation-student-command";
@@ -73,43 +74,22 @@ export default function ProjectDetail() {
 
   const queryClient = useQueryClient();
 
-  const { data: res_stage, isLoading: isLoadingSemester } = useQuery({
-    queryKey: ["getBeforeSemester"],
-    queryFn: () => semesterService.getBeforeSemester(),
-    refetchOnWindowFocus: false,
-  });
-
   const { data: res_current_semester, isLoading: isLoadingCurrent } = useQuery({
     queryKey: ["getCurrentSemester"],
     queryFn: () => semesterService.getCurrentSemester(),
     refetchOnWindowFocus: false,
   });
 
-  const isLock = useMemo(() => {
-    const now = new Date();
-
-    if (res_current_semester?.data && res_stage?.data) {
-      const beforeSemesterEndDate = new Date(res_stage.data.endDate ?? 0);
-      const currentSemesterStartDate = new Date(res_current_semester.data.startDate ?? 0);
-      
-      // Kiểm tra nếu hiện tại nằm giữa endDate của kì trước và startDate của kì hiện tại
-      return now > beforeSemesterEndDate && now < currentSemesterStartDate;
+  const hasCurrentSemester = useMemo(() => {
+    if (
+      res_current_semester?.data == undefined ||
+      res_current_semester.data == null
+    ) {
+      // Đang chưa vô kì nhưng vô đợt hoặc chưa vô đợt
+      return false;
     }
-
-    // Nếu có currentSemester → KHÔNG KHÓA (đang trong kì hiện tại)
-    if (res_current_semester?.data) {
-      return true;
-    }
-
-    // Nếu không có currentSemester nhưng có beforeSemester
-    if (res_stage?.data) {
-      const beforeSemesterEndDate = new Date(res_stage.data.endDate ?? 0);
-      return now > beforeSemesterEndDate; // KHÓA nếu đã qua endDate
-    }
-
-    // Nếu không có cả currentSemester và beforeSemester → KHÓA
     return true;
-  }, [res_stage?.data, res_current_semester?.data]);
+  }, [res_current_semester?.data]);
 
   // Query: Idea của user
   const {
@@ -122,7 +102,6 @@ export default function ProjectDetail() {
     refetchOnWindowFocus: false,
   });
 
-  console.log("check_isLock", isLock)
   // Query: Thông tin project
   const {
     data: project,
@@ -229,7 +208,7 @@ export default function ProjectDetail() {
     }
   };
 
-  if (isLoadingIdeaCurrent || isLoadingTeam || isLoadingSemester || isLoadingCurrent)
+  if (isLoadingIdeaCurrent || isLoadingTeam || isLoadingCurrent)
     return <LoadingComponent />;
   if (isErrorIdeaCurrent || isErrorTeam) return <ErrorSystem />;
 
@@ -250,7 +229,7 @@ export default function ProjectDetail() {
                       Cancel Request
                     </Button>
                   ) : (
-                    !isLock && (
+                    !hasCurrentSemester && (
                       <>
                         <Dialog>
                           <DialogTrigger asChild>

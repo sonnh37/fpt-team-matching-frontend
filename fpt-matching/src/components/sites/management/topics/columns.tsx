@@ -71,6 +71,12 @@ export const columns: ColumnDef<Topic>[] = [
     },
   },
   {
+    accessorKey: "roles",
+    header: () => null,
+    cell: () => null,
+    enableHiding: false,
+  },
+  {
     accessorKey: "actions",
     header: "Actions",
     cell: ({ row }) => {
@@ -126,7 +132,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   // Điều kiện hiển thị các nút
   const showEditButton = idea?.status === IdeaStatus.ConsiderByCouncil;
-  const showReturnButton = idea?.status === IdeaStatus.ConsiderByCouncil && (idea?.ownerId != idea?.mentorId);
+  const showReturnButton =
+    idea?.status === IdeaStatus.ConsiderByCouncil &&
+    idea?.ownerId != idea?.mentorId;
 
   const showSubmitToCouncilButton =
     idea?.status === IdeaStatus.Pending &&
@@ -292,10 +300,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       <>
         {showEditButton && (
           <Button variant="ghost" size="sm" asChild>
-            <Link
-              href={`/idea/request/${ideaId}`}
-              className="flex items-center"
-            >
+            <Link href={`/idea/detail/${ideaId}`} className="flex items-center">
               <FaEdit className="h-4 w-4" />
               Sửa
             </Link>

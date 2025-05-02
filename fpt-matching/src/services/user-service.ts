@@ -9,11 +9,27 @@ import { buildQueryParams, cleanQueryParams } from "@/lib/utils";
 import UserCreateByManagerCommand from "@/types/models/commands/users/user-create-by-manager-command";
 import { UserEmailSuggestions } from "@/types/models/UserEmailSuggestions";
 import { UserCheckMentorAndSubMentorQuery } from "@/types/models/queries/users/user-check-mentor-and-submentor-query";
+import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
+import { UserGetAllInSemesterQuery } from "@/types/models/queries/users/user-get-all-in-semester-query";
 
 class UserService extends BaseService<User> {
   constructor() {
     super(Const.USERS);
   }
+
+  public getUsersInSemester = async (
+    query?: UserGetAllInSemesterQuery
+  ): Promise<BusinessResult<QueryResult<User>>> => {
+    try {
+      const cleanedQuery = cleanQueryParams(query);
+      const response = await axiosInstance.get<
+        BusinessResult<QueryResult<User>>
+      >(`${this.endpoint}/current-semester?${cleanedQuery}`);
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  };
 
   public updatePassword = async (
     command: UserUpdatePasswordCommand
@@ -32,6 +48,23 @@ class UserService extends BaseService<User> {
     return axiosInstance
       .get<BusinessResult<QueryResult<User>>>(
         `${this.endpoint}/council/pending-ideas?${cleanedQuery}`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
+
+  public getStudentsNoTeam = (
+    query?: UserGetAllQuery
+  ): Promise<BusinessResult<QueryResult<User>>> => {
+    const cleanedQuery = cleanQueryParams(query);
+
+    return axiosInstance
+      .get<BusinessResult<QueryResult<User>>>(
+        `${this.endpoint}/student/no-team?${cleanedQuery}`
       )
       .then((response) => {
         return response.data;

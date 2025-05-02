@@ -39,26 +39,9 @@ import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<Idea>[] = [
   {
-    accessorKey: "latestVersion",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Latest Version" />
-    ),
-    cell: ({ row }) => {
-      const idea = row.original;
-      if (!idea.ideaVersions) return;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion ? `v${highestVersion.version}` : "-";
-    },
-  },
-  {
     accessorKey: "englishName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Idea name" />
+      <DataTableColumnHeader column={column} title="Tên tiếng anh" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -73,9 +56,27 @@ export const columns: ColumnDef<Idea>[] = [
     },
   },
   {
+    accessorKey: "latestVersion",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Phiên bản mới nhất" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      if (!idea.ideaVersions) return;
+      const highestVersion =
+        idea.ideaVersions.length > 0
+          ? idea.ideaVersions.reduce((prev, current) =>
+              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+            )
+          : undefined;
+      return highestVersion ? `v${highestVersion.version}` : "-";
+    },
+  },
+
+  {
     accessorKey: "semester",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Semester" />
+      <DataTableColumnHeader column={column} title="Kì" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -93,7 +94,7 @@ export const columns: ColumnDef<Idea>[] = [
   {
     accessorKey: "stage",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Current Stage" />
+      <DataTableColumnHeader column={column} title="Giai đoạn" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -109,23 +110,13 @@ export const columns: ColumnDef<Idea>[] = [
     },
   },
   {
-    accessorKey: "createdDate",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date created" />
-    ),
-    cell: ({ row }) => {
-      const date = new Date(row.getValue("createdDate"));
-      return formatDate(date);
-    },
-  },
-  {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as IdeaStatus | undefined;
-      const statusText = status !== undefined ? IdeaStatus[status] : "Unknown";
+      const statusText = status !== undefined ? IdeaStatus[status] : "-";
 
       let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
         "default";
@@ -152,13 +143,12 @@ export const columns: ColumnDef<Idea>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       return <Actions row={row} />;
     },
   },
 ];
-
 interface ActionsProps {
   row: Row<Idea>;
 }
@@ -222,9 +212,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Idea detail</DialogTitle>
-          </DialogHeader>
           <div className="flex justify-between p-4 gap-4">
             <TimeStageIdea stageIdea={highestVersion?.stageIdea} />
             {/* <HorizontalLinearStepper idea={idea} /> */}
@@ -239,27 +226,27 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                   <Dialog>
                     <DialogTrigger asChild>
                       <Button size="sm" variant="destructive" disabled={isLock}>
-                        Delete idea
+                        Xóa ý tưởng
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Confirm Deletion</DialogTitle>
+                        <DialogTitle>Xác nhận xóa</DialogTitle>
                       </DialogHeader>
                       <TypographyP>
-                        Are you sure you want to delete this idea? This action
-                        cannot be undone.
+                        Bạn có chắc chắn muốn xóa ý tưởng này không? Hành động
+                        này không thể hoàn tác.
                       </TypographyP>
                       <DialogFooter>
                         <DialogClose asChild>
-                          <Button variant="outline">Cancel</Button>
+                          <Button variant="outline">Hủy</Button>
                         </DialogClose>
                         <Button
                           variant="destructive"
                           onClick={handleDelete}
                           disabled={isDeleting}
                         >
-                          {isDeleting ? "Deleting..." : "Confirm Delete"}
+                          {isDeleting ? "Đang xử lí..." : "Xác nhận xóa"}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
@@ -268,14 +255,18 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
               </TooltipTrigger>
               {isLock && (
                 <TooltipContent>
-                  <p>Mentor approval has been granted for this idea.</p>
+                  <p>Ý tưởng này đã được người cố vấn chấp thuận.</p>
                 </TooltipContent>
               )}
             </Tooltip>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Button size="sm" onClick={() => router.push(`/idea/request/${idea.id}`)} variant="default">
+      <Button
+        size="sm"
+        onClick={() => router.push(`/idea/detail/${idea.id}`)}
+        variant="default"
+      >
         Chi tiết
       </Button>
     </div>

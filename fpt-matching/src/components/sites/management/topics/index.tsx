@@ -53,11 +53,16 @@ import { topicService } from "@/services/topic-service";
 const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
 });
+
+const roles_options = [
+  { label: "Người hướng dẫn", value: "Mentor" },
+  { label: "Người hướng dẫn 2", value: "SubMentor" },
+];
 //#endregion
 export default function TopicTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
-    { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
+    { columnId: "roles", title: "Phân loại vị trí", options: roles_options },
   ];
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([

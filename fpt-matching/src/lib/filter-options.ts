@@ -10,8 +10,8 @@ export const isDeleted_options = [
 ];
 
 export const isExistedTeam_options = [
-    {label: "Chưa có nhóm", value: false},
-    {label: "Đã có nhóm", value: true},
+    {label: "Mở", value: false},
+    {label: "Đã đóng", value: true},
 ];
 
 export const isActive_options = [

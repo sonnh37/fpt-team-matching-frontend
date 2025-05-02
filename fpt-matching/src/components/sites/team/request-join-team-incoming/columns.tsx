@@ -30,10 +30,10 @@ export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "sender.email",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="User" />
+      <DataTableColumnHeader column={column} title="Email người dùng" />
     ),
     cell: ({ row }) => {
-      const email = row.original.sender?.email ?? "Unknown";
+      const email = row.original.sender?.email ?? "-";
       const senderId = row.original.senderId ?? "#";
 
       return (
@@ -47,13 +47,13 @@ export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "content",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Process Note" />
+      <DataTableColumnHeader column={column} title="Ghi chú quy trình" />
     ),
   },
   {
     accessorKey: "createdDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date created" />
+      <DataTableColumnHeader column={column} title="Ngày tạo" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
@@ -62,7 +62,7 @@ export const columns: ColumnDef<Invitation>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       const model = row.original;
 
@@ -135,7 +135,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         invitationService.approveOrRejectFromPersonalizeByLeader(command);
 
       toast.promise(promise, {
-        loading: "Processing cancellation...",
+        loading: "Đang xử lí...",
         success: (res) => {
           if (res.status === 1) {
             queryClient.refetchQueries({ queryKey: ["data"] });
@@ -144,7 +144,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             throw new Error(res.message);
           }
         },
-        error: (err) => err.message || "Failed to cancel invitation",
+        error: (err) => err.message || "Không thể từ chối lời mời",
       });
     } catch (error) {
       toast.error("An error occurred", {
@@ -155,7 +155,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const handleApprove = async () => {
     if (availableSlots === 0) {
-      toast.error("Team is already full");
+      toast.error("Nhóm đã đầy đủ");
       return;
     }
 
@@ -189,20 +189,18 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       };
 
       toast.promise(approvalPromise(), {
-        loading: "Processing approval...",
+        loading: "Đang xử lí...",
         success: (res) => {
           queryClient.refetchQueries({ queryKey: ["data"] });
           queryClient.refetchQueries({ queryKey: ["getTeamInfo"] });
 
           if (availableSlots === 1) {
-            toast.success("Team is now locked", {
-              description: "All available slots have been filled",
-            });
+            toast.success("Nhóm hiện tại đã khóa");
           }
 
           return res.message;
         },
-        error: (err) => err.message || "Failed to approve invitation",
+        error: (err) => err.message || "Không thể chấp nhận lời mời",
       });
     } catch (error) {
       toast.error("An error occurred", {
@@ -214,22 +212,22 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   return (
     <div className="isolate flex -space-x-px">
       <Button className="rounded-r-none focus:z-10" onClick={handleApprove}>
-        Accept
+        Đồng ý
       </Button>
       <Button
         variant="outline"
         className="rounded-l-none focus:z-10"
         onClick={handleCancel}
       >
-        Cancel
+        Hủy
       </Button>
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Last Slot Warning</DialogTitle>
+            <DialogTitle>Cảnh báo vị trí cuối cùng</DialogTitle>
             <DialogDescription>
-              This will be the last available slot. Accepting will lock the team
-              and reject all other pending invitations.
+            Đây sẽ là vị trí cuối cùng còn trống. Việc chấp nhận sẽ khóa nhóm
+            và từ chối mọi lời mời đang chờ xử lý khác.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
@@ -240,13 +238,13 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 proceedWithApproval();
               }}
             >
-              Continue
+              Tiếp tục
             </Button>
             <Button
               variant="destructive"
               onClick={() => setShowConfirmDialog(false)}
             >
-              Cancel
+              Hủy
             </Button>
           </div>
         </DialogContent>
