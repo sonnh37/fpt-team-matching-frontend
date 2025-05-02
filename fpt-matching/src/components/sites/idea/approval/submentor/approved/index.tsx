@@ -1,22 +1,20 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { useSelectorUser } from "@/hooks/use-auth";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
-import { ideaService } from "@/services/idea-service";
-import { IdeaStatus } from "@/types/enums/idea";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
 import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { FilterEnum } from "@/types/models/filter-enum";
-import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ColumnFiltersState,
   getCoreRowModel,
+  getFilteredRowModel,
   PaginationState,
   SortingState,
   useReactTable,
-  VisibilityState
+  VisibilityState,
 } from "@tanstack/react-table";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
@@ -24,13 +22,20 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
+import { Idea } from "@/types/idea";
+import { IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-current-by-status-and-roles";
+import { RootState } from "@/lib/redux/store";
+import { useSelector } from "react-redux";
+import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
+import { ideaService } from "@/services/idea-service";
+import { IdeaStatus } from "@/types/enums/idea";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaVersionRequestRejectedByMentorTable() {
+export default function IdeaVersionRequestApprovedBySubMentorTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -66,12 +71,11 @@ export default function IdeaVersionRequestRejectedByMentorTable() {
   const [inputFields, setInputFields] =
     useState<z.infer<typeof defaultSchema>>();
 
-  const user = useSelectorUser();
+  const user = useSelector((state: RootState) => state.user.user);
 
   if (!user) {
     return null;
   }
-
   // default field in table
   const queryParams: IdeaGetListByStatusAndRoleQuery = useMemo(() => {
     const params: IdeaGetListByStatusAndRoleQuery = useQueryParams(
@@ -81,9 +85,9 @@ export default function IdeaVersionRequestRejectedByMentorTable() {
       sorting
     );
 
-    params.status = IdeaVersionRequestStatus.Rejected;
-    params.ideaStatus = IdeaStatus.Rejected;
-    params.roles = ["Mentor"];
+    params.status = IdeaVersionRequestStatus.Approved;
+    params.ideaStatus = IdeaStatus.Pending;
+    params.roles = ["SubMentor"];
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);

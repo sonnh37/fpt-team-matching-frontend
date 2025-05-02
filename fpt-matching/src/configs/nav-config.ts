@@ -84,6 +84,12 @@ export const NAV_CONFIG = {
           roles: ["Mentor"],
         },
         {
+          title: "Duyệt ý tưởng bởi submentor",
+          icon: MdOutlineRateReview,
+          url: "/idea/reviews/submentor",
+          roles: ["Mentor"],
+        },
+        {
           title: "Duyệt ý tưởng",
           icon: MdOutlineRateReview,
           url: "/idea/reviews/council",

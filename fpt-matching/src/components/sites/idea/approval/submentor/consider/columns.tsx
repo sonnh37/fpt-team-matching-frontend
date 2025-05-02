@@ -49,7 +49,6 @@ import { toast } from "sonner";
 import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
-import { useSelectorUser } from "@/hooks/use-auth";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -191,7 +190,6 @@ interface ActionsProps {
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const idea = row.original;
-  const user = useSelectorUser();
   const ideaId = idea.id;
   const [open, setOpen] = useState(false);
 
@@ -205,14 +203,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const hasCouncilRequests = highestVersion?.ideaVersionRequests.some(
     (request) => request.role == "Council"
   );
-
-  const isMentorOfIdea = idea.mentorId == user?.id;
-
-  const hasSubmentorPendingRequest = highestVersion?.ideaVersionRequests.some(
-    (request) =>
-      request.role == "SubMentor" &&
-      request.status == IdeaVersionRequestStatus.Pending
-  );
   const handleSubmit = async () => {
     try {
       const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
@@ -223,7 +213,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       toast.success(res.message);
 
       queryClient.refetchQueries({
-        queryKey: ["data"],
+        queryKey: ["getIdeaDetailWhenClick", ideaId],
       });
       setOpen(false);
     } catch (error: any) {
@@ -235,7 +225,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   return (
     <div className="flex flex-col gap-2">
-      <Dialog open={open} onOpenChange={setOpen}>
+     <Dialog>
         <DialogTrigger asChild>
           <Button size="icon" variant="outline">
             <Eye className="h-4 w-4" />
@@ -243,18 +233,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         </DialogTrigger>
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
           {idea && <IdeaDetailForm ideaId={idea.id} />}
-          <DialogFooter>
-            {isMentorOfIdea && (
-              <Button
-                variant={`${hasCouncilRequests ? "secondary" : "default"}`}
-                size="sm"
-                onClick={() => handleSubmit()}
-                disabled={hasCouncilRequests || hasSubmentorPendingRequest}
-              >
-                {hasCouncilRequests ? "Đã nộp" : "Nộp cho hội đồng"}
-              </Button>
-            )}
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

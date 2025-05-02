@@ -1,7 +1,6 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import { TypographyP } from "@/components/_common/typography/typography-p";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,12 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { IdeaStatus } from "@/types/enums/idea";
 import { ProjectStatus } from "@/types/enums/project";
 import { Project } from "@/types/project";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 export const columns: ColumnDef<Project>[] = [
@@ -92,12 +89,10 @@ export const columns: ColumnDef<Project>[] = [
     },
   },
   {
-    accessorKey: "isDeleted",
-    header: ({ column }) => null,
-    cell: ({ row }) => null,
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
+    accessorKey: "roles",
+    header: () => null,
+    cell: () => null,
+    enableHiding: false,
   },
   {
     accessorKey: "actions",

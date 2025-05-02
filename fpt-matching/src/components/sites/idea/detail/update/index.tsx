@@ -102,12 +102,14 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
 
   if (
     (roleCurrent === "Mentor" || roleCurrent === "Lecturer") &&
-    idea.status === IdeaStatus.ConsiderByCouncil
+    idea.status === IdeaStatus.ConsiderByCouncil &&
+    idea.ownerId == user.id
   ) {
     canCreate = true;
   } else if (
     idea.status === IdeaStatus.ConsiderByMentor &&
-    latest?.ideaVersionRequests.length > 0
+    latest?.ideaVersionRequests.length > 0 &&
+    idea.ownerId == user.id
   ) {
     canCreate = true;
   }
@@ -159,8 +161,14 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
 
     const requests =
       roleCurrent === "Student"
-        ? version.ideaVersionRequests.filter((m) => m.role === "Mentor")
-        : version.ideaVersionRequests.filter((m) => m.reviewerId === user.id);
+        ? version.ideaVersionRequests.filter(
+            (m) => m.role == "Mentor" || m.role == "SubMentor"
+          )
+        : roleCurrent == "Mentor"
+        ? version.ideaVersionRequests.filter(
+            (m) => m.role == "Mentor" || m.role == "SubMentor"
+          )
+        : version.ideaVersionRequests.filter((m) => m.reviewerId == user.id);
 
     return (
       <div className="space-y-6">
