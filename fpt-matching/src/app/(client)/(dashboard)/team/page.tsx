@@ -154,8 +154,10 @@ export default function TeamInfo() {
   }
 
   if (teamInfo?.status === -1) {
-    if (res_current_semester?.data != undefined ||
-      res_current_semester?.data != null)
+    if (
+      res_current_semester?.data != undefined ||
+      res_current_semester?.data != null
+    )
       return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
     return <NoTeam />;
   }
@@ -751,7 +753,9 @@ export default function TeamInfo() {
               if (adjustedReviewDate < currentDate) {
                 return (
                   <Button className="w-full" asChild>
-                    <Link href="/team/rate">Đánh giá thành viên</Link>
+                    <Link href={`/team/rate/${project.id}`}>
+                      Đánh giá thành viên
+                    </Link>
                   </Button>
                 );
               }

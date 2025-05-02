@@ -50,7 +50,7 @@ import { semesterService } from "@/services/semester-service";
 import { stageideaService } from "@/services/stage-idea-service";
 import { IdeaStatus } from "@/types/enums/idea";
 import { TeamMemberRole } from "@/types/enums/team-member";
-import { StudentInvitationCommand } from "@/types/models/commands/invitation/invitation-student-command";
+import { InvitationStudentCreatePendingCommand } from "@/types/models/commands/invitation/invitation-student-command";
 import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-get-current-by-status";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -164,8 +164,8 @@ export default function ProjectDetail() {
     a.role === TeamMemberRole.Leader
       ? -1
       : b.role === TeamMemberRole.Leader
-      ? 1
-      : 0
+        ? 1
+        : 0
   );
 
   const isHasTopic = !!project?.topic;
@@ -194,7 +194,7 @@ export default function ProjectDetail() {
         return;
       }
 
-      const ideacreate: StudentInvitationCommand = {
+      const ideacreate: InvitationStudentCreatePendingCommand = {
         projectId: id,
         content: "Muốn tham gia vào nhóm bạn",
       };
@@ -543,7 +543,8 @@ export default function ProjectDetail() {
 
               <div className="space-y-3">
                 {sortedMembers.map((member, index) => {
-                  const initials = `${member.user?.lastName?.charAt(0) || ""}`;
+                  const initials = `${member.user?.lastName?.charAt(0).toUpperCase() || ""
+                    }`;
                   const isLeader = member.role === TeamMemberRole.Leader;
 
                   return (

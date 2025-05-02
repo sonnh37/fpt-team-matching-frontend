@@ -8,9 +8,9 @@ import {
 } from "@/types/models/responses/business-result";
 import { cleanQueryParams } from "@/lib/utils";
 import axiosInstance from "@/lib/interceptors/axios-instance";
-import { StudentInvitationCommand } from "@/types/models/commands/invitation/invitation-student-command";
+import { InvitationStudentCreatePendingCommand } from "@/types/models/commands/invitation/invitation-student-command";
 import { BusinessResultWithoutData } from "@/types/models/responses/business-result-without-data";
-import { TeamInvitationCommand } from "@/types/models/commands/invitation/invitation-team-command";
+import { InvitationTeamCreatePendingCommand } from "@/types/models/commands/invitation/invitation-team-command";
 import { InvitationUpdateCommand } from "@/types/models/commands/invitation/invitation-update-command";
 
 class InvitationService extends BaseService<Invitation> {
@@ -80,7 +80,7 @@ class InvitationService extends BaseService<Invitation> {
   };
 
   public sendByStudent = async (
-    command: StudentInvitationCommand
+    command: InvitationStudentCreatePendingCommand
   ): Promise<BusinessResultWithoutData> => {
     try {
       const response = await axiosInstance.post<BusinessResultWithoutData>(
@@ -95,7 +95,7 @@ class InvitationService extends BaseService<Invitation> {
   };
 
   public sendByTeam = async (
-    command: TeamInvitationCommand
+    command: InvitationTeamCreatePendingCommand
   ): Promise<BusinessResultWithoutData> => {
     try {
       const response = await axiosInstance.post<BusinessResultWithoutData>(
