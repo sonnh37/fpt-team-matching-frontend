@@ -12,7 +12,7 @@ export const Icons = {
             width={9999}
             height={9999}
             alt="Nhu My Studio"
-            className={cn("w-16", className)}
+            className={cn("w-28", className)}
         />
         </>
     ),
