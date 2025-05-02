@@ -74,15 +74,6 @@ class IdeaVersionRequestService extends BaseService<IdeaVersionRequest> {
     }
   };
 
-  public updateStatus = (
-    command: IdeaVersionRequestUpdateStatusCommand
-  ): Promise<BusinessResult<IdeaVersionRequest>> => {
-    return axiosInstance
-      .put<BusinessResult<IdeaVersionRequest>>(`${this.endpoint}/status`, command)
-      .then((response) => response.data)
-      .catch((error) => this.handleError(error)); // Xử lý lỗi
-  };
-
   public updateStatusWithCriteriaByMentorOrCouncil = (
       command: IdeaVersionRequestUpdateStatusCommand
   ): Promise<BusinessResult<IdeaVersionRequest>> => {

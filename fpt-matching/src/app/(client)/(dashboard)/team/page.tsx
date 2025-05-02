@@ -1,4 +1,5 @@
 "use client";
+import { AlertMessage } from "@/components/_common/alert-message";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { useConfirm } from "@/components/_common/formdelete/confirm-context";
 import { LoadingComponent } from "@/components/_common/loading-page";
@@ -34,27 +35,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
+import { useSelectorUser } from "@/hooks/use-auth";
 import { formatDate } from "@/lib/utils";
+import { ideaService } from "@/services/idea-service";
 import { projectService } from "@/services/project-service";
+import { semesterService } from "@/services/semester-service";
 import { teammemberService } from "@/services/team-member-service";
 import { IdeaStatus } from "@/types/enums/idea";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
+import { ProjectStatus } from "@/types/enums/project";
 import { TeamMemberRole } from "@/types/enums/team-member";
 import { ProjectUpdateCommand } from "@/types/models/commands/projects/project-update-command";
+import { TeamMember } from "@/types/team-member";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
 import { Pencil, Save, Trash, UserRoundPlus, Users, X } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import InviteUsersForm from "../idea/updateidea/page";
-import { TeamMember } from "@/types/team-member";
-import { useSelectorUser } from "@/hooks/use-auth";
-import { ideaService } from "@/services/idea-service";
-import { ProjectStatus } from "@/types/enums/project";
-import { semesterService } from "@/services/semester-service";
-import { AlertMessage } from "@/components/_common/alert-message";
 
 export default function TeamInfo() {
   const user = useSelectorUser();
@@ -62,22 +62,27 @@ export default function TeamInfo() {
   const [teamName, setTeamName] = useState("");
   const confirm = useConfirm();
 
-  // Fetch all data in parallel
   const {
-    data: res_stage,
+    data: res_current_semester,
     isLoading: isLoadingStage,
     isError: isErrorStage,
     error: errorStage,
   } = useQuery({
-    queryKey: ["getBeforeSemester"],
-    queryFn: () => semesterService.getBeforeSemester(),
+    queryKey: ["getCurrentSemester"],
+    queryFn: () => semesterService.getCurrentSemester(),
     refetchOnWindowFocus: false,
   });
 
-  const isLock = res_stage?.data?.endDate
-    ? new Date() <= new Date(res_stage.data.endDate)
-    : false;
-
+  const hasCurrentSemester = useMemo(() => {
+    if (
+      res_current_semester?.data == undefined ||
+      res_current_semester.data == null
+    ) {
+      // Đang chưa vô kì nhưng vô đợt hoặc chưa vô đợt
+      return false;
+    }
+    return true;
+  }, [res_current_semester?.data]);
   const {
     data: teamInfo,
     isLoading: isLoadingTeam,
@@ -135,7 +140,7 @@ export default function TeamInfo() {
   }
 
   if (teamInfo?.status === -1) {
-    if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
+    if (!hasCurrentSemester) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
     return <NoTeam />;
   }
 
@@ -143,6 +148,7 @@ export default function TeamInfo() {
   if (!project) return <NoTeam />;
 
   const isLockProject = project.status === ProjectStatus.InProgress;
+  const isLockTrash = project.topicId != undefined || project.topicId != null;
   const latestTopicVersion = (project.topic?.topicVersions ?? []).sort(
     (a, b) =>
       new Date(b.createdDate!).getTime() - new Date(a.createdDate!).getTime()
@@ -225,27 +231,6 @@ export default function TeamInfo() {
       }
     }
   };
-
-  async function handleDeleteMember(id: string) {
-    // Gọi confirm để mở dialog
-    const confirmed = await confirm({
-      title: "Delete Member",
-      description: "Are you sure you want to delete your member?",
-      confirmText: "Yes, delete it",
-      cancelText: "No, cancel it",
-    });
-
-    if (confirmed) {
-      const res = await teammemberService.deletePermanent(id);
-      if (res.status != 1) {
-        toast.error(res.message);
-      }
-
-      toast.success(res.message);
-      refetchTeam();
-    } else {
-    }
-  }
 
   const pendingInvitations =
     project.invitations?.filter(
@@ -373,7 +358,7 @@ export default function TeamInfo() {
                     {/* Delete Team Button */}
                     <Button
                       variant="ghost"
-                      disabled={isLockProject}
+                      disabled={isLockTrash}
                       size="icon"
                       onClick={() =>
                         handleAction(

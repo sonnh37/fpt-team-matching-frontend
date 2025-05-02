@@ -1,36 +1,59 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { useSelectorUser } from "@/hooks/use-auth";
+import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
+import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
+import { TypographyH2 } from "@/components/_common/typography/typography-h2";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
 import { ideaService } from "@/services/idea-service";
-import { IdeaStatus } from "@/types/enums/idea";
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
+import { IdeaStatus, IdeaType } from "@/types/enums/idea";
 import { FilterEnum } from "@/types/models/filter-enum";
-import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
+import { IdeaGetAllQuery } from "@/types/models/queries/ideas/idea-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ColumnFiltersState,
   getCoreRowModel,
+  getFilteredRowModel,
   PaginationState,
   SortingState,
   useReactTable,
-  VisibilityState
+  VisibilityState,
 } from "@tanstack/react-table";
+import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
+import { IdeaVersionRequestGetAllQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-query";
+import { ideaVersionRequestService } from "@/services/idea-version-request-service";
+import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
+import { Idea } from "@/types/idea";
+import { IdeaVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/idea-version-requests/idea-version-request-get-all-current-by-status-and-roles";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/redux/store";
+import { useSelectorUser } from "@/hooks/use-auth";
+import { IdeaGetListByStatusAndRoleQuery } from "@/types/models/queries/ideas/idea-get-list-by-status-and-roles-query";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function IdeaVersionRequestRejectedByMentorTable() {
+export default function IdeaVersionRequestRejectedBySubMentorTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -83,7 +106,7 @@ export default function IdeaVersionRequestRejectedByMentorTable() {
 
     params.status = IdeaVersionRequestStatus.Rejected;
     params.ideaStatus = IdeaStatus.Rejected;
-    params.roles = ["Mentor"];
+    params.roles = ["SubMentor"];
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);

@@ -101,8 +101,14 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
 
     const requests =
       roleCurrent === "Student"
-        ? version.ideaVersionRequests.filter((m) => m.role === "Mentor")
-        : version.ideaVersionRequests.filter((m) => m.reviewerId === user.id);
+        ? version.ideaVersionRequests.filter(
+            (m) => m.role == "Mentor" || m.role == "SubMentor"
+          )
+        : roleCurrent == "Mentor"
+        ? version.ideaVersionRequests.filter(
+            (m) => m.role == "Mentor" || m.role == "SubMentor"
+          )
+        : version.ideaVersionRequests.filter((m) => m.reviewerId == user.id);
 
     return (
       <div className="space-y-6">
