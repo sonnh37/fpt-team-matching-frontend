@@ -29,18 +29,18 @@ export function MainNav({ user = null }: MainNavProps) {
   return (
     <div className="flex flex-col w-full py-2">
       <div className="hidden lg:flex overflow-hidden w-full justify-between mx-auto gap-6 text-lg">
-        <div className="flex flex-row gap-4 w-full">
-          <div className="">
+        <div className="flex flex-row gap-4 w-full pt-3">
+          <div className="ml-3 py-2 flex justify-center">
             <Button asChild variant={"ghost"}>
               <Link href={"/"} className="px-6">
-                <Icons.logo className="w-12" />
+                <Icons.logo className="w-24" />
                 <TypographyLarge className="tracking-wider">
                    {"Team Matching"}
                 </TypographyLarge>
               </Link>
             </Button>
           </div>
-          <div className="w-full border rounded-xl items-center text-center">
+          <div className="w-[80%]  border rounded-xl flex justify-start text-center">
             <Search />
           </div>
 

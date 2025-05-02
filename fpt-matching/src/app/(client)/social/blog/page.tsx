@@ -126,14 +126,14 @@ export default function Blog() {
         toast.error("⚠️ Tiêu đề phải có ít nhất 10 ký tự!");
         return;
       }
-  
-      if (!formData.content  || formData.content .trim().length < 10) {
+
+      if (!formData.content || formData.content.trim().length < 10) {
         toast.error("⚠️ Nội dung phải có ít nhất 10 ký tự!");
         return;
       }
-  
-      if (!formData.skillRequired  || formData.skillRequired.trim().length < 10) {
-        toast.error("⚠️ Kỹ năng yêu cầu phải có ít nhất 10 ký tự!");
+
+      if (!formData.skillRequired || formData.skillRequired.trim().length < 5) {
+        toast.error("⚠️ Kỹ năng yêu cầu phải có ít nhất 5 ký tự!");
         return;
       }
       const blognew: BlogCreateCommand = {
@@ -521,7 +521,7 @@ export default function Blog() {
                             {/* Team của bạn */}
                             <div className="flex items-start gap-4 mt-4 min-h-28">
                               <div className="w-1/5 flex flex-col p-2">
-                                <h3>Team của bạn:</h3>
+                                <h3 className="text-nowrap">Team của bạn:</h3>
 
                               </div>
                               <div className="w-3/5">
@@ -548,7 +548,10 @@ export default function Blog() {
                                     </SelectGroup>
                                   </SelectContent>
                                 </Select>
-                                <h4 className="text-red-400 text-sm mt-2">*Không bắt buộc</h4>
+                                {!projectUser?.id && (
+                                  <h4 className="text-red-400 text-sm mt-2">*Không có nhóm</h4>
+                                )}
+                                <h4 className="text-red-400 text-sm">*Không bắt buộc</h4>
                                 <h4 className="text-red-400 text-sm">{messageUser}</h4>
                               </div>
                             </div>

@@ -13,7 +13,7 @@ export function Search() {
     window.location.href = `/social/blog/search/${inputValue}`;
   };
   return (
-    <div className="relative flex items-center">
+    <div className="relative flex items-center justify-center">
       <SearchIcon className="absolute left-3 text-gray-500" />
       <form onSubmit={handleSubmit} className="w-full">
       <Input
