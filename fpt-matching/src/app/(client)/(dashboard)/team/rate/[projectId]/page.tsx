@@ -27,18 +27,21 @@ import {
 } from "@/components/ui/dialog"
 import RateStudent from '@/components/_common/rate-student/rate-student';
 import { rateService } from '@/services/rate-service';
+import { useParams } from 'next/navigation';
 
 export default function Page() {
+    const { projectId } = useParams<{ projectId: string }>(); // Lấy giá trị từ params
     //gọi thông tin user đã đăng nhập
     const user = useSelector((state: RootState) => state.user.user)
     const {
         data: result,
         refetch,
     } = useQuery({
-        queryKey: ["getTeamInfo"],
-        queryFn: projectService.getProjectInfo,
+        queryKey: ["getTeamInfo",projectId],
+        queryFn: () =>projectService.getById(projectId),
         refetchOnWindowFocus: false,
     });
+    
     //   Loc member ngoai thang danh gia
     const member = result?.data?.teamMembers.filter(x => x.userId != user?.id)
 
@@ -59,7 +62,7 @@ export default function Page() {
                         <TableHead className="w-[100px]">Số thứ tự</TableHead>
                         <TableHead className="">Tên nhóm</TableHead>
                         <TableHead className="">Chuyên ngành</TableHead>
-                        <TableHead className="">Người hướng dẫn</TableHead>
+                        {/* <TableHead className="">Người hướng dẫn</TableHead> */}
                         <TableHead>Tên thành viên</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Đánh giá</TableHead>
@@ -67,7 +70,7 @@ export default function Page() {
                 </TableHeader>
                 <TableBody>
                     {member?.map((cv, index) => {
-                        const hasRated = ratingData?.data?.some(
+                        const hasRated = ratingData?.data?.results?.some(
                             (r) => r.rateById === user?.teamMembers.find(x=> x.userId == user?.id)?.id && r.rateForId === cv.id
                         );
 
@@ -76,9 +79,9 @@ export default function Page() {
                                 <TableCell className="font-medium">{index + 1}</TableCell>
                                 <TableCell>{result?.data?.teamName}</TableCell>
                                 <TableCell>
-                                    {cv.user?.profileStudent?.specialty?.profession?.professionName}
+                                    {cv.user?.profileStudent?.specialty?.specialtyName}
                                 </TableCell>
-                                <TableCell>{result?.data?.idea?.mentorId}</TableCell>
+                                {/* <TableCell>{result?.data?.topic?.ideaVersion?.}</TableCell> */}
                                 <TableCell>
                                     {cv.user?.lastName} {cv.user?.firstName}
                                 </TableCell>
@@ -88,7 +91,7 @@ export default function Page() {
                                     {hasRated ? (
                                         <span className="text-green-600 font-semibold">Bạn đã đánh giá</span>
                                     ) : (
-                                        <RateStudent id={cv.id ?? ""} />
+                                        <RateStudent id={cv.id ?? ""} projectId={projectId ?? ""} />
                                     )}
                                 </TableCell>
                             </TableRow>

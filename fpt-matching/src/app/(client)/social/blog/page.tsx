@@ -118,7 +118,22 @@ export default function Blog() {
   const handleSubmit = async () => {
     try {
       if (!formData.title || !formData.content) {
-        toast.error("⚠️ Vui lòng nhập tiêu đề và nội dung!");
+        toast.error("⚠️ Vui lòng nhập tiêu đề hoặc nội dung!");
+        return;
+      }
+
+      if (!formData.title || formData.title.trim().length < 10) {
+        toast.error("⚠️ Tiêu đề phải có ít nhất 10 ký tự!");
+        return;
+      }
+  
+      if (!formData.content  || formData.content .trim().length < 10) {
+        toast.error("⚠️ Nội dung phải có ít nhất 10 ký tự!");
+        return;
+      }
+  
+      if (!formData.skillRequired  || formData.skillRequired.trim().length < 10) {
+        toast.error("⚠️ Kỹ năng yêu cầu phải có ít nhất 10 ký tự!");
         return;
       }
       const blognew: BlogCreateCommand = {
@@ -396,7 +411,7 @@ export default function Blog() {
                 <ModalTrigger className='w-full'>
                   <div
                     className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
-                    {user?.firstName} đi, bạn đang nghĩ gì thế?
+                    {user?.firstName} ơi, bạn đang nghĩ gì thế?
                   </div>
 
                 </ModalTrigger>

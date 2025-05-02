@@ -120,7 +120,7 @@ const InviteUsersForm = () => {
           const idReceiver = receiver.data.id;
           const prj = await projectService.getProjectInfo();
 
-          const invitation: TeamInvitationCommand = {
+          const invitation: InvitationTeamCreatePendingCommand = {
             receiverId: idReceiver,
             projectId: prj.data?.id ?? "",
             content: "Muốn mời bạn vào nhóm!",
