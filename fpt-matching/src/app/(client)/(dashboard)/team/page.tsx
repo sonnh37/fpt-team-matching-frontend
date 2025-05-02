@@ -23,6 +23,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -50,11 +51,24 @@ import { TeamMember } from "@/types/team-member";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Save, Trash, UserRoundPlus, Users, X } from "lucide-react";
+import {
+  AlertCircle,
+  MoreVertical,
+  Pencil,
+  Save,
+  Trash,
+  Trash2,
+  User,
+  UserRoundPlus,
+  Users,
+  X,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import InviteUsersForm from "../idea/updateidea/page";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function TeamInfo() {
   const user = useSelectorUser();
@@ -140,7 +154,11 @@ export default function TeamInfo() {
   }
 
   if (teamInfo?.status === -1) {
-    if (!hasCurrentSemester) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
+    if (
+      res_current_semester?.data != undefined ||
+      res_current_semester?.data != null
+    )
+      return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
     return <NoTeam />;
   }
 
@@ -240,88 +258,98 @@ export default function TeamInfo() {
     ) ?? [];
 
   return (
-    <div className="grid grid-cols-4 p-4 gap-4">
-      <div className="col-span-3 space-y-2">
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle className="text-2xl">
-                  {isEditing ? (
-                    <div className="flex items-center gap-2">
-                      <Input
-                        value={teamName}
-                        onChange={(e) => setTeamName(e.target.value)}
-                        className="w-64"
-                      />
+    <div className="grid grid-cols-1 lg:grid-cols-4 p-4 gap-6">
+      {/* Main Content - Chiếm 3/4 màn hình lớn */}
+      <div className="lg:col-span-3 space-y-6">
+        <Card className="rounded-lg shadow-sm hover:shadow-md transition-shadow">
+          <CardHeader className="border-b p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
+              {/* Phần tên nhóm */}
+              <div className="space-y-2">
+                {isEditing ? (
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Input
+                      value={teamName}
+                      onChange={(e) => setTeamName(e.target.value)}
+                      className="w-full sm:w-72 text-lg font-semibold"
+                      placeholder="Nhập tên nhóm"
+                    />
+                    <div className="flex gap-2">
                       <Button
                         size="sm"
                         onClick={handleSave}
                         disabled={!teamName.trim()}
+                        className="gap-1"
                       >
-                        <Save className="h-4 w-4 mr-1" />
+                        <Save className="h-4 w-4" />
                         Lưu
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={handleCancel}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={handleCancel}
+                      >
                         <X className="h-4 w-4" />
                       </Button>
                     </div>
-                  ) : (
-                    <div className="flex gap-1">
-                      <TypographyH3>
-                        {project.teamName ?? "Unknown"}
-                      </TypographyH3>
-                      {isLeader ? (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          disabled={isLockProject}
-                          onClick={() => setIsEditing(true)}
-                          className="h-8 w-8"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      ) : (
-                        <></>
-                      )}
-                    </div>
-                  )}
-                </CardTitle>
-                <CardDescription className="mt-1">
-                  Ngày tạo {formatDate(project?.createdDate)}
-                </CardDescription>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-2xl font-bold text-foreground">
+                      {project.teamName ?? "Chưa đặt tên"}
+                    </h2>
+                    {isLeader && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        disabled={isLockProject}
+                        onClick={() => setIsEditing(true)}
+                        className="text-muted-foreground hover:text-primary"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  Ngày tạo: {formatDate(project?.createdDate)}
+                </p>
               </div>
 
-              <div className="flex gap-3 items-center">
+              {/* Các action button */}
+              <div className="flex flex-wrap gap-2 justify-end">
                 {currentUserMember?.role === TeamMemberRole.Leader ? (
-                  <div className="flex items-center gap-1">
-                    {/* Invitations Dialog */}
+                  <div className="flex items-center gap-2">
+                    {/* Nút yêu cầu tham gia */}
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           disabled={isLockTeamMember}
-                          size="icon"
+                          size="sm"
                           className="relative"
                         >
-                          <Users />
+                          <Users className="mr-2 h-4 w-4" />
+                          Yêu cầu
                           {pendingInvitations.length > 0 && (
                             <Badge
                               variant="destructive"
-                              className="absolute right-1 top-1 h-4 w-4 translate-x-1/2 -translate-y-1/2 p-0 flex items-center justify-center"
+                              className="absolute -right-2 -top-2 h-5 w-5 flex items-center justify-center p-0"
                             >
                               {pendingInvitations.length}
                             </Badge>
                           )}
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:max-w-fit h-[80%] overflow-y-auto">
+                      <DialogContent className="max-w-4xl h-[80vh] overflow-auto">
                         <DialogHeader>
-                          <DialogTitle>
-                            Những yêu cầu tham gia vào nhóm
-                          </DialogTitle>
+                          <DialogTitle>Yêu cầu tham gia nhóm</DialogTitle>
+                          <DialogDescription>
+                            Danh sách các thành viên đang yêu cầu tham gia nhóm
+                            của bạn
+                          </DialogDescription>
                         </DialogHeader>
-                        <div className="grid gap-4 py-4">
+                        <div className="py-4">
                           {project.id && (
                             <InvitationsInComingToLeaderTable
                               projectId={project.id}
@@ -331,56 +359,61 @@ export default function TeamInfo() {
                       </DialogContent>
                     </Dialog>
 
-                    {/* Add Member Dialog */}
+                    {/* Nút thêm thành viên */}
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button
-                          variant="ghost"
+                          variant="default"
                           disabled={isLockTeamMember}
-                          size="icon"
+                          size="sm"
+                          className="gap-1"
                         >
-                          <UserRoundPlus />
+                          <UserRoundPlus className="h-4 w-4" />
+                          Thêm thành viên
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="sm:min-w-[60%] sm:max-w-fit h-fit">
+                      <DialogContent className="max-w-4xl">
                         <DialogHeader>
-                          <DialogTitle>Thêm thành viên</DialogTitle>
-                          <CardDescription>
-                            Thêm thành viên vào nhóm của bạn
-                          </CardDescription>
+                          <DialogTitle>Mời thành viên mới</DialogTitle>
+                          <DialogDescription>
+                            Thêm thành viên vào nhóm bằng email hoặc mã sinh
+                            viên
+                          </DialogDescription>
                         </DialogHeader>
-                        <div className="h-full p-2 overflow-y-auto overflow-visible">
+                        <div className="p-4">
                           <InviteUsersForm />
                         </div>
                       </DialogContent>
                     </Dialog>
 
-                    {/* Delete Team Button */}
+                    {/* Nút xóa nhóm */}
                     <Button
                       variant="ghost"
                       disabled={isLockTrash}
-                      size="icon"
+                      size="sm"
                       onClick={() =>
                         handleAction(
                           () =>
                             projectService.deletePermanent(project.id ?? ""),
-                          "Bạn đã xóa nhóm"
+                          "Bạn đã xóa nhóm thành công"
                         )
                       }
+                      className="text-destructive hover:text-destructive"
                     >
-                      <Trash />
+                      <Trash className="h-4 w-4" />
                     </Button>
                   </div>
                 ) : (
                   <Button
-                    variant="destructive"
+                    variant="outline"
                     disabled={isLockProject}
                     onClick={() =>
                       handleAction(
                         teammemberService.leaveTeam,
-                        "Bạn đã rời nhóm"
+                        "Bạn đã rời nhóm thành công"
                       )
                     }
+                    className="text-destructive border-destructive hover:text-destructive"
                   >
                     Rời nhóm
                   </Button>
@@ -388,275 +421,250 @@ export default function TeamInfo() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-6">
-              {project.topic?.ideaVersion != null ? (
-                <>
-                  {/* Idea Information */}
-                  {project?.topic.ideaVersion.idea && (
-                    <>
-                      <Separator />
-                      <div>
-                        <h4 className="text-lg font-semibold mb-4">
-                          Đề tài của nhóm
-                        </h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {/* Abbreviations */}
-                          <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Viết tắt
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {project.topic.ideaVersion.abbreviations || "-"}
-                            </TypographyP>
-                          </div>
 
-                          {/* Vietnamese Name */}
-                          <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Tiếng Việt
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {project.topic.ideaVersion.vietNamName || "-"}
-                            </TypographyP>
-                          </div>
+          <CardContent className="p-6 space-y-8">
+            {/* Thông tin đề tài */}
+            {project.topic?.ideaVersion != null ? (
+              <>
+                <Separator className="my-4" />
+                <div className="space-y-6">
+                  <h3 className="text-xl font-semibold text-foreground">
+                    Thông tin đề tài
+                  </h3>
 
-                          {/* English Name */}
-                          <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Tiếng Anh
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {project.topic.ideaVersion.englishName || "-"}
-                            </TypographyP>
-                          </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Card thông tin cơ bản */}
+                    <Card className="col-span-1">
+                      <CardHeader className="pb-3">
+                        <CardTitle>Thông tin chung</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-1">
+                          <Label>Viết tắt:</Label>
+                          <p>
+                            {project.topic.ideaVersion.abbreviations ||
+                              "Chưa có"}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Tên tiếng Việt:</Label>
+                          <p>
+                            {project.topic.ideaVersion.vietNamName || "Chưa có"}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Tên tiếng Anh:</Label>
+                          <p>
+                            {project.topic.ideaVersion.englishName || "Chưa có"}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
 
-                          {/* Idea Code */}
-                          <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Mã đề tài
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {project.topic.topicCode || "-"}
-                            </TypographyP>
-                          </div>
+                    {/* Card thông tin bổ sung */}
+                    <Card className="col-span-1">
+                      <CardHeader className="pb-3">
+                        <CardTitle>Chi tiết đề tài</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-1">
+                          <Label>Mã đề tài:</Label>
+                          <p>{project.topic.topicCode || "Chưa có"}</p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Ngành:</Label>
+                          <p>
+                            {idea?.specialty?.profession?.professionName ||
+                              "Chưa có"}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Chuyên ngành:</Label>
+                          <p>{idea?.specialty?.specialtyName || "Chưa có"}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
 
-                          {/* Ngành */}
-                          <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Ngành
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {idea?.specialty?.profession?.professionName ||
-                                "-"}
-                            </TypographyP>
-                          </div>
+                    {/* Card mô tả (full width) */}
+                    <Card className="md:col-span-2">
+                      <CardHeader className="pb-3">
+                        <CardTitle>Mô tả đề tài</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="whitespace-pre-line">
+                          {project.topic.ideaVersion.description ||
+                            "Chưa có mô tả"}
+                        </p>
+                      </CardContent>
+                    </Card>
 
-                          {/* Chuyên ngành */}
+                    {/* Card thông tin khác */}
+                    <Card className="md:col-span-2">
+                      <CardHeader className="pb-3">
+                        <CardTitle>Thông tin bổ sung</CardTitle>
+                      </CardHeader>
+                      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
                           <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Chuyên ngành
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {idea?.specialty?.specialtyName || "-"}
-                            </TypographyP>
-                          </div>
-
-                          {/* Mô tả */}
-                          <div className="space-y-1 md:col-span-2">
-                            <TypographySmall className="text-muted-foreground">
-                              Mô tả
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {project.topic.ideaVersion.description || "-"}
-                            </TypographyP>
-                          </div>
-
-                          {/* File */}
-                          <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Tệp đính kèm
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {project.topic?.topicVersions?.length > 0 &&
-                              latestTopicVersion?.fileUpdate ? (
-                                <a
-                                  className="text-blue-500 underline"
-                                  target="_blank"
-                                  href={latestTopicVersion.fileUpdate}
-                                >
-                                  Xem file
-                                </a>
-                              ) : (
-                                "-"
-                              )}
-                            </TypographyP>
-                          </div>
-
-                          {/* Enterprise */}
-                          <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Đề tài doanh nghiệp
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {project.topic.ideaVersion.idea.isEnterpriseTopic
+                            <Label>Đề tài doanh nghiệp:</Label>
+                            <p>
+                              {project.topic.ideaVersion.idea?.isEnterpriseTopic
                                 ? "Có"
                                 : "Không"}
-                            </TypographyP>
+                            </p>
                           </div>
-
-                          {project.topic.ideaVersion.idea.isEnterpriseTopic && (
+                          {project.topic.ideaVersion.idea
+                            ?.isEnterpriseTopic && (
                             <div className="space-y-1">
-                              <TypographySmall className="text-muted-foreground">
-                                Tên doanh nghiệp
-                              </TypographySmall>
-                              <TypographyP className="p-0">
+                              <Label>Tên doanh nghiệp:</Label>
+                              <p>
                                 {project.topic.ideaVersion.enterpriseName ||
-                                  "-"}
-                              </TypographyP>
+                                  "Chưa có"}
+                              </p>
                             </div>
                           )}
-
-                          {/* Mentor & SubMentor */}
+                        </div>
+                        <div className="space-y-4">
                           <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Mentor
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {idea?.mentor?.email || "-"}
-                            </TypographyP>
+                            <Label>Người hướng dẫn:</Label>
+                            <p>{idea?.mentor?.email || "Chưa có"}</p>
                           </div>
-
                           <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Mentor phụ
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {idea?.subMentor?.email || "-"}
-                            </TypographyP>
-                          </div>
-
-                          {/* Trạng thái */}
-                          <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Trạng thái
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {IdeaStatus[idea?.status ?? 0] || "-"}
-                            </TypographyP>
-                          </div>
-
-                          {/* Số lượng thành viên tối đa */}
-                          <div className="space-y-1">
-                            <TypographySmall className="text-muted-foreground">
-                              Số lượng thành viên tối đa
-                            </TypographySmall>
-                            <TypographyP className="p-0">
-                              {project.topic.ideaVersion.teamSize || "-"}
-                            </TypographyP>
+                            <Label>Người hướng dẫn 2:</Label>
+                            <p>{idea?.subMentor?.email || "Chưa có"}</p>
                           </div>
                         </div>
-                      </div>
-                    </>
-                  )}
-                </>
-              ) : (
-                <>
-                  <TypographyP className="text-red-600">
-                    Not have idea yet.{" "}
-                    <Button variant="link" className="p-0 m-0" asChild>
-                      <Link
-                        className="text-red-600 font-semibold"
-                        href="/idea/supervisors"
-                      >
-                        Click hear to view list idea from lecturer
-                      </Link>
-                    </Button>
-                  </TypographyP>
-                </>
-              )}
-              {/* Team Members */}
-              <Separator />
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="text-lg font-semibold">Team Members</h4>
-                  <Badge variant="outline" className="text-sm">
-                    {availableSlots} slot{availableSlots !== 1 ? "s" : ""}{" "}
-                    available
-                  </Badge>
+                        <div className="space-y-1">
+                          <Label>Số lượng thành viên tối đa:</Label>
+                          <p>
+                            {project.topic.ideaVersion.teamSize || "Chưa có"}
+                          </p>
+                        </div>
+                        <div className="space-y-1">
+                          <Label>Tệp đính kèm:</Label>
+                          {project.topic?.topicVersions?.length > 0 &&
+                          latestTopicVersion?.fileUpdate ? (
+                            <Button variant="link" className="px-0" asChild>
+                              <a
+                                target="_blank"
+                                href={latestTopicVersion.fileUpdate}
+                              >
+                                Xem file đính kèm
+                              </a>
+                            </Button>
+                          ) : (
+                            <p>Chưa có file</p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
-                <div className="space-y-3">
-                  {sortedMembers.map((member: TeamMember, index) => {
-                    const initials = `${
-                      member.user?.lastName?.charAt(0).toUpperCase() || ""
-                    }`;
-                    const isLeaderInMembers =
-                      member.role === TeamMemberRole.Leader;
+              </>
+            ) : (
+              <Alert variant="destructive" className="mt-6">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Chưa có đề tài!</AlertTitle>
+                <AlertDescription>
+                  Nhóm của bạn chưa đăng ký đề tài.{" "}
+                  <Button variant="link" className="p-0 h-auto" asChild>
+                    <Link
+                      href="/idea/supervisors"
+                      className="text-primary font-semibold"
+                    >
+                      Xem danh sách đề tài từ giảng viên
+                    </Link>
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            )}
 
-                    return (
-                      <div
-                        key={index}
-                        className="flex items-center justify-between p-3 rounded-lg border hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-10 w-10 rounded-lg">
+            {/* Danh sách thành viên */}
+            <Separator className="my-6" />
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <h3 className="text-xl font-semibold text-foreground">
+                  Thành viên nhóm
+                </h3>
+                <Badge variant="secondary" className="px-3 py-1 text-sm">
+                  Còn {availableSlots} vị trí trống
+                </Badge>
+              </div>
+
+              <div className="space-y-3">
+                {sortedMembers.map((member: TeamMember, index) => {
+                  const initials = `${
+                    member.user?.lastName?.charAt(0).toUpperCase() || ""
+                  }`;
+                  const isLeaderInMembers =
+                    member.role === TeamMemberRole.Leader;
+
+                  return (
+                    <Card
+                      key={index}
+                      className="hover:shadow-sm transition-shadow"
+                    >
+                      <div className="flex items-center justify-between p-4">
+                        <div className="flex items-center gap-4">
+                          <Avatar className="h-12 w-12 border">
                             <AvatarImage
                               src={member.user?.avatar}
                               alt={member.user?.email}
                             />
-                            <AvatarFallback className="rounded-lg">
+                            <AvatarFallback className="font-medium">
                               {initials}
                             </AvatarFallback>
                           </Avatar>
 
                           <div>
                             <p className="font-medium">
-                              {member.user?.firstName} {member.user?.lastName}
+                              {member.user?.lastName} {member.user?.firstName}
                             </p>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-muted-foreground">
                               {member.user?.email}
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-4">
                           <Badge
                             variant={
                               isLeaderInMembers ? "default" : "secondary"
                             }
+                            className="min-w-[100px] justify-center"
                           >
-                            {TeamMemberRole[member.role ?? 0]}
-                            {isLeaderInMembers && " (Owner)"}
+                            {isLeaderInMembers ? "Trưởng nhóm" : "Thành viên"}
                           </Badge>
 
                           <DropdownMenu>
-                            <DropdownMenuTrigger className="hover:bg-gray-100 p-1 rounded">
-                              <FontAwesomeIcon
-                                className="size-4 text-gray-500"
-                                icon={faEllipsisVertical}
-                              />
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>
-                                <a
+                            <DropdownMenuContent align="end" className="w-48">
+                              <DropdownMenuItem asChild>
+                                <Link
                                   href={`/profile-detail/${member.user?.id}`}
-                                  className="w-full"
                                 >
-                                  View Profile
-                                </a>
+                                  <User className="mr-2 h-4 w-4" />
+                                  Xem hồ sơ
+                                </Link>
                               </DropdownMenuItem>
                               {isLeader && !isLeaderInMembers && (
                                 <DropdownMenuItem
+                                  className="text-destructive"
                                   onClick={() =>
                                     handleAction(
                                       () =>
                                         teammemberService.deletePermanent(
                                           member.id ?? ""
                                         ),
-                                      "Đã xóa thành viên"
+                                      "Đã xóa thành viên thành công"
                                     )
                                   }
                                 >
+                                  <Trash2 className="mr-2 h-4 w-4" />
                                   Xóa thành viên
                                 </DropdownMenuItem>
                               )}
@@ -664,86 +672,102 @@ export default function TeamInfo() {
                           </DropdownMenu>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    </Card>
+                  );
+                })}
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
-      <div className="col-span-1 space-y-4">
-        <div className="space-y-2">
-          <TypographyH4>Đăng ký nhóm</TypographyH4>
-          <Card className="">
-            <CardContent className="flex mt-4 flex-col justify-center items-center gap-1">
-              <TypographyP>Nộp đăng ký đề tài</TypographyP>
-              <TypographyMuted>
-                Lưu ý: Đề tài được nộp nên được thông qua bởi các thành viên
-                trong nhóm,nếu nộp thì sẽ không còn chỉnh sửa nữa
-              </TypographyMuted>
-              <Button className={"mt-8 min-w-40"} asChild>
-                <Link href={"/team/submit"}>Nộp đề tài</Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
 
+      {/* Sidebar - Chiếm 1/4 màn hình lớn */}
+      <div className="lg:col-span-1 space-y-6">
+        {/* Card đăng ký nhóm */}
+        <Card className="rounded-lg">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Đăng ký nhóm</CardTitle>
+            <CardDescription>Nộp đăng ký đề tài chính thức</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm">
+              Lưu ý: Đề tài cần được thống nhất bởi tất cả thành viên trước khi
+              nộp
+            </p>
+            <Button className="w-full" asChild>
+              <Link href="/team/submit">Nộp đề tài</Link>
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Card xin đề tài từ GV (nếu có) */}
         {teamInfo?.data?.status === ProjectStatus.Pending &&
           teamInfo?.data?.topicId && (
-            <div className="space-y-2 mt-4">
-              <TypographyH4>Xin đề tài từ giảng viên</TypographyH4>
-              <Card>
-                <CardContent className="flex mt-4 flex-col justify-center items-center gap-4">
-                  <TypographyP>Xem những đề đang có của giảng viên</TypographyP>
-                  <TypographyMuted>
-                    Lưu ý: Khi nộp đơn xin đề tài nên có sự đồng ý của thành
-                    viên trong nhóm
-                  </TypographyMuted>
-                  <Button asChild>
-                    <Link href="/idea/supervisors">Xem danh sách đề tài</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
+            <Card className="rounded-lg">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Xin đề tài từ GV</CardTitle>
+                <CardDescription>
+                  Đề xuất đề tài từ giảng viên hướng dẫn
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm">
+                  Cần có sự đồng ý của tất cả thành viên trong nhóm
+                </p>
+                <Button className="w-full" asChild>
+                  <Link href="/idea/supervisors">Danh sách đề tài</Link>
+                </Button>
+              </CardContent>
+            </Card>
           )}
 
-        <div className="space-y-2">
-          <TypographyH4>Đánh giá thành viên nhóm</TypographyH4>
-          <Card>
-            <CardContent className="flex mt-4 flex-col justify-center items-center gap-4">
-              <TypographyP>Đánh giá quá trình làm thành viên</TypographyP>
-              <TypographyMuted>
-                Lưu ý: Chỉ được đánh giá sau ngày review 3, và phải nộp trước
-                ngày bảo vệ 1 tuần
-              </TypographyMuted>
-              {(() => {
-                const review3 = project.reviews?.find((x) => x.number === 3);
-
-                if (!review3?.reviewDate) {
-                  return <Button disabled={true}>Đánh giá thành viên</Button>;
-                }
-
-                const reviewDate = new Date(review3.reviewDate);
-                const adjustedReviewDate = new Date(
-                  reviewDate.getTime() +
-                    reviewDate.getTimezoneOffset() * 60 * 1000
+        {/* Card đánh giá thành viên */}
+        <Card className="rounded-lg">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg">Đánh giá thành viên</CardTitle>
+            <CardDescription>
+              Đánh giá quá trình làm việc của các thành viên
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm">
+              Chỉ thực hiện sau Review 3 và trước ngày bảo vệ 1 tuần
+            </p>
+            {(() => {
+              const review3 = project.reviews?.find((x) => x.number === 3);
+              if (!review3?.reviewDate) {
+                return (
+                  <Button disabled className="w-full">
+                    Chưa đến thời gian đánh giá
+                  </Button>
                 );
-                const currentDate = new Date();
+              }
 
-                if (adjustedReviewDate < currentDate) {
-                  return (
-                    <Button>
-                      <Link href={`/team/rate/${project.id}`}>Đánh giá thành viên</Link>
-                    </Button>
-                  );
-                }
+              const reviewDate = new Date(review3.reviewDate);
+              const adjustedReviewDate = new Date(
+                reviewDate.getTime() +
+                  reviewDate.getTimezoneOffset() * 60 * 1000
+              );
+              const currentDate = new Date();
 
-                return <Button disabled={true}>Đánh giá thành viên</Button>;
-              })()} 
-            </CardContent>
-          </Card>
-        </div>
+              if (adjustedReviewDate < currentDate) {
+                return (
+                  <Button className="w-full" asChild>
+                    <Link href={`/team/rate/${project.id}`}>
+                      Đánh giá thành viên
+                    </Link>
+                  </Button>
+                );
+              }
+
+              return (
+                <Button disabled className="w-full">
+                  Chưa đến thời gian đánh giá
+                </Button>
+              );
+            })()}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
