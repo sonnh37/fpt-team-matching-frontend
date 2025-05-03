@@ -25,6 +25,7 @@ import { TypographyP } from "@/components/_common/typography/typography-p";
 import {
   initializeCache,
   updateUserCache,
+  UserCache,
 } from "@/lib/redux/slices/cacheSlice";
 import { useTheme } from "next-themes";
 import { TypographySmall } from "@/components/_common/typography/typography-small";
@@ -45,6 +46,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (!user) return;
 
     if (user.cache) {
+      const cache = JSON.parse(user.cache) as UserCache;
+      setTheme(cache.theme ?? "light");
       dispatch(initializeCache(user.cache));
     } else {
       const primaryRole = user.userXRoles.find((role) => role.isPrimary)?.role

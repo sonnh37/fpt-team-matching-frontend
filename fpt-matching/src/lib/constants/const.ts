@@ -40,4 +40,5 @@ export class Const {
   static readonly TOPICS = "topics";
   static readonly TOPIC_VERSIONS = "topic-versions";
   static readonly TOPIC_VERSIONS_REQUEST = "topic-version-requests";
+  static readonly HANGFIRE="hangfire"
 }
