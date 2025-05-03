@@ -37,9 +37,14 @@ import { userService } from "@/services/user-service";
 import { projectService } from "@/services/project-service";
 import { InvitationTeamCreatePendingCommand } from "@/types/models/commands/invitation/invitation-team-command";
 import { apiHubsService } from "@/services/api-hubs-service";
+import { InvitationGetAllQuery } from "@/types/models/queries/invitations/invitation-get-all-query";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/redux/store";
+import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 
 const ListUploadCv = ({ blogId }: { blogId: string }) => {
-
+    //gọi thông tin user đã đăng nhập
+    const user = useSelector((state: RootState) => state.user.user)
 
 
     const tabs = {
@@ -69,7 +74,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
         refetchOnWindowFocus: false,
     });
 
-    console.log(blog?.data?.skillRequired,"skill") 
+    console.log(blog?.data?.skillRequired, "skill")
 
     const {
         data: recommend,
@@ -111,7 +116,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
         // Gọi confirm để mở dialog
         const confirmed = await confirm({
             title: "Bạn có muốn mời thành viên này không?",
-            description: "Bạn sẽ mời thành viên này vào nhóm"  ,
+            description: "Bạn sẽ mời thành viên này vào nhóm",
             confirmText: "Có",
             cancelText: "Không,cảm ơn",
         })
@@ -119,9 +124,24 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
             try {
                 const receiver = await userService.getByEmail(email);
 
+
+
                 if (receiver.status === 1 && receiver.data) {
                     const idReceiver = receiver.data.id;
                     const prj = await projectService.getProjectInfo();
+
+                    let query: InvitationGetAllQuery = {
+                        projectId: prj.data?.id ?? "",
+                        receiverId: idReceiver,
+                        status: InvitationStatus.Pending,
+                        isPagination: false
+
+                    }
+                    const checkIsExistInvitation = await invitationService.getAll(query);
+                    if (checkIsExistInvitation?.data?.results?.length && checkIsExistInvitation?.data?.results?.length > 0) {
+                        toast.error("Bạn đã mời người dùng này rồi,xin hãy đợi họ trả lời.");
+                        return
+                    }
 
                     const invitation: InvitationTeamCreatePendingCommand = {
                         receiverId: idReceiver,
