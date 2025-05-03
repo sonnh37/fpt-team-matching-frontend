@@ -1,6 +1,8 @@
 export interface CreateCommand {
+  note?: string;
 }
 
 export interface UpdateCommand {
-    id?: string;
+  id?: string;
+  note?: string;
 }

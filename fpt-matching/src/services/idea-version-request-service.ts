@@ -80,7 +80,7 @@ class IdeaVersionRequestService extends BaseService<IdeaVersionRequest> {
     return axiosInstance
         .put<BusinessResult<IdeaVersionRequest>>(`${this.endpoint}/respond-by-mentor-or-council`, command)
         .then((response) => response.data)
-        .catch((error) => this.handleError(error)); // Xử lý lỗi
+        .catch((error) => this.handleError(error));
   };
 
   public createCouncilRequestsForIdea = (
