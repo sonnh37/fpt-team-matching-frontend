@@ -21,7 +21,7 @@ export default function Page() {
   // Nếu không có kì học hiện tại
   if (!res_semes?.data) {
     return (
-      <AlertMessage message="Chưa tới kì để xem các đề tài từ các mentor" />
+      <AlertMessage message="Chưa tới ngày để xem các đề tài từ các mentor" />
     );
   }
 

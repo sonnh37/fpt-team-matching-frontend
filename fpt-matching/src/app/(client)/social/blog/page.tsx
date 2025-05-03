@@ -281,22 +281,20 @@ export default function Blog() {
                 <li className="px-4 py-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Blog
                   Management
                 </li>
-                <li className="px-4 cursor-pointer hover:bg-blue-300">
-                  <a className="py-3 flex items-center" href="/social/blog/blogmanagement">
-                    😀
-
-                    Blog Cá nhân
+                <li
+                  className="px-4 cursor-pointer hover:bg-blue-300"
+                >
+                  <a className="py-3 flex items-center"
+                    onClick={() => handleFilterChange(BlogType.Share)}>
+                    ✍️  Blog chia sẻ
                   </a>
                 </li>
-                <li className="px-4 cursor-pointer hover:bg-blue-300">
-                  <a className="py-3 flex items-center" href="/">
-                    🖇 Blog Sharing
-                  </a>
-                </li>
-                <li className="px-4 cursor-pointer hover:bg-blue-300">
-                  <a className="py-3 flex items-center" href="/">
-                    📖
-                    Blog Project
+                <li
+                  className="px-4 cursor-pointer hover:bg-blue-300"
+                >
+                  <a className="py-3 flex items-center"
+                    onClick={() => handleFilterChange(BlogType.Recruit)}>
+                    🔍 Blog tìm thành viên
                   </a>
                 </li>
                 <li className="px-4 py-2 mt-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Apps</li>
@@ -314,13 +312,13 @@ export default function Blog() {
                     <span className="ml-auto text-xs bg-gray-300 px-2 py-1 rounded-sm">16</span>
                   </a>
                 </li>
-                <li className="px-4 cursor-pointer hover:bg-blue-300">
+                {/* <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a href="#" className="py-2 flex items-center">
                     📅
 
                     Calendar
                   </a>
-                </li>
+                </li> */}
                 <li className="px-4 py-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Other</li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
@@ -335,8 +333,9 @@ export default function Blog() {
                   </a>
                 </li>
                 <li className="px-4 hover:bg-blue-300">
-                  <a href="#" className="py-3 flex items-center">
-                    💡 About
+                  <a href="/about" className="py-3 flex items-center gap-2">
+                    💡
+                    <span>About</span>
                   </a>
                 </li>
                 <li className="px-4 hover:bg-blue-300">
@@ -349,49 +348,49 @@ export default function Blog() {
             </nav>
             <div className="p-6 min-h-20 flex flex-col items-start">
               {/* Icons */}
-              <div className="flex flex-wrap gap-4 text-gray-700 text-xl">
-                <FaXTwitter />
-                <FaFacebookF />
-                <FaGithub />
-                <FaInstagram />
-                <FaTwitch />
-                <FaMastodon />
-                <PiButterflyFill />
-              </div>
+              {/*<div className="flex flex-wrap gap-4 text-gray-700 text-xl">*/}
+              {/*  <FaXTwitter />*/}
+              {/*  <FaFacebookF />*/}
+              {/*  <FaGithub />*/}
+              {/*  <FaInstagram />*/}
+              {/*  <FaTwitch />*/}
+              {/*  <FaMastodon />*/}
+              {/*  <PiButterflyFill />*/}
+              {/*</div>*/}
 
-              {/* My Tags */}
-              <div className=" flex mt-3 w-full  justify-between gap-2">
-                <p className="font-semibold text-lg">My Tags</p>
-                <PiGearSixBold className="text-gray-700 text-xl" />
-              </div>
+              {/* My Tags */}   {/*<div className=" flex mt-3 w-full  justify-between gap-2">*/}
+              {/*  <p className="font-semibold text-lg">My Tags</p>*/}
+              {/*  <PiGearSixBold className="text-gray-700 text-xl" />*/}
+              {/*</div>
+           */}
             </div>
 
-            <div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">
-              <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing
-                developers
-              </div>
-              <div className='text-sm mt-2'>a place where coders share, stay up-to-date and grow their
-                careers.
-              </div>
+            {/*<div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">*/}
+            {/*  <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing*/}
+            {/*    developers*/}
+            {/*  </div>*/}
+            {/*  <div className='text-sm mt-2'>a place where coders share, stay up-to-date and grow their*/}
+            {/*    careers.*/}
+            {/*  </div>*/}
 
-              {!user?.id && (
-                <>
-                  <a href="">
-                    <div
-                      className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
-                      Login
-                    </div>
-                  </a>
-                  <a href="">
-                    <div
-                      className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
-                      Register
-                    </div>
-                  </a>
-                </>
-              )}
+            {/*  {!user?.id && (*/}
+            {/*    <>*/}
+            {/*      <a href="">*/}
+            {/*        <div*/}
+            {/*          className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">*/}
+            {/*          Login*/}
+            {/*        </div>*/}
+            {/*      </a>*/}
+            {/*      <a href="">*/}
+            {/*        <div*/}
+            {/*          className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">*/}
+            {/*          Register*/}
+            {/*        </div>*/}
+            {/*      </a>*/}
+            {/*    </>*/}
+            {/*  )}*/}
 
-            </div>
+            {/*</div>*/}
 
 
           </aside>
@@ -401,87 +400,112 @@ export default function Blog() {
           {/* Form tạo blog */}
           <div className='form-create-blog bg-white rounded-xl w-full max-w-3xl p-3 mx-2 mt-3'>
 
-            <div className="flex items-center ">
-              <img
-                src={user?.avatar || "/user-avatardefault.jpg"}
-                alt="Avatar"
-                className="w-12 h-12 rounded-full"
-              />
-              <Modal>
-                <ModalTrigger className='w-full'>
+
+            <Modal>
+              <ModalTrigger className='w-full'>
+                <div className="flex items-center ">
+                  <img
+                    src={user?.avatar || "/user-avatardefault.jpg"}
+                    alt="Avatar"
+                    className="w-12 h-12 rounded-full"
+                  />
                   <div
-                    className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
+                    className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 ml-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
                     {user?.firstName} ơi, bạn đang nghĩ gì thế?
                   </div>
+                </div>
 
-                </ModalTrigger>
 
-                <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
-                  <ModalContent>
-                    <div className="header-blog mb-4 py-4 border-b-slate-100 h-1/6 bg-[#ff9240]">
-                      <h4 className='text-lg md:text-2xl text-white dark:text-neutral-100 font-bold text-center'>
-                        Tạo bài viết mới
-                      </h4>
+                <div className="flex my-3 border-b-2  border-gray-400 px-6"></div>
+                <div className="flex mt-3 ">
+                  <div className="flex space-x-4 justify-center w-full">
+                    <button className="text-red-500 hover:text-gray-800 w-1/2">
+                      <FontAwesomeIcon icon={faVideo} />
+                      <span> </span>
+                      Bài tuyển thành viên
+                    </button>
+                    {/* <button className=" hover:text-gray-800 w-1/4">
+                  <FontAwesomeIcon icon={faPhotoFilm} />
+                  <span> </span>
+                  Ảnh/video
+                </button> */}
+                    <button className="text-green-600 hover:text-gray-800 w-1/2">
+                      <FontAwesomeIcon icon={faFaceSmile} />
+                      <span> </span>
+                      Bài chia sẻ cảm xúc/hoạt động
+                    </button>
+                  </div>
+                </div>
+
+
+              </ModalTrigger>
+
+              <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
+                <ModalContent>
+                  <div className="header-blog mb-4 py-4 border-b-slate-100 h-1/6 bg-[#ff9240]">
+                    <h4 className='text-lg md:text-2xl text-white dark:text-neutral-100 font-bold text-center'>
+                      Tạo bài viết mới
+                    </h4>
+                  </div>
+                  <div className='body-blog w-full h-4/5'>
+                    <div className='headerbody pb-4 gap-2 flex items-center w-full h-1/4 px-3'>
+                      {/*<img*/}
+                      {/*  src={user?.avatar || "/user-avatardefault.jpg"}*/}
+                      {/*  alt="Avatar"*/}
+                      {/*  className="w-12 h-12 rounded-full"*/}
+                      {/*/>*/}
+                      <Avatar>
+                        <AvatarImage src="/user-avatardefault.jpg" alt="@shadcn" />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                      <div className='w-full ml-3'>
+                        <div className=' '>
+                          <p className="text-lg font-semibold text-gray-800">
+                            <FontAwesomeIcon
+                              icon={faUser} /> {user?.lastName} {user?.firstName}</p>
+                        </div>
+
+                        <Select value={postType.toString()}
+                          defaultValue={BlogType.Share.toString()}
+                          onValueChange={(e) => {
+                            setPostType(parseInt(e))
+                            setFormData((prev) => ({
+                              ...prev,
+                              [status]: parseInt(e),
+                            }));
+                          }}>
+                          <SelectTrigger className={"w-1/3"}>
+                            <SelectValue placeholder="Chọn thể loại" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectGroup>
+                              <SelectLabel>Chọn thể loại</SelectLabel>
+                              <SelectItem value={BlogType.Share.toString()}>Đăng chia
+                                sẻ</SelectItem>
+                              <SelectItem value={BlogType.Recruit.toString()}>Đăng tìm
+                                thành viên</SelectItem>
+                            </SelectGroup>
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                    <div className='body-blog w-full h-4/5'>
-                      <div className='headerbody pb-4 gap-2 flex items-center w-full h-1/4 px-3'>
-                        {/*<img*/}
-                        {/*  src={user?.avatar || "/user-avatardefault.jpg"}*/}
-                        {/*  alt="Avatar"*/}
-                        {/*  className="w-12 h-12 rounded-full"*/}
-                        {/*/>*/}
-                        <Avatar>
-                          <AvatarImage src="/user-avatardefault.jpg" alt="@shadcn" />
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                        <div className='w-full ml-3'>
-                          <div className=' '>
-                            <p className="text-lg font-semibold text-gray-800">
-                              <FontAwesomeIcon
-                                icon={faUser} /> {user?.lastName} {user?.firstName}</p>
-                          </div>
-
-                          <Select value={postType.toString()}
-                            defaultValue={BlogType.Share.toString()}
-                            onValueChange={(e) => {
-                              setPostType(parseInt(e))
-                              setFormData((prev) => ({
-                                ...prev,
-                                [status]: parseInt(e),
-                              }));
-                            }}>
-                            <SelectTrigger className={"w-1/3"}>
-                              <SelectValue placeholder="Chọn thể loại" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                <SelectLabel>Chọn thể loại</SelectLabel>
-                                <SelectItem value={BlogType.Share.toString()}>Đăng chia
-                                  sẻ</SelectItem>
-                                <SelectItem value={BlogType.Recruit.toString()}>Đăng tìm
-                                  thành viên</SelectItem>
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
+                    <div className="body px-4 mt-3 h-3/4 flex flex-col gap-4">
+                      {/* Tiêu đề */}
+                      <div className="flex items-center gap-4">
+                        <div className="w-1/5 flex items-center">
+                          <h3 className="text-nowrap"><FontAwesomeIcon icon={faPencil} className="pr-1.5" /> Tiêu đề:</h3>
+                        </div>
+                        <div className="w-3/5">
+                          <Input
+                            name="title"
+                            type="text"
+                            value={formData.title}
+                            onChange={handleChange}
+                            placeholder="Nhập tựa đề ở đây"
+                            className="w-full"
+                          />
                         </div>
                       </div>
-                      <div className="body px-4 mt-3 h-3/4 flex flex-col gap-4">
-                        {/* Tiêu đề */}
-                        <div className="flex items-center gap-4">
-                          <div className="w-1/5 flex items-center">
-                            <h3 className="text-nowrap"><FontAwesomeIcon icon={faPencil} className="pr-1.5" /> Tiêu đề:</h3>
-                          </div>
-                          <div className="w-3/5">
-                            <Input
-                              name="title"
-                              type="text"
-                              value={formData.title}
-                              onChange={handleChange}
-                              placeholder="Nhập tựa đề ở đây"
-                              className="w-full"
-                            />
-                          </div>
-                        </div>
 
                         {/* Nội dung */}
                         <div className="flex items-center gap-4">
@@ -582,21 +606,21 @@ export default function Blog() {
             <div className="flex mt-3 ">
 
               <div className="flex space-x-4 justify-center w-full">
-                <button className="text-red-500 hover:text-gray-800 w-1/2">
-                  <FontAwesomeIcon icon={faVideo} />
-                  <span> </span>
-                  Bài tuyển thành viên
-                </button>
+                {/*<button className="text-red-500 hover:text-gray-800 w-1/2">*/}
+                {/*  <FontAwesomeIcon icon={faVideo} />*/}
+                {/*  <span> </span>*/}
+                {/*  Bài tuyển thành viên*/}
+                {/*</button>*/}
                 {/* <button className=" hover:text-gray-800 w-1/4">
                   <FontAwesomeIcon icon={faPhotoFilm} />
                   <span> </span>
                   Ảnh/video
                 </button> */}
-                <button className="text-green-600 hover:text-gray-800 w-1/2">
-                  <FontAwesomeIcon icon={faFaceSmile} />
-                  <span> </span>
-                  Bài chia sẻ cảm xúc/hoạt động
-                </button>
+                {/*<button className="text-green-600 hover:text-gray-800 w-1/2">*/}
+                {/*  <FontAwesomeIcon icon={faFaceSmile} />*/}
+                {/*  <span> </span>*/}
+                {/*  Bài chia sẻ cảm xúc/hoạt động*/}
+                {/*</button>*/}
               </div>
             </div>
 

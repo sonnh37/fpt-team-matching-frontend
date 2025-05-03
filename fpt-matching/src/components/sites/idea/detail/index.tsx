@@ -229,7 +229,7 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
             <Separator />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1">
-                <Label className="italic">Tên đề tài</Label>
+                <Label className="italic">Mã đề tài</Label>
                 <p className="text-sm font-medium">
                   {version.topic.topicCode || "-"}
                 </p>
@@ -280,7 +280,7 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
                       <div className="space-y-1">
                         <Label className="italic">Ngày xử lí</Label>
                         <p className="text-sm font-medium">
-                          {formatDate(request.processDate)}
+                          {formatDate(request.processDate) == "Không có ngày" ? "Đang đợi duyệt" : formatDate(request.processDate)}
                         </p>
                       </div>
 

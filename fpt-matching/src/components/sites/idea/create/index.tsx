@@ -352,7 +352,7 @@ export const CreateProjectForm = () => {
 
   if (hasActiveIdeas && isStudent) return <PageIsIdea />;
   // if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
-  if (isLockStageIdea) return <AlertMessage message="Chưa tới đợt!" />;
+  if (isLockStageIdea) return <AlertMessage message="Chưa tới đợt duyệt!" />;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Hiển thị confirm dialog trước khi submit
