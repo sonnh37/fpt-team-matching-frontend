@@ -34,6 +34,7 @@ import ErrorSystem from "@/components/_common/errors/error-system";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { FileUpload } from "@/components/ui/file-upload";
+import {hangfireService} from "@/services/hangfire-service";
 
 interface SemesterFormProps {
   initialData?: Semester | null;
@@ -161,6 +162,11 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
 
   const criteriaforms = res_criteriaforms?.data?.results ?? [];
 
+  const handleTriggerNow = async (jobId: string) => {
+    console.log(jobId);
+    // const response = await hangfireService.TriggerNow({jobId: jobId})
+    // toast.info(response.data)
+  }
   return (
     <>
       <ConfirmationDialog
@@ -214,8 +220,19 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
             {/* Left column - Main form */}
             <div className="lg:col-span-2 space-y-6">
               <Card>
-                <CardHeader className="border-b">
+                <CardHeader className="border-b flex flex-row justify-between">
                   <CardTitle className="text-lg">Thông tin chung</CardTitle>
+                  <div className={"flex flex-row gap-2"}>
+                    <Button onClick={(e) =>{
+                      e.preventDefault();
+                      handleTriggerNow(`auto-update-result-${form.getValues("semesterCode")}`)
+                    }}>Public Idea Result Now !</Button>
+                    <Button onClick={(e) => {
+                      e.preventDefault();
+                      handleTriggerNow(`auto-update-project-inprogress-${form.getValues("semesterCode")}`)
+                      handleTriggerNow(`auto-create-review-${form.getValues("semesterCode")}`)
+                    }}>Bắt đầu kì ngay !</Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="pt-6 grid gap-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -79,7 +79,7 @@ export const LoginGoogleForm = ({
             <form className="p-6 md:p-8" onSubmit={form.handleSubmit(onSubmit)}>
               <div className="flex flex-col gap-6">
                 <div className="flex w-full justify-center items-center gap-2">
-                  <Icons.logo></Icons.logo>
+                  <Icons.logo className="w-28"></Icons.logo>
                 </div>
                 <div className="grid gap-2">
                   <FormSelectEnum

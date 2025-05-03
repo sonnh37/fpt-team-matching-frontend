@@ -8,7 +8,7 @@ export default function Page() {
 
   return (
     <div className="relative flex min-h-svh items-center justify-center p-6 md:p-10">
-      <div className="absolute inset-0 bg-[url('/dai-hoc-fpt.jpg')] bg-cover bg-center blur-sm"></div>
+      <div className="absolute inset-0 bg-[url('/dai-hoc-fpt.jpg')] bg-cover bg-center blur-sm "></div>
 
       {/* Overlay làm tối nền (tuỳ chọn) */}
       <div className="absolute inset-0 bg-black/50 "></div>
