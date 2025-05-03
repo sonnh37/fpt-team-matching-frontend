@@ -314,13 +314,13 @@ export default function Blog() {
                     <span className="ml-auto text-xs bg-gray-300 px-2 py-1 rounded-sm">16</span>
                   </a>
                 </li>
-                <li className="px-4 cursor-pointer hover:bg-blue-300">
-                  <a href="#" className="py-2 flex items-center">
-                    📅
+                {/*<li className="px-4 cursor-pointer hover:bg-blue-300">*/}
+                {/*  <a href="#" className="py-2 flex items-center">*/}
+                {/*    📅*/}
 
-                    Calendar
-                  </a>
-                </li>
+                {/*    Calendar*/}
+                {/*  </a>*/}
+                {/*</li>*/}
                 <li className="px-4 py-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Other</li>
                 <li className="px-4 hover:bg-blue-300">
                   <a href="#" className="py-3 flex items-center">
@@ -349,49 +349,49 @@ export default function Blog() {
             </nav>
             <div className="p-6 min-h-20 flex flex-col items-start">
               {/* Icons */}
-              <div className="flex flex-wrap gap-4 text-gray-700 text-xl">
-                <FaXTwitter />
-                <FaFacebookF />
-                <FaGithub />
-                <FaInstagram />
-                <FaTwitch />
-                <FaMastodon />
-                <PiButterflyFill />
-              </div>
+              {/*<div className="flex flex-wrap gap-4 text-gray-700 text-xl">*/}
+              {/*  <FaXTwitter />*/}
+              {/*  <FaFacebookF />*/}
+              {/*  <FaGithub />*/}
+              {/*  <FaInstagram />*/}
+              {/*  <FaTwitch />*/}
+              {/*  <FaMastodon />*/}
+              {/*  <PiButterflyFill />*/}
+              {/*</div>*/}
 
-              {/* My Tags */}
-              <div className=" flex mt-3 w-full  justify-between gap-2">
-                <p className="font-semibold text-lg">My Tags</p>
-                <PiGearSixBold className="text-gray-700 text-xl" />
-              </div>
+              {/* My Tags */}   {/*<div className=" flex mt-3 w-full  justify-between gap-2">*/}
+              {/*  <p className="font-semibold text-lg">My Tags</p>*/}
+              {/*  <PiGearSixBold className="text-gray-700 text-xl" />*/}
+              {/*</div>
+           */}
             </div>
 
-            <div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">
-              <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing
-                developers
-              </div>
-              <div className='text-sm mt-2'>a place where coders share, stay up-to-date and grow their
-                careers.
-              </div>
+            {/*<div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">*/}
+            {/*  <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing*/}
+            {/*    developers*/}
+            {/*  </div>*/}
+            {/*  <div className='text-sm mt-2'>a place where coders share, stay up-to-date and grow their*/}
+            {/*    careers.*/}
+            {/*  </div>*/}
 
-              {!user?.id && (
-                <>
-                  <a href="">
-                    <div
-                      className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
-                      Login
-                    </div>
-                  </a>
-                  <a href="">
-                    <div
-                      className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
-                      Register
-                    </div>
-                  </a>
-                </>
-              )}
+            {/*  {!user?.id && (*/}
+            {/*    <>*/}
+            {/*      <a href="">*/}
+            {/*        <div*/}
+            {/*          className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">*/}
+            {/*          Login*/}
+            {/*        </div>*/}
+            {/*      </a>*/}
+            {/*      <a href="">*/}
+            {/*        <div*/}
+            {/*          className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">*/}
+            {/*          Register*/}
+            {/*        </div>*/}
+            {/*      </a>*/}
+            {/*    </>*/}
+            {/*  )}*/}
 
-            </div>
+            {/*</div>*/}
 
 
           </aside>
@@ -582,21 +582,21 @@ export default function Blog() {
             <div className="flex mt-3 ">
 
               <div className="flex space-x-4 justify-center w-full">
-                <button className="text-red-500 hover:text-gray-800 w-1/2">
-                  <FontAwesomeIcon icon={faVideo} />
-                  <span> </span>
-                  Bài tuyển thành viên
-                </button>
+                {/*<button className="text-red-500 hover:text-gray-800 w-1/2">*/}
+                {/*  <FontAwesomeIcon icon={faVideo} />*/}
+                {/*  <span> </span>*/}
+                {/*  Bài tuyển thành viên*/}
+                {/*</button>*/}
                 {/* <button className=" hover:text-gray-800 w-1/4">
                   <FontAwesomeIcon icon={faPhotoFilm} />
                   <span> </span>
                   Ảnh/video
                 </button> */}
-                <button className="text-green-600 hover:text-gray-800 w-1/2">
-                  <FontAwesomeIcon icon={faFaceSmile} />
-                  <span> </span>
-                  Bài chia sẻ cảm xúc/hoạt động
-                </button>
+                {/*<button className="text-green-600 hover:text-gray-800 w-1/2">*/}
+                {/*  <FontAwesomeIcon icon={faFaceSmile} />*/}
+                {/*  <span> </span>*/}
+                {/*  Bài chia sẻ cảm xúc/hoạt động*/}
+                {/*</button>*/}
               </div>
             </div>
 

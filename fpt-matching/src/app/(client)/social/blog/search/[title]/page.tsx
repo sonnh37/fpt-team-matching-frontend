@@ -270,26 +270,26 @@ export default function Search() {
               </div>
             </div>
 
-            <div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">
-              <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>
-              <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>
+            {/*<div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">*/}
+            {/*  <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing developers</div>*/}
+            {/*  <div className='text-sm mt-2'>We're a place where coders share, stay up-to-date and grow their careers.</div>*/}
 
-              {!user?.id && (
-                <>
-                  <a href="">
-                    <div className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
-                      Login
-                    </div>
-                  </a>
-                  <a href="">
-                    <div className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
-                      Register
-                    </div>
-                  </a>
-                </>
-              )}
+            {/*  {!user?.id && (*/}
+            {/*    <>*/}
+            {/*      <a href="">*/}
+            {/*        <div className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">*/}
+            {/*          Login*/}
+            {/*        </div>*/}
+            {/*      </a>*/}
+            {/*      <a href="">*/}
+            {/*        <div className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">*/}
+            {/*          Register*/}
+            {/*        </div>*/}
+            {/*      </a>*/}
+            {/*    </>*/}
+            {/*  )}*/}
 
-            </div>
+            {/*</div>*/}
 
 
 
@@ -566,7 +566,7 @@ export default function Search() {
 
                   <Pagination
                     currentPage={currentPage}
-                    totalPages={totalPages}
+                    totalPages={totalPages}f
                     onPageChange={setCurrentPage}
                   />
                 </>
