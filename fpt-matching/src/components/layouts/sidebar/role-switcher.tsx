@@ -44,27 +44,24 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
     return null;
   }
 
-  // Lọc và map roles
   const filteredRoles = (user.userXRoles || [])
-  .filter(userRole => userRole?.role) // Thêm kiểm tra role tồn tại
-  .map((userRole) => ({
-    ...userRole,
-    roleInfo: getRoleInfo(userRole.role?.roleName || ""),
-  }));
+    .filter((userRole) => userRole?.role)
+    .map((userRole) => ({
+      ...userRole,
+      roleInfo: getRoleInfo(userRole.role?.roleName || ""),
+    }));
 
-  // Sắp xếp roles: primary trước, current semester trước
   const sortedRoles = React.useMemo(() => {
     return [...filteredRoles].sort((a, b) => {
       if (a.isPrimary !== b.isPrimary) return a.isPrimary ? -1 : 1;
       return (a.role?.roleName || "").localeCompare(b.role?.roleName || "");
     });
   }, [filteredRoles]);
-  
-  console.log("check_user", sortedRoles)
+
+  console.log("check_user", sortedRoles);
 
   // Active role logic
   const activeRolePlan = useCurrentRole();
-  console.log("check_activeRolePlan", activeRolePlan);
   const activeRole =
     sortedRoles.find((role) => role.role?.roleName === activeRolePlan) ||
     sortedRoles.find((role) => role.isPrimary);

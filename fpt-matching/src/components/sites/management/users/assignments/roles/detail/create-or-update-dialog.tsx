@@ -21,6 +21,8 @@ import { roleService } from "@/services/role-service";
 import { semesterService } from "@/services/semester-service";
 import { userService } from "@/services/user-service";
 import { userxroleService } from "@/services/user-x-role-service";
+import { UserXRoleCreateCommand } from "@/types/models/commands/user-x-roles/user-x-role-create-command";
+import { UserCreateCommand } from "@/types/models/commands/users/user-create-command";
 import { User } from "@/types/user";
 import { UserXRole } from "@/types/user-x-role";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -31,12 +33,11 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
-// Schema validation
 const formSchema = z.object({
   id: z.string().optional(),
-  semesterId: z.string().min(1, "Name is required").optional().nullable(),
-  userId: z.string().min(1, "Name is required"),
-  roleId: z.string().min(1, "Name is required"),
+  semesterId: z.string().min(1, "Yêu cầu chọn học kỳ").optional().nullable(),
+  userId: z.string().min(1, "Yêu cầu có người dùng"),
+  roleId: z.string().min(1, "Yêu cầu chọn vai trò"),
   isPrimary: z.boolean().default(false),
 });
 
@@ -122,7 +123,6 @@ export function UserXRoleFormDialog({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // Lấy thông tin user và các role đã gán
       const res_user = await userService.getById(params.userId.toString());
       if (res_user.status != 1) {
         toast.error(res_user.message);
@@ -132,62 +132,62 @@ export function UserXRoleFormDialog({
       const user = res_user.data ?? ({} as User);
       const userXRoles = user.userXRoles ?? [];
 
-      // Kiểm tra nếu đang tạo/chỉnh sửa role primary
       if (values.isPrimary) {
-        // Kiểm tra user đã có role primary chưa
         const hasExistingPrimary = userXRoles.some(
           (item) => item.isPrimary && item.id !== values.id
         );
 
         if (hasExistingPrimary) {
-          toast.error("User đã có role primary, không thể tạo thêm");
+          toast.error("Người dùng đã có vai trò chính, không thể thêm mới");
           return;
         }
       } else {
-        // Nếu không phải primary, kiểm tra user có ít nhất 1 role primary không
         const hasAnyPrimary = userXRoles.some(
           (item) => item.isPrimary && item.id !== values.id
         );
 
-        if (!hasAnyPrimary) {
-          toast.error("User cần có ít nhất 1 role primary");
-          return;
-        }
+        // if (!hasAnyPrimary) {
+        //   toast.error("Người dùng cần có ít nhất 1 vai trò chính");
+        //   return;
+        // }
 
         if (!values.semesterId) {
-          toast.error("Vui lòng chọn semester");
+          toast.error("Vui lòng chọn học kỳ");
           return;
         }
       }
 
-      // Thực hiện create/update
       if (userXRole) {
-        // Edit mode
         const res = await userxroleService.update(values);
         if (res.status == 1) toast.success(res.message);
         else throw Error(res.message);
       } else {
-        // Create mode
-        const res = await userxroleService.create(values);
+        const createCommand: UserXRoleCreateCommand = {
+          userId: values.userId,
+          roleId: values.roleId,
+          isPrimary: values.isPrimary,
+          semesterId: values.semesterId ?? undefined,
+        };
+        const res = await userxroleService.create(createCommand);
         if (res.status == 1) {
           toast.success(res.message);
         } else throw Error(res.message);
       }
 
-      // queryClient.refetchQueries({ queryKey: ["data"] });
-
       onOpenChange(false);
       onSuccess?.();
+      queryClient.invalidateQueries({ queryKey: ["getUserInfo"] });
     } catch (error) {
       toast.error(error as string);
     }
   };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>
-            {userXRole ? "Edit Assignment Role" : "Create New Assignment Role"}
+          <DialogTitle className="text-lg">
+            {userXRole ? "Chỉnh sửa phân quyền" : "Thêm quyền mới"}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -201,29 +201,46 @@ export function UserXRoleFormDialog({
             <FormSelectObject
               form={form}
               name="roleId"
-              label="Select role"
+              label="Vai trò"
               options={roles}
               selectValue={"id"}
               selectLabel={"roleName"}
-              placeholder="Chọn vị trí"
+              placeholder="Chọn vai trò"
+              description="Chọn vai trò sẽ gán cho người dùng"
             />
-            <FormSwitch form={form} name="isPrimary" label="Chính" />
+            
+            <FormSwitch 
+              form={form} 
+              name="isPrimary" 
+              label="Vai trò chính" 
+              description="Vai trò chính sẽ được áp dụng cho tất cả học kỳ"
+            />
 
             {!isPrimary && (
               <FormSelectObject
                 form={form}
                 name="semesterId"
-                label="Select semester"
+                label="Học kỳ áp dụng"
                 options={semesters}
                 selectValue={"id"}
                 selectLabel={"semesterName"}
-                placeholder="Chọn kì"
+                placeholder="Chọn học kỳ"
+                description="Chọn học kỳ mà vai trò này sẽ áp dụng"
               />
             )}
 
-            <Button type="submit" className="w-full">
-              {userXRole ? "Update" : "Create"}
-            </Button>
+            <div className="flex justify-end gap-2 pt-4">
+              <Button 
+                variant="outline" 
+                type="button" 
+                onClick={() => onOpenChange(false)}
+              >
+                Hủy bỏ
+              </Button>
+              <Button type="submit">
+                {userXRole ? "Cập nhật" : "Tạo mới"}
+              </Button>
+            </div>
           </form>
         </Form>
       </DialogContent>
