@@ -572,7 +572,8 @@ export default function TeamInfo() {
                       href="/idea/supervisors"
                       className="text-primary font-semibold"
                     >
-                      Xem danh sách đề tài từ giảng viên
+                      <div className="font-bold text-black">     Xem danh sách đề tài từ giảng viên</div>
+                 
                     </Link>
                   </Button>
                 </AlertDescription>

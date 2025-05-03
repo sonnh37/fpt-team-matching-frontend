@@ -20,7 +20,7 @@ import { invitationService } from "@/services/invitation-service";
 import { projectService } from "@/services/project-service";
 import { userService } from "@/services/user-service";
 import { TeamMemberRole } from "@/types/enums/team-member";
-import { TeamInvitationCommand } from "@/types/models/commands/invitation/invitation-team-command";
+import { InvitationTeamCreatePendingCommand } from "@/types/models/commands/invitation/invitation-team-command";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, UserPlus } from "lucide-react";
