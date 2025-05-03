@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { useCurrentRole } from "@/hooks/use-current-role";
 import { FormInput, FormSwitch } from "@/lib/form-custom-shadcn";
 import { fileUploadService } from "@/services/file-upload-service";
 import { ideaService } from "@/services/idea-service";
@@ -113,6 +114,7 @@ const formSchema = z.object({
   isEnterpriseTopic: z.boolean().default(false),
 });
 export const CreateProjectForm = () => {
+  const role = useCurrentRole();
   const user = useSelectorUser();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
@@ -743,7 +745,7 @@ export const CreateProjectForm = () => {
 
                       return (
                         <FormItem>
-                          <FormLabel>Giảng viên hướng dẫn 2</FormLabel>
+                          <FormLabel>Giảng viên hướng dẫn 2 (Tùy chọn)</FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             value={field.value}
@@ -775,6 +777,54 @@ export const CreateProjectForm = () => {
                     }}
                   />
                 </div>
+              )}
+
+              {role == "Mentor" && (
+                <FormField
+                  control={form.control}
+                  name="subMentorId"
+                  render={({ field }) => {
+                    const filteredUsers = usersData?.data?.results?.filter(
+                      (user_) => user_.id !== user.id
+                    );
+
+                    return (
+                      <FormItem>
+                        <FormLabel>Giảng viên 2 (Tùy chọn)</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                          disabled={!user.id}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Chọn giảng viên 2" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {filteredUsers?.map((userFiltered) => (
+                              <SelectItem
+                                key={userFiltered?.id}
+                                value={userFiltered.id ?? ""}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span>
+                                    {userFiltered.lastName}{" "}
+                                    {userFiltered.firstName}
+                                  </span>
+                                  <span className="text-muted-foreground text-xs">
+                                    {userFiltered.email}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Chọn giảng viên sẽ hướng dẫn dự án của bạn
+                        </FormDescription>
+                      </FormItem>
+                    );
+                  }}
+                />
               )}
 
               {/* File Upload */}

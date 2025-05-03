@@ -284,21 +284,25 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
                         </p>
                       </div>
 
-                      {isRequestForCurrentUser && (
-                        <div className="space-y-1">
-                          <Link href={`/idea/reviews/${request.id}`} passHref>
-                            <Button
-                              variant={
-                                isRequestForCurrentUserHasAnswer || (request.role == "SubMentor" && request.status != IdeaVersionRequestStatus.Pending)
-                                  ? "default"
-                                  : "outline"
-                              }
-                            >
-                              <ListChecks className="h-4 w-4" />
-                            </Button>
-                          </Link>
-                        </div>
-                      )}
+                      {isRequestForCurrentUser &&
+                        idea.ownerId != user.id && (
+                          <div className="space-y-1">
+                            <Link href={`/idea/reviews/${request.id}`} passHref>
+                              <Button
+                                variant={
+                                  isRequestForCurrentUserHasAnswer ||
+                                  (request.role == "SubMentor" &&
+                                    request.status !=
+                                      IdeaVersionRequestStatus.Pending)
+                                    ? "default"
+                                    : "outline"
+                                }
+                              >
+                                <ListChecks className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                          </div>
+                        )}
 
                       {!(note == undefined || note == "" || note == null) && (
                         <div className="space-y-1">
