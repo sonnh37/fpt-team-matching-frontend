@@ -572,8 +572,10 @@ export default function TeamInfo() {
                       href="/idea/supervisors"
                       className="text-primary font-semibold"
                     >
-                      <div className="font-bold text-black">     Xem danh sách đề tài từ giảng viên</div>
-                 
+                      <div className="font-bold text-black">
+                        {" "}
+                        Xem danh sách đề tài từ giảng viên
+                      </div>
                     </Link>
                   </Button>
                 </AlertDescription>
@@ -702,25 +704,24 @@ export default function TeamInfo() {
         </Card>
 
         {/* Card xin đề tài từ GV (nếu có) */}
-        {teamInfo?.data?.status === ProjectStatus.Pending &&
-          teamInfo?.data?.topicId && (
-            <Card className="rounded-lg">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Xin đề tài từ GV</CardTitle>
-                <CardDescription>
-                  Đề xuất đề tài từ giảng viên hướng dẫn
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm">
-                  Cần có sự đồng ý của tất cả thành viên trong nhóm
-                </p>
-                <Button className="w-full" asChild>
-                  <Link href="/idea/supervisors">Danh sách đề tài</Link>
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+        {!teamInfo?.data?.topicId && (
+          <Card className="rounded-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Xin đề tài từ GV</CardTitle>
+              <CardDescription>
+                Đề xuất đề tài từ giảng viên hướng dẫn
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm">
+                Cần có sự đồng ý của tất cả thành viên trong nhóm
+              </p>
+              <Button className="w-full" asChild>
+                <Link href="/idea/supervisors">Danh sách đề tài</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Card đánh giá thành viên */}
         <Card className="rounded-lg">

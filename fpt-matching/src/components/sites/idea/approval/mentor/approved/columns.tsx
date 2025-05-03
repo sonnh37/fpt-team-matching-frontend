@@ -50,6 +50,7 @@ import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { useCurrentRole } from "@/hooks/use-current-role";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -145,36 +146,7 @@ export const columns: ColumnDef<Idea>[] = [
   //     return highestVersion?.enterpriseName || "-";
   //   },
   // },
-  {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Trạng thái" />
-    ),
-    cell: ({ row }) => {
-      const status = row.getValue("status") as IdeaVersionRequestStatus;
-      const statusText = IdeaVersionRequestStatus[status];
-
-      let badgeVariant:
-        | "secondary"
-        | "destructive"
-        | "default"
-        | "outline"
-        | null = "default";
-
-      switch (status) {
-        case IdeaVersionRequestStatus.Approved:
-          badgeVariant = "default";
-          break;
-        default:
-          badgeVariant = "outline";
-      }
-
-      return <Badge variant={badgeVariant}>{statusText}</Badge>;
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
+  
   {
     accessorKey: "actions",
     header: "Tùy chọn",
@@ -194,6 +166,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const user = useSelectorUser();
   const ideaId = idea.id;
   const [open, setOpen] = useState(false);
+  const role = useCurrentRole();
 
   const highestVersion =
     idea.ideaVersions.length > 0
@@ -202,9 +175,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         )
       : undefined;
 
-  const hasCouncilRequests = highestVersion?.ideaVersionRequests.some(
-    (request) => request.role == "Council"
-  );
+  const hasCouncilRequests =
+    highestVersion?.ideaVersionRequests.some(
+      (request) => request.role == "Council"
+    ) && role == "Mentor";
 
   const isMentorOfIdea = idea.mentorId == user?.id;
 

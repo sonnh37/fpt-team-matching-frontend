@@ -42,7 +42,6 @@ import { Icons } from "@/components/_common/icons";
 import { User } from "@/types/user";
 import { DataOnlyTable } from "@/components/_common/data-table-client/data-table";
 import { DataOnlyTablePagination } from "@/components/_common/data-table-client/data-table-pagination";
-import { ProfileForm } from "@/app/(client)/(dashboard)/profile-detail/[profileId]/page";
 import { UserXRoleFormDialog } from "./create-or-update-dialog";
 import { UserXRole } from "@/types/user-x-role";
 import {
@@ -57,6 +56,7 @@ import {
 import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
 import { userxroleService } from "@/services/user-x-role-service";
 import { useUserXRoleColumns } from "./column";
+import { ProfileForm } from "@/app/(client)/(dashboard)/settings/profile-form";
 interface UserXRoleAssignmentTableProps {
   userId: string;
 }
