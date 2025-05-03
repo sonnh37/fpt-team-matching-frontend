@@ -1,7 +1,7 @@
 import { userService } from "@/services/user-service";
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 
-interface UserCache {
+export interface UserCache {
   role?: string;
   theme?: string;
   sidebar?: boolean;
