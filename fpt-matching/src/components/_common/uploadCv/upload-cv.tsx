@@ -23,6 +23,7 @@ import { blogService } from "@/services/blog-service";
 import { FileUpload } from "@/components/ui/file-upload";
 import { useState } from "react";
 import { cloudinaryService } from "@/services/cloudinary-service";
+import { BlogCvGetAllQuery } from "@/types/models/queries/blogcv/blogcv-get-all-query";
 
 const UploadCv = ({ blogId }: { blogId: string }) => {
     //gọi thông tin user đã đăng nhập
@@ -50,32 +51,50 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
         if (isSubmitting) return; // Nếu API đang chạy, không cho phép bấm tiếp
         setIsSubmitting(true); // Đánh dấu API đang chạy
 
-        if(user?.id == userIsExist ){
+        if (user?.id == userIsExist) {
             toast("Bạn không thể gửi vì bạn đã có nhóm")
             setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
             return
         }
         const projectInfo = await projectService.getProjectInfo();
-     
+
         //check xem người nộp có team chưa
         if (projectInfo.status === 1) {
-            toast("Bạn đã có team rồi không thể nộp ứng tuyển")
+            toast.error("Bạn đã có team rồi không thể nộp ứng tuyển")
             setIsSubmitting(false);
             return
         }
+
+
+
+        let checkCv: BlogCvGetAllQuery = {
+            userId: user?.id,
+            blogId: blogId,
+            isDeleted: false,
+            isPagination: false
+        };
+
+        const existUpload = await blogCvService.getAll(checkCv);
+
+        if (existUpload?.data?.results?.length && existUpload.data.results.length > 0) {
+            toast.error("Bạn đã đã nộp ứng tuyển cho nhóm này rồi");
+            setIsSubmitting(false);
+            return;
+        }
+        
 
         let fileurl = "";
 
         if (files?.length) {
             try {
-                fileurl = await cloudinaryService.uploadFile(files[0] ) ?? "";
+                fileurl = await cloudinaryService.uploadFile(files[0]) ?? "";
             } catch (error) {
                 console.error("Upload failed:", error);
                 setIsSubmitting(false);
                 return
             }
         }
-        console.log("check" , fileurl)
+        console.log("check", fileurl)
 
         let query: BlogCvCommand = {
             blogId: blogId,
