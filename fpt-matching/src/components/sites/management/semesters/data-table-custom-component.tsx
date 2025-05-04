@@ -145,7 +145,7 @@ export function DataTableSemesterComponent<TData>({
                   <CardTitle>
                     <div className="flex items-center justify-between">
                       <Link
-                        href={`${pathName}/semester-details?semesterId=${id}`}
+                        href={`${pathName}/${id}`}
                         className="hover:border-b-2 border-black"
                       >
                         {model.semesterName}

@@ -26,7 +26,7 @@ const ActionCell = ({row}: {row :Row<Review>}) => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => {
                         router.push("manage-review/review-details?reviewId="+review.id)
-                    }}>Xem chi tiết</DropdownMenuItem>
+                    }}>View review details</DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         )
@@ -67,7 +67,7 @@ export const ReviewColumns: ColumnDef<Review>[] = [
         cell: ({row}) => {
             const reviewDate = row.getValue<Date | null>("reviewDate");
 
-            return reviewDate ? new Date(reviewDate).toLocaleDateString("en-GB") : <div className={"text-gray-500"}>Chưa có</div>
+            return reviewDate ? new Date(reviewDate).toLocaleDateString("en-GB") : <div className={"text-gray-500"}>Not yet</div>
         }
     },
     {
@@ -75,7 +75,7 @@ export const ReviewColumns: ColumnDef<Review>[] = [
         header: "Phòng",
         cell: ({row}) => {
             const room = row.getValue<string | null>("room");
-            return room ? room : <div className={"text-gray-500"}>Chưa có</div>;
+            return room ? room : <div className={"text-gray-500"}>Not yet</div>;
         }
     },
     {
@@ -84,7 +84,7 @@ export const ReviewColumns: ColumnDef<Review>[] = [
         size: 100,
         cell: ({row}) => {
             const slot = row.getValue<number | null>("slot");
-            return slot ? slot : <div className={"text-gray-500"}>Chưa có</div>;
+            return slot ? slot : <div className={"text-gray-500"}>Not yet</div>;
         }
     },
     {
@@ -99,7 +99,7 @@ export const ReviewColumns: ColumnDef<Review>[] = [
             const room = row.getValue<string | null>("room");
             const slot = row.getValue<number | null>("slot");
 
-            return (reviewDate && room && slot ) ? (<Button className={"px-4 bg-green-600 hover:bg-green-400"}>Đã cập nhật</Button>) : (<Button variant={"destructive"}>Chưa có</Button>)
+            return (reviewDate && room && slot ) ? (<Button className={"px-4 bg-green-600"}>Assigned</Button>) : (<Button variant={"destructive"}>Not yet</Button>)
         }
     },
     {
