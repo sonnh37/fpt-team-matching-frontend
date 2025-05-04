@@ -200,7 +200,6 @@ const InviteUsersForm = () => {
               <div className="flex space-x-2">
                 <div className="relative flex-1 overflow-visible">
                   <Input
-                  
                     placeholder="Tìm email ví dụ: example@fpt.edu.vn"
                     value={email}
                     onChange={(e) => {

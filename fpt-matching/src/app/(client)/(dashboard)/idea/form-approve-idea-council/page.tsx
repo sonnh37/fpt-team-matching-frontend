@@ -94,10 +94,10 @@ const EvaluteCriteriaForm = ({
 
       const answerCriteriaList = Object.entries(currentAnswers).map(
         ([criteriaId, value]) =>
-          ({
-            criteriaId,
-            value,
-          } as AnswerCriteriaForLecturerRespond)
+        ({
+          criteriaId,
+          value,
+        } as AnswerCriteriaForLecturerRespond)
       );
 
       const command: IdeaVersionRequestUpdateStatusCommand = {
@@ -131,7 +131,7 @@ const EvaluteCriteriaForm = ({
             .filter((x) => x.isDeleted == false)
             .map((criteria, index) => {
               const answerValue = form.watch(`answers.${criteria.criteria?.id}`);
-              
+
               return (
                 <Card key={criteria.id} className="mb-8 p-4">
                   <CardHeader>
@@ -146,7 +146,7 @@ const EvaluteCriteriaForm = ({
 
                   <CardContent className="flex gap-4">
                     {criteria?.criteria?.valueType ===
-                    CriteriaValueType.Boolean ? (
+                      CriteriaValueType.Boolean ? (
                       <RadioGroup
                         value={answerValue}
                         onValueChange={(value) => {
