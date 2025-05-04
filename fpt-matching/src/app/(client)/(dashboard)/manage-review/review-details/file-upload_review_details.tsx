@@ -75,13 +75,13 @@ export default function SheetFileUpload({file, setFile, fileUrl}: {file: File | 
     return (
         <Sheet>
             <SheetTrigger asChild>
-                <Button className={"ml-5"} variant="default">Click to view file review</Button>
+                <Button className={"ml-5"} variant="default">Nhấn để xem file đã tải lên</Button>
             </SheetTrigger>
             <SheetContent className={"sm:max-w-[30vw]"}>
                 <SheetHeader>
-                    <SheetTitle>Review file</SheetTitle>
+                    <SheetTitle>File đã tải lên</SheetTitle>
                     <SheetDescription className={"flex flex-col"}>
-                        <span>Quick look about review file.</span>
+                        <span>Tổng quát thông tin trong file.</span>
                         <span className={"text-red-500 font-medium"}>*Đặt tên file theo template Checklist_CapstoneProjectReview_(Mã nhóm).xlsx</span>
                         <span className={"text-red-500 font-medium"}>*Dùng file có đuôi xlsx, xlsm</span>
                     </SheetDescription>

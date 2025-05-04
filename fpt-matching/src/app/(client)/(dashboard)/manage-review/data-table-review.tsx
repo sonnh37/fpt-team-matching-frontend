@@ -138,10 +138,10 @@ export function ReviewDataTable<TData, TValue>({
             <div className="flex items-center justify-between py-4 ">
                 <div className={"items-left flex gap-4 "}>
                     <div className={"w-auto"}>
-                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="team-code">Team code</Label>
+                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="team-code">Mã nhóm</Label>
                         <Input
                             id={"team-code"}
-                            placeholder="Filter team code..."
+                            placeholder="Filter mã nhóm..."
                             value={(table.getColumn("teamCode")?.getFilterValue() as string) ?? ""}
                             onChange={(event) =>
                                 table.getColumn("teamCode")?.setFilterValue(event.target.value)
@@ -150,10 +150,10 @@ export function ReviewDataTable<TData, TValue>({
                         />
                     </div>
                     <div className={"w-auto"}>
-                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="idea-code">Idea code</Label>
+                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="idea-code">Mã đề tài</Label>
                         <Input
                             id={"idea-code"}
-                            placeholder="Filter idea code..."
+                            placeholder="Filter mã đề tài..."
                             value={(table.getColumn("ideaCode")?.getFilterValue() as string) ?? ""}
                             onChange={(event) =>
                                 table.getColumn("ideaCode")?.setFilterValue(event.target.value)
@@ -162,10 +162,10 @@ export function ReviewDataTable<TData, TValue>({
                         />
                     </div>
                     <div className={"w-auto"}>
-                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="vietnamese">Vietnamese name</Label>
+                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="vietnamese">Tên tiếng Việt</Label>
                         <Input
                             id={"vietnamese"}
-                            placeholder="Filter Vietnamese name..."
+                            placeholder="Filter tên tiếng Việt..."
                             value={(table.getColumn("vietnameseName")?.getFilterValue() as string) ?? ""}
                             onChange={(event) =>
                                 table.getColumn("vietnameseName")?.setFilterValue(event.target.value)
@@ -174,9 +174,9 @@ export function ReviewDataTable<TData, TValue>({
                         />
                     </div>
                     <div className={"w-auto"}>
-                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="project-code">English/Japanese name</Label>
+                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="project-code">Tên tiếng Anh/Nhật</Label>
                         <Input
-                            placeholder="Filter English/Japanese name..."
+                            placeholder="Filter tên tiếng Anh/Nhật..."
                             value={(table.getColumn("englishName")?.getFilterValue() as string) ?? ""}
                             onChange={(event) =>
                                 table.getColumn("englishName")?.setFilterValue(event.target.value)
@@ -187,18 +187,18 @@ export function ReviewDataTable<TData, TValue>({
 
                     {/*---------Filter Review Date -------------*/}
                     <div className={"w-auto flex flex-col pt-1 gap-1"}>
-                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="project-code">Review date</Label>
+                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="project-code">Ngày review</Label>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
                                     variant={"outline"}
                                     className={cn(
-                                        "w-[280px] justify-start text-left font-normal",
+                                        "w-[10vw] justify-start text-left font-normal",
                                         !date && "text-muted-foreground"
                                     )}
                                 >
                                     <CalendarIcon />
-                                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                                    {date ? format(date, "PPP") : <span>Chọn ngày</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
@@ -270,7 +270,7 @@ export function ReviewDataTable<TData, TValue>({
             </div>
 
             {/*------- Table part --------------*/}
-            <div className="rounded-md border">
+            <div className="rounded-md border w-[82vw] overflow-auto">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (

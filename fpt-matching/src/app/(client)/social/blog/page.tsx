@@ -410,102 +410,78 @@ export default function Blog() {
                     className="w-12 h-12 rounded-full"
                   />
                   <div
-                    className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 ml-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
+                    className="shadow appearance-none bg-slate-200 border rounded-xl w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline text-start ">
                     {user?.firstName} ơi, bạn đang nghĩ gì thế?
                   </div>
-                </div>
 
+                </ModalTrigger>
 
-                <div className="flex my-3 border-b-2  border-gray-400 px-6"></div>
-                <div className="flex mt-3 ">
-                  <div className="flex space-x-4 justify-center w-full">
-                    <button className="text-red-500 hover:text-gray-800 w-1/2">
-                      <FontAwesomeIcon icon={faVideo} />
-                      <span> </span>
-                      Bài tuyển thành viên
-                    </button>
-                    {/* <button className=" hover:text-gray-800 w-1/4">
-                  <FontAwesomeIcon icon={faPhotoFilm} />
-                  <span> </span>
-                  Ảnh/video
-                </button> */}
-                    <button className="text-green-600 hover:text-gray-800 w-1/2">
-                      <FontAwesomeIcon icon={faFaceSmile} />
-                      <span> </span>
-                      Bài chia sẻ cảm xúc/hoạt động
-                    </button>
-                  </div>
-                </div>
-
-
-              </ModalTrigger>
-
-              <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
-                <ModalContent>
-                  <div className="header-blog mb-4 py-4 border-b-slate-100 h-1/6 bg-[#ff9240]">
-                    <h4 className='text-lg md:text-2xl text-white dark:text-neutral-100 font-bold text-center'>
-                      Tạo bài viết mới
-                    </h4>
-                  </div>
-                  <div className='body-blog w-full h-4/5'>
-                    <div className='headerbody pb-4 gap-2 flex items-center w-full h-1/4 px-3'>
-                      {/*<img*/}
-                      {/*  src={user?.avatar || "/user-avatardefault.jpg"}*/}
-                      {/*  alt="Avatar"*/}
-                      {/*  className="w-12 h-12 rounded-full"*/}
-                      {/*/>*/}
-                      <Avatar>
-                        <AvatarImage src="/user-avatardefault.jpg" alt="@shadcn" />
-                        <AvatarFallback>CN</AvatarFallback>
-                      </Avatar>
-                      <div className='w-full ml-3'>
-                        <div className=' '>
-                          <p className="text-lg font-semibold text-gray-800">
-                            <FontAwesomeIcon
-                              icon={faUser} /> {user?.lastName} {user?.firstName}</p>
-                        </div>
-
-                        <Select value={postType.toString()}
-                          defaultValue={BlogType.Share.toString()}
-                          onValueChange={(e) => {
-                            setPostType(parseInt(e))
-                            setFormData((prev) => ({
-                              ...prev,
-                              [status]: parseInt(e),
-                            }));
-                          }}>
-                          <SelectTrigger className={"w-1/3"}>
-                            <SelectValue placeholder="Chọn thể loại" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              <SelectLabel>Chọn thể loại</SelectLabel>
-                              <SelectItem value={BlogType.Share.toString()}>Đăng chia
-                                sẻ</SelectItem>
-                              <SelectItem value={BlogType.Recruit.toString()}>Đăng tìm
-                                thành viên</SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </div>
+                <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
+                  <ModalContent>
+                    <div className="header-blog mb-4 py-4 border-b-slate-100 h-1/6 bg-[#ff9240]">
+                      <h4 className='text-lg md:text-2xl text-white dark:text-neutral-100 font-bold text-center'>
+                        Tạo bài viết mới
+                      </h4>
                     </div>
-                    <div className="body px-4 mt-3 h-3/4 flex flex-col gap-4">
-                      {/* Tiêu đề */}
-                      <div className="flex items-center gap-4">
-                        <div className="w-1/5 flex items-center">
-                          <h3 className="text-nowrap"><FontAwesomeIcon icon={faPencil} className="pr-1.5" /> Tiêu đề:</h3>
-                        </div>
-                        <div className="w-3/5">
-                          <Input
-                            name="title"
-                            type="text"
-                            value={formData.title}
-                            onChange={handleChange}
-                            placeholder="Nhập tựa đề ở đây"
-                            className="w-full"
-                          />
+                    <div className='body-blog w-full h-4/5'>
+                      <div className='headerbody pb-4 gap-2 flex items-center w-full h-1/4 px-3'>
+                        {/*<img*/}
+                        {/*  src={user?.avatar || "/user-avatardefault.jpg"}*/}
+                        {/*  alt="Avatar"*/}
+                        {/*  className="w-12 h-12 rounded-full"*/}
+                        {/*/>*/}
+                        <Avatar>
+                          <AvatarImage src="/user-avatardefault.jpg" alt="@shadcn" />
+                          <AvatarFallback>CN</AvatarFallback>
+                        </Avatar>
+                        <div className='w-full ml-3'>
+                          <div className=' '>
+                            <p className="text-lg font-semibold text-gray-800">
+                              <FontAwesomeIcon
+                                icon={faUser} /> {user?.lastName} {user?.firstName}</p>
+                          </div>
+
+                          <Select value={postType.toString()}
+                            defaultValue={BlogType.Share.toString()}
+                            onValueChange={(e) => {
+                              setPostType(parseInt(e))
+                              setFormData((prev) => ({
+                                ...prev,
+                                [status]: parseInt(e),
+                              }));
+                            }}>
+                            <SelectTrigger className={"w-1/3"}>
+                              <SelectValue placeholder="Chọn thể loại" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectLabel>Chọn thể loại</SelectLabel>
+                                <SelectItem value={BlogType.Share.toString()}>Đăng chia
+                                  sẻ</SelectItem>
+                                <SelectItem value={BlogType.Recruit.toString()}>Đăng tìm
+                                  thành viên</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
                         </div>
                       </div>
+                      <div className="body px-4 mt-3 h-3/4 flex flex-col gap-4">
+                        {/* Tiêu đề */}
+                        <div className="flex items-center gap-4">
+                          <div className="w-1/5 flex items-center">
+                            <h3 className="text-nowrap"><FontAwesomeIcon icon={faPencil} className="pr-1.5" /> Tiêu đề:</h3>
+                          </div>
+                          <div className="w-3/5">
+                            <Input
+                              name="title"
+                              type="text"
+                              value={formData.title}
+                              onChange={handleChange}
+                              placeholder="Nhập tựa đề ở đây"
+                              className="w-full"
+                            />
+                          </div>
+                        </div>
 
                         {/* Nội dung */}
                         <div className="flex items-center gap-4">
@@ -606,21 +582,21 @@ export default function Blog() {
             <div className="flex mt-3 ">
 
               <div className="flex space-x-4 justify-center w-full">
-                {/*<button className="text-red-500 hover:text-gray-800 w-1/2">*/}
-                {/*  <FontAwesomeIcon icon={faVideo} />*/}
-                {/*  <span> </span>*/}
-                {/*  Bài tuyển thành viên*/}
-                {/*</button>*/}
+                <button className="text-red-500 hover:text-gray-800 w-1/2">
+                  <FontAwesomeIcon icon={faVideo} />
+                  <span> </span>
+                  Bài tuyển thành viên
+                </button>
                 {/* <button className=" hover:text-gray-800 w-1/4">
                   <FontAwesomeIcon icon={faPhotoFilm} />
                   <span> </span>
                   Ảnh/video
                 </button> */}
-                {/*<button className="text-green-600 hover:text-gray-800 w-1/2">*/}
-                {/*  <FontAwesomeIcon icon={faFaceSmile} />*/}
-                {/*  <span> </span>*/}
-                {/*  Bài chia sẻ cảm xúc/hoạt động*/}
-                {/*</button>*/}
+                <button className="text-green-600 hover:text-gray-800 w-1/2">
+                  <FontAwesomeIcon icon={faFaceSmile} />
+                  <span> </span>
+                  Bài chia sẻ cảm xúc/hoạt động
+                </button>
               </div>
             </div>
 
