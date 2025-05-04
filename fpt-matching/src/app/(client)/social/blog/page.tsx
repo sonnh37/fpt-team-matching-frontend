@@ -339,7 +339,7 @@ export default function Blog() {
                   </a>
                 </li>
                 <li className="px-4 hover:bg-blue-300">
-                  <a href="https://www.facebook.com/ThanhThu03" className="py-3 flex items-center">
+                  <a href="#" className="py-3 flex items-center">
                     📧
                     Contact
                   </a>
@@ -348,49 +348,49 @@ export default function Blog() {
             </nav>
             <div className="p-6 min-h-20 flex flex-col items-start">
               {/* Icons */}
-              <div className="flex flex-wrap gap-4 text-gray-700 text-xl">
-                <FaXTwitter />
-                <FaFacebookF />
-                <FaGithub />
-                <FaInstagram />
-                <FaTwitch />
-                <FaMastodon />
-                <PiButterflyFill />
-              </div>
+              {/*<div className="flex flex-wrap gap-4 text-gray-700 text-xl">*/}
+              {/*  <FaXTwitter />*/}
+              {/*  <FaFacebookF />*/}
+              {/*  <FaGithub />*/}
+              {/*  <FaInstagram />*/}
+              {/*  <FaTwitch />*/}
+              {/*  <FaMastodon />*/}
+              {/*  <PiButterflyFill />*/}
+              {/*</div>*/}
 
-              {/* My Tags */}
-              <div className=" flex mt-3 w-full  justify-between gap-2">
-                <p className="font-semibold text-lg">My Tags</p>
-                <PiGearSixBold className="text-gray-700 text-xl" />
-              </div>
+              {/* My Tags */}   {/*<div className=" flex mt-3 w-full  justify-between gap-2">*/}
+              {/*  <p className="font-semibold text-lg">My Tags</p>*/}
+              {/*  <PiGearSixBold className="text-gray-700 text-xl" />*/}
+              {/*</div>
+           */}
             </div>
 
-            <div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">
-              <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing
-                developers
-              </div>
-              <div className='text-sm mt-2'>a place where coders share, stay up-to-date and grow their
-                careers.
-              </div>
+            {/*<div className="py-3 mt-6 text-2xl items-start bg-white border-b-2 mb-6 mt-5 mx-3  px-3 w-full">*/}
+            {/*  <div className="font-bold text-xl">DEV Community is a community of 2,827,832 amazing*/}
+            {/*    developers*/}
+            {/*  </div>*/}
+            {/*  <div className='text-sm mt-2'>a place where coders share, stay up-to-date and grow their*/}
+            {/*    careers.*/}
+            {/*  </div>*/}
 
-              {!user?.id && (
-                <>
-                  <a href="">
-                    <div
-                      className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">
-                      Login
-                    </div>
-                  </a>
-                  <a href="">
-                    <div
-                      className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">
-                      Register
-                    </div>
-                  </a>
-                </>
-              )}
+            {/*  {!user?.id && (*/}
+            {/*    <>*/}
+            {/*      <a href="">*/}
+            {/*        <div*/}
+            {/*          className="Login w-full mt-2 text-center border-2 p-1 text-xl border-blue-700 hover:bg-blue-700 hover:text-white hover:underline">*/}
+            {/*          Login*/}
+            {/*        </div>*/}
+            {/*      </a>*/}
+            {/*      <a href="">*/}
+            {/*        <div*/}
+            {/*          className="Register w-full mt-2 text-center p-1 text-xl hover:bg-blue-200 hover:underline">*/}
+            {/*          Register*/}
+            {/*        </div>*/}
+            {/*      </a>*/}
+            {/*    </>*/}
+            {/*  )}*/}
 
-            </div>
+            {/*</div>*/}
 
 
           </aside>
@@ -507,101 +507,122 @@ export default function Blog() {
                         </div>
                       </div>
 
-                      {/* Nội dung */}
-                      <div className="flex items-center gap-4">
-                        <div className="w-1/5 flex items-center">
-                          <h3 className="text-nowrap"><FontAwesomeIcon icon={faNoteSticky} className="pr-1.5" /> Nội dung:</h3>
+                        {/* Nội dung */}
+                        <div className="flex items-center gap-4">
+                          <div className="w-1/5 flex items-center">
+                            <h3 className="text-nowrap"><FontAwesomeIcon icon={faNoteSticky} className="pr-1.5" /> Nội dung:</h3>
+                          </div>
+                          <div className="w-3/5">
+                            <Textarea
+                              name="content"
+                              placeholder="Viết nội dung ở đây."
+                              value={formData.content}
+                              onChange={handleChange}
+                              className="w-full"
+                            />
+                          </div>
                         </div>
-                        <div className="w-3/5">
-                          <Textarea
-                            name="content"
-                            placeholder="Viết nội dung ở đây."
-                            value={formData.content}
-                            onChange={handleChange}
-                            className="w-full"
-                          />
-                        </div>
+
+                        {/* Nếu chọn "Đăng tìm thành viên" thì hiển thị thêm field nhập */}
+                        {postType === BlogType.Recruit && user?.projects ? (
+                          <div>
+                            {/* Kỹ năng yêu cầu */}
+                            <div className="flex items-center gap-4">
+                              <div className="w-1/5 flex items-center">
+                                <h3 className="text-nowrap">Kỹ năng yêu cầu:</h3>
+                              </div>
+                              <div className="w-3/5">
+                                <Textarea
+                                  name="skillRequired"
+                                  placeholder="Viết kỹ năng yêu cầu ở đây."
+                                  value={formData.skillRequired}
+                                  onChange={handleChange}
+                                  className="w-full"
+                                />
+                              </div>
+                            </div>
+
+                            {/* Team của bạn */}
+                            <div className="flex items-start gap-4 mt-4 min-h-28">
+                              <div className="w-1/5 flex flex-col p-2">
+                                <h3 className="text-nowrap">Team của bạn:</h3>
+
+                              </div>
+                              <div className="w-3/5">
+                                <Select
+                                  name="projectId"
+                                  value={formData.projectId}
+                                  defaultValue={undefined}
+                                  onValueChange={(e) => {
+                                    setFormData((prev) => ({
+                                      ...prev,
+                                      projectId: e,
+                                    }));
+                                  }}
+                                >
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Chọn dự án" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectGroup>
+                                      <SelectLabel>Dự án của bạn</SelectLabel>
+                                      {projectUser?.id && (
+                                        <SelectItem value={projectUser.id}>{projectUser.teamName}</SelectItem>
+                                      )}
+                                    </SelectGroup>
+                                  </SelectContent>
+                                </Select>
+                                {!projectUser?.id && (
+                                  <h4 className="text-red-400 text-sm mt-2">*Không có nhóm</h4>
+                                )}
+                                <h4 className="text-red-400 text-sm">*Không bắt buộc</h4>
+                                <h4 className="text-red-400 text-sm">{messageUser}</h4>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div></div>
+                        )}
                       </div>
 
-                      {/* Nếu chọn "Đăng tìm thành viên" thì hiển thị thêm field nhập */}
-                      {postType === BlogType.Recruit && user?.projects ? (
-                        <div>
-                          {/* Kỹ năng yêu cầu */}
-                          <div className="flex items-center gap-4">
-                            <div className="w-1/5 flex items-center">
-                              <h3 className="text-nowrap">Kỹ năng yêu cầu:</h3>
-                            </div>
-                            <div className="w-3/5">
-                              <Textarea
-                                name="skillRequired"
-                                placeholder="Viết kỹ năng yêu cầu ở đây."
-                                value={formData.skillRequired}
-                                onChange={handleChange}
-                                className="w-full"
-                              />
-                            </div>
-                          </div>
 
-                          {/* Team của bạn */}
-                          <div className="flex items-start gap-4 mt-4 min-h-28">
-                            <div className="w-1/5 flex flex-col p-2">
-                              <h3 className="text-nowrap">Team của bạn:</h3>
-
-                            </div>
-                            <div className="w-3/5">
-                              <Select
-                                name="projectId"
-                                value={formData.projectId}
-                                defaultValue={undefined}
-                                onValueChange={(e) => {
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    projectId: e,
-                                  }));
-                                }}
-                              >
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Chọn dự án" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectGroup>
-                                    <SelectLabel>Dự án của bạn</SelectLabel>
-                                    {projectUser?.id && (
-                                      <SelectItem value={projectUser.id}>{projectUser.teamName}</SelectItem>
-                                    )}
-                                  </SelectGroup>
-                                </SelectContent>
-                              </Select>
-                              {!projectUser?.id && (
-                                <h4 className="text-red-400 text-sm mt-2">*Không có nhóm</h4>
-                              )}
-                              <h4 className="text-red-400 text-sm">*Không bắt buộc</h4>
-                              <h4 className="text-red-400 text-sm">{messageUser}</h4>
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div></div>
-                      )}
                     </div>
+                  </ModalContent>
+                  <ModalFooter>
+                    <div
+                      className='flex w-full h-14 sticky bottom-0  items-center justify-center'>
+                      <button onClick={() => handleSubmit()}
+                        className='bg-blue-500 h-3/4 w-1/3 mx-2 rounded-xl hover:bg-blue-400 hover:text-black  mt-2 mb-4'>Post
+                        Bài
+                      </button>
+                    </div>
+                  </ModalFooter>
+                </ModalBody>
 
 
-                  </div>
-                </ModalContent>
-                <ModalFooter>
-                  <div
-                    className='flex w-full h-14 sticky bottom-0  items-center justify-center'>
-                    <button onClick={() => handleSubmit()}
-                      className='bg-blue-500 h-3/4 w-1/3 mx-2 rounded-xl hover:bg-blue-400 hover:text-black  mt-2 mb-4'>Post
-                      Bài
-                    </button>
-                  </div>
-                </ModalFooter>
-              </ModalBody>
+              </Modal>
+            </div>
+            <div className="flex my-3 border-b-2  border-gray-400 px-6"></div>
+            <div className="flex mt-3 ">
 
-
-            </Modal>
-
+              <div className="flex space-x-4 justify-center w-full">
+                {/*<button className="text-red-500 hover:text-gray-800 w-1/2">*/}
+                {/*  <FontAwesomeIcon icon={faVideo} />*/}
+                {/*  <span> </span>*/}
+                {/*  Bài tuyển thành viên*/}
+                {/*</button>*/}
+                {/* <button className=" hover:text-gray-800 w-1/4">
+                  <FontAwesomeIcon icon={faPhotoFilm} />
+                  <span> </span>
+                  Ảnh/video
+                </button> */}
+                {/*<button className="text-green-600 hover:text-gray-800 w-1/2">*/}
+                {/*  <FontAwesomeIcon icon={faFaceSmile} />*/}
+                {/*  <span> </span>*/}
+                {/*  Bài chia sẻ cảm xúc/hoạt động*/}
+                {/*</button>*/}
+              </div>
+            </div>
 
           </div>
           {/* filter blog */}

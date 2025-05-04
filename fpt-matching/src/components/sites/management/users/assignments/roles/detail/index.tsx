@@ -1,48 +1,8 @@
-import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
-import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import { LoadingComponent } from "@/components/_common/loading-page";
+"use client";
+
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { useQueryParams } from "@/hooks/use-query-params";
-import { isDeleted_options } from "@/lib/filter-options";
-import { FilterEnum } from "@/types/models/filter-enum";
-import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  PaginationState,
-  Row,
-  SortingState,
-  useReactTable,
-  VisibilityState,
-} from "@tanstack/react-table";
-import { MoreHorizontal, Search } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { getEnumOptions } from "@/lib/utils";
-import { Department } from "@/types/enums/user";
-import { userService } from "@/services/user-service";
 import { Icons } from "@/components/_common/icons";
-import { User } from "@/types/user";
 import { DataOnlyTable } from "@/components/_common/data-table-client/data-table";
-import { DataOnlyTablePagination } from "@/components/_common/data-table-client/data-table-pagination";
-import { ProfileForm } from "@/app/(client)/(dashboard)/profile-detail/[profileId]/page";
 import { UserXRoleFormDialog } from "./create-or-update-dialog";
 import { UserXRole } from "@/types/user-x-role";
 import {
@@ -51,140 +11,189 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
 import { userxroleService } from "@/services/user-x-role-service";
 import { useUserXRoleColumns } from "./column";
+import { ProfileForm } from "@/app/(client)/(dashboard)/settings/profile-form";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { userService } from "@/services/user-service";
+import { User } from "@/types/user";
+import { ColumnDef, Row } from "@tanstack/react-table";
+import { MoreHorizontal, Plus } from "lucide-react";
+import { useState } from "react";
+
 interface UserXRoleAssignmentTableProps {
   userId: string;
 }
 
-interface ActionsProps {
+const Actions = ({
+  row,
+  onEdit,
+  onDeleteSuccess,
+}: {
   row: Row<UserXRole>;
-  onEdit: (userXRole: UserXRole) => void; // Thêm callback để mở dialog
-}
-
-const Actions: React.FC<ActionsProps> = ({ row, onEdit }) => {
+  onEdit: (userXRole: UserXRole) => void;
+  onDeleteSuccess: () => Promise<void>;
+}) => {
   const model = row.original;
-  const [showDeleteTaskDialog, setShowDeleteTaskDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">Open menu</span>
+            <span className="sr-only">Mở menu</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>Hành động</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => onEdit(model)}>
-            {" "}
-            {/* Mở form Edit */}
-            Edit
+            Chỉnh sửa
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>
-            Delete
-            <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+          <DropdownMenuItem
+            onSelect={() => setShowDeleteDialog(true)}
+            className="text-red-600 focus:text-red-600"
+          >
+            Xóa
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <DeleteBaseEntitysDialog
         deleteById={userxroleService.deletePermanent}
-        open={showDeleteTaskDialog}
-        onOpenChange={setShowDeleteTaskDialog}
+        open={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
         list={[model]}
         showTrigger={false}
-        onSuccess={() => row.toggleSelected(false)}
+        onSuccess={async () => {
+          row.toggleSelected(false);
+          await onDeleteSuccess();
+        }}
       />
     </>
   );
 };
-//#endr
+
 export default function UserXRoleAssignmentTable({
   userId,
 }: UserXRoleAssignmentTableProps) {
-  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [currentModel, setCurrentModel] = useState<UserXRole | null>(null);
-  const handleEdit = (userXRole: UserXRole) => {
-    setCurrentModel(userXRole);
-    setIsFormDialogOpen(true);
-  };
-  const { columns } = useUserXRoleColumns();
-
-  const columns_: ColumnDef<UserXRole>[] = [
-    ...columns,
-    {
-      accessorKey: "actions",
-      header: "Actions",
-      cell: ({ row }) => {
-        return <Actions row={row} onEdit={handleEdit} />;
-      },
-    },
-  ];
+  const queryClient = useQueryClient();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [currentRole, setCurrentRole] = useState<UserXRole | null>(null);
 
   const {
     data: result,
     error,
-    isError,
     isLoading,
+    isError,
   } = useQuery({
-    queryKey: ["getUserInfo", userId],
-    queryFn: () => userService.getById(userId?.toString()),
-    refetchOnWindowFocus: false,
+    queryKey: ["userDetail", userId],
+    queryFn: () => userService.getById(userId),
+    staleTime: 1000 * 60 * 5, // 5 phút
   });
 
-  if (isLoading)
+  const { columns } = useUserXRoleColumns();
+
+  const columnsWithActions: ColumnDef<UserXRole>[] = [
+    ...columns,
+    {
+      accessorKey: "actions",
+      header: "Thao tác",
+      cell: ({ row }) => (
+        <Actions
+          row={row}
+          onEdit={(role) => {
+            setCurrentRole(role);
+            setIsDialogOpen(true);
+          }}
+          onDeleteSuccess={handleRefreshData}
+        />
+      ),
+    },
+  ];
+
+  const handleRefreshData = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: ["userDetail", userId],
+      exact: true,
+    });
+  };
+
+  const handleCreate = () => {
+    setCurrentRole(null);
+    setIsDialogOpen(true);
+  };
+
+  const handleDialogSuccess = async () => {
+    await handleRefreshData();
+    setIsDialogOpen(false);
+  };
+
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <Icons.spinner className="h-8 w-8 animate-spin" />
       </div>
     );
-  if (isError) return <div>Error: {error.message}</div>;
-  if (!result) return <div>No data</div>;
+  }
+
+  if (isError) {
+    return <div>Lỗi: {error.message}</div>;
+  }
+
+  if (!result?.data) {
+    return <div>Không tìm thấy dữ liệu người dùng</div>;
+  }
 
   const user = result.data;
-  if (!user) return;
 
-  const handleCreateClick = () => {
-    setCurrentModel(null); // Reset để tạo mới
-    setIsFormDialogOpen(true);
-  };
-
-  const handleSuccess = () => {
-    // refetch(); // Gọi lại API để cập nhật dữ liệu
-  };
   return (
-    <>
-      <div className="mx-auto space-y-8">
-        <div className="">
-          <div className="space-y-4 p-4 mx-auto">
-            <ProfileForm user={user} />
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">
+            Thông tin cá nhân
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ProfileForm user={user} />
+        </CardContent>
+      </Card>
 
-            <div>
-              {" "}
-              <Button
-                type="button"
-                onClick={handleCreateClick}
-                variant="default"
-              >
-                Create New
-              </Button>
-              <DataOnlyTable columns={columns_} data={user.userXRoles} />
-            </div>
-          </div>
-          <UserXRoleFormDialog
-            open={isFormDialogOpen}
-            onOpenChange={setIsFormDialogOpen}
-            userXRole={currentModel}
-            onSuccess={handleSuccess}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-lg font-semibold">
+            Phân quyền người dùng
+          </CardTitle>
+          <Button
+            onClick={handleCreate}
+            variant="default"
+            size="sm"
+            className="gap-1"
+          >
+            <Plus className="h-4 w-4" />
+            Thêm quyền mới
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <DataOnlyTable
+            columns={columnsWithActions}
+            data={user.userXRoles || []}
           />
-        </div>
-      </div>
-    </>
+        </CardContent>
+      </Card>
+
+      <UserXRoleFormDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        userXRole={currentRole}
+        onSuccess={handleDialogSuccess}
+      />
+    </div>
   );
 }

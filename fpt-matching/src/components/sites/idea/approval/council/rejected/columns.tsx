@@ -139,36 +139,7 @@ export const columns: ColumnDef<Idea>[] = [
   //     return highestVersion?.enterpriseName || "-";
   //   },
   // },
-  {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Trạng thái" />
-    ),
-    cell: ({ row }) => {
-      const status = row.getValue("status") as IdeaVersionRequestStatus;
-      const statusText = IdeaVersionRequestStatus[status];
-
-      let badgeVariant:
-        | "secondary"
-        | "destructive"
-        | "default"
-        | "outline"
-        | null = "default";
-
-      switch (status) {
-        case IdeaVersionRequestStatus.Approved:
-          badgeVariant = "default";
-          break;
-        default:
-          badgeVariant = "outline";
-      }
-
-      return <Badge variant={badgeVariant}>{statusText}</Badge>;
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
+  
   {
     accessorKey: "actions",
     header: "Tùy chọn",

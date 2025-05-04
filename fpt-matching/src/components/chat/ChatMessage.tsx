@@ -30,7 +30,9 @@ const ChatMessage = ({messages, loadMessage} : {messages:MessageModel[], loadMes
                             <ChatBubbleTimestamp className={"mx-11 text-gray-400"} timestamp={new Date(message.createdDate).toLocaleDateString("en-GB") + "  " + new Date(message.createdDate).toLocaleTimeString("en-GB", {
                                 hour: "2-digit",
                                 minute: "2-digit",
-                            })} />
+                            })}
+                                                 variant={user && user.id == message.sendById ? "send" : "received"}
+                            />
 
                         </div>
                         /*eslint-disable-next-line react/jsx-no-comment-textnodes*/

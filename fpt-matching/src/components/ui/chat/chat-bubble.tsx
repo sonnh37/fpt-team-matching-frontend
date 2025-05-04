@@ -128,14 +128,16 @@ ChatBubbleMessage.displayName = "ChatBubbleMessage";
 interface ChatBubbleTimestampProps
   extends React.HTMLAttributes<HTMLDivElement> {
   timestamp: string;
+  variant: string;
 }
 
 const ChatBubbleTimestamp: React.FC<ChatBubbleTimestampProps> = ({
   timestamp,
+    variant,
   className,
   ...props
 }) => (
-  <div className={cn("text-xs mt-2 text-right", className)} {...props}>
+  <div className={cn("text-xs mt-2", className, variant == "send"? "text-right": "text-left")} {...props}>
     {timestamp}
   </div>
 );

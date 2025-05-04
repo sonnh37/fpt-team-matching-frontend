@@ -77,7 +77,7 @@ const ChatRoom = ({setLoadMessage, conn, messages, setMessages, chatRoom, loadMe
                     <div className={"mt-2"}>
                         <div className={"w-full bg-white min-h-[10vh] leading-[5rem] font-bold text-lg pl-8 flex items-center gap-4"}>
                             <Avatar>
-                                <AvatarImage src={chatRoom.partnerInfoResults.avatarUrl.trim() != null && chatRoom.partnerInfoResults.avatarUrl.trim() != "" ? chatRoom.partnerInfoResults.avatarUrl : "https://github.com/shadcn.png"} alt="@shadcn" />
+                                <AvatarImage src={chatRoom.partnerInfoResults.avatarUrl != null && chatRoom.partnerInfoResults.avatarUrl.trim() != "" ? chatRoom.partnerInfoResults.avatarUrl : "https://github.com/shadcn.png"} alt="@shadcn" />
                                 <AvatarFallback>CN</AvatarFallback>
                             </Avatar>
                             <div onClick={() => {

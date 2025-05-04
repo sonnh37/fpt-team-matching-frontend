@@ -259,7 +259,7 @@ const ConversationList = (
                                 : "font-medium"}`}>
                             <div className={"flex items-center gap-4 mx-4"}>
                                 <Avatar>
-                                    <AvatarImage className={"rounded-full"} src={conversation.partnerInfoResults.avatarUrl.trim() != null && conversation.partnerInfoResults.avatarUrl.trim() != "" ? conversation.partnerInfoResults.avatarUrl : "https://github.com/shadcn.png"} alt="@shadcn" />
+                                    <AvatarImage className={"rounded-full"} src={conversation.partnerInfoResults.avatarUrl != null && conversation.partnerInfoResults.avatarUrl.trim() != "" ? conversation.partnerInfoResults.avatarUrl : "https://github.com/shadcn.png"} alt="@shadcn" />
                                     <AvatarFallback>{conversation.partnerInfoResults.firstName}</AvatarFallback>
                                 </Avatar>
                                 <div className={"h-full flex flex-col justify-center gap-2 text-left"}>

@@ -155,7 +155,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
           profileStudentCommand
         );
         if (response.status !== 1) throw new Error(response.message);
-        toast.success("Tạo hồ sơ thành công!");
+        toast.success("Cập nhật hồ sơ thành công!");
       } else {
         const profileStudentCommand: ProfileStudentUpdateCommand = {
           ...data,
@@ -439,7 +439,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                 ) : profile?.id ? (
                   "Cập nhật hồ sơ"
                 ) : (
-                  "Tạo hồ sơ"
+                  "Cập nhật hồ sơ"
                 )}
               </Button>
             </div>

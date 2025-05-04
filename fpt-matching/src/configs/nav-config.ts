@@ -63,13 +63,13 @@ export const NAV_CONFIG = {
           title: "Tạo ý tưởng",
           icon: PencilRuler,
           url: "/idea/create",
-          roles: ["Student", "Lecturer"],
+          roles: ["Student", "Mentor"],
         },
         {
           title: "Lịch sử duyệt ý tưởng",
           icon: History,
           url: "/idea/request",
-          roles: ["Student", "Lecturer"],
+          roles: ["Student", "Mentor"],
         },
         {
           title: "Đề xuất từ giảng viên",
@@ -187,12 +187,6 @@ export const NAV_CONFIG = {
         {
           title: "Yêu cầu chờ của hội đồng",
           url: "/management/users/councils/pending-requests",
-          icon: Users,
-          roles: ["Manager"],
-        },
-        {
-          title: "Đăng ký Vai Trò ",
-          url: "/management/users/assignments/roles",
           icon: Users,
           roles: ["Manager"],
         },
