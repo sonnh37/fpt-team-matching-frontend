@@ -1,26 +1,52 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
+import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/utils";
+import { userService } from "@/services/user-service";
 import { Department } from "@/types/enums/user";
 import { User } from "@/types/user";
 import { UserXRole } from "@/types/user-x-role";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<User>[] = [
+  {
+    accessorKey: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+      />
+    ),
+  },
   {
     accessorKey: "avatar",
     header: ({ column }) => (
@@ -31,7 +57,7 @@ export const columns: ColumnDef<User>[] = [
       const initials = `${user.firstName?.charAt(0) ?? ""}${
         user.lastName?.charAt(0) ?? ""
       }`.toUpperCase();
-      
+
       return (
         <Avatar className="size-10">
           <AvatarImage
@@ -52,7 +78,9 @@ export const columns: ColumnDef<User>[] = [
     ),
     cell: ({ row }) => {
       const email = row.original.email ?? "Unknown";
-      return <TypographyP className="truncate max-w-[180px]">{email}</TypographyP>;
+      return (
+        <TypographyP className="truncate max-w-[180px]">{email}</TypographyP>
+      );
     },
     size: 200,
   },
@@ -83,14 +111,14 @@ export const columns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="Role" />
     ),
     cell: ({ row }) => {
-      const roles = row.original.userXRoles?.map(
-        (userXRole: UserXRole) => userXRole.role?.roleName
-      ).filter(Boolean);
-      
+      const roles = row.original.userXRoles
+        ?.map((userXRole: UserXRole) => userXRole.role?.roleName)
+        .filter(Boolean);
+
       return (
         <div className="flex flex-wrap gap-1 max-w-[200px]">
           {roles?.map((role, index) => (
-            <span 
+            <span
               key={index}
               className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"
             >
@@ -106,30 +134,50 @@ export const columns: ColumnDef<User>[] = [
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
+      const [showDeleteTaskDialog, setShowDeleteTaskDialog] = useState(false);
+
       const user = row.original;
-      
+
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="h-8 w-8 p-0">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(user.id || "")}
-            >
-              Copy user ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href={`/management/users/assignments/roles/${user.id}`}>
-                Assign Roles
-              </Link>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuItem
+                onClick={() => {
+                  navigator.clipboard.writeText(user.id || "")
+                  toast.success("Đã sao chép!")
+                }}
+              >
+                Sao chép Id
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href={`/management/users/assignments/roles/${user.id}`}>
+                  Assign Roles
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>
+                Delete
+                <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <DeleteBaseEntitysDialog
+            deleteById={userService.delete}
+            open={showDeleteTaskDialog}
+            onOpenChange={setShowDeleteTaskDialog}
+            list={[user]}
+            showTrigger={false}
+            onSuccess={() => row.toggleSelected(false)}
+          />
+        </>
       );
     },
     size: 60,
