@@ -3,7 +3,13 @@
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -111,7 +117,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   }
 
   const project = result?.data;
- 
+
   const isHasTopic = project?.topicId ? true : false;
 
   let availableSlots = 6;
@@ -129,6 +135,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       const command: InvitationUpdateCommand = {
         id: model.id,
         status: InvitationStatus.Rejected,
+        senderId: model.senderId,
+        receiverId: model.receiverId,
       };
 
       const promise =
@@ -175,6 +183,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         const command: InvitationUpdateCommand = {
           id: model.id,
           status: InvitationStatus.Accepted,
+          senderId: model.senderId,
+          receiverId: model.receiverId,
         };
         const res =
           await invitationService.approveOrRejectFromPersonalizeByLeader(
@@ -226,8 +236,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           <DialogHeader>
             <DialogTitle>Cảnh báo vị trí cuối cùng</DialogTitle>
             <DialogDescription>
-            Đây sẽ là vị trí cuối cùng còn trống. Việc chấp nhận sẽ khóa nhóm
-            và từ chối mọi lời mời đang chờ xử lý khác.
+              Đây sẽ là vị trí cuối cùng còn trống. Việc chấp nhận sẽ khóa nhóm
+              và từ chối mọi lời mời đang chờ xử lý khác.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">

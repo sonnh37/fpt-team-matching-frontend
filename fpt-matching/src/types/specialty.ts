@@ -4,9 +4,9 @@ import { Profession } from "./profession";
 import { ProfileStudent } from "./profile-student";
 
 export interface Specialty extends BaseEntity {
-    professionId?: string;
-    specialtyName?: string;
-    profession?: Profession;
-    ideas: Idea[];
-    profileStudents: ProfileStudent[]
+  professionId?: string;
+  specialtyName?: string;
+  profession?: Profession;
+  ideas: Idea[];
+  profileStudents: ProfileStudent[];
 }

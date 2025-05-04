@@ -58,16 +58,16 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
     });
   }, [filteredRoles]);
 
-  console.log("check_user", sortedRoles);
-
   // Active role logic
   const activeRolePlan = useCurrentRole();
-  const activeRole =
+  let activeRole =
     sortedRoles.find((role) => role.role?.roleName === activeRolePlan) ||
     sortedRoles.find((role) => role.isPrimary);
-
+  console.log("check_user_role", activeRole);
   if (!activeRole) {
-    return null;
+    if (sortedRoles.length == 0) return null;
+    activeRole = sortedRoles[0];
+    dispatch(updateUserCache({ role: activeRole.role?.roleName }));
   }
 
   //  React.useEffect(() => {

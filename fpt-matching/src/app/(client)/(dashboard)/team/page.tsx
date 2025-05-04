@@ -406,7 +406,7 @@ export default function TeamInfo() {
                 ) : (
                   <Button
                     variant="outline"
-                    disabled={isLockProject}
+                    disabled={isLockTeamMember}
                     onClick={() =>
                       handleAction(
                         teammemberService.leaveTeam,
@@ -654,7 +654,7 @@ export default function TeamInfo() {
                                   Xem hồ sơ
                                 </Link>
                               </DropdownMenuItem>
-                              {isLeader && !isLeaderInMembers && (
+                              {isLeader && !isLeaderInMembers && !isLockTeamMember && (
                                 <DropdownMenuItem
                                   className="text-destructive"
                                   onClick={() =>

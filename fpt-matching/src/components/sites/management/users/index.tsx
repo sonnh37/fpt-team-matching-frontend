@@ -173,6 +173,7 @@ export default function UserTable() {
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
+    
     manualPagination: true,
     debugTable: true,
   });
@@ -203,6 +204,7 @@ export default function UserTable() {
               isSortColumns={false}
               isCreateButton={false}
               columnSearch={columnSearch}
+              deleteAll={userService.delete}
               // handleSheetChange={handleSheetChange}
               // formFilterAdvanceds={formFilterAdvanceds}
             />
