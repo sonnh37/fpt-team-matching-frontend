@@ -71,10 +71,10 @@ function ButtonWithIcon({router} : {router: AppRouterInstance}) {
     return (
         <div className={"flex flex-row gap-2"}>
             <Button className={""} onClick={() => {router.push("manage-review/import-csv")}}>
-                <Import /> Import csv file
+                <Import /> Nhập review bằng file CSV
             </Button>
             <div className={"mb-4"}>
-                <Button onClick={() => handleDownTemplate()}>Tải template tại đây</Button>
+                <Button onClick={() => handleDownTemplate()}>Tải template để nhật tại đây</Button>
             </div>
         </div>
     )
@@ -116,15 +116,15 @@ export default function Page ()  {
     const router = useRouter()
     return (
         <div className={"px-4"}>
-            <div className={"mb-4 flex "}>
-                <div className={"w-1/6"}>
+            <div className={"mb-4 flex relative"}>
+                <div className={"absolute"}>
                     <ButtonWithIcon router={router} />
                 </div>
-                {<div className={"w-2/3 flex justify-center items-center"}>
+                <div className={"flex justify-center items-center w-full"}>
                     <div className={"font-bold text-2xl"}>
                         Kì hiện tại: {currentSemester?.semesterName} - {currentSemester?.semesterCode}
                     </div>
-                </div>}
+                </div>
             </div>
             <div className={"mb-4 flex justify-center"}>
                 <div className={"flex items-center flex-col justify-center"}>
