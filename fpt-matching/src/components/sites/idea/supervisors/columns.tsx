@@ -21,8 +21,10 @@ import {
 } from "@/components/ui/tooltip";
 import { mentortopicrequestService } from "@/services/mentor-topic-request-service";
 import { projectService } from "@/services/project-service";
+import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Idea } from "@/types/idea";
 import { MentorTopicRequestCreateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-create-command";
+import { Topic } from "@/types/topic";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { AlertTriangle, Loader2, Send } from "lucide-react";
@@ -31,54 +33,50 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export const columns: ColumnDef<Idea>[] = [
+export const columns: ColumnDef<Topic>[] = [
   {
-    accessorKey: "englishName",
+    accessorKey: "topicCode",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tên ý tưởng" />
+      <DataTableColumnHeader column={column} title="Mã đề tài" />
     ),
-    cell: ({ row }) => {
-      const highestVersion = getHighestVersion(row.original);
-      return (
-        <Button variant="link" className="p-0" asChild>
-          <Link href={`/idea/detail/${row.original.id || "#"}`}>
-            {highestVersion?.englishName || "-"}
-          </Link>
-        </Button>
-      );
-    },
   },
   {
-    accessorKey: "maxTeamSize",
+    accessorKey: "ideaVersion.englishName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tên đề tài" />
+    ),
+  },
+  {
+    accessorKey: "ideaVersion.teamSize",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Số thành viên" />
     ),
-    cell: ({ row }) => getHighestVersion(row.original)?.teamSize || 0,
   },
   {
-    accessorKey: "professionName",
+    accessorKey: "ideaVersion.idea.specialty.profession.professionName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Ngành học" />
     ),
-    cell: ({ row }) =>
-      row.original?.specialty?.profession?.professionName || "-",
   },
   {
-    accessorKey: "specialtyName",
+    accessorKey: "ideaVersion.idea.specialty.specialtyName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Chuyên ngành" />
     ),
-    cell: ({ row }) => row.original?.specialty?.specialtyName || "-",
   },
   {
-    accessorKey: "mentor.email",
+    accessorKey: "ideaVersion.idea.mentor.email",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Giảng viên hướng dẫn" />
     ),
     cell: ({ row }) => (
       <Button variant="link" className="p-0" asChild>
-        <Link href={`/profile-detail/${row.original.mentorId || "#"}`}>
-          {row.original.mentor?.email || "-"}
+        <Link
+          href={`/profile-detail/${
+            row.original.ideaVersion?.idea?.mentorId || "#"
+          }`}
+        >
+          {row.original.ideaVersion?.idea?.mentor?.email || "-"}
         </Link>
       </Button>
     ),
@@ -89,10 +87,8 @@ export const columns: ColumnDef<Idea>[] = [
       <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
-      const hasProjects = row.original.ideaVersions.some(
-        (v) => v.topic?.project
-      );
-      return hasProjects ? (
+      const project = row.original.project;
+      return project != undefined || project != null ? (
         <Badge variant="destructive">Đã đóng</Badge>
       ) : (
         <Badge variant="default">Mở</Badge>
@@ -107,68 +103,42 @@ export const columns: ColumnDef<Idea>[] = [
   },
 ];
 
-const getHighestVersion = (idea: Idea) => {
-  return idea.ideaVersions.reduce((prev, current) =>
-    (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  );
-};
-
-const RequestAction: React.FC<{ row: Row<Idea> }> = ({ row }) => {
+const RequestAction: React.FC<{ row: Row<Topic> }> = ({ row }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const queryClient = useQueryClient();
-  const idea = row.original;
-  const highestVersion = getHighestVersion(idea);
+  const topic = row.original;
+  const highestVersion = topic.ideaVersion;
 
   const { data: projectData, isLoading, error } = useQuery({
-    queryKey: ["teamInfo", idea.id],
+    queryKey: ["teamInfo"],
     queryFn: () => projectService.getProjectInfo(),
     refetchOnWindowFocus: false,
   });
 
-  if (isLoading) return <LoadingComponent />;
-  if (error) {
-    console.error("Lỗi khi tải dữ liệu:", error);
-    return <ErrorSystem />;
-  }
-
   const project = projectData?.data;
-  const hasSentRequest = highestVersion?.topic?.mentorTopicRequests?.some(
-    req => req.projectId === project?.id
+  const hasSentRequest = topic?.mentorTopicRequests?.some(
+    (req) => req.projectId === project?.id && req.status != MentorTopicRequestStatus.Rejected
   );
 
   const handleButtonClick = () => {
-    if (!project) {
-      toast.warning("Vui lòng tạo nhóm trước khi gửi yêu cầu");
-      return;
-    }
-    
-    if (hasSentRequest) {
-      toast.info("Bạn đã gửi yêu cầu cho đề tài này");
-      return;
-    }
-    
-    if (idea.isExistedTeam) {
-      toast.warning("Đề tài này đã đóng, không thể gửi yêu cầu");
-      return;
-    }
-    
     setIsDialogOpen(true);
   };
 
   const handleSubmitRequest = async () => {
     setIsSubmitting(true);
     try {
-      if (!idea.id || !project?.id) {
+      if (!topic.id) {
         throw new Error("Thiếu thông tin ý tưởng hoặc dự án");
       }
 
       const command: MentorTopicRequestCreateCommand = {
-        projectId: project.id,
-        ideaId: idea.id,
+        topicId: topic.id,
       };
 
-      const res = await mentortopicrequestService.sendRequestIdeaByStudent(command);
+      const res = await mentortopicrequestService.sendRequestIdeaByStudent(
+        command
+      );
       if (res.status !== 1) {
         toast.error(res.message);
         return;
@@ -190,7 +160,7 @@ const RequestAction: React.FC<{ row: Row<Idea> }> = ({ row }) => {
         <TooltipTrigger asChild>
           <Button
             variant={hasSentRequest ? "secondary" : "default"}
-            disabled={idea.isExistedTeam || hasSentRequest}
+            disabled={hasSentRequest}
             size="icon"
             onClick={handleButtonClick}
           >
@@ -209,7 +179,7 @@ const RequestAction: React.FC<{ row: Row<Idea> }> = ({ row }) => {
             <DialogDescription>
               Bạn sẽ gửi yêu cầu tới giảng viên{" "}
               <span className="font-semibold">
-                {idea.mentor?.email || "không xác định"}
+                {topic.ideaVersion?.idea?.mentor?.email || "-"}
               </span>{" "}
               cho đề tài:
             </DialogDescription>
@@ -219,7 +189,9 @@ const RequestAction: React.FC<{ row: Row<Idea> }> = ({ row }) => {
             <p className="font-medium">{highestVersion?.englishName}</p>
             <div className="flex items-start gap-3 mt-3 text-sm text-muted-foreground">
               <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0 text-yellow-500" />
-              <p>Sau khi gửi, vui lòng chờ phê duyệt từ giảng viên và hội đồng.</p>
+              <p>
+                Sau khi gửi, vui lòng chờ phê duyệt từ giảng viên và hội đồng.
+              </p>
             </div>
           </div>
 
@@ -228,7 +200,9 @@ const RequestAction: React.FC<{ row: Row<Idea> }> = ({ row }) => {
               <Button variant="outline">Hủy</Button>
             </DialogClose>
             <Button onClick={handleSubmitRequest} disabled={isSubmitting}>
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {isSubmitting && (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              )}
               {isSubmitting ? "Đang gửi..." : "Xác nhận"}
             </Button>
           </DialogFooter>

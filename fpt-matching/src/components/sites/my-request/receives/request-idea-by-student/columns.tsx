@@ -32,7 +32,7 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
       <DataTableColumnHeader column={column} title="Project" />
     ),
     cell: ({ row }) => {
-      const teamName = row.original.project?.teamName ?? "Unknown"; // Tránh lỗi undefined
+      const teamName = row.original.project?.teamName ?? "-"; // Tránh lỗi undefined
       const projectId = row.original.project?.id ?? "#";
 
       return (
@@ -118,7 +118,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: model.id,
         status: MentorTopicRequestStatus.Rejected,
         projectId: model.projectId,
-        ideaId: model.topic?.ideaVersion?.ideaId,
+        topicId: model.topicId,
       };
       const res = await mentortopicrequestService.update(command);
       if (res.status != 1) {
@@ -126,7 +126,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         return;
       }
 
-      toast.success(`Canceled`);
+      toast.success(`Đã từ chối`);
       queryClient.invalidateQueries({ queryKey: ["data"] });
     } catch (error) {
       toast.error(error as string);
@@ -140,7 +140,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: model.id,
         status: MentorTopicRequestStatus.Approved,
         projectId: model.projectId,
-        ideaId: model.topic?.ideaVersion?.ideaId,
+        topicId: model.topicId,
       };
       const res = await mentortopicrequestService.update(command);
       if (res.status != 1) {
@@ -148,7 +148,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         return;
       }
 
-      toast.success(`Approved`);
+      toast.success(`Đã đồng ý`);
       queryClient.invalidateQueries({ queryKey: ["data"] });
     } catch (error) {
       toast.error(error as string);
@@ -159,14 +159,14 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     <>
       <div className="isolate flex -space-x-px">
         <Button className="rounded-r-none focus:z-10" onClick={handleApprove}>
-          Accept
+          Đồng ý
         </Button>
         <Button
           variant="outline"
           className="rounded-l-none focus:z-10"
           onClick={handleCancel}
         >
-          Cancel
+          Từ chối
         </Button>
       </div>
     </>

@@ -145,6 +145,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       const command: InvitationUpdateCommand = {
         id: model.id,
         status: InvitationStatus.Accepted,
+        senderId: model.senderId,
+        receiverId: model.receiverId
       };
       const res = await invitationService.approveOrRejectFromTeamByMe(command);
       if (res.status != 1) {

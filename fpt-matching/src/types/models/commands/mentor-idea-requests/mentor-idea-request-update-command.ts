@@ -3,6 +3,6 @@ import { CreateCommand, UpdateCommand } from "../_base/base-command";
 
 export interface MentorTopicRequestUpdateCommand extends UpdateCommand {
   projectId?: string;
-  ideaId?: string;
+  topicId?: string;
   status?: MentorTopicRequestStatus;
 }
