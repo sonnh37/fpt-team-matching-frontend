@@ -99,7 +99,7 @@ export default function CouncilIdeaVersionRequestPendingTable() {
 
   const { data: res_semester } = useQuery({
     queryKey: ["get-current-semester"],
-    queryFn: () => semesterService.getCurrentSemester(),
+    queryFn: () => semesterService.getUpComingSemester(),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -139,7 +139,7 @@ export default function CouncilIdeaVersionRequestPendingTable() {
               Danh sách hội đồng đang chấm
             </TypographyH2>
             <Badge variant="outline" className="text-sm font-normal">
-              Học kỳ hiện tại: {res_semester?.data?.semesterName || "N/A"}
+              Học kỳ sắp tới: {res_semester?.data?.semesterName || "N/A"}
             </Badge>
           </div>
 

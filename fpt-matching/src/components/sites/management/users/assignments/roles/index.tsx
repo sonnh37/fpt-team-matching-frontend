@@ -37,13 +37,8 @@ import { z } from "zod";
 import { getEnumOptions } from "@/lib/utils";
 import { Department } from "@/types/enums/user";
 import { columns } from "./column";
+import { roleService } from "@/services/role-service";
 
-const role_options = [
-  { label: "Student", value: "Student" },
-  { label: "Council", value: "Council" },
-  { label: "Lecturer", value: "Lecturer" },
-  { label: "Reviewer", value: "Reviewer" },
-];
 //#region INPUT
 const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
@@ -53,8 +48,23 @@ export default function UserAssignmentRolesTable() {
   const searchParams = useSearchParams();
   const columnSearch = "emailOrFullname";
 
+  const { data: res_role } = useQuery({
+    queryKey: ["get-all-role"],
+    queryFn: () => roleService.getAll(),
+    refetchOnWindowFocus: false,
+  });
+
   const filterEnums: FilterEnum[] = [
-    { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
+    {
+      columnId: "role",
+      title: "Role",
+      options:
+        res_role?.data?.results?.map((role) => ({
+          label: role.roleName,
+          value: role.roleName,
+        })) || [],
+      type: "single",
+    },
     {
       columnId: "department",
       title: "Department",

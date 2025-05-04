@@ -36,6 +36,7 @@ import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { useCurrentRole } from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { TypographyP } from "@/components/_common/typography/typography-p";
 
 interface IdeaDetailFormProps {
   ideaId?: string;
@@ -257,6 +258,8 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
                 const isRequestForCurrentUserHasAnswer =
                   request?.answerCriterias?.length > 0 || false;
 
+                const note = request?.note;
+
                 return (
                   <div key={request.id} className="border rounded-lg p-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -281,22 +284,32 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
                         </p>
                       </div>
 
-                      <div className="space-y-1">
-                        {/* <Label className="italic"></Label> */}
-                        {isRequestForCurrentUser && (
-                          <Link href={`/idea/reviews/${request.id}`} passHref>
-                            <Button
-                              variant={
-                                isRequestForCurrentUserHasAnswer
-                                  ? "default"
-                                  : "outline"
-                              }
-                            >
-                              <ListChecks className="h-4 w-4" />
-                            </Button>
-                          </Link>
+                      {isRequestForCurrentUser &&
+                        idea.ownerId != user.id && (
+                          <div className="space-y-1">
+                            <Link href={`/idea/reviews/${request.id}`} passHref>
+                              <Button
+                                variant={
+                                  isRequestForCurrentUserHasAnswer ||
+                                  (request.role == "SubMentor" &&
+                                    request.status !=
+                                      IdeaVersionRequestStatus.Pending)
+                                    ? "default"
+                                    : "outline"
+                                }
+                              >
+                                <ListChecks className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                          </div>
                         )}
-                      </div>
+
+                      {!(note == undefined || note == "" || note == null) && (
+                        <div className="space-y-1">
+                          <Label className="italic">Ghi chú</Label>
+                          <p className="text-sm font-medium">{note}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

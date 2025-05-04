@@ -50,7 +50,7 @@ import { formatDate, getFileNameFromUrl, getPreviewUrl } from "@/lib/utils";
 import { format } from "date-fns";
 import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { IdeaVersion } from "@/types/idea-version";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ideaService } from "@/services/idea-service";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
@@ -74,6 +74,7 @@ type CreateVersionFormValues = z.infer<typeof createVersionSchema>;
 export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
   const roleCurrent = useCurrentRole();
   const user = useSelectorUser();
+  const queryClient = useQueryClient();
   if (!user) return;
   const {
     data: idea,
@@ -82,6 +83,7 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
   } = useQuery({
     queryKey: ["ideaUpdate", ideaId],
     queryFn: () => ideaService.getById(ideaId).then((res) => res.data),
+    refetchOnWindowFocus: false,
   });
 
   const [selectedVersion, setSelectedVersion] = useState<
@@ -101,12 +103,13 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
   let canCreate = false;
 
   if (
-    (roleCurrent === "Mentor" || roleCurrent === "Lecturer") &&
+    roleCurrent === "Mentor" &&
     idea.status === IdeaStatus.ConsiderByCouncil &&
-    idea.ownerId == user.id
+    idea.mentorId == user.id
   ) {
     canCreate = true;
   } else if (
+    roleCurrent === "Student" &&
     idea.status === IdeaStatus.ConsiderByMentor &&
     latest?.ideaVersionRequests.length > 0 &&
     idea.ownerId == user.id
@@ -511,9 +514,12 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
           </DialogHeader>
           <CreateVersionForm
             idea={idea}
-            onSuccess={() => {
+            onSuccess={async () => {
               setOpenCreate(false);
               setSelectedVersion(undefined);
+              await queryClient.refetchQueries({
+                queryKey: ["ideaUpdate", ideaId],
+              });
             }}
             initialData={highestVersion}
             onCancel={() => setOpenCreate(false)}

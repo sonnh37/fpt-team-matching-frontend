@@ -226,7 +226,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                     <Button onClick={(e) =>{
                       e.preventDefault();
                       handleTriggerNow(`auto-update-result-${form.getValues("semesterCode")}`)
-                    }}>Công khai kết quả ngay! !</Button>
+                    }}>Public Idea Result Now !</Button>
                     <Button onClick={(e) => {
                       e.preventDefault();
                       handleTriggerNow(`auto-update-project-inprogress-${form.getValues("semesterCode")}`)

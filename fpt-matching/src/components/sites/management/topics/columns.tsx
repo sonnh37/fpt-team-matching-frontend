@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -185,8 +186,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         return;
       }
 
-      await queryClient.invalidateQueries({
-        queryKey: ["getIdeaById", ideaId],
+      await queryClient.refetchQueries({
+        queryKey: ["data"],
       });
 
       toast.success("Đã trả đề tài về nhóm thành công!", {
@@ -234,7 +235,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: "submit-status",
       });
 
-      queryClient.refetchQueries({
+      await queryClient.refetchQueries({
         queryKey: ["data"],
       });
     } catch (error) {
@@ -276,6 +277,31 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       </div>
     </div>
   );
+  const isMentorOfIdea = idea?.mentorId == user?.id;
+  const hasSubmentorPendingRequest = ideaVersionRequests?.some(
+    (request) =>
+      request.role == "SubMentor" &&
+      request.status == IdeaVersionRequestStatus.Pending
+  );
+  const handleSubmit = async () => {
+    try {
+      const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
+        ideaVersion?.id
+      );
+      if (res.status != 1) return toast.error(res.message);
+
+      toast.success(res.message);
+
+      queryClient.refetchQueries({
+        queryKey: ["data"],
+      });
+      setIsDetailDialogOpen(false);
+    } catch (error: any) {
+      toast.error(error || "An unexpected error occurred");
+      setIsDetailDialogOpen(false);
+      return;
+    }
+  };
 
   return (
     <div className="flex items-center">
@@ -292,6 +318,18 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <DialogTitle>Chi tiết ý tưởng</DialogTitle>
           </DialogHeader>
           <IdeaDetailForm ideaId={ideaId} />
+          <DialogFooter>
+            {isMentorOfIdea && (
+              <Button
+                variant={`${hasCouncilRequests ? "secondary" : "default"}`}
+                size="sm"
+                onClick={() => handleSubmit()}
+                disabled={hasCouncilRequests || hasSubmentorPendingRequest}
+              >
+                {hasCouncilRequests ? "Đã nộp" : "Nộp cho hội đồng"}
+              </Button>
+            )}
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

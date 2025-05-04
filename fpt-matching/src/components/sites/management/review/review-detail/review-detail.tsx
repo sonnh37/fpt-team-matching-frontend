@@ -39,10 +39,10 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                         const file = new File([blob], fileName[1], {type: blob.type || ".xlsx"} )
                         setFileupload(file)
                     }
-                    if ( result.data.project != null && result.data?.project?.topic?.topicVersions && result.data?.project?.topic?.topicVersions?.length > 0){
+                    if ( result.data.project != null && result.data.project.topic.topicVersions.length > 0){
                         const listTopicVersion : TopicVersion[] = []
                         // const listFile : File[] = []
-                        for (const ideaHistory of result.data?.project?.topic?.topicVersions) {
+                        for (const ideaHistory of result.data.project.topic.topicVersions) {
                             if (ideaHistory.reviewStage === result.data?.number) {
                                 listTopicVersion.push(ideaHistory);
                             }
@@ -78,25 +78,21 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                     <div className={""}>
                         <BreadcrumbReviewDetails
                             semesterName={semester!.semesterName!}
-                            ideaCode={reviewDetails.project?.topic?.topicCode ? reviewDetails.project?.topic?.topicCode : ""}
+                            ideaCode={reviewDetails.project!.topic.topicCode!}
                             projectCode={reviewDetails.project!.teamCode!}
                             reviewNumber={reviewDetails.number}
                         />
                         <div className={"font-bold text-xl mt-6"}>
                             <div>
-                                {reviewDetails.project?.topic?.ideaVersion?.englishName}
+                                {reviewDetails.project?.topic.ideaVersion?.englishName}
                             </div>
                             <div className={"pt-4"}>
                                 {reviewDetailsRBAC.hasPermission(currentRole, "feedbackUpdatedCapstone")
                                     ? (
-                                        // <Link className={"font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"}
-                                        //       href={`/management/projects/detail/idea/update-idea?ideaId=${reviewDetails.project?.idea?.id}`} >Xem nội dùng đề tài chỉnh sửa</Link>
-                                        <div></div>
+                                        <Link className={"font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/management/projects/detail/idea/update-idea?ideaId=${reviewDetails.project?.idea?.id}`} >Xem nội dùng đề tài chỉnh sửa</Link>
                                     )
                                     : (reviewDetails.number != 3 && reviewDetails.number != 4)
-                                        ? <UpdateIdeaSheet topicVersionId={reviewDetails?.project?.topic?.ideaVersion?.id ? reviewDetails?.project?.topic?.ideaVersion?.id : ""}
-                                                           ideaId={reviewDetails.project?.topic?.id ? reviewDetails.project?.topic?.id : ""}
-                                                           reviewStage={reviewDetails.number} ideaHis={topicVersion} />
+                                        ? <UpdateIdeaSheet topicVersionId={reviewDetails?.project?.topic.ideaVersion?.id!} ideaId={reviewDetails && reviewDetails.project!.topic.id!} reviewStage={reviewDetails.number} ideaHis={topicVersion} />
                                         : <div></div>}
                                 {
                                     (topicVersion &&
@@ -115,31 +111,31 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                     <Accordion type="single" collapsible className="w-full">
                                         <AccordionItem value="item-1">
                                             <AccordionTrigger className={"font-bold text-lg"}>
-                                                Thông tin nhóm
+                                                Project information
                                             </AccordionTrigger>
                                             <AccordionContent>
                                                 <div className={"flex flex-col gap-1.5 font-bold"}>
-                                                    <div>Tên nhóm: <span className={"font-medium ml-2"}>{reviewDetails.project?.teamName}</span></div>
-                                                    <div>Mã nhóm: <span className={"font-medium ml-2"}>{reviewDetails.project?.teamCode}</span></div>
-                                                    <div>Số lượng thành viên: <span className={"font-medium ml-2"}>{reviewDetails.project?.teamSize}</span></div>
+                                                    <div>Team Name: <span className={"font-medium ml-2"}>{reviewDetails.project?.teamName}</span></div>
+                                                    <div>Team Code: <span className={"font-medium ml-2"}>{reviewDetails.project?.teamCode}</span></div>
+                                                    <div>Team size: <span className={"font-medium ml-2"}>{reviewDetails.project?.teamSize}</span></div>
                                                 </div>
                                             </AccordionContent>
                                         </AccordionItem>
                                         <AccordionItem value="item-2">
                                             <AccordionTrigger className={"font-bold text-lg"}>
-                                                Thông tin đề tài
+                                                Idea information
                                             </AccordionTrigger>
                                             <AccordionContent>
                                                 <div className={"flex flex-col gap-1.5 font-bold"}>
-                                                    <div>Mã đề tài: <span className={"font-medium ml-2"}>{reviewDetails?.project?.topic?.topicCode}</span></div>
-                                                    <div>Tên tiếng Anh: <span className={"font-medium ml-2"}>{reviewDetails?.project?.topic?.ideaVersion?.englishName}</span></div>
-                                                    <div>Tên tiếng việt: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.vietNamName}</span></div>
-                                                    <div>Viết tắt: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.abbreviations}</span></div>
-                                                    <div>Mô tả: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.description}</span></div>
-                                                    <div>Đề tài doanh nghiệp:
+                                                    <div>Idea code: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic.topicCode}</span></div>
+                                                    <div>English name: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic.ideaVersion?.englishName}</span></div>
+                                                    <div>Vietnamese name: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic.ideaVersion?.vietNamName}</span></div>
+                                                    <div>Abbreviations: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic.ideaVersion?.abbreviations}</span></div>
+                                                    <div>Description: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic.ideaVersion?.description}</span></div>
+                                                    <div>Enterprise project:
                                                         <Button
                                                             className={"ml-4"}
-                                                            variant={reviewDetails.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic != null ? "destructive" : "ghost"}>{!reviewDetails.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic ? "No" : reviewDetails.project?.topic.ideaVersion?.idea?.isEnterpriseTopic}</Button>
+                                                            variant={reviewDetails.project?.topic.ideaVersion?.idea?.isEnterpriseTopic != null ? "destructive" : "ghost"}>{!reviewDetails.project?.topic.ideaVersion?.idea?.isEnterpriseTopic ? "No" : reviewDetails.project?.topic.ideaVersion?.idea?.isEnterpriseTopic}</Button>
                                                     </div>
                                                 </div>
                                             </AccordionContent>
@@ -148,13 +144,13 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                 </CardContent>
                                 <CardFooter className={"w-full"} >
                                     <div className={"w-full"}>
-                                        <div className={"font-bold text-lg mb-2"}>Thông tin review</div>
+                                        <div className={"font-bold text-lg mb-2"}>Review information</div>
                                         <div className={"flex gap-4 flex-col font-bold text-sm"}>
                                             <div className={"w-full flex items-center"}>
                                                 <span className={"min-w-24"}>Reviewer 1: </span>
                                                 {reviewDetails.reviewer1?.username != null
                                                     ? (<span>{reviewDetails.reviewer1?.username}</span>)
-                                                    : <Button className={"ml-2"} variant={"destructive"}>Chưa có</Button>}
+                                                    : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
                                                 {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
                                                     <Button className={"ml-2"}>Update information</Button>
                                                 )}
@@ -163,7 +159,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                                 <span className={"min-w-24"}>Reviewer 2: </span>
                                                 {reviewDetails.reviewer2?.username != null
                                                     ? <span>{reviewDetails.reviewer2?.username}</span>
-                                                    : <Button className={"ml-2"} variant={"destructive"}>Chưa có</Button>}
+                                                    : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
                                                 {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
                                                     <Button className={"ml-2"}>Update information</Button>
                                                 )}
@@ -172,7 +168,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                                 <span className={"min-w-24"}>Review date: </span>
                                                 {reviewDetails.reviewDate != null
                                                     ? (<span>{new Date(reviewDetails.reviewDate).toLocaleDateString("en-GB")}</span>)
-                                                    : <Button className={"ml-2"} variant={"destructive"}>Chưa có</Button>}
+                                                    : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
                                                 {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
                                                     <Button className={"ml-2"}>Update information</Button>
                                                 )}
@@ -181,7 +177,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                                 <span className={"min-w-24"}>Room: </span>
                                                 {reviewDetails.room != null
                                                     ? <span>{reviewDetails.room}</span>
-                                                    : <Button className={"ml-2"} variant={"destructive"}>Chưa có</Button>}
+                                                    : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
                                                 {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
                                                     <Button className={"ml-2"}>Update information</Button>
                                                 )}
@@ -190,12 +186,12 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                                 <span className={"min-w-24"}>Slot: </span>
                                                 {reviewDetails.slot != null
                                                     ? <span>{reviewDetails.slot}</span>
-                                                    : <Button className={"ml-2"} variant={"destructive"}>Chưa có</Button>}
+                                                    : <Button className={"ml-2"} variant={"destructive"}>Not assigned</Button>}
                                                 {reviewDetailsRBAC.hasPermission(currentRole, "assignReview") && (
                                                     <Button className={"ml-2"}>Update information</Button>
                                                 )}
                                             </div>
-                                            <div>File tải lên: <SheetFileUpload reviewNumber={reviewDetails.number} fileUrl={reviewDetails.fileUpload} file={fileUpload} setFile={setFileupload} /></div>
+                                            <div>File upload: <SheetFileUpload reviewNumber={reviewDetails.number} fileUrl={reviewDetails.fileUpload} file={fileUpload} setFile={setFileupload} /></div>
                                         </div>
                                     </div>
                                 </CardFooter>

@@ -21,7 +21,7 @@ import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import SamilaritiesProjectModels from "@/types/models/samilarities-project-models";
-import { Eye, ListChecks } from "lucide-react";
+import {Brain, Eye, ListChecks} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -130,36 +130,7 @@ export const columns: ColumnDef<Idea>[] = [
   //     return highestVersion?.enterpriseName || "-";
   //   },
   // },
-  {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Trạng thái" />
-    ),
-    cell: ({ row }) => {
-      const status = row.getValue("status") as IdeaVersionRequestStatus;
-      const statusText = IdeaVersionRequestStatus[status];
-
-      let badgeVariant:
-        | "secondary"
-        | "destructive"
-        | "default"
-        | "outline"
-        | null = "default";
-
-      switch (status) {
-        case IdeaVersionRequestStatus.Approved:
-          badgeVariant = "default";
-          break;
-        default:
-          badgeVariant = "outline";
-      }
-
-      return <Badge variant={badgeVariant}>{statusText}</Badge>;
-    },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
+  
   {
     accessorKey: "actions",
     header: "Tùy chọn",
@@ -252,40 +223,44 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             {loadingAI ? (
               <LoadingComponent />
             ) : (
-              <div className="flex flex-col gap-10">
-                {samilaritiesProject && samilaritiesProject.length > 0 ? (
-                  samilaritiesProject.map((project, index) => (
-                    <Card key={index}>
-                      <CardHeader>
-                        <CardTitle>{project.name}</CardTitle>
-                        <CardDescription>
-                          Độ tương đồng:{" "}
-                          {(Number(project.similarity.toFixed(2)) ?? 0) * 100}%
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-2">
-                          <div>
-                            <Label className="font-bold">Project Code:</Label>
-                            <p>{project.project_code}</p>
-                          </div>
-                          <div>
-                            <Label>Context:</Label>
-                            <p>{project.context}</p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                ) : (
-                  <p>No similar projects found</p>
-                )}
-              </div>
+                <div className="flex flex-col gap-10 h-screen overflow-auto">
+                  <div className="text-lg font-semibold flex gap-2">
+                    <Brain className="h-5 w-5" />
+                    <h3>Các đề tài tương đồng đã tồn tại</h3>
+                  </div>
+                  {samilaritiesProject && samilaritiesProject.length > 0 ? (
+                      samilaritiesProject.map((project, index) => (
+                          <Card key={index}>
+                            <CardHeader>
+                              <CardTitle>{project.name}</CardTitle>
+                              <CardDescription>
+                                Độ tương đồng:{" "}
+                                {(Number(project.similarity.toFixed(2)) ?? 0) * 100}%
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-2">
+                                <div className={"flex gap-4"}>
+                                  <Label className="font-bold">Mã đề tài:</Label>
+                                  <p>{project.project_code}</p>
+                                </div>
+                                <div>
+                                  <Label className={"font-bold"}>Mô tả:</Label>
+                                  <p>{project.context}</p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                      ))
+                  ) : (
+                      <p>No similar projects found</p>
+                  )}
+                </div>
             )}
           </div>
         </DialogContent>
       </Dialog>
-      <Tooltip>
+      {/* <Tooltip>
         <TooltipTrigger asChild>
           <Link href={`/idea/reviews/${councilRequest?.id}`} passHref>
             <Button size="icon" variant="default">
@@ -296,7 +271,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         <TooltipContent>
           <p>Đánh giá</p>
         </TooltipContent>
-      </Tooltip>
+      </Tooltip> */}
     </div>
   );
 };

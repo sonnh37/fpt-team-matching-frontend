@@ -103,8 +103,6 @@ function DatePickerReview({currentReviewer, setCurrentReview}: {currentReviewer:
                 <Calendar
                     mode="single"
                     selected={currentReviewer?.reviewDate}
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-expect-error
                     onSelect={setDate}
                     initialFocus
                 />
@@ -115,34 +113,17 @@ function DatePickerReview({currentReviewer, setCurrentReview}: {currentReviewer:
 
 function DialogConfirm({currentReview, open, setOpen} :{currentReview: ReviewUpdateCommand, open: boolean, setOpen: Dispatch<SetStateAction<boolean>>}) {
     const handleUpdate= async () => {
-        try {
-            if (currentReview.reviewDate == null || currentReview.room == null || currentReview.slot == null || !currentReview.reviewer1Id || !currentReview.reviewer2Id) {
-                toast.error("Vui lòng nhập đầy đủ các trường")
-                return;
-            }
-            if (currentReview.reviewer2Id == currentReview.reviewer1Id) {
-                toast.error("2 người review phải khác nhau")
-                return;
-            }
-            if (currentReview.reviewDate < new Date(Date.now())) {
-                toast.error("Ngày review phải lớn hơn ngày hiện tại")
-                return;
-            }
-            const response = await reviewService.update(currentReview)
-            if (response && response.status == 1) {
-                toast.success("Cập nhật review thành công!")
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500)
-            } else {
-                toast.error(response.message)
-            }
-        } catch (e) {
-            toast.error(e)
+        const response = await reviewService.update(currentReview)
+        if (response && response.status == 1) {
+            toast.success("Update review successfully!")
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500)
+        } else {
+            toast.error(response.message)
         }
-        finally {
-            setOpen(false)
-        }
+        setOpen(false)
+
     }
     return(
         <Dialog open={open}>
@@ -219,14 +200,14 @@ export function DialogUpdateReview({review}: {review: Review}) {
                         </div>
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="username" className="text-right">
-                                Ngày review:
+                                Review date:
                             </Label>
                             <DatePickerReview setCurrentReview={setCurrentReview} currentReviewer={currentReview} />
                         </div>
 
                         <div className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor="username" className="text-right">
-                                Phòng:
+                                Room:
                             </Label>
                             <Input
                                 className="col-span-3"

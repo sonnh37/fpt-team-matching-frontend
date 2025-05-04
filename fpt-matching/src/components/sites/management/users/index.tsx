@@ -32,18 +32,15 @@ import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
-import { columns } from "./columns";
 import { getEnumOptions } from "@/lib/utils";
 import { Department } from "@/types/enums/user";
 
-const role_options = [
-  { label: "Student", value: "Student" },
-  { label: "Council", value: "Council" },
-  { label: "Lecturer", value: "Lecturer" },
-  { label: "Reviewer", value: "Reviewer" },
-];
+import { roleService } from "@/services/role-service";
+import { columns } from "./columns";
+import { semesterService } from "@/services/semester-service";
+
 //#region INPUT
 const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
@@ -51,16 +48,47 @@ const defaultSchema = z.object({
 //#endregion
 export default function UserTable() {
   const searchParams = useSearchParams();
+  const columnSearch = "emailOrFullname";
+
+  const { data: res_role } = useQuery({
+    queryKey: ["get-all-role"],
+    queryFn: () => roleService.getAll(),
+    refetchOnWindowFocus: false,
+  });
+
+  const { data: res_semester } = useQuery({
+    queryKey: ["get-all-semester"],
+    queryFn: () => semesterService.getAll(),
+    refetchOnWindowFocus: false,
+  });
 
   const filterEnums: FilterEnum[] = [
-    { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
+    {
+      columnId: "role",
+      title: "Role",
+      options:
+        res_role?.data?.results?.map((role) => ({
+          label: role.roleName,
+          value: role.roleName,
+        })) || [],
+      type: "single",
+    },
+    {
+      columnId: "semesterId",
+      title: "Semester",
+      options:
+        res_semester?.data?.results?.map((semester) => ({
+          label: semester.semesterName,
+          value: semester.id,
+        })) || [],
+      type: "single",
+    },
     {
       columnId: "department",
       title: "Department",
       options: getEnumOptions(Department),
       type: "single",
     },
-    { columnId: "role", title: "Role", options: role_options, type: "single" },
   ];
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -86,6 +114,10 @@ export default function UserTable() {
     resolver: zodResolver(defaultSchema),
   });
 
+  const formValues = useWatch({
+    control: form.control,
+  });
+
   // input field
   const [inputFields, setInputFields] =
     useState<z.infer<typeof defaultSchema>>();
@@ -93,14 +125,14 @@ export default function UserTable() {
   // default field in table
   const queryParams = useMemo(() => {
     const params: UserGetAllQuery = useQueryParams(
-      inputFields,
+      formValues,
       columnFilters,
       pagination,
       sorting
     );
 
     return { ...params };
-  }, [inputFields, columnFilters, pagination, sorting]);
+  }, [formValues, columnFilters, pagination, sorting]);
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
@@ -110,6 +142,17 @@ export default function UserTable() {
       }));
     }
   }, [columnFilters, inputFields]);
+
+  useEffect(() => {
+    const field = formValues[columnSearch as keyof typeof formValues] as
+      | string
+      | undefined;
+    if (field && field.length > 0) {
+      setIsTyping(true);
+    } else {
+      setIsTyping(false);
+    }
+  }, [formValues[columnSearch as keyof typeof formValues]]);
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
@@ -136,42 +179,17 @@ export default function UserTable() {
 
   //#endregion
 
-  const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-    setInputFields(values);
-  };
+  const onSubmit = (values: z.infer<typeof defaultSchema>) => {};
 
   return (
     <>
-      <div className="container mx-auto space-y-8">
+      <div className="">
         <div className="w-fit mx-auto space-y-4">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="emailOrFullname"
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>Search name or code</FormLabel>
-                      <div className="flex items-center gap-2">
-                        <FormControl>
-                          <Input
-                            placeholder=""
-                            className="focus-visible:ring-none"
-                            type="text"
-                            {...field}
-                          />
-                        </FormControl>
-                        <Button type="submit" variant="default" size="icon">
-                          <Search />
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
-              />
-            </form>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-8"
+            ></form>
           </Form>
         </div>
 
@@ -182,9 +200,9 @@ export default function UserTable() {
               table={table}
               filterEnums={filterEnums}
               isSelectColumns={false}
-              isCreateButton={false}
               isSortColumns={false}
-              // columnSearch={columnSearch}
+              isCreateButton={false}
+              columnSearch={columnSearch}
               // handleSheetChange={handleSheetChange}
               // formFilterAdvanceds={formFilterAdvanceds}
             />
@@ -194,7 +212,6 @@ export default function UserTable() {
               restore={userService.restore}
               deletePermanent={userService.deletePermanent}
             />
-
             <DataTablePagination table={table} />
           </div>
         </div>

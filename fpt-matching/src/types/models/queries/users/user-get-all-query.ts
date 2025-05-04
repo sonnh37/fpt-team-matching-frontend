@@ -15,5 +15,6 @@ export interface UserGetAllQuery extends BaseQueryableQuery {
   address?: string;
   department?: Department;
   role?: string;
+  semesterId?: string;
   emailOrFullname?: string;
 }
