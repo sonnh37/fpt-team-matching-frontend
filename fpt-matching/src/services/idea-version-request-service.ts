@@ -48,6 +48,24 @@ class IdeaVersionRequestService extends BaseService<IdeaVersionRequest> {
       });
   };
 
+  
+  public getAllExceptPending = (
+    query?: BaseQueryableQuery
+  ): Promise<BusinessResult<QueryResult<IdeaVersionRequest>>> => {
+    const cleanedQuery = cleanQueryParams(query);
+
+    return axiosInstance
+      .get<BusinessResult<QueryResult<IdeaVersionRequest>>>(
+        `${this.endpoint}/by-status-different-pending?${cleanedQuery}`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
+
   public deletePermanent = async (
     id: string
   ): Promise<BusinessResult<null>> => {
