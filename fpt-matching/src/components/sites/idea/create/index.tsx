@@ -681,7 +681,7 @@ export const CreateProjectForm = () => {
                         <SelectValue placeholder="Chọn số lượng thành viên" />
                       </SelectTrigger>
                       <SelectContent>
-                        {[4, 5, 6].map((option) => (
+                        {[4, 5].map((option) => (
                           <SelectItem key={option} value={option.toString()}>
                             {option} thành viên
                           </SelectItem>
