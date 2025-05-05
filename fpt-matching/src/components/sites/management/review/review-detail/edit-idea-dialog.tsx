@@ -54,14 +54,14 @@ export function EditIdeaDialog(
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    {!loading ? <Button onClick={handleSaveChange} variant={"destructive"} type="submit">Save changes</Button>
+                    {!loading ? <Button onClick={handleSaveChange} variant={"destructive"} type="submit">Cập nhật</Button>
                         : (
                             <Button disabled>
                                 <Loader2 className="animate-spin" />
                                 Please wait
                             </Button>
                         )}
-                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Close</AlertDialogCancel>
+                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Huỷ</AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

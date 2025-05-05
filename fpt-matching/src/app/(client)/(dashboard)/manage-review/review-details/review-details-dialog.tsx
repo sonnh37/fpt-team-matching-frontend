@@ -28,7 +28,7 @@ export function ReviewDetailsDialog(
                 const response = await reviewService.uploadFileUrp({reviewId: reviewId, fileUrl: result})
                 console.log(response)
                 if (response.status == 1) {
-                   toast.success("Successfully uploaded");
+                   toast.success("Cập nhật thành công");
                 } else {
                     toast.error(response.message);
                 }
@@ -42,8 +42,8 @@ export function ReviewDetailsDialog(
     return (
         <AlertDialog open={isOpen}>
             <AlertDialogTrigger asChild>
-                {reviewDate && reviewDate.getDate() != new Date(Date.now()).getDate() ?
-                    <Button onClick={() => {setIsOpen(true)}} variant="destructive">Upload file</Button> : <Button disabled={true} className={"bg-red-400 hover:bg-red-400 "} variant="destructive">Upload file</Button>
+                {reviewDate && reviewDate.getDate() == new Date(Date.now()).getDate() ?
+                    <Button onClick={() => {setIsOpen(true)}} variant="destructive">Tải file lên</Button> : <Button disabled={true} className={"bg-red-400 hover:bg-red-400 "} variant="destructive">Upload file</Button>
                 }
             </AlertDialogTrigger>
             <AlertDialogContent  className="sm:max-w-[425px]">
@@ -55,14 +55,14 @@ export function ReviewDetailsDialog(
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    {!loading ? <Button onClick={handleSaveChange} variant={"destructive"} type="submit">Save changes</Button>
+                    {!loading ? <Button onClick={handleSaveChange} variant={"destructive"} type="submit">Cập nhật</Button>
                         : (
                         <Button disabled>
                             <Loader2 className="animate-spin" />
                             Please wait
                         </Button>
                         )}
-                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Close</AlertDialogCancel>
+                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Huỷ</AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
