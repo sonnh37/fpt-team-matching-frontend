@@ -163,9 +163,8 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
   const criteriaforms = res_criteriaforms?.data?.results ?? [];
 
   const handleTriggerNow = async (jobId: string) => {
-    console.log(jobId);
-    // const response = await hangfireService.TriggerNow({jobId: jobId})
-    // toast.info(response.data)
+    const response = await hangfireService.TriggerNow({jobId: jobId})
+    toast.info(response.data)
   }
   return (
     <>
@@ -226,7 +225,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                     <Button onClick={(e) =>{
                       e.preventDefault();
                       handleTriggerNow(`auto-update-result-${form.getValues("semesterCode")}`)
-                    }}>Public Idea Result Now !</Button>
+                    }}>Công khai kết quả duyệt ngay !</Button>
                     <Button onClick={(e) => {
                       e.preventDefault();
                       handleTriggerNow(`auto-update-project-inprogress-${form.getValues("semesterCode")}`)
