@@ -40,9 +40,9 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { columns } from "./columns";
 import { TopicGetListOfSupervisorsQuery } from "@/types/models/queries/topics/topic-get-list-of-supervisor-query";
 import { topicService } from "@/services/topic-service";
+import { useTopicColumns } from "./columns";
 
 const defaultSchema = z.object({
   englishName: z.string().optional(),
@@ -50,10 +50,11 @@ const defaultSchema = z.object({
 
 export default function TopicsOfSupervisorsTable() {
   const searchParams = useSearchParams();
+  const columns = useTopicColumns();
   const filterEnums: FilterEnum[] = [
     {
       columnId: "isExistedTeam",
-      title: "Trạng thái",
+      title: "Trạng thái nhóm",
       options: isExistedTeam_options,
     },
   ];

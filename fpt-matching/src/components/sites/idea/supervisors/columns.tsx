@@ -19,11 +19,14 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useCurrentRole } from "@/hooks/use-current-role";
 import { mentortopicrequestService } from "@/services/mentor-topic-request-service";
 import { projectService } from "@/services/project-service";
+import { semesterService } from "@/services/semester-service";
 import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Idea } from "@/types/idea";
 import { MentorTopicRequestCreateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-create-command";
+import { Semester } from "@/types/semester";
 import { Topic } from "@/types/topic";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
@@ -33,84 +36,123 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export const columns: ColumnDef<Topic>[] = [
-  {
-    accessorKey: "topicCode",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã đề tài" />
-    ),
-  },
-  {
-    accessorKey: "ideaVersion.englishName",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tên đề tài" />
-    ),
-  },
-  {
-    accessorKey: "ideaVersion.teamSize",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Số thành viên" />
-    ),
-  },
-  {
-    accessorKey: "ideaVersion.idea.specialty.profession.professionName",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Ngành học" />
-    ),
-  },
-  {
-    accessorKey: "ideaVersion.idea.specialty.specialtyName",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Chuyên ngành" />
-    ),
-  },
-  {
-    accessorKey: "ideaVersion.idea.mentor.email",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Giảng viên hướng dẫn" />
-    ),
-    cell: ({ row }) => (
-      <Button variant="link" className="p-0" asChild>
-        <Link
-          href={`/profile-detail/${
-            row.original.ideaVersion?.idea?.mentorId || "#"
-          }`}
-        >
-          {row.original.ideaVersion?.idea?.mentor?.email || "-"}
-        </Link>
-      </Button>
-    ),
-  },
-  {
-    accessorKey: "isExistedTeam",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Trạng thái" />
-    ),
-    cell: ({ row }) => {
-      const project = row.original.project;
-      return project != undefined || project != null ? (
-        <Badge variant="destructive">Đã đóng</Badge>
-      ) : (
-        <Badge variant="default">Mở</Badge>
-      );
-    },
-    filterFn: (row, id, value) => value.includes(row.getValue(id)),
-  },
-  {
-    id: "actions",
-    header: "Thao tác",
-    cell: ({ row }) => <RequestAction row={row} />,
-  },
-];
+export const useTopicColumns = () => {
+  // Fetch all required data once
+  const { data: res_semester, isLoading: isLoadingSemester } = useQuery({
+    queryKey: ["current-semester-columns"],
+    queryFn: () => semesterService.getCurrentSemester(),
+    refetchOnWindowFocus: false,
+  });
 
-const RequestAction: React.FC<{ row: Row<Topic> }> = ({ row }) => {
+  if (isLoadingSemester) return [];
+
+  const columns: ColumnDef<Topic>[] = [
+    {
+      accessorKey: "topicCode",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Mã đề tài" />
+      ),
+    },
+    {
+      accessorKey: "ideaVersion.englishName",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Tên đề tài" />
+      ),
+    },
+    {
+      accessorKey: "ideaVersion.teamSize",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Số thành viên" />
+      ),
+    },
+    {
+      accessorKey: "ideaVersion.idea.specialty.profession.professionName",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Ngành học" />
+      ),
+    },
+    {
+      accessorKey: "ideaVersion.idea.specialty.specialtyName",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Chuyên ngành" />
+      ),
+    },
+    {
+      accessorKey: "ideaVersion.idea.mentor.email",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Giảng viên hướng dẫn" />
+      ),
+      cell: ({ row }) => (
+        <Button variant="link" className="p-0" asChild>
+          <Link
+            href={`/profile-detail/${
+              row.original.ideaVersion?.idea?.mentorId || "#"
+            }`}
+          >
+            {row.original.ideaVersion?.idea?.mentor?.email || "-"}
+          </Link>
+        </Button>
+      ),
+    },
+    {
+      accessorKey: "semesterStatus",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Trạng thái kỳ" />
+      ),
+      cell: ({ row }) => {
+        const isSemesterClosed = res_semester?.status == 1;
+        return isSemesterClosed ? (
+          <Badge variant="destructive">Đã đóng</Badge>
+        ) : (
+          <Badge variant="default">Mở</Badge>
+        );
+      },
+      filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    },
+    {
+      accessorKey: "isExistedTeam",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Trạng thái nhóm" />
+      ),
+      cell: ({ row }) => {
+        const project = row.original.project;
+        const hasTeam = project != undefined || project != null;
+        return hasTeam ? (
+          <Badge variant="secondary">Đã có nhóm</Badge>
+        ) : (
+          <Badge variant="outline">Chưa có nhóm</Badge>
+        );
+      },
+      filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    },
+    {
+      id: "actions",
+      header: "Thao tác",
+      cell: ({ row }) => (
+        <RequestAction row={row} semester={res_semester?.data} />
+      ),
+    },
+  ];
+
+  return columns;
+};
+
+const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
+  row,
+  semester,
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const queryClient = useQueryClient();
   const topic = row.original;
+  const role = useCurrentRole();
   const highestVersion = topic.ideaVersion;
 
-  const { data: projectData, isLoading, error } = useQuery({
+  const {
+    data: projectData,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["teamInfo"],
     queryFn: () => projectService.getProjectInfo(),
     refetchOnWindowFocus: false,
@@ -118,7 +160,9 @@ const RequestAction: React.FC<{ row: Row<Topic> }> = ({ row }) => {
 
   const project = projectData?.data;
   const hasSentRequest = topic?.mentorTopicRequests?.some(
-    (req) => req.projectId === project?.id && req.status != MentorTopicRequestStatus.Rejected
+    (req) =>
+      req.projectId === project?.id &&
+      req.status != MentorTopicRequestStatus.Rejected
   );
 
   const handleButtonClick = () => {
@@ -156,58 +200,65 @@ const RequestAction: React.FC<{ row: Row<Topic> }> = ({ row }) => {
 
   return (
     <>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant={hasSentRequest ? "secondary" : "default"}
-            disabled={hasSentRequest}
-            size="icon"
-            onClick={handleButtonClick}
-          >
-            {hasSentRequest ? "Đã gửi" : <Send className="h-4 w-4" />}
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{hasSentRequest ? "Yêu cầu đã được gửi" : "Gửi yêu cầu"}</p>
-        </TooltipContent>
-      </Tooltip>
+      {role == "Student" && (
+        <>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={hasSentRequest ? "secondary" : "default"}
+                disabled={
+                  hasSentRequest || semester != undefined || semester != null
+                }
+                size="icon"
+                onClick={handleButtonClick}
+              >
+                {hasSentRequest ? "Đã gửi" : <Send className="h-4 w-4" />}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{hasSentRequest ? "Yêu cầu đã được gửi" : "Gửi yêu cầu"}</p>
+            </TooltipContent>
+          </Tooltip>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Xác nhận gửi yêu cầu</DialogTitle>
-            <DialogDescription>
-              Bạn sẽ gửi yêu cầu tới giảng viên{" "}
-              <span className="font-semibold">
-                {topic.ideaVersion?.idea?.mentor?.email || "-"}
-              </span>{" "}
-              cho đề tài:
-            </DialogDescription>
-          </DialogHeader>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Xác nhận gửi yêu cầu</DialogTitle>
+                <DialogDescription>
+                  Bạn sẽ gửi yêu cầu tới giảng viên{" "}
+                  <span className="font-semibold">
+                    {topic.ideaVersion?.idea?.mentor?.email || "-"}
+                  </span>{" "}
+                  cho đề tài:
+                </DialogDescription>
+              </DialogHeader>
 
-          <div className="py-4">
-            <p className="font-medium">{highestVersion?.englishName}</p>
-            <div className="flex items-start gap-3 mt-3 text-sm text-muted-foreground">
-              <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0 text-yellow-500" />
-              <p>
-                Sau khi gửi, vui lòng chờ phê duyệt từ giảng viên và hội đồng.
-              </p>
-            </div>
-          </div>
+              <div className="py-4">
+                <p className="font-medium">{highestVersion?.englishName}</p>
+                <div className="flex items-start gap-3 mt-3 text-sm text-muted-foreground">
+                  <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0 text-yellow-500" />
+                  <p>
+                    Sau khi gửi, vui lòng chờ phê duyệt từ giảng viên và hội
+                    đồng.
+                  </p>
+                </div>
+              </div>
 
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Hủy</Button>
-            </DialogClose>
-            <Button onClick={handleSubmitRequest} disabled={isSubmitting}>
-              {isSubmitting && (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              )}
-              {isSubmitting ? "Đang gửi..." : "Xác nhận"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Hủy</Button>
+                </DialogClose>
+                <Button onClick={handleSubmitRequest} disabled={isSubmitting}>
+                  {isSubmitting && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  {isSubmitting ? "Đang gửi..." : "Xác nhận"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
     </>
   );
 };
