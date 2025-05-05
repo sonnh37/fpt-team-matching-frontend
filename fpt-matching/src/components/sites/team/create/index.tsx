@@ -54,7 +54,7 @@ export const TeamForm = () => {
       const response = await projectService.createTeam(createdValues);
       if (response.status !== 1) throw new Error(response.message);
 
-      toast.success("Chúc mừng bạn đã tạo idea thành công!");
+      toast.success(response.message);
       await queryClient.refetchQueries({ queryKey: ["getTeamInfo"] });
       router.push("/team");
     } catch (error: any) {
