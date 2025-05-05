@@ -87,93 +87,69 @@ const FormAnswer = ({
                 <Button className="p-2 px-4 bg-blue-500 rounded-sm text-white"  >Chi tiết</Button>
             </ModalTrigger>
 
-            <ModalBody className='min-h-[80%] max-h-[90%] md:max-w-[70%]'>
-
-                <ModalContent>
-                    <div className="flex flex-col max-h-screen"> {/* Tổng chiều cao modal */}
-
-                        {/* HEADER  */}
-                        <div className="basis-[10%] flex justify-center items-center py-4 ">
-                            <h1 className="text-2xl md:text-3xl"> Đánh giá đề tài Capstone Project</h1>
-                        </div>
-                        <div className="basis-[90%] min-h-0  overflow-y-auto px-4">
-
-
-                            {result?.data?.criteriaXCriteriaForms &&
-                                result?.data?.criteriaXCriteriaForms
-                                    .filter((x) => x.isDeleted == false)
-                                    .map((criteria, index) => {
-                                        const answerValue = form.watch(`answers.${criteria.criteria?.id}`);
-
-                                        return (
-                                            <Card key={criteria.id} className="mb-8 p-4">
-                                                <CardHeader>
-                                                    <div className="flex items-start gap-2">
-                                                        <span className="font-semibold whitespace-nowrap">
-                                                            Câu {index + 1}:
-                                                        </span>
-                                                        <p className="flex-1">{criteria?.criteria?.question}</p>
-                                                    </div>
-                                                    <Separator />
-                                                </CardHeader>
-
-                                                <CardContent className="flex gap-4">
-                                                    {criteria?.criteria?.valueType ===
-                                                        CriteriaValueType.Boolean ? (
-                                                        <RadioGroup
-                                                            value={answerValue}
-                                                            onValueChange={(value) => {
-                                                                form.setValue(
-                                                                    `answers.${criteria.criteria?.id}`,
-                                                                    value
-                                                                );
-                                                            }}
-                                                            disabled={isAnswered}
-                                                        >
-                                                            <div className="flex items-center space-x-2">
-                                                                <RadioGroupItem
-                                                                    value="yes"
-                                                                    id={`r1-${criteria.id}`}
-                                                                />
-                                                                <Label htmlFor={`r1-${criteria.id}`}>Có</Label>
-                                                            </div>
-                                                            <div className="flex items-center space-x-2">
-                                                                <RadioGroupItem
-                                                                    value="no"
-                                                                    id={`r2-${criteria.id}`}
-                                                                />
-                                                                <Label htmlFor={`r2-${criteria.id}`}>Không</Label>
-                                                            </div>
-                                                        </RadioGroup>
-                                                    ) : (
-                                                        <div className="dark: rounded-lg w-full min-h-[200px]">
-                                                            <div className="flex gap-4 w-full h-full">
-                                                                <Textarea
-                                                                    value={answerValue || ""}
-                                                                    onChange={(e) =>
-                                                                        form.setValue(
-                                                                            `answers.${criteria.criteria?.id}`,
-                                                                            e.target.value
-                                                                        )
-                                                                    }
-                                                                    disabled={isAnswered}
-                                                                    placeholder="Nhập đánh giá"
-                                                                />
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </CardContent>
-                                            </Card>
-                                        );
-                                    })}
-                        </div>
-
+            <ModalBody className="p-0">
+                <div className="max-h-[90vh] w-full flex flex-col overflow-hidden">
+                    {/* Header cố định */}
+                    <div className="flex-none bg-orange-400 py-4 flex justify-center items-center">
+                        <h1 className="text-2xl md:text-3xl">Đánh giá đề tài Capstone Project</h1>
                     </div>
-                </ModalContent>
 
+                    {/* Nội dung scroll */}
+                    <div className="flex-1 overflow-y-auto px-4 py-2">
+                        {result?.data?.criteriaXCriteriaForms &&
+                            result.data.criteriaXCriteriaForms
+                                .filter((x) => !x.isDeleted)
+                                .map((criteria, index) => {
+                                    const answerValue = form.watch(`answers.${criteria.criteria?.id}`);
+                                    return (
+                                        <Card key={criteria.id} className="mb-6 mt-3 p-4">
+                                            <CardHeader>
+                                                <div className="flex items-start gap-2">
+                                                    <span className="font-semibold whitespace-nowrap">
+                                                        Câu {index + 1}:
+                                                    </span>
+                                                    <p className="flex-1">{criteria?.criteria?.question}</p>
+                                                </div>
+                                                <Separator />
+                                            </CardHeader>
 
-
+                                            <CardContent className="flex gap-4">
+                                                {criteria.criteria?.valueType === CriteriaValueType.Boolean ? (
+                                                    <RadioGroup
+                                                        value={answerValue}
+                                                        onValueChange={(value) =>
+                                                            form.setValue(`answers.${criteria.criteria?.id}`, value)
+                                                        }
+                                                        disabled={isAnswered}
+                                                    >
+                                                        <div className="flex items-center space-x-2">
+                                                            <RadioGroupItem value="yes" id={`r1-${criteria.id}`} />
+                                                            <Label htmlFor={`r1-${criteria.id}`}>Có</Label>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <RadioGroupItem value="no" id={`r2-${criteria.id}`} />
+                                                            <Label htmlFor={`r2-${criteria.id}`}>Không</Label>
+                                                        </div>
+                                                    </RadioGroup>
+                                                ) : (
+                                                    <Textarea
+                                                        value={answerValue || ""}
+                                                        onChange={(e) =>
+                                                            form.setValue(`answers.${criteria.criteria?.id}`, e.target.value)
+                                                        }
+                                                        disabled={isAnswered}
+                                                        placeholder="Nhập đánh giá"
+                                                    />
+                                                )}
+                                            </CardContent>
+                                        </Card>
+                                    );
+                                })}
+                    </div>
+                </div>
             </ModalBody>
+
+
 
 
         </Modal>

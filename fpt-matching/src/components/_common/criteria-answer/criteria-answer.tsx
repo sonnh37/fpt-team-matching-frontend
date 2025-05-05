@@ -43,6 +43,7 @@ const CriteriaAnswerManagement = () => {
     const [title, setTitle] = useState<string>("");
     const [search, setSearch] = useState<string>("");
     const [queryParams, setQueryParams] = useState<IdeaVersionRequestGetAllQuery>({
+
         pageNumber: 1,
         pageSize: 5,
         isDeleted: false,
@@ -88,7 +89,7 @@ const CriteriaAnswerManagement = () => {
 
         // Gọi confirm để mở dialog
         const confirmed = await confirm({
-            title: "Xóa yêu cầu gia nhập",
+            title: "Xóa đi form kết quả",
             description: "Bạn có muốn xóa đơn này không?",
             confirmText: "Có,xóa nó đi",
             cancelText: "Không,cảm ơn",
@@ -96,7 +97,7 @@ const CriteriaAnswerManagement = () => {
         if (confirmed) {
             const result = await criteriaFormService.delete(id)
             if (result.status == 1) {
-                toast.success("Xóa thành công lời mời!")
+                toast.success("Xóa thành công đơn!")
                 refetch();
             }
         } else {
@@ -229,19 +230,33 @@ const CriteriaAnswerManagement = () => {
                                     hour: "2-digit"
                                 })
                                     : "Không có ngày "}</TableCell>
-                                <TableCell>{cv.createdBy}  </TableCell>
+                                <TableCell>{cv.reviewer?.email}  </TableCell>
                                 <TableCell >{cv.criteriaForm?.title}</TableCell>
                                 <TableCell className=' justify-center'>
-                                    {IdeaVersionRequestStatus[cv.status!]}
+                                    {cv.status == IdeaVersionRequestStatus.Approved ? (
+
+                                        <button className=" text-white p-2 bg-green-500 rounded-sm">
+                                            Đã duyệt
+                                        </button>
+                                    ) : (
+                                        <button className=" p-2 bg-red-600 rounded-sm">
+                                            Đã từ chối
+                                        </button>
+                                    )}
+                                    {cv.status == IdeaVersionRequestStatus.Consider && (
+
+                                        <button className=" text-white p-2 bg-yellow-500 rounded-sm">
+                                            Yêu cầu sửa
+                                        </button>
+                                    )}
                                 </TableCell>
 
-                               
+
                                 <TableCell className='flex justify-center items-center' >
-                                    <Button variant={"destructive"} onClick={() => handleDelete(cv.id ?? "")}> Xóa đơn</Button>
-                                    <FormAnswer 
-                                     criteriaId={cv.criteriaFormId}
-                                     ideaVersionRequestId={cv.id}
-                                     isAnswered={(cv?.answerCriterias?.length ?? 0) > 0}
+                                    <FormAnswer
+                                        criteriaId={cv.criteriaFormId}
+                                        ideaVersionRequestId={cv.id}
+                                        isAnswered={(cv?.answerCriterias?.length ?? 0) > 0}
                                     />
                                 </TableCell>
                             </TableRow>
