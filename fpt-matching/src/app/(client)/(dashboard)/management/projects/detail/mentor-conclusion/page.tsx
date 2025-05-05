@@ -134,7 +134,7 @@ const Page = () => {
                 teamMemberResponse.status === 1 ||
                 projectResponse.status === 1
             ) {
-                toast.success("Save success");
+                toast.success("Lưu lịch bảo vệ thành công");
             } else {
                 toast.error(
                     teamMemberResponse.status !== 1
@@ -296,7 +296,7 @@ const Page = () => {
                                 })
                             }}>
                                 <SelectTrigger className="w-[40%]">
-                                    <SelectValue placeholder="Quyết định giao đoạn ra hội đồng" />
+                                    <SelectValue placeholder="Quyết định giai đoạn ra hội đồng" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>

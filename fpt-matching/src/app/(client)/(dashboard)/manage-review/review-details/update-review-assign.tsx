@@ -115,7 +115,7 @@ function DialogConfirm({currentReview, open, setOpen} :{currentReview: ReviewUpd
     const handleUpdate= async () => {
         const response = await reviewService.update(currentReview)
         if (response && response.status == 1) {
-            toast.success("Update review successfully!")
+            toast.success("Cập nhật review thành công!")
             setTimeout(() => {
                 window.location.reload();
             }, 1500)

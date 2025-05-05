@@ -15,20 +15,41 @@ import {ReviewDetailsDialog} from "@/app/(client)/(dashboard)/manage-review/revi
 import {reviewDetailsRBAC} from "@/app/(client)/(dashboard)/manage-review/review-details/mange-role";
 import {useCurrentRole} from "@/hooks/use-current-role";
 import Link from "next/link";
-
-export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber}: {file: File | null, setFile: Dispatch<SetStateAction<File | null>>, fileUrl: string | undefined, reviewNumber: number}) {
+import {useSelectorUser} from "@/hooks/use-auth";
+import {toast} from "sonner";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow
+} from "@/components/ui/table"
+export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber, leaderId, reviewDate}: {file: File | null, setFile: Dispatch<SetStateAction<File | null>>, fileUrl: string | undefined, reviewNumber: number, leaderId: string, reviewDate: Date | null}) {
     const [comments, setComments] = useState<string[] | null>([]);
     const [suggestions, setSuggestions] = useState<string[] | null>([]);
     const [fileChange, setFileChange] = useState<boolean>(false)
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const currentRole = useCurrentRole()
     const handleSetFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if(event.target.files && event.target.files[0]) {
-            setFile(event.target?.files[0]);
+        if(!event.target.files || !event.target.files[0]) {
+            return;
         }
+        const regex = new RegExp(`^Checklist_CapstoneProjectReview_([A-Za-z0-9]+)_(${reviewNumber})\\.xlsx$`);
+        const match = event.target.files[0].name.match(regex);
+        if (!match) {
+            toast.error(`Tên file phải có dạng Checklist_CapstoneProjectReview_Mã nhóm_${reviewNumber}.xlsx`)
+            return;
+        }
+        setFile(event.target?.files[0]);
+
     }
+    const user = useSelectorUser()
     useEffect(() => {
         if (!file) {
+            return;
+        }
+        if (!user) {
             return;
         }
         const reader = new FileReader();
@@ -47,49 +68,82 @@ export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber}: 
             let header_comment_index = 0
             let header_suggestion_index = 0
             let end_data_row = 0
-            rows.map((row, index) => {
-                if (rows[index][0] == "* Comments") header_comment_index = index;
-                if (rows[index][0] == "* Suggestion") header_suggestion_index = index;
-                if (row.length == 0 && header_suggestion_index && !end_data_row) end_data_row = index;
-            })
-            const comment_data_row = rows.slice(header_comment_index+1, header_suggestion_index)
-            const suggestion_data_row = rows.slice(header_suggestion_index+1, end_data_row)
+            if (reviewNumber != 3) {
+                rows.map((row, index) => {
+                    if (rows[index][0] == "* Comments") header_comment_index = index;
+                    if (rows[index][0] == "* Suggestion") header_suggestion_index = index;
+                    if (row.length == 0 && header_suggestion_index && !end_data_row) end_data_row = index;
+                })
+                const comment_data_row = rows.slice(header_comment_index+1, header_suggestion_index)
+                const suggestion_data_row = rows.slice(header_suggestion_index+1, end_data_row)
 
-            const comments_list : string[] = []
-            const suggestions_list : string[] = []
+                const comments_list : string[] = []
+                const suggestions_list : string[] = []
 
-            comment_data_row.map((row) => {
-                comments_list.push(...row)
-            })
-            suggestion_data_row.map((row) => {
-                suggestions_list.push(...row)
-            })
+                comment_data_row.map((row) => {
+                    comments_list.push(...row)
+                })
+                suggestion_data_row.map((row) => {
+                    suggestions_list.push(...row)
+                })
 
-            setComments(comments_list);
-            setSuggestions(suggestions_list)
+                setComments(comments_list);
+                setSuggestions(suggestions_list)
 
-            setFileChange(true)
+                setFileChange(true)
+            }
+            if (reviewNumber == 3) {
+                console.log(true)
+                rows.map((row, index) => {
+                    if (rows[index][4] == "Reviewer(s) Comment") header_comment_index = index;
+                    if (rows[index][2] == "Suggestion for Project Supervisor") header_suggestion_index = index;
+                    if (row.length == 0 && header_suggestion_index && !end_data_row) end_data_row = index;
+                })
+                const comment_data_row = rows.slice(header_comment_index+1, end_data_row)
+                const suggestion_data_row = rows.slice(header_suggestion_index+1, end_data_row)
+
+                const comments_list : string[] = []
+                const suggestions_list : string[] = []
+
+                comment_data_row.forEach((row) => {
+                    if (row[4]) {
+                        comments_list.push(...row[4].split('\n').map(c => c.trim()).filter(Boolean));
+                    }
+                });
+                // comment_data_row.map((row) => {
+                //     comments_list.push(row[4])
+                // })
+                suggestion_data_row.map((row) => {
+                    suggestions_list.push(row[2])
+                })
+
+                setComments(comments_list);
+                setSuggestions(suggestions_list)
+
+                setFileChange(true)
+            }
 
         }
     }, [file])
-    return (
+    return user && (
         <Sheet>
             <SheetTrigger asChild>
-                <Button className={"ml-5"} variant="default">Click to view file review</Button>
+                <Button className={"ml-5"} variant="default">Nhấn để xem file</Button>
             </SheetTrigger>
             <SheetContent className={"sm:max-w-[30vw]"}>
                 <SheetHeader>
                     <SheetTitle>Review file</SheetTitle>
                     <SheetDescription className={"flex flex-col"}>
-                        <span>Quick look about review file.</span>
-                        <span className={"text-red-500 font-medium"}>*Đặt tên file theo template Checklist_CapstoneProjectReview_(Mã nhóm).xlsx</span>
+                        <span>Khái quát nội dung trong file.</span>
+                        <span className={"text-red-500 font-medium"}>*Đặt tên file theo template Checklist_CapstoneProjectReview_(Mã nhóm)_{reviewNumber}.xlsx</span>
                         <span className={"text-red-500 font-medium"}>*Dùng file có đuôi xlsx</span>
+                        <span className={"text-red-500 font-medium"}>*Chỉ có thể nộp trong ngày review.</span>
                     </SheetDescription>
                 </SheetHeader>
                 <div className="grid gap-4 py-4">
                     {file == null ? (
                             <span>
-                            {currentRole && reviewDetailsRBAC.hasPermission(currentRole, "updateFile") && (
+                            {currentRole && reviewDetailsRBAC.hasPermission(currentRole, "updateFile") && user.id == leaderId && (
                                 <>
                                     <div className={"my-6"}>
                                         {/*{reviewNumber == 1 ? (*/}
@@ -149,24 +203,75 @@ export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber}: 
                                 {fileUrl &&
                                     <Link href={fileUrl} className={"flex gap-2 mt-4"}><Paperclip />{file!.name}</Link>
                                 }
-                                <div className={"font-bold text-lg pt-6 pb-2"}>* Comment</div>
-                                <div className={"flex flex-col text-sm gap-1.5"}>
-                                    {comments ? comments.map((comment, index) => (
-                                        <span className={"pl-2"} key={index}>{comment}</span>
-                                        ))
-                                        : (
-                                            <div>No comment found</div>
-                                        )}
+                                {/*<div className={"font-bold text-lg pt-6 pb-2"}>* Comment</div>*/}
+                                {/*<div className={"flex flex-col text-sm gap-1.5"}>*/}
+                                {/*    {comments ? comments.map((comment, index) => (*/}
+                                {/*        <span className={"pl-2"} key={index}>{comment}</span>*/}
+                                {/*        ))*/}
+                                {/*        : (*/}
+                                {/*            <div>No comment found</div>*/}
+                                {/*        )}*/}
+                                {/*</div>*/}
+
+                                {/*<div className={"font-bold text-lg pt-6 pb-2"}>* Suggestion</div>*/}
+                                {/*<div className={"flex flex-col text-sm gap-1.5"}>*/}
+                                {/*    {suggestions?.length != 0 && suggestions ? suggestions.map((suggestion, index) => (*/}
+                                {/*            <span className={"pl-2"} key={index}>{suggestion}</span>*/}
+                                {/*        ))*/}
+                                {/*        : (*/}
+                                {/*            <div>No suggestion found</div>*/}
+                                {/*        )}*/}
+                                {/*</div>*/}
+                                <div className="pt-6">
+                                    <h2 className="font-bold text-lg pb-2">* Comment</h2>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead className="w-10">#</TableHead>
+                                                <TableHead>Comment</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {comments && comments.length > 0 ? (
+                                                comments.map((comment, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell className="font-medium">{index + 1}</TableCell>
+                                                        <TableCell>{comment}</TableCell>
+                                                    </TableRow>
+                                                ))
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell colSpan={2}>No comment found</TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
                                 </div>
 
-                                <div className={"font-bold text-lg pt-6 pb-2"}>* Suggestion</div>
-                                <div className={"flex flex-col text-sm gap-1.5"}>
-                                    {suggestions?.length != 0 && suggestions ? suggestions.map((suggestion, index) => (
-                                            <span className={"pl-2"} key={index}>{suggestion}</span>
-                                        ))
-                                        : (
-                                            <div>No suggestion found</div>
-                                        )}
+                                <div className="pt-6">
+                                    <h2 className="font-bold text-lg pb-2">* Suggestion</h2>
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead className="w-10">#</TableHead>
+                                                <TableHead>Suggestion</TableHead>
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {suggestions && suggestions.length > 0 ? (
+                                                suggestions.map((suggestion, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell className="font-medium">{index + 1}</TableCell>
+                                                        <TableCell>{suggestion}</TableCell>
+                                                    </TableRow>
+                                                ))
+                                            ) : (
+                                                <TableRow>
+                                                    <TableCell colSpan={2}>No suggestion found</TableCell>
+                                                </TableRow>
+                                            )}
+                                        </TableBody>
+                                    </Table>
                                 </div>
                             </div>
                         )}
@@ -180,7 +285,7 @@ export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber}: 
                         file &&
                         currentRole &&
                         reviewDetailsRBAC.hasPermission(currentRole, "updateFile") &&
-                        <ReviewDetailsDialog setIsOpen={setIsOpen} isOpen={isOpen} file={file} />
+                        <ReviewDetailsDialog reviewDate={reviewDate} setIsOpen={setIsOpen} isOpen={isOpen} file={file} />
                     }
                 </SheetFooter>
             </SheetContent>

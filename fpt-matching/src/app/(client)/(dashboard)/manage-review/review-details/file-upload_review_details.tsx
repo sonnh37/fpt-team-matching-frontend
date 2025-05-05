@@ -16,7 +16,7 @@ import {reviewDetailsRBAC} from "@/app/(client)/(dashboard)/manage-review/review
 import {useCurrentRole} from "@/hooks/use-current-role";
 import Link from "next/link";
 
-export default function SheetFileUpload({file, setFile, fileUrl}: {file: File | null, setFile: Dispatch<SetStateAction<File | null>>, fileUrl: string | undefined}) {
+export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber}: {file: File | null, setFile: Dispatch<SetStateAction<File | null>>, fileUrl: string | undefined, reviewNumber: number}) {
     const [comments, setComments] = useState<string[] | null>([]);
     const [suggestions, setSuggestions] = useState<string[] | null>([]);
     const [fileChange, setFileChange] = useState<boolean>(false)
@@ -75,14 +75,14 @@ export default function SheetFileUpload({file, setFile, fileUrl}: {file: File | 
     return (
         <Sheet>
             <SheetTrigger asChild>
-                <Button className={"ml-5"} variant="default">Click to view file review</Button>
+                <Button className={"ml-5"} variant="default">Nhấn để xem file</Button>
             </SheetTrigger>
             <SheetContent className={"sm:max-w-[30vw]"}>
                 <SheetHeader>
                     <SheetTitle>Review file</SheetTitle>
                     <SheetDescription className={"flex flex-col"}>
-                        <span>Quick look about review file.</span>
-                        <span className={"text-red-500 font-medium"}>*Đặt tên file theo template Checklist_CapstoneProjectReview_(Mã nhóm).xlsx</span>
+                        <span>Sơ bộ nội dung trong file.</span>
+                        <span className={"text-red-500 font-medium"}>*Đặt tên file theo template Checklist_CapstoneProjectReview_(Mã nhóm)_{reviewNumber}.xlsx</span>
                         <span className={"text-red-500 font-medium"}>*Dùng file có đuôi xlsx, xlsm</span>
                     </SheetDescription>
                 </SheetHeader>
@@ -93,8 +93,8 @@ export default function SheetFileUpload({file, setFile, fileUrl}: {file: File | 
                                 <>
                                     <a
                                         className="px-4 py-4 bg-amber-500 rounded-md"
-                                        download="Checklist_CapstoneProjectReview_1_Template.xlsx"
-                                        href="/Checklist_CapstoneProjectReview_1_Template.xlsx"
+                                        download="Checklist_CapstoneProjectReview.xlsx"
+                                        href="/Checklist_CapstoneProjectReview.xlsx"
                                     >
                                         Tải template tại đây
                                     </a>

@@ -64,7 +64,7 @@ const ActionCell = ({row}: {row : Row<CapstoneSchedule>}) => {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => {
                     router.push(`manage-defense/defense-details?defenseId=${row.original.id}`)
-                }}>View defense details</DropdownMenuItem>
+                }}>Xem chi tiết</DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     )
