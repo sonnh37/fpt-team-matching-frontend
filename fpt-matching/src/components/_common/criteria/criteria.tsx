@@ -105,7 +105,7 @@ const Criteria = () => {
 
         // Gọi confirm để mở dialog
         const confirmed = await confirm({
-            title: "Xóa yêu cầu gia nhập",
+            title: "Xóa đi tiêu chí trong đơn",
             description: "Bạn có muốn xóa đơn này không?",
             confirmText: "Có,xóa nó đi",
             cancelText: "Không,cảm ơn",
@@ -113,7 +113,7 @@ const Criteria = () => {
         if (confirmed) {
             const result = await criteriaService.delete(id)
             if (result.status == 1) {
-                toast.success("Xóa thành công lời mời!")
+                toast.success("Xóa thành công tiêu chí!")
                 refetch();
             }
         } else {
@@ -272,7 +272,7 @@ const Criteria = () => {
                                             Đã xóa
                                         </button>
                                     ) : (
-                                        <button className=" p-2 bg-green-500 rounded-sm">
+                                        <button className=" text-white p-2 bg-green-500 rounded-sm">
                                             Đang sử dụng
                                         </button>
                                     )}
