@@ -57,7 +57,7 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
             setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
             return
         }
-        if(role != "Student"){
+        if(role !== "Student"){
             toast("Bạn không thể gửi vì bạn không có quyền hạn")
             setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
             return
