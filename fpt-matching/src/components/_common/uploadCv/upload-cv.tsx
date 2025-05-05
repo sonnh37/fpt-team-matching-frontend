@@ -24,6 +24,7 @@ import { FileUpload } from "@/components/ui/file-upload";
 import { useState } from "react";
 import { cloudinaryService } from "@/services/cloudinary-service";
 import { BlogCvGetAllQuery } from "@/types/models/queries/blogcv/blogcv-get-all-query";
+import { useCurrentRole } from "@/hooks/use-current-role";
 
 const UploadCv = ({ blogId }: { blogId: string }) => {
     //gọi thông tin user đã đăng nhập
@@ -44,7 +45,7 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
         refetchOnWindowFocus: false,
     });
     const userIsExist = result?.data?.user?.id ?? ""
-
+    const role = useCurrentRole()
 
 
     const submit = async () => {
@@ -52,10 +53,16 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
         setIsSubmitting(true); // Đánh dấu API đang chạy
 
         if (user?.id == userIsExist) {
-            toast("Bạn không thể gửi vì bạn đã có nhóm")
+            toast("Bạn không thể gửi vì đây bài viết của bạn")
             setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
             return
         }
+        if(role !== "Student"){
+            toast("Bạn không thể gửi vì bạn không có quyền hạn")
+            setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
+            return
+        }
+
         const projectInfo = await projectService.getProjectInfo();
 
         //check xem người nộp có team chưa
@@ -64,7 +71,6 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
             setIsSubmitting(false);
             return
         }
-
 
 
         let checkCv: BlogCvGetAllQuery = {

@@ -184,9 +184,15 @@ export default function ProjectDetail() {
     !isCurrentUserInTeam &&
     !teamUserLogin;
 
+    const role = useCurrentRole()
+
   const requestJoinTeam = async (id: string) => {
     setIsLoading(true);
 
+    if(role !== "Student"){
+      toast.error("Bạn không có quyền xin vào nhóm ")
+      return
+    }
     try {
       // Kiểm tra size idea có lớn hơn số thành viên hiện tại không
       if (availableSlots <= 0) {
