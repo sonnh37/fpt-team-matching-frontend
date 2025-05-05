@@ -280,11 +280,14 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
                       <div className="space-y-1">
                         <Label className="italic">Ngày xử lí</Label>
                         <p className="text-sm font-medium">
-                          {formatDate(request.processDate) == "Không có ngày" ? "Đang đợi duyệt" : formatDate(request.processDate)}
+                          {formatDate(request.processDate) == "Không có ngày"
+                            ? "Đang đợi duyệt"
+                            : formatDate(request.processDate)}
                         </p>
                       </div>
 
                       {isRequestForCurrentUser &&
+                        request.status == IdeaVersionRequestStatus.Pending &&
                         idea.ownerId != user.id && (
                           <div className="space-y-1">
                             <Link href={`/idea/reviews/${request.id}`} passHref>

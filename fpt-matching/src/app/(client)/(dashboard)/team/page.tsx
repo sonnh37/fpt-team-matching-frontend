@@ -81,6 +81,7 @@ export default function TeamInfo() {
     isLoading: isLoadingStage,
     isError: isErrorStage,
     error: errorStage,
+    refetch: refetchCurrentSemester,
   } = useQuery({
     queryKey: ["getCurrentSemester"],
     queryFn: () => semesterService.getCurrentSemester(),
@@ -189,6 +190,7 @@ export default function TeamInfo() {
       setIsEditing(false);
       refetchTeam();
       refetchTeamInCurrentSemester();
+      refetchCurrentSemester();
     } catch (error) {
       toast.error(error as string);
     } finally {
@@ -241,6 +243,7 @@ export default function TeamInfo() {
           toast.success(successMessage);
           refetchTeam();
           refetchTeamInCurrentSemester();
+          refetchCurrentSemester();
         } else {
           toast.error(res.message || "Thao tác thất bại");
         }
@@ -395,7 +398,7 @@ export default function TeamInfo() {
                         handleAction(
                           () =>
                             projectService.deletePermanent(project.id ?? ""),
-                          "Bạn đã xóa nhóm thành công"
+                          "Đã xóa nhóm"
                         )
                       }
                       className="text-destructive hover:text-destructive"
@@ -408,10 +411,7 @@ export default function TeamInfo() {
                     variant="outline"
                     disabled={isLockTeamMember}
                     onClick={() =>
-                      handleAction(
-                        teammemberService.leaveTeam,
-                        "Bạn đã rời nhóm thành công"
-                      )
+                      handleAction(teammemberService.leaveTeam, "Đã rời nhóm")
                     }
                     className="text-destructive border-destructive hover:text-destructive"
                   >
@@ -654,23 +654,25 @@ export default function TeamInfo() {
                                   Xem hồ sơ
                                 </Link>
                               </DropdownMenuItem>
-                              {isLeader && !isLeaderInMembers && !isLockTeamMember && (
-                                <DropdownMenuItem
-                                  className="text-destructive"
-                                  onClick={() =>
-                                    handleAction(
-                                      () =>
-                                        teammemberService.deletePermanent(
-                                          member.id ?? ""
-                                        ),
-                                      "Đã xóa thành viên thành công"
-                                    )
-                                  }
-                                >
-                                  <Trash2 className="mr-2 h-4 w-4" />
-                                  Xóa thành viên
-                                </DropdownMenuItem>
-                              )}
+                              {isLeader &&
+                                !isLeaderInMembers &&
+                                !isLockTeamMember && (
+                                  <DropdownMenuItem
+                                    className="text-destructive"
+                                    onClick={() =>
+                                      handleAction(
+                                        () =>
+                                          teammemberService.deletePermanent(
+                                            member.id ?? ""
+                                          ),
+                                        "Đã xóa thành viên"
+                                      )
+                                    }
+                                  >
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    Xóa thành viên
+                                  </DropdownMenuItem>
+                                )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
@@ -685,24 +687,38 @@ export default function TeamInfo() {
       </div>
 
       {/* Sidebar - Chiếm 1/4 màn hình lớn */}
+
       <div className="lg:col-span-1 space-y-6">
         {/* Card đăng ký nhóm */}
-        <Card className="rounded-lg">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Đăng ký nhóm</CardTitle>
-            <CardDescription>Nộp đăng ký đề tài chính thức</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm">
-              Lưu ý: Đề tài cần được thống nhất bởi tất cả thành viên trước khi
-              nộp
-            </p>
-            <Button className="w-full" asChild>
-              <Link href="/team/submit">Nộp đề tài</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        {project.status == ProjectStatus.Pending && (
+          <Card className="rounded-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Đăng ký nhóm</CardTitle>
+              <CardDescription>Nộp đăng ký đề tài chính thức</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm">
+                Lưu ý: Đề tài cần được thống nhất bởi tất cả thành viên trước
+                khi nộp và sẽ không được thay đổi tên nhóm
+              </p>
 
+              <Button
+                className="w-full"
+                onClick={() =>
+                  handleAction(async () => {
+                    const command: ProjectUpdateCommand = {
+                      ...project,
+                      status: ProjectStatus.InProgress,
+                    };
+                    return projectService.update(command);
+                  }, "Đã nộp đề tài")
+                }
+              >
+                Nộp đề tài
+              </Button>
+            </CardContent>
+          </Card>
+        )}
         {/* Card xin đề tài từ GV (nếu có) */}
         {!teamInfo?.data?.topicId && (
           <Card className="rounded-lg">
