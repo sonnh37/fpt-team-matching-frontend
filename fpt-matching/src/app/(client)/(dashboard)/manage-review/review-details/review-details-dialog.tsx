@@ -10,8 +10,8 @@ import {toast} from "sonner";
 
 
 export function ReviewDetailsDialog(
-    {file, isOpen, setIsOpen} :
-    {file: File, isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>}
+    {file, isOpen, setIsOpen, reviewDate} :
+    {file: File, isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, reviewDate: Date| null}
 ) {
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -42,7 +42,9 @@ export function ReviewDetailsDialog(
     return (
         <AlertDialog open={isOpen}>
             <AlertDialogTrigger asChild>
-                <Button onClick={() => {setIsOpen(true)}} variant="destructive">Upload file</Button>
+                {reviewDate && reviewDate.getDate() != new Date(Date.now()).getDate() ?
+                    <Button onClick={() => {setIsOpen(true)}} variant="destructive">Upload file</Button> : <Button disabled={true} className={"bg-red-400 hover:bg-red-400 "} variant="destructive">Upload file</Button>
+                }
             </AlertDialogTrigger>
             <AlertDialogContent  className="sm:max-w-[425px]">
                 <AlertDialogHeader>

@@ -292,7 +292,7 @@ const Page = () => {
         if (file) {
             const result = await capstoneService.importExcelFile({file, stage: stage})
             if (result.status == 1) {
-                toast.success("Import successfully imported!");
+                toast.success("Cập nhật thành công!");
                 setOpen(false);
             }
             if (result.data) {
@@ -439,7 +439,7 @@ const Page = () => {
                                                                 <SelectGroup>
                                                                     <SelectLabel>Mã đề tài</SelectLabel>
                                                                     {projects.length > 0 && projects.map((project) => (
-                                                                        <SelectItem key={project.topic.topicCode} value={project.id!}>{project.topic.topicCode}</SelectItem>
+                                                                        <SelectItem key={project.topic?.topicCode} value={project.id!}>{project.topic?.topicCode}</SelectItem>
                                                                     ))}
                                                                 </SelectGroup>
                                                             </SelectContent>

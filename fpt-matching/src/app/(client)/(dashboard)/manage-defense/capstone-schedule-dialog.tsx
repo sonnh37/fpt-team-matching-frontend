@@ -17,7 +17,7 @@ export function CapstoneScheduleDialog({handleSaveChange, open, setOpen}: {handl
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Import capstone schedule</DialogTitle>
+                    <DialogTitle>Nhập lịch bảo vệ</DialogTitle>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     Bạn có chắc các thông tin đã chính xác.<br/> Hành động này sẽ không thể hoàn tác.

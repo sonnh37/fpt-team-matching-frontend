@@ -66,7 +66,7 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
     console.log(selectedIdeaHistory)
     // console.log(managerComment)
     // console.log(mentorComment)
-    return selectedIdeaHistory && (
+    return selectedIdeaHistory ? (
         <div className={"w-full flex flex-row  justify-between"}>
             <div className={"w-1/5 h-[85vh] "}>
                 <Card className="w-[18vw] ml-8 mt-12 h-[80vh] overflow-auto">
@@ -198,7 +198,7 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
             </div>
             {fileUrl && <DocxView url={fileUrl}/>}
         </div>
-    )
+    ) : <div className={"font-bold text-lg w-full flex justify-center items-center"}>Không có cập nhật từ sinh viên</div>
 };
 
 export default UpdateIdea;

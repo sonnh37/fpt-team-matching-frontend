@@ -193,7 +193,7 @@ export default function Page() {
                 setOpenFailReview(true)
             }
         } else {
-            toast.error("Not found semester")
+            toast.error("Không tìm thấy kì hiện tại")
         }
         setIsLoading(false)
     }

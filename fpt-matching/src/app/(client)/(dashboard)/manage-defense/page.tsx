@@ -255,7 +255,7 @@ const Page = () => {
         if (file) {
             const result = await capstoneService.importExcelFile({file, stage: stage})
             if (result.status == 1) {
-                toast.success("Import successfully imported!");
+                toast.success("Cập nhật thành công!");
                 setOpen(false);
             }
             if (result.data) {

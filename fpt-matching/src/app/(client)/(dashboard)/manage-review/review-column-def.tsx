@@ -17,7 +17,7 @@ const ActionCell = ({row}: {row :Row<Review>}) => {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
+                        {/*<span className="sr-only">Open menu</span>*/}
                         <MoreHorizontal className="h-4 w-4" />
                     </Button>
                 </DropdownMenuTrigger>
@@ -26,7 +26,7 @@ const ActionCell = ({row}: {row :Row<Review>}) => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => {
                         router.push("manage-review/review-details?reviewId="+review.id)
-                    }}>View review details</DropdownMenuItem>
+                    }}>Xem chi tiết</DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         )
@@ -99,7 +99,7 @@ export const ReviewColumns: ColumnDef<Review>[] = [
             const room = row.getValue<string | null>("room");
             const slot = row.getValue<number | null>("slot");
 
-            return (reviewDate && room && slot ) ? (<Button className={"px-4 bg-green-600"}>Assigned</Button>) : (<Button variant={"destructive"}>Not yet</Button>)
+            return (reviewDate && room && slot ) ? (<Button className={"px-4 bg-green-600"}>Đã có</Button>) : (<Button variant={"destructive"}>Chưa có</Button>)
         }
     },
     {

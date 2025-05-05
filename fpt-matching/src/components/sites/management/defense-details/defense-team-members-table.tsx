@@ -29,7 +29,7 @@ function DialogSaveChange({teamMemberUpdateDefense, stage} : {teamMemberUpdateDe
         try {
             const response = await teammemberService.updateDefenseByManager({teamMemberUpdate: teamMemberUpdateDefense, stage})
             if (response && response.status == 1){
-                toast.success("Successfully updated");
+                toast.success("Cập nhật thành công");
             } else{
                 toast.error(response.message);
             }
