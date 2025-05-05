@@ -23,6 +23,8 @@ import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import CriteriaFormTable from "@/components/_common/criteria-form/criteria-form";
 import Criteria from "@/components/_common/criteria/criteria";
+import CriteriaAnswerManagement from "@/components/_common/criteria-answer/criteria-answer";
+
 
 export default function Page() {
     const roleCurrent = useCurrentRole();
@@ -30,13 +32,15 @@ export default function Page() {
 
     const tabs = {
         form: "Quản lí các đơn",
-        criteria: "Quản lí các tiêu chí"
+        criteria: "Quản lí các tiêu chí",
+        answer: "Quản lí các kết quả của form"
+
     };
 
     const defaultTab = roleCurrent === "Lecturer" ? tabs.criteria : tabs.form;
 
 
- 
+
 
     return (
         <div className="container mx-auto px-4 py-6">
@@ -44,21 +48,26 @@ export default function Page() {
                 <h1 className="text-2xl font-bold mb-6 text-center">Quản lý Các Tiêu Chí Trong Đơn</h1>
 
                 <Tabs defaultValue={defaultTab} className="w-full">
-                    <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto mb-6">
+                    <TabsList className="grid grid-cols-3 w-full max-w-screen-lg mx-auto mb-6">
                         <TabsTrigger value={tabs.form} className="data-[state=active]:bg-primary data-[state=active]:text-white">
                             {tabs.form}
                         </TabsTrigger>
                         <TabsTrigger value={tabs.criteria} className="data-[state=active]:bg-primary data-[state=active]:text-white">
                             {tabs.criteria}
                         </TabsTrigger>
+                        <TabsTrigger value={tabs.answer} className="data-[state=active]:bg-primary data-[state=active]:text-white">
+                            {tabs.answer}
+                        </TabsTrigger>
                     </TabsList>
 
                     <TabsContent value={tabs.form}>
-                    <CriteriaFormTable/>
+                        <CriteriaFormTable />
                     </TabsContent>
-
                     <TabsContent value={tabs.criteria}>
-                      <Criteria/>
+                        <Criteria />
+                    </TabsContent>
+                    <TabsContent value={tabs.answer}>
+                        <CriteriaAnswerManagement />
                     </TabsContent>
                 </Tabs>
             </Card>

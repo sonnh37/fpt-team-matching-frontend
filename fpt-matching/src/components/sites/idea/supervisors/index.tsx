@@ -40,18 +40,21 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { columns } from "./columns";
+import { TopicGetListOfSupervisorsQuery } from "@/types/models/queries/topics/topic-get-list-of-supervisor-query";
+import { topicService } from "@/services/topic-service";
+import { useTopicColumns } from "./columns";
 
 const defaultSchema = z.object({
   englishName: z.string().optional(),
 });
 
-export default function IdeasOfSupervisorsTable() {
+export default function TopicsOfSupervisorsTable() {
   const searchParams = useSearchParams();
+  const columns = useTopicColumns();
   const filterEnums: FilterEnum[] = [
     {
       columnId: "isExistedTeam",
-      title: "Trạng thái",
+      title: "Trạng thái nhóm",
       options: isExistedTeam_options,
     },
   ];
@@ -74,7 +77,7 @@ export default function IdeasOfSupervisorsTable() {
   const [inputFields, setInputFields] =
     useState<z.infer<typeof defaultSchema>>();
 
-  const queryParams: IdeaGetListOfSupervisorsQuery = useMemo(() => {
+  const queryParams: TopicGetListOfSupervisorsQuery = useMemo(() => {
     const baseParams = useQueryParams(
       inputFields,
       columnFilters,
@@ -83,8 +86,6 @@ export default function IdeasOfSupervisorsTable() {
     );
     return {
       ...baseParams,
-      types: [IdeaType.Lecturer, IdeaType.Enterprise],
-      status: IdeaStatus.Approved,
     };
   }, [inputFields, columnFilters, pagination, sorting]);
 
@@ -95,8 +96,8 @@ export default function IdeasOfSupervisorsTable() {
   }, [columnFilters, inputFields]);
 
   const { data, isFetching, error, refetch } = useQuery({
-    queryKey: ["ideas-of-supervisors", queryParams],
-    queryFn: () => ideaService.getAllIdeasOfSupervisors(queryParams),
+    queryKey: ["topics-of-supervisors", queryParams],
+    queryFn: () => topicService.getAllTopicsOfSupervisors(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -125,62 +126,18 @@ export default function IdeasOfSupervisorsTable() {
   };
 
   if (error) return <ErrorSystem />;
-  if (isLoadingSemester) return <LoadingComponent />;
-
-  if (res_semester?.status != 1) {
-    return (
-      <div className="container mx-auto py-8">
-        <AlertMessage
-          messageType="info"
-          message="Hiện tại chưa tới kỳ đăng ký ý tưởng"
-        />
-      </div>
-    );
-  }
-
-  if (res_semester?.status == 1) {
-    const publicTopicDate = res_semester.data?.publicTopicDate;
-    const currentDate = new Date();
-
-    if (publicTopicDate) {
-      const publishDate = new Date(publicTopicDate);
-
-      if (currentDate < publishDate) {
-        const timeDiff = publishDate.getTime() - currentDate.getTime();
-        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-
-        return (
-          <div className="container mx-auto py-8">
-            <AlertMessage
-              messageType="warning"
-              message={`Chưa tới thời gian công bố đề tài. Còn ${daysRemaining} ngày nữa`}
-            />
-          </div>
-        );
-      }
-    } else {
-      return (
-        <div className="container mx-auto py-8">
-          <AlertMessage
-            messageType="info"
-            message="Chưa có thông tin ngày công bố đề tài"
-          />
-        </div>
-      );
-    }
-  }
 
   return (
     <div className="container mx-auto py-8 space-y-6">
       {/* Header Section */}
       <div className="space-y-4 text-center">
         <TypographyH2 className="text-primary">
-          Danh Sách Ý Tưởng Từ Giảng Viên
+          Danh Sách đề tài Từ Giảng Viên
         </TypographyH2>
 
         <div className="flex justify-center">
           <Badge variant="outline" className="text-sm font-normal">
-            Học kỳ hiện tại: {res_semester.data?.semesterName || "N/A"}
+            Học kỳ hiện tại: {res_semester?.data?.semesterName || "-"}
           </Badge>
         </div>
       </div>

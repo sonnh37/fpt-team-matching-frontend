@@ -52,25 +52,9 @@ import Link from "next/link";
 
 export const columns: ColumnDef<Idea>[] = [
   {
-    accessorKey: "teamCode",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã nhóm" />
-    ),
-    cell: ({ row }) => {
-      const idea = row.original;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.topic?.project?.teamCode || "-";
-    },
-  },
-  {
     accessorKey: "topicCode",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã topic" />
+      <DataTableColumnHeader column={column} title="Mã đề tài" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -83,40 +67,11 @@ export const columns: ColumnDef<Idea>[] = [
       return highestVersion?.topic?.topicCode || "-";
     },
   },
-  // {
-  //   accessorKey: "vietNamName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Tên đề tài (VN)" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.vietNamName || "-";
-  //   },
-  // },
-  // {
-  //   accessorKey: "englishName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Tên đề tài (EN)" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.englishName || "-";
-  //   },
-  // },
+
   {
-    accessorKey: "version",
+    accessorKey: "vietNamName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phiên bản" />
+      <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -126,25 +81,19 @@ export const columns: ColumnDef<Idea>[] = [
               (prev.version ?? 0) > (current.version ?? 0) ? prev : current
             )
           : undefined;
-      return highestVersion ? `v${highestVersion.version}` : "-";
+      return highestVersion?.englishName || "-";
     },
   },
-  // {
-  //   accessorKey: "enterpriseName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Doanh nghiệp" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.enterpriseName || "-";
-  //   },
-  // },
-  
+  {
+    accessorKey: "mentorId",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Người hướng dẫn" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      return idea?.mentor?.email || "-";
+    },
+  },
   {
     accessorKey: "actions",
     header: "Tùy chọn",
@@ -196,7 +145,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   return (
     <div className="flex flex-col gap-2">
-     <Dialog>
+      <Dialog>
         <DialogTrigger asChild>
           <Button size="icon" variant="outline">
             <Eye className="h-4 w-4" />

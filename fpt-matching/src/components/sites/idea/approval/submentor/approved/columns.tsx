@@ -51,6 +51,7 @@ import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useCurrentRole } from "@/hooks/use-current-role";
+import { ProjectStatus } from "@/types/enums/project";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -60,19 +61,26 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.topic?.project?.teamCode || "-";
+      const projectOfLeader = idea?.owner?.projects.filter(
+        (m) => m.leaderId == idea.ownerId && m.status == ProjectStatus.Pending
+      )[0];
+      return projectOfLeader?.teamCode || "Chưa có mã nhóm";
     },
   },
   {
-    accessorKey: "topicCode",
+    accessorKey: "leaderId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã topic" />
+      <DataTableColumnHeader column={column} title="Trưởng nhóm" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      return idea?.owner?.email || "-";
+    },
+  },
+  {
+    accessorKey: "vietNamName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -82,71 +90,9 @@ export const columns: ColumnDef<Idea>[] = [
               (prev.version ?? 0) > (current.version ?? 0) ? prev : current
             )
           : undefined;
-      return highestVersion?.topic?.topicCode || "-";
+      return highestVersion?.englishName || "-";
     },
   },
-  // {
-  //   accessorKey: "vietNamName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Tên đề tài (VN)" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.vietNamName || "-";
-  //   },
-  // },
-  // {
-  //   accessorKey: "englishName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Tên đề tài (EN)" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.englishName || "-";
-  //   },
-  // },
-  {
-    accessorKey: "version",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phiên bản" />
-    ),
-    cell: ({ row }) => {
-      const idea = row.original;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion ? `v${highestVersion.version}` : "-";
-    },
-  },
-  // {
-  //   accessorKey: "enterpriseName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Doanh nghiệp" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.enterpriseName || "-";
-  //   },
-  // },
-  
   {
     accessorKey: "actions",
     header: "Tùy chọn",
@@ -175,9 +121,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         )
       : undefined;
 
-  const hasCouncilRequests = highestVersion?.ideaVersionRequests.some(
-    (request) => request.role == "Council" 
-  ) && role == "Mentor";
+  const hasCouncilRequests =
+    highestVersion?.ideaVersionRequests.some(
+      (request) => request.role == "Council"
+    ) && role == "Mentor";
 
   const isMentorOfIdea = idea.mentorId == user?.id;
 

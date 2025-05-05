@@ -313,6 +313,8 @@ export const CreateProjectForm = () => {
   if (isError) return <ErrorSystem />;
 
   // Student-specific checks
+  if (isLockStageIdea) return <AlertMessage message="Chưa tới đợt duyệt!" />;
+
   if (isStudent) {
     if (project) {
       const isProjectNoIdea = !project?.topicId;
@@ -351,8 +353,6 @@ export const CreateProjectForm = () => {
   }
 
   if (hasActiveIdeas && isStudent) return <PageIsIdea />;
-  // if (isLock) return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
-  if (isLockStageIdea) return <AlertMessage message="Chưa tới đợt duyệt!" />;
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Hiển thị confirm dialog trước khi submit
@@ -681,7 +681,7 @@ export const CreateProjectForm = () => {
                         <SelectValue placeholder="Chọn số lượng thành viên" />
                       </SelectTrigger>
                       <SelectContent>
-                        {[4, 5, 6].map((option) => (
+                        {[4, 5].map((option) => (
                           <SelectItem key={option} value={option.toString()}>
                             {option} thành viên
                           </SelectItem>
@@ -745,7 +745,9 @@ export const CreateProjectForm = () => {
 
                       return (
                         <FormItem>
-                          <FormLabel>Giảng viên hướng dẫn 2 (Tùy chọn)</FormLabel>
+                          <FormLabel>
+                            Giảng viên hướng dẫn 2 (Tùy chọn)
+                          </FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             value={field.value}

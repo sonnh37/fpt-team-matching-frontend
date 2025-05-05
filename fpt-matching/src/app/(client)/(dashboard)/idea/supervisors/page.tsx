@@ -2,7 +2,7 @@
 
 import { AlertMessage } from "@/components/_common/alert-message";
 import { LoadingComponent } from "@/components/_common/loading-page";
-import IdeasOfSupervisorsTableTable from "@/components/sites/idea/supervisors";
+import TopicsOfSupervisorsTableTable from "@/components/sites/idea/supervisors";
 import { formatDate } from "@/lib/utils";
 import { semesterService } from "@/services/semester-service";
 import { useQuery } from "@tanstack/react-query";
@@ -14,42 +14,54 @@ export default function Page() {
     refetchOnWindowFocus: false,
   });
 
+  const { data: res_semes_up } = useQuery({
+    queryKey: ["getUpComingSemester"],
+    queryFn: () => semesterService.getUpComingSemester(),
+    refetchOnWindowFocus: false,
+  });
+
   if (isLoading) {
     return <LoadingComponent />;
   }
 
-  // Nếu không có kì học hiện tại
+  // Kì hiện tại đang bị null
   if (!res_semes?.data) {
-    return (
-      <AlertMessage message="Chưa tới ngày để xem các đề tài từ các mentor" />
-    );
-  }
+    // Kì sắp tới có
+    // Xét public
+    if (res_semes_up?.data) {
+      const publicTopicIdea = res_semes_up.data.publicTopicDate;
+      if (publicTopicIdea) {
+        const today = new Date();
+        const publicDate = new Date(publicTopicIdea);
 
-  const currentSemester = res_semes.data;
+        // Nếu ngày public từ hôm nay trở đi (bao gồm cả hôm nay)
+        console.log("check_publicDate", publicDate);
+        console.log("check_today", today);
+        if (publicDate >= today) {
+          const formattedDate = formatDate(publicDate);
 
-  // Kiểm tra nếu có ngày công bố đề tài và chưa tới ngày đó
-  if (currentSemester.publicTopicDate) {
-    const publicDate = new Date(currentSemester.publicTopicDate);
-    const now = new Date();
-
-    console.log("check_publicDate", publicDate);
-    console.log("check_now", now);
-    if (now < publicDate) {
-      // Format ngày hiển thị cho đẹp
-      const formattedDate = formatDate(publicDate);
-
+          return (
+            <AlertMessage
+              message={`Chưa tới ngày để xem các đề tài từ các mentor. Ngày công bố: ${formattedDate}`}
+            />
+          );
+        }
+      }
+    } else {
       return (
-        <AlertMessage
-          message={`Chưa tới thời gian công bố đề tài. Ngày công bố: ${formattedDate}`}
-        />
+        <div className="container mx-auto py-8">
+          <AlertMessage
+            messageType="info"
+            message="Chưa có thông tin ngày công bố đề tài"
+          />
+        </div>
       );
     }
   }
 
-  // Nếu đã qua ngày công bố hoặc không có publicTopicDate
   return (
     <>
-      <IdeasOfSupervisorsTableTable />
+      <TopicsOfSupervisorsTableTable />
     </>
   );
 }

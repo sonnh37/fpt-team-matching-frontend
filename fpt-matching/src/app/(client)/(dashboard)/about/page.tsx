@@ -36,10 +36,12 @@ const page = () => {
 
     return (
         <div>
-            <AnimatedTestimonials testimonials={testimonials} />
             <div >
                 <div className="container mx-auto py-16 px-4 sm:px-6 lg:px-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-8">
+                    <div className="flex gap-10 items-center justify-center ">
+                        <div className="mt-12 md:mt-0">
+                            <img src="/logo_web.png" alt="About Us Image" className="object-cover rounded-lg shadow-md w-[300px]"></img>
+                        </div>
                         <div className="max-w-lg">
                             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Về chúng tôi</h2>
                             <p className="mt-4 text-gray-600 text-lg">
@@ -47,13 +49,14 @@ const page = () => {
                             </p>
 
                         </div>
-                        <div className="mt-12 md:mt-0">
-                            <img src="/logo_web.png" alt="About Us Image" className="object-cover rounded-lg shadow-md w-[300px]"></img>
-                        </div>
+
                     </div>
                 </div>
             </div>
-
+            <div className="mx-auto max-w-screen-sm text-center mb-4 lg:mb-6">
+                <h2 className="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Nhóm chúng tôi</h2>
+            </div>
+            <AnimatedTestimonials testimonials={testimonials} />
         </div>
     )
 }

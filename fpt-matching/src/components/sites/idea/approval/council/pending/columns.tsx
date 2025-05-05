@@ -38,106 +38,55 @@ import { Label } from "@/components/ui/label";
 
 export const columns: ColumnDef<Idea>[] = [
   {
-    accessorKey: "teamCode",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã nhóm" />
-    ),
-    cell: ({ row }) => {
-      const idea = row.original;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.topic?.project?.teamCode || "-";
+      accessorKey: "topicCode",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Mã đề tài" />
+      ),
+      cell: ({ row }) => {
+        const idea = row.original;
+        const highestVersion =
+          idea.ideaVersions.length > 0
+            ? idea.ideaVersions.reduce((prev, current) =>
+                (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+              )
+            : undefined;
+        return highestVersion?.topic?.topicCode || "-";
+      },
     },
-  },
-  {
-    accessorKey: "topicCode",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã topic" />
-    ),
-    cell: ({ row }) => {
-      const idea = row.original;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.topic?.topicCode || "-";
-    },
-  },
-  // {
-  //   accessorKey: "vietNamName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Tên đề tài (VN)" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.vietNamName || "-";
-  //   },
-  // },
-  // {
-  //   accessorKey: "englishName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Tên đề tài (EN)" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.englishName || "-";
-  //   },
-  // },
-  {
-    accessorKey: "version",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phiên bản" />
-    ),
-    cell: ({ row }) => {
-      const idea = row.original;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion ? `v${highestVersion.version}` : "-";
-    },
-  },
-  // {
-  //   accessorKey: "enterpriseName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Doanh nghiệp" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.enterpriseName || "-";
-  //   },
-  // },
   
-  {
-    accessorKey: "actions",
-    header: "Tùy chọn",
-    cell: ({ row }) => {
-      return <Actions row={row} />;
+    {
+      accessorKey: "vietNamName",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Tên đề tài" />
+      ),
+      cell: ({ row }) => {
+        const idea = row.original;
+        const highestVersion =
+          idea.ideaVersions.length > 0
+            ? idea.ideaVersions.reduce((prev, current) =>
+                (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+              )
+            : undefined;
+        return highestVersion?.englishName || "-";
+      },
     },
-  },
+    {
+      accessorKey: "mentorId",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Người hướng dẫn" />
+      ),
+      cell: ({ row }) => {
+        const idea = row.original;
+        return idea?.mentor?.email || "-";
+      },
+    },
+    {
+      accessorKey: "actions",
+      header: "Tùy chọn",
+      cell: ({ row }) => {
+        return <Actions row={row} />;
+      },
+    },
 ];
 
 interface ActionsProps {

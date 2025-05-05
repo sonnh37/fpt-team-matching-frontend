@@ -145,6 +145,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       const command: InvitationUpdateCommand = {
         id: model.id,
         status: InvitationStatus.Accepted,
+        senderId: model.senderId,
+        receiverId: model.receiverId
       };
       const res = await invitationService.approveOrRejectFromTeamByMe(command);
       if (res.status != 1) {
@@ -163,14 +165,14 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     <>
       <div className="isolate flex -space-x-px">
         <Button className="rounded-r-none focus:z-10" onClick={handleApprove}>
-          Accept
+          Đồng ý
         </Button>
         <Button
           variant="outline"
           className="rounded-l-none focus:z-10"
           onClick={handleCancel}
         >
-          Cancel
+          Từ chối
         </Button>
       </div>
     </>
