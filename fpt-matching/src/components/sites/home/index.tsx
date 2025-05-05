@@ -98,7 +98,7 @@ export default function ProjectSearchList() {
     const params: ProjectSearchQuery = {
       ...useQueryParams(inputFields, columnFilters, pagination, sorting),
       isHasTeam: true,
-      status: ProjectStatus.Pending,
+      // status: ProjectStatus.Pending,
     };
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
