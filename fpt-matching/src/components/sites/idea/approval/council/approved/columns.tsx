@@ -1,76 +1,26 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import ErrorSystem from "@/components/_common/errors/error-system";
-import { LoadingComponent } from "@/components/_common/loading-page";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import { Badge } from "@/components/ui/badge";
+import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Textarea } from "@/components/ui/textarea";
-import { RootState } from "@/lib/redux/store";
 import { ideaVersionRequestService } from "@/services/idea-version-request-service";
-import { ideaService } from "@/services/idea-service";
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
 import { Idea } from "@/types/idea";
-import { IdeaVersionRequest } from "@/types/idea-version-request";
-import { IdeaVersionRequestUpdateStatusCommand } from "@/types/models/commands/idea-version-requests/idea-version-request-update-status-command";
-import { User } from "@/types/user";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { Eye, ListChecks, MoreHorizontal } from "lucide-react";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { Eye } from "lucide-react";
 import { useState } from "react";
-import { CiFolderOn, CiFolderOff } from "react-icons/ci";
-import { useSelector } from "react-redux";
 import { toast } from "sonner";
-import { IdeaDetailForm } from "@/components/sites/idea/detail";
-import { formatDate } from "@/lib/utils";
-import Link from "next/link";
 
 export const columns: ColumnDef<Idea>[] = [
   {
-    accessorKey: "teamCode",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã nhóm" />
-    ),
-    cell: ({ row }) => {
-      const idea = row.original;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.topic?.project?.teamCode || "-";
-    },
-  },
-  {
     accessorKey: "topicCode",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã topic" />
+      <DataTableColumnHeader column={column} title="Mã đề tài" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -83,40 +33,11 @@ export const columns: ColumnDef<Idea>[] = [
       return highestVersion?.topic?.topicCode || "-";
     },
   },
-  // {
-  //   accessorKey: "vietNamName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Tên đề tài (VN)" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.vietNamName || "-";
-  //   },
-  // },
-  // {
-  //   accessorKey: "englishName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Tên đề tài (EN)" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.englishName || "-";
-  //   },
-  // },
+
   {
-    accessorKey: "version",
+    accessorKey: "vietNamName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phiên bản" />
+      <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -126,25 +47,19 @@ export const columns: ColumnDef<Idea>[] = [
               (prev.version ?? 0) > (current.version ?? 0) ? prev : current
             )
           : undefined;
-      return highestVersion ? `v${highestVersion.version}` : "-";
+      return highestVersion?.englishName || "-";
     },
   },
-  // {
-  //   accessorKey: "enterpriseName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Doanh nghiệp" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.enterpriseName || "-";
-  //   },
-  // },
-  
+  {
+    accessorKey: "mentorId",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Người hướng dẫn" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      return idea?.mentor?.email || "-";
+    },
+  },
   {
     accessorKey: "actions",
     header: "Tùy chọn",

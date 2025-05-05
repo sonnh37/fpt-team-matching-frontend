@@ -43,23 +43,52 @@ import { toast } from "sonner";
 import { IdeaDetailForm } from "../../idea/detail";
 import { Eye, EyeIcon, ListChecks, Send, Undo2 } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { TypographyP } from "@/components/_common/typography/typography-p";
 export const columns: ColumnDef<Topic>[] = [
   {
     accessorKey: "topicCode",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Mã đề tài" />
     ),
+    cell: ({ row }) => {
+      const model = row.original;
+      const topicCode = model.topicCode;
+      return <TypographyP>{topicCode ?? "Chưa có mã đề tài"}</TypographyP>;
+    },
+  },
+  {
+    accessorKey: "ideaVersion.vietNamName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tên đề tài" />
+    ),
+    cell: ({ row }) => {
+      const model = row.original;
+      const vietNamName = model.ideaVersion?.vietNamName;
+      return <TypographyP>{vietNamName ?? "Không có tên"}</TypographyP>;
+    },
+  },
+  {
+    accessorKey: "ideaVersion.enterpriseName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tên đề tài doanh nghiệp" />
+    ),
+    cell: ({ row }) => {
+      const model = row.original;
+      const enterpriseName = model.ideaVersion?.enterpriseName;
+      return <TypographyP>{enterpriseName ?? "Không có tên"}</TypographyP>;
+    },
   },
   {
     accessorKey: "ideaVersion.version",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Bản hiện tại" />
+      <DataTableColumnHeader column={column} title="Phiên bản" />
     ),
   },
   {
     accessorKey: "ideaVersion.idea.status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Trạng thái idea mới nhất" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const model = row.original;
@@ -79,7 +108,7 @@ export const columns: ColumnDef<Topic>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       return <Actions row={row} />;
     },

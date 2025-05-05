@@ -21,7 +21,7 @@ import { IdeaDetailForm } from "@/components/sites/idea/detail";
 import { Button } from "@/components/ui/button";
 import { formatDate } from "@/lib/utils";
 import SamilaritiesProjectModels from "@/types/models/samilarities-project-models";
-import {Brain, Eye, FileText, ListChecks} from "lucide-react";
+import { Brain, Eye, FileText, ListChecks } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -44,6 +44,7 @@ import { apiHubsService } from "@/services/api-hubs-service";
 import { ideaVersionRequestService } from "@/services/idea-version-request-service";
 import { Label } from "@radix-ui/react-label";
 import { useParams } from "next/navigation";
+import { ProjectStatus } from "@/types/enums/project";
 
 export const columns: ColumnDef<Idea>[] = [
   {
@@ -53,19 +54,26 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const idea = row.original;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.topic?.project?.teamCode || "-";
+      const projectOfLeader = idea?.owner?.projects.filter(
+        (m) => m.leaderId == idea.ownerId && m.status == ProjectStatus.Pending
+      )[0];
+      return projectOfLeader?.teamCode || "Chưa có mã nhóm";
     },
   },
   {
-    accessorKey: "topicCode",
+    accessorKey: "leaderId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã topic" />
+      <DataTableColumnHeader column={column} title="Trưởng nhóm" />
+    ),
+    cell: ({ row }) => {
+      const idea = row.original;
+      return idea?.owner?.email || "-";
+    },
+  },
+  {
+    accessorKey: "vietNamName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
     cell: ({ row }) => {
       const idea = row.original;
@@ -75,71 +83,9 @@ export const columns: ColumnDef<Idea>[] = [
               (prev.version ?? 0) > (current.version ?? 0) ? prev : current
             )
           : undefined;
-      return highestVersion?.topic?.topicCode || "-";
+      return highestVersion?.englishName || "-";
     },
   },
-  // {
-  //   accessorKey: "vietNamName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Tên đề tài (VN)" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.vietNamName || "-";
-  //   },
-  // },
-  // {
-  //   accessorKey: "englishName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Tên đề tài (EN)" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.englishName || "-";
-  //   },
-  // },
-  {
-    accessorKey: "version",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phiên bản" />
-    ),
-    cell: ({ row }) => {
-      const idea = row.original;
-      const highestVersion =
-        idea.ideaVersions.length > 0
-          ? idea.ideaVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion ? `v${highestVersion.version}` : "-";
-    },
-  },
-  // {
-  //   accessorKey: "enterpriseName",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Doanh nghiệp" />
-  //   ),
-  //   cell: ({ row }) => {
-  //     const idea = row.original;
-  //     const highestVersion = idea.ideaVersions.length > 0
-  //       ? idea.ideaVersions.reduce((prev, current) =>
-  //           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //         )
-  //       : undefined;
-  //     return highestVersion?.enterpriseName || "-";
-  //   },
-  // },
-  
   {
     accessorKey: "actions",
     header: "Tùy chọn",
@@ -225,39 +171,39 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             {loadingAI ? (
               <LoadingComponent />
             ) : (
-                <div className="flex flex-col gap-10 h-screen overflow-auto">
-                  <div className="text-lg font-semibold flex gap-2">
-                    <Brain className="h-5 w-5" />
-                    <h3>Các đề tài tương đồng đã tồn tại</h3>
-                  </div>
-                  {samilaritiesProject && samilaritiesProject.length > 0 ? (
-                      samilaritiesProject.map((project, index) => (
-                          <Card key={index}>
-                            <CardHeader>
-                              <CardTitle>{project.name}</CardTitle>
-                              <CardDescription>
-                                Độ tương đồng:{" "}
-                                {(Number(project.similarity.toFixed(2)) ?? 0) * 100}%
-                              </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                              <div className="space-y-2">
-                                <div className={"flex gap-4"}>
-                                  <Label className="font-bold">Mã đề tài:</Label>
-                                  <p>{project.project_code}</p>
-                                </div>
-                                <div>
-                                  <Label className={"font-bold"}>Mô tả:</Label>
-                                  <p>{project.context}</p>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                      ))
-                  ) : (
-                      <p>No similar projects found</p>
-                  )}
+              <div className="flex flex-col gap-10 h-screen overflow-auto">
+                <div className="text-lg font-semibold flex gap-2">
+                  <Brain className="h-5 w-5" />
+                  <h3>Các đề tài tương đồng đã tồn tại</h3>
                 </div>
+                {samilaritiesProject && samilaritiesProject.length > 0 ? (
+                  samilaritiesProject.map((project, index) => (
+                    <Card key={index}>
+                      <CardHeader>
+                        <CardTitle>{project.name}</CardTitle>
+                        <CardDescription>
+                          Độ tương đồng:{" "}
+                          {(Number(project.similarity.toFixed(2)) ?? 0) * 100}%
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <div className={"flex gap-4"}>
+                            <Label className="font-bold">Mã đề tài:</Label>
+                            <p>{project.project_code}</p>
+                          </div>
+                          <div>
+                            <Label className={"font-bold"}>Mô tả:</Label>
+                            <p>{project.context}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <p>No similar projects found</p>
+                )}
+              </div>
             )}
           </div>
         </DialogContent>
