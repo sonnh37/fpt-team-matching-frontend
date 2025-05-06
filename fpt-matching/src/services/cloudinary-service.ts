@@ -8,7 +8,7 @@ class CloudinaryService {
       formData.append("upload_preset", "ml_default");
 
       const response = await axios.post(
-        `https://api.cloudinary.com/v1_1/drvtiqqgl/upload`,
+        `https://api.cloudinary.com/v1_1/dijvg89ff/upload`,
         formData
       );
 
