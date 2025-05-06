@@ -114,7 +114,7 @@ export default function Search() {
     refetch,
     isLoading
   } = useQuery({
-    queryKey: ["getBlogAllSearch", query],
+    queryKey: ["getBlogSearch", query],
     queryFn: () => blogService.getAll(query),
     refetchOnWindowFocus: false,
   });

@@ -25,6 +25,7 @@ import { useState } from "react";
 import { cloudinaryService } from "@/services/cloudinary-service";
 import { BlogCvGetAllQuery } from "@/types/models/queries/blogcv/blogcv-get-all-query";
 import { useCurrentRole } from "@/hooks/use-current-role";
+import { ProjectStatus } from "@/types/enums/project";
 
 const UploadCv = ({ blogId }: { blogId: string }) => {
     //gọi thông tin user đã đăng nhập
@@ -44,21 +45,37 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
         queryFn: () => blogService.getById(blogId),
         refetchOnWindowFocus: false,
     });
+
+    // const {
+    //     data: prj,
+       
+    // } = useQuery({
+    //     queryKey: ["getProjectInfo", result?.data?.projectId],
+    //     queryFn: () => blogService.getById(blogId),
+    //     refetchOnWindowFocus: false,
+    // });
     const userIsExist = result?.data?.user?.id ?? ""
     const role = useCurrentRole()
 
+    const prj = result?.data?.project?.status
 
     const submit = async () => {
+
         if (isSubmitting) return; // Nếu API đang chạy, không cho phép bấm tiếp
         setIsSubmitting(true); // Đánh dấu API đang chạy
 
+        if (prj !== ProjectStatus.Pending) {
+            toast.error("Bạn không thể gửi vì nhóm này đang trong quá trình làm!")
+            setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
+            return
+        }
         if (user?.id == userIsExist) {
-            toast("Bạn không thể gửi vì đây bài viết của bạn")
+            toast.error("Bạn không thể gửi vì đây bài viết của bạn!")
             setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
             return
         }
         if(role !== "Student"){
-            toast("Bạn không thể gửi vì bạn không có quyền hạn")
+            toast.error("Bạn không thể gửi vì bạn không có quyền hạn")
             setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
             return
         }
@@ -123,7 +140,7 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <div><span className="ml-2 text-lg ">{result?.data?.blogCvs.length} Uploads <FontAwesomeIcon icon={faPaperclip} /></span></div>
+                <div><span className="ml-2 text-[16px] ">{result?.data?.blogCvs.length} Uploads <FontAwesomeIcon icon={faPaperclip} /></span></div>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[505px]  min-h-[450px]">
                 <DialogHeader>

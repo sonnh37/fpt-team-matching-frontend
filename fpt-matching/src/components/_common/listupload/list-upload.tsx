@@ -41,6 +41,8 @@ import { InvitationGetAllQuery } from "@/types/models/queries/invitations/invita
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/redux/store";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
+import { ProjectStatus } from "@/types/enums/project";
+import { TeamMemberStatus } from "@/types/enums/team-member";
 
 const ListUploadCv = ({ blogId }: { blogId: string }) => {
     //gọi thông tin user đã đăng nhập
@@ -74,7 +76,12 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
         refetchOnWindowFocus: false,
     });
 
-    console.log(blog?.data?.skillRequired, "skill")
+    const prj = blog?.data?.project?.status
+    // const checkMember = blog?.data?.project?.teamMembers.filter(x => !x.leaveDate).length;
+    // clg
+    // const avaibleIsTrue = blog?.data?.project?.teamSize === checkMember;
+    
+
 
     const {
         data: recommend,
@@ -112,6 +119,15 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
 
 
     const handleInvite = async (email: string) => {
+
+        // if(avaibleIsTrue){
+        //     toast.error("Nhóm của bạn đã đủ thành viên")
+        //     return
+        // }
+        if(prj !== ProjectStatus.Pending){
+            toast.error("Nhóm của bạn đang trong quá trình làm.Không thể mời")
+            return
+        }
 
         // Gọi confirm để mở dialog
         const confirmed = await confirm({
