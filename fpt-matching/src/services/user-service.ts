@@ -166,10 +166,12 @@ class UserService extends BaseService<User> {
   };
 
   public createManyStudentByManager = async (
-    file: File
+    file: File,
+    semesterId: string
   ): Promise<BusinessResult<User[]>> => {
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("semesterId", semesterId);
     const response = await axiosInstance.post<BusinessResult<User[]>>(
       `${this.endpoint}/import/students/many`,
       formData
@@ -203,9 +205,9 @@ class UserService extends BaseService<User> {
     return response.data;
   };
 
-  public updateExistedUser = async ({ users }: { users: User[] }) => {
+  public updateExistedUser = async ({ users, semesterId }: { users: User[], semesterId: string }) => {
     const response = await axiosInstance.put<BusinessResult<void>>(
-      `${this.endpoint}/import/students/update-existed`,
+      `${this.endpoint}/import/students/update-existed?semesterId=${semesterId}`,
       [...users]
     );
     return response.data;

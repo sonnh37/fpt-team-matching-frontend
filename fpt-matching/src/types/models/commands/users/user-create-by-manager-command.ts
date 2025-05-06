@@ -17,4 +17,5 @@ export default interface UserCreateByManagerCommand {
     username: string;
     department: number | null;
     phone: string | null;
+    semesterId: string | null;
 }

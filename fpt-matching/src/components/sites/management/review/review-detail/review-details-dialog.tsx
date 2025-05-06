@@ -48,7 +48,8 @@ export function ReviewDetailsDialog(
                 <AlertDialogHeader>
                     <AlertDialogTitle>Cập nhật file Checklist</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Bạn có chắc với những thông tin trong file ? <br /> Có thể chỉnh sửa sau khi cập nhật
+                        Bạn có chắc với những thông tin trong file ? <br />
+                        {/*Có thể chỉnh sửa sau khi cập nhật*/}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
