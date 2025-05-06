@@ -122,7 +122,7 @@ function ImportManyCardDialog({handleSaveChange, loading, open, setOpen}: {handl
         </Dialog>
     )
 }
-const ImportManyCard = ({role}: {role: string}) => {
+const ImportManyCard = ({role, semesterId}: {role: string,semesterId: string | null}) => {
     const [file, setFile] = React.useState<File | null>(null);
     const [importUsers, setImportUsers] = React.useState<ImportUserModels[]>([])
     const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
@@ -178,7 +178,11 @@ const ImportManyCard = ({role}: {role: string}) => {
         }
         let response;
         if (role == "Student") {
-            response = await userService.createManyStudentByManager(file);
+            if (semesterId == null) {
+                toast.error("Kì hiện tại đang không tồn tại")
+                return;
+            }
+            response = await userService.createManyStudentByManager(file, semesterId);
             if (response.status == -1) {
                 setOpen(false);
                 toast.error(response.message)
@@ -242,7 +246,7 @@ const ImportManyCard = ({role}: {role: string}) => {
     }
     return (
         <>
-            {usersConfirm.length > 0 && <DialogConfirmUpdate role={role}  usersConfirm={usersConfirm} open={openConfirmDialog} setOpen={setOpenConfirmDialog} />}
+            {usersConfirm.length > 0 && <DialogConfirmUpdate role={role} semesterId={semesterId} usersConfirm={usersConfirm} open={openConfirmDialog} setOpen={setOpenConfirmDialog} />}
             <Card>
                 <CardHeader className={"flex justify-center items-center"}>
                     <CardTitle>Thêm danh sách tài khoản mới</CardTitle>
