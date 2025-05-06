@@ -21,6 +21,8 @@ import { IconType } from "react-icons/lib";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@radix-ui/react-tooltip";
+import { useState, useRef, useEffect } from "react";
 
 export function NavMain({
   items,
@@ -58,7 +60,7 @@ export function NavMain({
               {item.items ? (
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton
+                    <SidebarMenuButton 
                       tooltip={item.title}
                       className={cn(
                         styleCommon,
@@ -74,17 +76,18 @@ export function NavMain({
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="overflow-hidden text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <SidebarMenuSub>
+                    <SidebarMenuSub className="pr-0">
                       {item.items?.map((subItem) => {
                         const isActiveSub = pathName === subItem.url;
                         return (
                           <SidebarMenuSubItem key={subItem.title}>
-                            <SidebarMenuSubButton
+                            <SidebarMenuSubButton 
                               className={cn(
                                 styleCommon,
                                 isActiveSub ? "!bg-orange-500 !text-white" : "",
-                                "py-3"
+                                "py-2.5"
                               )}
+                                
                               asChild
                             >
                               <Link href={subItem.url}>
@@ -126,3 +129,30 @@ export function NavMain({
     </SidebarGroup>
   );
 }
+
+
+const TooltipWrapper = ({ children, text }: { children: React.ReactNode; text: string }) => {
+  const [isOverflowed, setIsOverflowed] = useState(false);
+  const textRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (textRef.current) {
+      setIsOverflowed(
+        textRef.current.scrollWidth > textRef.current.clientWidth
+      );
+    }
+  }, [text]);
+
+  return isOverflowed ? (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        {children}
+      </TooltipTrigger>
+      <TooltipContent side="right">
+        <p>{text}</p>
+      </TooltipContent>
+    </Tooltip>
+  ) : (
+    children
+  );
+};

@@ -4,11 +4,7 @@ import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-
 import TimeStageIdea from "@/components/_common/time-stage-idea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { IdeaStatus } from "@/types/enums/idea";
 import { Idea } from "@/types/idea";
 import { useQueryClient } from "@tanstack/react-query";
@@ -95,7 +91,19 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as IdeaStatus | undefined;
-      const statusText = status !== undefined ? IdeaStatus[status] : "-";
+
+      // Ánh xạ status sang tiếng Việt
+      const statusText =
+        status !== undefined
+          ? {
+              [IdeaStatus.Pending]: "Đang chờ",
+              [IdeaStatus.Approved]: "Đã duyệt",
+              [IdeaStatus.Rejected]: "Đã từ chối",
+              [IdeaStatus.ConsiderByMentor]:
+                "Được xem xét bởi giáo viên hướng dẫn",
+              [IdeaStatus.ConsiderByCouncil]: "Được xem xét bởi Hội đồng",
+            }[status] || "Khác"
+          : "-";
 
       let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
         "default";

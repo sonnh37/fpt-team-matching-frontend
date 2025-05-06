@@ -8,11 +8,8 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { formatDate } from "@/lib/utils";
-import { InvitationStatus } from "@/types/enums/invitation";
 import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Invitation } from "@/types/invitation";
 import { MentorTopicRequest } from "@/types/mentor-topic-request";
@@ -28,7 +25,7 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
       <DataTableColumnHeader column={column} title="Project" />
     ),
     cell: ({ row }) => {
-      const teamName = row.original.project?.teamName ?? "Unknown"; // Tránh lỗi undefined
+      const teamName = row.original.project?.teamName ?? "-"; // Tránh lỗi undefined
       const projectId = row.original.project?.id ?? "#";
 
       return (
@@ -45,8 +42,8 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
       <DataTableColumnHeader column={column} title="Idea" />
     ),
     cell: ({ row }) => {
-      const englishName = row.original.idea?.englishName ?? "Unknown"; // Tránh lỗi undefined
-      const ideaId = row.original.idea?.id ?? "#";
+      const englishName = row.original.topic?.ideaVersion?.englishName ?? "-"; // Tránh lỗi undefined
+      const ideaId = row.original.topic?.ideaVersion?.idea?.id ?? "#";
 
       return (
         <Button variant="link" className="p-0 m-0" asChild>
@@ -58,11 +55,19 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue("status") as MentorTopicRequestStatus;
-      const statusText = MentorTopicRequestStatus[status];
+      const status = row.original.status as MentorTopicRequestStatus;
+
+      // Map status to Vietnamese text
+      const statusText =
+        {
+          [MentorTopicRequestStatus.Pending]: "Chờ phê duyệt",
+          [MentorTopicRequestStatus.Approved]: "Đã chấp nhận",
+          [MentorTopicRequestStatus.Rejected]: "Đã từ chối",
+          // Add other statuses if needed
+        }[status] || "Khác";
 
       let badgeVariant:
         | "secondary"
@@ -73,16 +78,16 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
 
       switch (status) {
         case MentorTopicRequestStatus.Pending:
-          badgeVariant = "secondary";
+          badgeVariant = "secondary"; // Neutral color for pending state
           break;
         case MentorTopicRequestStatus.Approved:
-          badgeVariant = "default";
+          badgeVariant = "default"; // Positive color for approved
           break;
         case MentorTopicRequestStatus.Rejected:
-          badgeVariant = "destructive";
+          badgeVariant = "destructive"; // Negative color for rejected
           break;
         default:
-          badgeVariant = "outline";
+          badgeVariant = "outline"; // Outline for unknown states
       }
 
       return <Badge variant={badgeVariant}>{statusText}</Badge>;
