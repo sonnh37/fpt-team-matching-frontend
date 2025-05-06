@@ -10,6 +10,7 @@ import { Department } from "@/types/enums/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoIosArrowRoundBack } from "react-icons/io";
 import { toast } from "sonner";
@@ -35,6 +36,7 @@ export const LoginAccountForm = ({
 }: React.ComponentProps<"div">) => {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   type FormSchema = z.infer<typeof loginSchema>;
 
   const form = useForm<FormSchema>({
@@ -48,6 +50,7 @@ export const LoginAccountForm = ({
 
   const onSubmit = async (data: FormSchema) => {
     try {
+      setIsLoading(true);
       const department = form.getValues("department");
       if (department === undefined || department === null) {
         toast.warning("Vui lòng chọn Campus trước khi đăng nhập.");
@@ -68,77 +71,100 @@ export const LoginAccountForm = ({
     } catch (error: any) {
       console.error(error);
       toast.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
     <Form {...form}>
-      <div className={cn("flex flex-col gap-6", className)} {...props}>
-        <Card className="overflow-hidden border-0">
+      <div className={cn("flex flex-col gap-6 mx-auto w-full", className)} {...props}>
+        <Card className="overflow-hidden bg-background/90  border-none shadow-lg">
           <CardContent className="grid p-0 md:grid-cols-2">
-            <form className="p-6 md:p-8" onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="flex flex-col gap-6">
-                <div className="flex w-full justify-center items-center gap-2">
-                  <Icons.logo></Icons.logo>
+            <form className="p-8" onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col items-center">
+                  <Icons.logo className="" />
+                  <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
+                    Đăng nhập bằng tài khoản
+                  </h1>
+                  <p className="text-sm text-muted-foreground text-center">
+                    Vui lòng nhập thông tin đăng nhập của bạn
+                  </p>
                 </div>
-                <div className="grid gap-2">
+
+                <div className="space-y-4">
                   <FormSelectEnum
                     name="department"
-                    label="Select Campus"
+                    label="Khu vực"
                     form={form}
-                    placeholder="Select a campus"
+                    placeholder="Chọn khu vực"
                     enumOptions={getEnumOptions(Department)}
                   />
-                </div>
-                <div className="grid gap-2">
+
                   <FormInput
-                    type="email"
+                    type="text"
                     name="account"
-                    label="Email"
+                    label="Tài khoản hoặc Email"
+                    placeholder="Nhập tài khoản hoặc email"
                     form={form}
                   />
-                </div>
-                <div className="grid gap-2">
+
                   <FormInput
                     type="password"
                     name="password"
-                    label="Password"
+                    label="Mật khẩu"
+                    placeholder="Nhập mật khẩu"
                     form={form}
                   />
-                </div>
-                <Button type="submit" className="w-full">
-                  Login
-                </Button>
-                <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border"></div>
-                <div className="grid grid-cols-1 gap-4">
-                  <Button
-                    variant="outline"
-                    type="button"
-                    onClick={() => {
-                      router.push("/login");
-                    }}
-                    className="w-full"
-                  >
-                    <IoIosArrowRoundBack />
-                    <span className=""> Back</span>
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading && (
+                      <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Đăng nhập
                   </Button>
                 </div>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="px-2 text-muted-foreground">
+                      Hoặc
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  variant="secondary"
+                  type="button"
+                  onClick={() => router.push("/login")}
+                  className="w-full"
+                  disabled={isLoading}
+                >
+                  <IoIosArrowRoundBack className="mr-2" />
+                  <span>Quay lại đăng nhập</span>
+                </Button>
               </div>
             </form>
-            <div className="relative hidden bg-muted md:block">
+            
+            <div className="hidden md:block relative">
               <Image
                 src="/dai-hoc-fpt.jpg"
-                width={9999}
-                height={9999}
-                alt="Image"
-                className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                fill
+                alt="FPT University Campus"
+                className="object-cover"
+                priority
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-black/30" />
+              <div className="absolute bottom-6 left-6 text-white/90">
+                <h2 className="text-xl font-bold">FPT University</h2>
+              </div>
             </div>
           </CardContent>
         </Card>
-        <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 hover:[&_a]:text-primary">
-          By clicking continue, you agree to our{" "}
-          <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
-        </div>
       </div>
     </Form>
   );
