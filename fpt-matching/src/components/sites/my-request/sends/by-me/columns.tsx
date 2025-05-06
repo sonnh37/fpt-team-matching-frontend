@@ -55,19 +55,28 @@ export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as InvitationStatus;
-      const statusText = InvitationStatus[status];
+      
+      // Ánh xạ status sang tiếng Việt
+      const statusText: Record<InvitationStatus, string> = {
+        [InvitationStatus.Pending]: "Đang chờ",
+        [InvitationStatus.Accepted]: "Đã chấp nhận",
+        [InvitationStatus.Rejected]: "Đã từ chối",
+        [InvitationStatus.Cancel]: "Đã bị hủy",
+      };
 
+      const statusDisplay = statusText[status] || "Không xác định";
+  
       let badgeVariant:
         | "secondary"
         | "destructive"
         | "default"
         | "outline"
         | null = "default";
-
+  
       switch (status) {
         case InvitationStatus.Pending:
           badgeVariant = "secondary";
@@ -81,13 +90,13 @@ export const columns: ColumnDef<Invitation>[] = [
         default:
           badgeVariant = "outline";
       }
-
-      return <Badge variant={badgeVariant}>{statusText}</Badge>;
+  
+      return <Badge variant={badgeVariant}>{statusDisplay}</Badge>;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
     },
-  },
+  }
   // {
   //   accessorKey: "actions",
   //   header: "Actions",

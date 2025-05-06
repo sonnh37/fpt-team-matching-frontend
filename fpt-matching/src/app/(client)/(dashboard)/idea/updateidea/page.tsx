@@ -19,11 +19,15 @@ import { useDebounce } from "@/hooks/use-debounce";
 import { invitationService } from "@/services/invitation-service";
 import { projectService } from "@/services/project-service";
 import { userService } from "@/services/user-service";
+import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import { TeamMemberRole } from "@/types/enums/team-member";
+import { Invitation } from "@/types/invitation";
 import { InvitationTeamCreatePendingCommand } from "@/types/models/commands/invitation/invitation-team-command";
+import { InvitationUpdateCommand } from "@/types/models/commands/invitation/invitation-update-command";
+import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, UserPlus } from "lucide-react";
+import { Loader2, UserPlus, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
@@ -35,6 +39,9 @@ const InviteUsersForm = () => {
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
   const [open, setOpen] = useState(false);
   const [isInviting, setIsInviting] = useState(false);
+  const [cancellingInvitationId, setCancellingInvitationId] = useState<
+    string | null
+  >(null);
 
   const query: UserGetAllQuery = {
     email: debouncedSearchQuery,
@@ -80,6 +87,24 @@ const InviteUsersForm = () => {
   const project = currentSemesterTeam?.data ?? result?.data;
   if (!project) return null;
 
+  const queryInvitation: InvitationGetByTypeQuery = {
+    projectId: project.id,
+    type: InvitationType.SendByTeam,
+    status: InvitationStatus.Pending,
+    isPagination: false,
+  };
+
+  const { data: res_invitations_pending, refetch: refetchInvitationPending } =
+    useQuery({
+      queryKey: ["get-invitation-pendings"],
+      queryFn: () =>
+        invitationService.getLeaderInvitationsByType(queryInvitation),
+      refetchOnWindowFocus: false,
+      enabled: !!project.id,
+    });
+
+  const invitationPending = res_invitations_pending?.data?.results || [];
+
   const sortedMembers = project?.teamMembers
     ?.slice()
     .sort((a, b) =>
@@ -92,7 +117,7 @@ const InviteUsersForm = () => {
 
   const isHasTopic = !!project?.topicId;
 
-  let availableSlots = 6;
+  let availableSlots = 5;
   if (!isHasTopic) {
     availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
   } else {
@@ -118,11 +143,10 @@ const InviteUsersForm = () => {
 
         if (receiver.status === 1 && receiver.data) {
           const idReceiver = receiver.data.id;
-          const prj = await projectService.getProjectInfo();
 
           const invitation: InvitationTeamCreatePendingCommand = {
             receiverId: idReceiver,
-            projectId: prj.data?.id ?? "",
+            projectId: project?.id ?? "",
             content: "Muốn mời bạn vào nhóm!",
           };
 
@@ -132,6 +156,7 @@ const InviteUsersForm = () => {
             setEmailInvite("");
             setMessage("");
             setEnableAddToTeam(false);
+            refetchInvitationPending();
           } else {
             toast.error(res.message || "Gửi lời mời thất bại");
             setMessage(res?.message ?? "");
@@ -146,8 +171,31 @@ const InviteUsersForm = () => {
         setIsInviting(false);
       }
     },
-    [availableSlots]
+    [availableSlots, project?.id, refetchInvitationPending]
   );
+
+  const handleCancelInvitation = async (invitation: Invitation) => {
+    setCancellingInvitationId(invitation.id ?? "");
+    try {
+      const command: InvitationUpdateCommand = {
+        ...invitation,
+        status: InvitationStatus.Cancel,
+      };
+      const res =
+        await invitationService.approveOrRejectFromPersonalizeByLeader(command);
+      if (res.status === 1) {
+        toast.success(res.message);
+        refetchInvitationPending();
+      } else {
+        toast.error(res.message || "Hủy lời mời thất bại");
+      }
+    } catch (error) {
+      toast.error("Có lỗi xảy ra khi hủy lời mời");
+      console.error("Lỗi hủy lời mời:", error);
+    } finally {
+      setCancellingInvitationId(null);
+    }
+  };
 
   return (
     <div className="space-y-6 overflow-visible">
@@ -164,7 +212,7 @@ const InviteUsersForm = () => {
         <div className="space-y-2">
           {sortedMembers?.map((member, index) => (
             <div
-              key={index}
+              key={`member-${index}`}
               className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent transition-colors"
             >
               <div className="flex items-center gap-3">
@@ -191,6 +239,52 @@ const InviteUsersForm = () => {
         </div>
       </div>
 
+      {/* Danh sách lời mời đang chờ */}
+      {invitationPending.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Label className="text-base font-medium">Lời mời đang chờ</Label>
+            <Badge variant="outline" className="px-2 py-0.5">
+              {invitationPending.length}
+            </Badge>
+          </div>
+
+          <div className="space-y-2">
+            {invitationPending.map((invitation) => (
+              <div
+                key={`invitation-${invitation.id}`}
+                className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-accent transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center justify-center h-8 w-8 rounded-full border">
+                    {invitation.receiver?.email?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-sm font-medium">
+                    {invitation.receiver?.email}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">Đang chờ phản hồi</Badge>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 text-red-500 hover:bg-red-50"
+                    onClick={() => handleCancelInvitation(invitation)}
+                    disabled={cancellingInvitationId === invitation.id}
+                  >
+                    {cancellingInvitationId === invitation.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <X className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Form mời thành viên mới */}
       <div className="space-y-2">
         <Label>Tìm bằng email</Label>
@@ -213,8 +307,6 @@ const InviteUsersForm = () => {
                     autoComplete="off"
                     className="w-full overflow-visible"
                     onClick={() => setOpen(true)}
-                    // onMouseLeave={() => setOpen(false)} // Mở popover khi click vào input
-                    // onCli
                   />
                   {isSearching && (
                     <Loader2 className="absolute right-3 top-3 h-4 w-4 animate-spin" />
@@ -246,7 +338,6 @@ const InviteUsersForm = () => {
               side="bottom"
               sideOffset={4}
               onInteractOutside={(e) => {
-                // Ngăn không cho đóng khi click bên ngoài
                 e.preventDefault();
               }}
             >

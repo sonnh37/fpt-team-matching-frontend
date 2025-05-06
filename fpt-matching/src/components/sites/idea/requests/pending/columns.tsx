@@ -103,37 +103,47 @@ export const columns: ColumnDef<Idea>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Trạng thái" />
-    ),
-    cell: ({ row }) => {
-      const status = row.getValue("status") as IdeaStatus | undefined;
-      const statusText = status !== undefined ? IdeaStatus[status] : "-";
-
-      let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
-        "default";
-
-      switch (status) {
-        case IdeaStatus.Pending:
-          badgeVariant = "secondary";
-          break;
-        case IdeaStatus.Approved:
-          badgeVariant = "default";
-          break;
-        case IdeaStatus.Rejected:
-          badgeVariant = "destructive";
-          break;
-        default:
-          badgeVariant = "outline";
-      }
-
-      return <Badge variant={badgeVariant}>{statusText}</Badge>;
+      accessorKey: "status",
+      header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Trạng thái" />
+      ),
+      cell: ({ row }) => {
+        const status = row.getValue("status") as IdeaStatus | undefined;
+        
+        // Ánh xạ status sang tiếng Việt
+        const statusText = status !== undefined 
+          ? {
+              [IdeaStatus.Pending]: "Đang chờ",
+              [IdeaStatus.Approved]: "Đã duyệt",
+              [IdeaStatus.Rejected]: "Đã từ chối",
+              [IdeaStatus.ConsiderByMentor]: "Được xem xét bởi giáo viên hướng dẫn",
+              [IdeaStatus.ConsiderByCouncil]: "Được xem xét bởi Hội đồng",
+            }[status] || "Khác"
+          : "-";
+    
+        let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
+          "default";
+    
+        switch (status) {
+          case IdeaStatus.Pending:
+            badgeVariant = "secondary";
+            break;
+          case IdeaStatus.Approved:
+            badgeVariant = "default";
+            break;
+          case IdeaStatus.Rejected:
+            badgeVariant = "destructive";
+            break;
+          default:
+            badgeVariant = "outline";
+        }
+    
+        return <Badge variant={badgeVariant}>{statusText}</Badge>;
+      },
+      filterFn: (row, id, value) => {
+        return value.includes(row.getValue(id));
+      },
     },
-    filterFn: (row, id, value) => {
-      return value.includes(row.getValue(id));
-    },
-  },
   {
     accessorKey: "actions",
     header: "Thao tác",

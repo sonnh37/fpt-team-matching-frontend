@@ -52,19 +52,22 @@ export const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as ProjectStatus;
-      const statusText = ProjectStatus[status];
-
-      let badgeVariant:
-        | "secondary"
-        | "destructive"
-        | "default"
-        | "outline"
-        | null = "default";
-
+      
+      // Map status to Vietnamese text
+      const statusText = {
+        [ProjectStatus.Pending]: "Đang chờ",
+        [ProjectStatus.InProgress]: "Đang thực hiện",
+        [ProjectStatus.Completed]: "Hoàn thành",
+        [ProjectStatus.Canceled]: "Đã hủy",
+        // Add other statuses if needed
+      }[status] || "Khác";
+  
+      let badgeVariant: "secondary" | "destructive" | "default" | "outline" | null = "default";
+  
       switch (status) {
         case ProjectStatus.Pending:
           badgeVariant = "secondary";
@@ -81,7 +84,7 @@ export const columns: ColumnDef<Project>[] = [
         default:
           badgeVariant = "outline";
       }
-
+  
       return <Badge variant={badgeVariant}>{statusText}</Badge>;
     },
     filterFn: (row, id, value) => {
