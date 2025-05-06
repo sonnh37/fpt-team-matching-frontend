@@ -33,7 +33,7 @@ export const ReviewManagement = ({projectId} : {projectId: string}) => {
     }, [projectId]);
     return (
         <div className={"p-8"}>
-            <div className={"flex justify-evenly gap-6 flex-wrap"}>
+            <div className={"flex gap-6 flex-wrap"}>
                 {reviews && reviews.map((review, index) => (
                     <ReviewCard key={index} review={review} />
                 ))}

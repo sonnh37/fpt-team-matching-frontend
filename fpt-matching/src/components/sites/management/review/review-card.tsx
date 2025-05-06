@@ -29,7 +29,7 @@ export function ReviewCard({review} : {review: Review}) {
     const pathName = usePathname()
     const router = useRouter()
     return (
-        <Card className="w-[25vw]">
+        <Card className="w-[22vw]">
             <CardHeader className={"flex flex-row justify-between items-center"}>
                 <CardTitle>Review {review.number}</CardTitle>
                 <div>

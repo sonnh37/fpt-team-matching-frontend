@@ -103,7 +103,7 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
   },
   // {
   //   accessorKey: "actions",
-  //   header: "Actions",
+  //   header: "Thao tác",
   //   cell: ({ row }) => {
   //     return <Actions row={row} />;
   //   },

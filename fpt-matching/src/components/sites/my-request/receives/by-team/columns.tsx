@@ -103,7 +103,7 @@ export const columns: ColumnDef<Invitation>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       const model = row.original;
 

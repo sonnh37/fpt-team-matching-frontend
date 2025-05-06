@@ -21,32 +21,32 @@ export const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "teamName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Team Name" />
+      <DataTableColumnHeader column={column} title="Tên nhóm" />
     ),
   },
   {
     accessorKey: "teamCode",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Team code" />
+      <DataTableColumnHeader column={column} title="Mã nhóm" />
     ),
   },
   {
     accessorKey: "leader.email",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Leader" />
+      <DataTableColumnHeader column={column} title="Trưởng nhóm" />
     ),
   },
   {
     accessorKey: "topic.ideaVersion.englishName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Idea name" />
+      <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
   },
 
   {
     accessorKey: "teamSize",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Team size" />
+      <DataTableColumnHeader column={column} title="Số lượng thành viên" />
     ),
   },
   {
@@ -99,7 +99,7 @@ export const columns: ColumnDef<Project>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       return <Actions row={row} />;
     },
@@ -137,13 +137,11 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem onClick={handleCopyId}>
-            Copy model ID
-          </DropdownMenuItem>
+          <DropdownMenuLabel>Các thao tác</DropdownMenuLabel>
+          
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleViewClick}>
-            View detail
+            Xem chi tiết
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

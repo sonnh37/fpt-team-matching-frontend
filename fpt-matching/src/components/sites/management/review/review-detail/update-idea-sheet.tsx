@@ -125,7 +125,7 @@ export function UpdateIdeaSheet({leaderId, topicVersionId,ideaHis, ideaId, revie
                 <SheetContent className={"sm:h-[50vh]"} side={"bottom"}>
                     <SheetHeader className={"flex justify-between"}>
                         <div>
-                            <SheetTitle>Cập nhập lại đề tài</SheetTitle>
+                            <SheetTitle>cập nhật lại đề tài</SheetTitle>
                             <SheetDescription>
                                 {
                                     ideaHis.some(x => x.status == TopicVersionStatus.Pending) ? "Bạn đã nộp file chỉnh sửa trước đó. Vui lòng chờ được mentor cập nhật. Hiện tại đã khoá chờ duyệt" : "Vui lòng upload lại file đề tài mới tại đây để chỉnh sửa."

@@ -166,7 +166,7 @@ export default function TeamInfo() {
   const project = currentSemesterTeam?.data ?? teamInfo?.data;
   if (!project) return <NoTeam />;
 
-  const isLockProject = project.status === ProjectStatus.InProgress;
+  const isLockProject = project.status !== ProjectStatus.Pending;
   const isLockTrash = project.topicId != undefined || project.topicId != null;
   const latestTopicVersion = (project.topic?.topicVersions ?? []).sort(
     (a, b) =>
@@ -221,7 +221,7 @@ export default function TeamInfo() {
   const availableSlots = isHasTopic
     ? (project.topic?.ideaVersion?.teamSize ?? 0) -
       (project.teamMembers?.length ?? 0)
-    : 6 - (project.teamMembers?.length ?? 0);
+    : 5 - (project.teamMembers?.length ?? 0);
 
   const isLockTeamMember = availableSlots === 0;
 

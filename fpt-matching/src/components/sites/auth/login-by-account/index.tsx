@@ -88,9 +88,7 @@ export const LoginAccountForm = ({
                   <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
                     Đăng nhập bằng tài khoản
                   </h1>
-                  <p className="text-sm text-muted-foreground text-center">
-                    Vui lòng nhập thông tin đăng nhập của bạn
-                  </p>
+                
                 </div>
 
                 <div className="space-y-4">

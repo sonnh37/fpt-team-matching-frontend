@@ -94,7 +94,7 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       const model = row.original;
 
