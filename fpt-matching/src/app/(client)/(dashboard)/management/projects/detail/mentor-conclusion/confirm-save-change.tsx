@@ -33,7 +33,7 @@ const ConfirmSaveChange = ({isOpen, setIsOpen, loading, handleSaveChange} :
                         : (
                             <Button disabled>
                                 <Loader2 className="animate-spin" />
-                                Please wait
+                                Đang xử lí
                             </Button>
                         )}
                 </AlertDialogFooter>
