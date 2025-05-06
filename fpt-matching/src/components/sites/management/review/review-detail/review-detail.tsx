@@ -92,7 +92,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                         <Link className={"font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/management/projects/detail/idea/update-idea?ideaId=${reviewDetails.project?.topic?.ideaVersion?.id}`} >Xem nội dùng đề tài chỉnh sửa</Link>
                                     )
                                     : (reviewDetails.number != 3 && reviewDetails.number != 4)
-                                        ? <UpdateIdeaSheet topicVersionId={reviewDetails?.project?.topic?.ideaVersion?.id ? reviewDetails?.project?.topic?.ideaVersion?.id : ""} ideaId={reviewDetails && reviewDetails.project!.topic?.id ? reviewDetails.project!.topic?.id : ""} reviewStage={reviewDetails.number} ideaHis={topicVersion} />
+                                        ? <UpdateIdeaSheet leaderId={reviewDetails.project?.leaderId ?? ""} topicVersionId={reviewDetails?.project?.topic?.ideaVersion?.id ? reviewDetails?.project?.topic?.ideaVersion?.id : ""} ideaId={reviewDetails && reviewDetails.project!.topic?.id ? reviewDetails.project!.topic?.id : ""} reviewStage={reviewDetails.number} ideaHis={topicVersion} />
                                         : <div></div>}
                                 {
                                     (topicVersion &&

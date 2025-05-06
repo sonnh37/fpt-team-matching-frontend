@@ -26,7 +26,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 import { useSelector } from "react-redux";
-import { MenuAction } from "@/app/(client)/(dashboard)/management/projects/detail/[projectId]/menu-action";
+import { MenuAction } from "@/app/(client)/(dashboard)/management/projects/detail/menu-action";
 
 export default function ProjectDetail() {
   const { projectId } = useParams();

@@ -112,7 +112,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const router = useRouter();
   const pathName = usePathname();
   const handleViewClick = () => {
-    router.push(`${pathName}/detail/${model.id}`);
+    router.push(`${pathName}/detail?projectId=${model.id}`);
   };
 
   const handleCopyId = async () => {
