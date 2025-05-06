@@ -97,7 +97,7 @@ const DialogConfirmUpdate = ({open, setOpen, usersConfirm, role, semesterId} : {
                     {loading ?
                         <Button disabled>
                             <Loader2 className="animate-spin"/>
-                            Please wait
+                            Đang xử lí
                         </Button> :
                        <>
                        {

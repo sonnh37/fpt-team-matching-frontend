@@ -107,7 +107,7 @@ function AlertDialogImport({loading, setLoading, callApiPostXLSXFunction, open, 
                             </div>)
                             : (<Button disabled>
                                 <Loader2 className="animate-spin"/>
-                                Please wait
+                                Đang xử lí
                             </Button>)
                     }
                 </DialogFooter>
@@ -182,7 +182,6 @@ export default function Page() {
                 return;
             }
             const result = await reviewService.importReviewFromXLSX(file!, parseInt(review), currentSemester.id!)
-            console.log(result)
             if (result.status == -1) {
                 toast.error(result.message)
             } else if (result.status == 1) {

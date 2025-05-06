@@ -59,7 +59,7 @@ function DialogSaveChange({teamMemberUpdateDefense, stage} : {teamMemberUpdateDe
                     {loading ? (
                         <Button disabled>
                             <Loader2 className="animate-spin"/>
-                            Please wait
+                            Đang xử lí
                         </Button>
                         ) : (
                         <Button onClick={()=> {handleSaveChange()}}>Tiếp tục lưu</Button>

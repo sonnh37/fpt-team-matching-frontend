@@ -181,6 +181,7 @@ const Page = () => {
     const [open, setOpen] = useState<boolean>(false);
     const [failOpen, setFailOpen] = useState<boolean>(false);
     const [capstoneFails, setCapstoneFails] = useState<CapstoneScheduleExcelModels[]>([]);
+    const [saveChangeLoading, setSaveChangeLoading] = useState<boolean>(false);
     useEffect(() => {
         const fetchData = async () => {
             const fetch_current_semester = await semesterService.getCurrentSemester();
@@ -254,6 +255,7 @@ const Page = () => {
 
     const handleSaveChange = async () => {
         if (file) {
+            setSaveChangeLoading(true)
             const result = await capstoneService.importExcelFile({file, stage: stage})
             if (result.status == 1) {
                 toast.success("Cập nhật thành công!");
@@ -267,6 +269,8 @@ const Page = () => {
                 toast.error(result.message);
                 setOpen(false)
             }
+
+            setSaveChangeLoading(false)
         }
     }
 
@@ -303,7 +307,7 @@ const Page = () => {
                     {capstoneScheduleData.length > 0 && (
                         <div className={"w-full flex flex-col items-center justify-center gap-4"}>
                             <CapstoneScheduleTableImport columns={capstoneScheduleColumn} data={capstoneScheduleData} />
-                            <CapstoneScheduleDialog open={open} setOpen={setOpen} handleSaveChange={handleSaveChange} />
+                            <CapstoneScheduleDialog loading={saveChangeLoading} open={open} setOpen={setOpen} handleSaveChange={handleSaveChange} />
                         </div>
                     )}
                 </div>

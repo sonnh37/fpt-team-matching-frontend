@@ -118,7 +118,7 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                         <div>
                                             <Label className={"pl-2 font-bold"}>Nhận xét của mentor</Label>
                                             <Textarea
-                                                disabled={!!(currentRole && currentRole == "Student")}
+                                                disabled={!!(currentRole && (currentRole == "Student" || currentRole == "Manager"))}
                                                 value={mentorComment || undefined} onChange={(e) => {
                                                 setMentorComment(e.target.value)
                                             }} placeholder="Type your message here."/>
@@ -156,7 +156,7 @@ const UpdateIdea = ({ideaId} : {ideaId: string}) => {
                                         <div>
                                             <Label className={"pl-2 font-bold"}>Nhận xét của manager</Label>
                                             <Textarea
-                                                disabled={!!(currentRole && currentRole == "Student")}
+                                                disabled={!!(currentRole && (currentRole == "Student" || currentRole == "Mentor"))}
                                                 value={managerComment || undefined} onChange={(e) => {
                                                 setManagerComment(e.target.value)
                                             }} placeholder="Type your message here."/>

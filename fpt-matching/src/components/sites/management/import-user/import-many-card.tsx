@@ -110,7 +110,7 @@ function ImportManyCardDialog({handleSaveChange, loading, open, setOpen}: {handl
                     {loading ?
                         <Button disabled>
                             <Loader2 className="animate-spin"/>
-                            Please wait
+                            Đang xử lí
                         </Button> :
                         <Button onClick={() => {
                             handleSaveChange()
