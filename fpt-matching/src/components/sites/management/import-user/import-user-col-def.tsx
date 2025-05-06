@@ -7,7 +7,7 @@ export const ImportUserColDef: ColumnDef<ImportUserModels>[] = [
     },
     {
         accessorKey: "Code",
-        header: "Mã sinh viên",
+        header: "Mã người dùng",
     },
     {
         accessorKey: "Email",

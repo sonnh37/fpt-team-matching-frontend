@@ -359,10 +359,10 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                   />
 
                   <FormInput
-                    label="Mã sinh viên"
+                    label="Mã người dùng"
                     name="code"
                     form={form}
-                    placeholder="Nhập mã sinh viên"
+                    placeholder="Nhập Mã người dùng"
                   />
                 </div>
 

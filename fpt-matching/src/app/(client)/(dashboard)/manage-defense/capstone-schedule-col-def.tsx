@@ -155,7 +155,7 @@ export const capstoneScheduleSchemaColumns: ColumnDef<CapstoneSchedule>[] = [
     },
     {
         id: "actions",
-        header: "Actions",
+        header: "Thao tác",
         cell: ({row}) => {
             return (
                 <ActionCell row={row} />

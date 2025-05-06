@@ -14,7 +14,7 @@ const ConfirmSaveChange = ({isOpen, setIsOpen, loading, handleSaveChange} :
     return (
         <AlertDialog open={isOpen}>
             <AlertDialogTrigger asChild>
-                <Button className={"mb-8"} onClick={() => {setIsOpen(true)}} variant="destructive">Cập nhật thay đổi</Button>
+                <Button className={"mb-8"} onClick={() => {setIsOpen(true)}} variant="default">Cập nhật thay đổi</Button>
             </AlertDialogTrigger>
             <AlertDialogContent  className="sm:max-w-[425px]">
                 <AlertDialogHeader>
@@ -27,14 +27,15 @@ const ConfirmSaveChange = ({isOpen, setIsOpen, loading, handleSaveChange} :
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    {!loading ? <Button onClick={() => handleSaveChange()} variant={"destructive"} type="submit">Tiếp tục lưu</Button>
+                    
+                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} >Huỷ</AlertDialogCancel>
+                    {!loading ? <Button onClick={() => handleSaveChange()} variant={"default"} type="submit">Tiếp tục lưu</Button>
                         : (
                             <Button disabled>
                                 <Loader2 className="animate-spin" />
                                 Please wait
                             </Button>
                         )}
-                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Huỷ</AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

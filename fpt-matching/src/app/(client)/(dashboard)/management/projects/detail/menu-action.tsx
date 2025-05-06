@@ -99,12 +99,12 @@ export function MenuAction({ ideaId }: { ideaId: string }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="outline">
-          Action
+          Thao tác
           <FontAwesomeIcon className="size-3" icon={faEllipsisVertical} />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
-        <DropdownMenuLabel>Action menu</DropdownMenuLabel>
+        <DropdownMenuLabel>Danh sách thao tác</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem>

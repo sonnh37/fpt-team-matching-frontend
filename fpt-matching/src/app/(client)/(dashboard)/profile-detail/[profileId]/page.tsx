@@ -231,7 +231,7 @@ const PersonalInfoSection = ({ user }: { user: User }) => {
             label: "Khoa",
             value: user.department ? Department[user.department] : null,
           },
-          { label: "Mã sinh viên", value: user.code },
+          { label: "Mã người dùng", value: user.code },
         ]}
       />
     </div>
@@ -260,7 +260,7 @@ const AcademicInfoSection = ({ profile }: { profile?: ProfileStudent }) => {
         items={[
           { label: "Chuyên ngành", value: profile.specialty?.specialtyName },
           { label: "Học kỳ", value: profile.semester?.semesterName },
-          { label: "Mã sinh viên", value: profile.code },
+          { label: "Mã người dùng", value: profile.code },
           {
             label: "Đủ điều kiện dự án",
             value: profile.isQualifiedForAcademicProject

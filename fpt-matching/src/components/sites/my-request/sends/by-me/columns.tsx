@@ -99,7 +99,7 @@ export const columns: ColumnDef<Invitation>[] = [
   }
   // {
   //   accessorKey: "actions",
-  //   header: "Actions",
+  //   header: "Thao tác",
   //   cell: ({ row }) => {
   //     return <Actions row={row} />;
   //   },
