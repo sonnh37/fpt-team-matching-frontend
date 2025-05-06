@@ -39,7 +39,13 @@ export default function DashboardLayout({
   // const isLock = res_stage?.status != 1 ? ((currentRole == "Manager" || currentRole == "Admin") ? false : true) : false;
 
   return (
-    <SidebarProvider className="h-screen overflow-hidden">
+    <SidebarProvider
+      className="h-screen overflow-hidden"
+      style={{
+        "--sidebar-width": "18rem",
+        // "--sidebar-width-mobile": "20rem",
+      } as React.CSSProperties}
+    >
       <AppSidebar />
       <SidebarInset className="overflow-hidden p-2">
         <Card className="bg-sidebar/50  flex h-16 z-10 rounded-lg shadow-sm items-center justify-between gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">

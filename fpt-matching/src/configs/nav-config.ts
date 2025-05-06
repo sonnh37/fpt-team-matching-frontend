@@ -78,19 +78,19 @@ export const NAV_CONFIG = {
           roles: ["*"],
         },
         {
-          title: "Duyệt ý tưởng",
+          title: "Duyệt ý tưởng (Mentor)",
           icon: MdOutlineRateReview,
           url: "/idea/reviews/mentor",
           roles: ["Mentor"],
         },
         {
-          title: "Duyệt ý tưởng bởi submentor",
+          title: "Duyệt ý tưởng (SubMentor)",
           icon: MdOutlineRateReview,
           url: "/idea/reviews/submentor",
           roles: ["Mentor"],
         },
         {
-          title: "Duyệt ý tưởng",
+          title: "Duyệt đề tài",
           icon: MdOutlineRateReview,
           url: "/idea/reviews/council",
           roles: ["Council"],
@@ -104,7 +104,7 @@ export const NAV_CONFIG = {
       roles: ["Student"],
     },
     {
-      title: "Yêu cầu nhận ý tưởng từ sinh viên",
+      title: "Đề nghị sử dụng đề tài",
       url: "/student-requests",
       icon: UserPlus,
       roles: ["Mentor"],

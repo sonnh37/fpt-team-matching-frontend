@@ -76,7 +76,7 @@ export function NavMain({
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="overflow-hidden text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <SidebarMenuSub className="pr-0">
+                    <SidebarMenuSub className="pr-0 mx-0 ml-3.5">
                       {item.items?.map((subItem) => {
                         const isActiveSub = pathName === subItem.url;
                         return (
@@ -91,7 +91,7 @@ export function NavMain({
                               asChild
                             >
                               <Link href={subItem.url}>
-                                <div className="flex aspect-square size-5 items-center justify-start">
+                                <div className="flex aspect-square size-4 items-center justify-start">
                                   {subItem.icon && <subItem.icon />}
                                 </div>
                                 <span>{subItem.title}</span>
