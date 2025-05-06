@@ -131,7 +131,7 @@ export function DataTableSemesterComponent<TData>({
                     <div className="space-y-1.5">
                       <CardTitle className="text-lg font-semibold flex items-center gap-2">
                         <Link
-                          href={`${pathName}/${model.id}`}
+                          href={`${pathName}/details?semesterId=${model.id}`}
                           className="hover:underline hover:text-primary decoration-primary/50"
                         >
                           {model.semesterName}

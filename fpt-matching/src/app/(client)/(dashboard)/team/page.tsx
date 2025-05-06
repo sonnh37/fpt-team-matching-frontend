@@ -879,7 +879,7 @@ export default function TeamInfo() {
               if (adjustedReviewDate < currentDate) {
                 return (
                   <Button className="w-full" asChild>
-                    <Link href={`/team/rate/${project.id}`}>
+                    <Link href={`/team/rate?projectId=${project.id}`}>
                       Đánh giá thành viên
                     </Link>
                   </Button>
