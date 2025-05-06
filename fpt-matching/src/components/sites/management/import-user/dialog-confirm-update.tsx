@@ -56,12 +56,12 @@ function UserConfirmationTable({users} : {users: User[]}) {
     )
 }
 
-const DialogConfirmUpdate = ({open, setOpen, usersConfirm, role} : {open: boolean, setOpen: Dispatch<SetStateAction<boolean>>, usersConfirm: User[], role: string}) => {
+const DialogConfirmUpdate = ({open, setOpen, usersConfirm, role, semesterId} : {open: boolean, setOpen: Dispatch<SetStateAction<boolean>>, usersConfirm: User[], role: string, semesterId: string}) => {
     const [loading, setLoading] = useState(false);
     const handleSaveChange = async () => {
         setLoading(true);
 
-        const response = await userService.updateExistedUser({users: usersConfirm});
+        const response = await userService.updateExistedUser({users: usersConfirm, semesterId});
         if (response.status && response.status !== 1) {
             toast.error(response.status);
             setLoading(false);
