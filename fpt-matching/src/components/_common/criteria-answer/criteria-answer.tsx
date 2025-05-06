@@ -106,13 +106,7 @@ const CriteriaAnswerManagement = () => {
 
     }
 
-    const handleSearch = () => {
-        setQueryParams((prev) => ({
-            ...prev,
-            title: search,   // lấy từ khóa từ input
-            pageNumber: 1,      // reset về trang 1 khi search
-        }));
-    };
+
     const handCreate = async () => {
 
         let query: CriteriaFormCreateCommand = {
@@ -124,9 +118,23 @@ const CriteriaAnswerManagement = () => {
             toast.success("Tạo thành công đơn!")
             refetch();
         }
-
+   
 
     }
+    const statusMap = {
+        [IdeaVersionRequestStatus.Approved]: {
+            text: "Đã duyệt",
+            className: "bg-green-500 text-white",
+        },
+        [IdeaVersionRequestStatus.Rejected]: {
+            text: "Đã từ chối",
+            className: "bg-red-600 text-white",
+        },
+        [IdeaVersionRequestStatus.Consider]: {
+            text: "Yêu cầu sửa",
+            className: "bg-yellow-500 text-white",
+        },
+    };
     return (
         <div className='bg-slate-50 border-2 rounded-sm shadow-lg p-4'>
             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
@@ -149,41 +157,7 @@ const CriteriaAnswerManagement = () => {
 
                 </div>
 
-                {/* Right: Create Form Button */}
-                <div>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <Button className="px-6 py-2  hover:bg-orange-700"> <PlusCircle className='' />Tạo đơn</Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Form tạo đơn tiêu chí</DialogTitle>
-                                <DialogDescription>
-                                    Đây là đơn để tạo form tiêu chí đánh giá.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label htmlFor="name" className="text-right">
-                                        Tiêu đề:
-                                    </Label>
-                                    <Input
-                                        id="title"
-                                        name="title"
-                                        value={title}
-                                        onChange={handleChange}
-                                        className="col-span-3"
-                                    />
-
-                                </div>
-                            </div>
-                            <DialogFooter>
-                                <Button type="submit" onClick={() => handCreate()} >Lưu đơn</Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
-
-                </div>
+               
             </div>
 
             {(form?.data?.results && form.data.results.length < 0) ? (
@@ -214,53 +188,49 @@ const CriteriaAnswerManagement = () => {
                             <TableHead className="w-[100px]">Số thứ tự</TableHead>
                             <TableHead>Ngày nộp</TableHead>
                             <TableHead>Tên người nộp</TableHead>
+                            <TableHead>Tên đề tài</TableHead>
                             <TableHead>Tên đơn</TableHead>
                             <TableHead>Trạng thái</TableHead>
                             <TableHead className="text-center">Hành động</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {form?.data?.results?.map((cv, index) => (
-                            <TableRow key={cv.id}>
-                                <TableCell className="font-medium">{index + 1}</TableCell>
-                                <TableCell className="font-medium">{cv.createdDate ? new Date(cv.createdDate).toLocaleString("vi-VN", {
-                                    day: "2-digit",
-                                    month: "2-digit",
-                                    year: "numeric",
-                                    hour: "2-digit"
-                                })
-                                    : "Không có ngày "}</TableCell>
-                                <TableCell>{cv.reviewer?.email}  </TableCell>
-                                <TableCell >{cv.criteriaForm?.title}</TableCell>
-                                <TableCell className=' justify-center'>
-                                    {cv.status == IdeaVersionRequestStatus.Approved ? (
+                        {form?.data?.results?.map((as, index) => {
+                            const statusInfo = as.status ? statusMap[as.status] : undefined;
 
-                                        <button className=" text-white p-2 bg-green-500 rounded-sm">
-                                            Đã duyệt
-                                        </button>
-                                    ) : (
-                                        <button className=" p-2 bg-red-600 rounded-sm">
-                                            Đã từ chối
-                                        </button>
-                                    )}
-                                    {cv.status == IdeaVersionRequestStatus.Consider && (
-
-                                        <button className=" text-white p-2 bg-yellow-500 rounded-sm">
-                                            Yêu cầu sửa
-                                        </button>
-                                    )}
-                                </TableCell>
-
-
-                                <TableCell className='flex justify-center items-center' >
-                                    <FormAnswer
-                                        criteriaId={cv.criteriaFormId}
-                                        ideaVersionRequestId={cv.id}
-                                        isAnswered={(cv?.answerCriterias?.length ?? 0) > 0}
-                                    />
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                            return (
+                                <TableRow key={as.id}>
+                                    <TableCell className="font-medium">{index + 1}</TableCell>
+                                    <TableCell className="font-medium">
+                                        {as.createdDate
+                                            ? new Date(as.createdDate).toLocaleString("vi-VN", {
+                                                day: "2-digit",
+                                                month: "2-digit",
+                                                year: "numeric",
+                                                hour: "2-digit"
+                                            })
+                                            : "Không có ngày"}
+                                    </TableCell>
+                                    <TableCell>{as.reviewer?.email}</TableCell>
+                                    <TableCell>{as?.ideaVersion?.abbreviations}</TableCell>
+                                    <TableCell>{as.criteriaForm?.title}</TableCell>
+                                    <TableCell className="justify-center">
+                                        {statusInfo && (
+                                            <span className={`px-2 py-1 rounded-sm ${statusInfo.className}`}>
+                                                {statusInfo.text}
+                                            </span>
+                                        )}
+                                    </TableCell>
+                                    <TableCell className="flex justify-center items-center">
+                                        <FormAnswer
+                                            criteriaId={as.criteriaFormId}
+                                            ideaVersionRequestId={as.id}
+                                            isAnswered={(as?.answerCriterias?.length ?? 0) > 0}
+                                        />
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
                     </TableBody>
 
 

@@ -142,6 +142,7 @@ export default function Blog() {
         skillRequired: formData.skillRequired,
         type: postType,
         status: formData.status,
+        // projectId: projectUser?.id || ""
         ...(formData.projectId ? { projectId: formData.projectId } : {})
       };
 
@@ -206,6 +207,7 @@ export default function Blog() {
   const query: BlogGetAllQuery = {
     pageNumber: currentPage,
     isDeleted: false,
+    status: BlogStatus.Public,
     isPagination: true,
   };
   // NẾU NGƯỜI DÙNG BẤM FILTER THÌ MỚI HIỆN RA
@@ -244,6 +246,9 @@ export default function Blog() {
   const sortFpt = notification.filter(x => x.type === BlogType.Share);
 
 
+  const sendMessage = async () => {
+    toast.error("Đây không phải bài tuyển dụng")
+   }
 
   return (
     <div className='bg-slate-100'>
@@ -549,7 +554,14 @@ export default function Blog() {
 
                             </div>
                             <div className="w-3/5">
-                              <Select
+                              {/* {!projectUser?.id ? (
+                                <h4 className="text-red-400 text-sm mt-2">*Không có nhóm</h4>
+                              ):(
+                                <div className="w-3/5 p-2">
+                                   {projectUser?.teamName}
+                              </div>
+                              )} */}
+                                        <Select
                                 name="projectId"
                                 value={formData.projectId}
                                 defaultValue={undefined}
@@ -580,7 +592,7 @@ export default function Blog() {
                             </div>
                           </div>
                         </div>
-                      ) : (
+                      ) : ( 
                         <div></div>
                       )}
                     </div>
@@ -881,17 +893,17 @@ export default function Blog() {
                               <span className="ml-2 text-base">{post.comments?.length ?? 0} Comments <FontAwesomeIcon
                                 icon={faComment} /></span>
                             </span>
-                            {post?.type === BlogType.Recruit ? (
+                            {(post?.type === BlogType.Recruit && post?.projectId) ? (
                               <span
-                                className="flex items-center mr-4 pr-4 p-2  hover:bg-slate-200">
+                                className="ml-2 text-base p-2   hover:bg-slate-200">
                                 <UploadCv blogId={post.id ?? ""} />
 
                               </span>
                             ) : (
 
-                              <span
+                              <button onClick={() =>sendMessage() }
                                 className="ml-2 text-base ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon
-                                  icon={faPaperclip} /></span>
+                                  icon={faPaperclip} /></button>
                             )}
                           </div>
                         </div>

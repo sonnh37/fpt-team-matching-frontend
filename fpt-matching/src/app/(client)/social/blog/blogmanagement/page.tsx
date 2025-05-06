@@ -152,6 +152,33 @@ export default function Blogmanagement() {
         // }
     }
 
+    async function handleChange(id: string) {
+
+        // Gọi confirm để mở dialog
+        const confirmed = await confirm({
+            title: "Đóng bài viết",
+            description: "Bạn có muốn đóng bài viết này không?",
+            confirmText: "Có,đóng nó đi",
+            cancelText: "Không,cảm ơn",
+        })
+        if (confirmed) {
+            // Người dùng chọn Yes
+            const result = await blogService.changStatusBLog(id)
+            if (result?.status === 1) {
+                toast.success("🎉 Chúc mừng bạn đã đóng bài viết thành công!");
+                refetch();
+
+            } else {
+                toast.error("Lỗi khi xóa bài viết");
+            }
+            // Thực hiện xóa
+        } else {
+            // Người dùng chọn No
+            toast("Người dùng đã hủy!")
+        }
+        // }
+    }
+
 
     // update blog
     const handleUpdate = async () => {
@@ -598,6 +625,7 @@ export default function Blogmanagement() {
                                                                              
                                                                             </DropdownMenuItem>
                                                                             <DropdownMenuItem onClick={() => handleDelete(post.id ?? "")}>Xóa blog</DropdownMenuItem>
+                                                                            <DropdownMenuItem onClick={() => handleChange(post.id ?? "")}>Đóng blog</DropdownMenuItem>
                                                                         </DropdownMenuContent>
                                                                     </DropdownMenu>
                                                                 </div>
