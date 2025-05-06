@@ -165,14 +165,14 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     <>
       <div className="isolate flex -space-x-px">
         <Button className="rounded-r-none focus:z-10" onClick={handleApprove}>
-          Accept
+          Đồng ý
         </Button>
         <Button
           variant="outline"
           className="rounded-l-none focus:z-10"
           onClick={handleCancel}
         >
-          Cancel
+          Từ chối
         </Button>
       </div>
     </>

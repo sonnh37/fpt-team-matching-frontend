@@ -1,4 +1,4 @@
-import { Book, Gavel, Kanban, Pickaxe } from "lucide-react";
+import { Book, Gavel, Kanban } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +13,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import {useSearchParams} from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ideaService } from "@/services/idea-service";
 import { IdeaStatus } from "@/types/enums/idea";
@@ -21,7 +21,9 @@ import { IdeaUpdateStatusCommand } from "@/types/models/commands/idea/idea-updat
 import { toast } from "sonner";
 
 export function MenuAction({ ideaId }: { ideaId: string }) {
-  const { projectId } = useParams();
+  // const { projectId } = useParams();
+  const searchParams = useSearchParams();
+  const projectId = searchParams.get("projectId");
   const queryClient = useQueryClient();
   const {
     data: result,
@@ -107,13 +109,13 @@ export function MenuAction({ ideaId }: { ideaId: string }) {
         <DropdownMenuGroup>
           <DropdownMenuItem>
             <Kanban />
-            <Link href={`review-management/?projectId=${projectId}`}>
+            <Link href={`detail/review-management/?projectId=${projectId}`}>
               Quản lí Review
             </Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Book />
-            <Link href={`idea/update-idea?ideaId=${ideaId}`}>
+            <Link href={`detail/idea/update-idea?ideaId=${ideaId}`}>
               Quản lí cập nhật đề tài
             </Link>
           </DropdownMenuItem>
@@ -123,7 +125,7 @@ export function MenuAction({ ideaId }: { ideaId: string }) {
           {/*</DropdownMenuItem>*/}
           <DropdownMenuItem>
             <Gavel />
-            <Link href={`mentor-conclusion?projectId=${projectId}`}>
+            <Link href={`detail/mentor-conclusion?projectId=${projectId}`}>
               Đánh giá nhóm
             </Link>
           </DropdownMenuItem>

@@ -47,7 +47,7 @@ const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: str
                         <div className={""}>
                             <BreadcumbCapstoneDetails
                                 semesterName={semester!.semesterName!}
-                                ideaCode={capstoneSchedule!.project?.topic?.topicCode!}
+                                ideaCode={capstoneSchedule!.project?.topic?.topicCode ?? ""}
                                 projectCode={capstoneSchedule.project!.teamCode!}
                                 stage={capstoneSchedule.stage ?? 0}
                             />
@@ -119,7 +119,7 @@ const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: str
                                                 <div className={"flex flex-col gap-4"}>
                                                     <Label className={"font-bold text-sm"}>Danh sách sinh viên: </Label>
                                                     {capstoneSchedule.project?.teamMembers && capstoneSchedule.stage && (
-                                                        <DefenseTeamMembersTable stage={capstoneSchedule.stage} sinhViens={capstoneSchedule.project?.teamMembers}  />
+                                                        <DefenseTeamMembersTable defenseDate={capstoneSchedule.date ?? null} stage={capstoneSchedule.stage} sinhViens={capstoneSchedule.project?.teamMembers}  />
                                                     )}
                                                 </div>
                                             </div>

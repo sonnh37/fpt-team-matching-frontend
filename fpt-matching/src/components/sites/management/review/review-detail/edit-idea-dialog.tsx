@@ -19,12 +19,14 @@ export function EditIdeaDialog(
         try {
             //1. set loading
             setLoading(true)
+            // Kiểm tra ngày hợp lệ hay không
+
             //2. upload file
             const result = await cloudinaryService.uploadFile(file)
             if (result) {
                 const response = await topicVersionService.updateByStudent({topicId: ideaId, fileUpdate: result, reviewStage: reviewNumber, note})
                     if (response.status == 1) {
-                        toast.success("Successfully uploaded");
+                        toast.success("Cập nhật thành công");
                     } else {
                         toast.error(response.message);
                     }
@@ -33,8 +35,10 @@ export function EditIdeaDialog(
         } catch (error: any) {
             toast.error(error.message);
         }
-        setLoading(false)
-        setIsOpen(false)
+        finally {
+            setLoading(false)
+            setIsOpen(false)
+        }
     }
     return (
         <AlertDialog open={isOpen}>
@@ -50,14 +54,14 @@ export function EditIdeaDialog(
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    {!loading ? <Button onClick={handleSaveChange} variant={"destructive"} type="submit">Save changes</Button>
+                    {!loading ? <Button onClick={handleSaveChange} variant={"destructive"} type="submit">Cập nhật</Button>
                         : (
                             <Button disabled>
                                 <Loader2 className="animate-spin" />
                                 Please wait
                             </Button>
                         )}
-                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Close</AlertDialogCancel>
+                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Huỷ</AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

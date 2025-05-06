@@ -185,25 +185,53 @@ const Page = () => {
     const [failOpen, setFailOpen] = useState<boolean>(false);
     const [capstoneFails, setCapstoneFails] = useState<CapstoneScheduleExcelModels[]>([]);
     const [projects, setProjects] = useState<Project[]>([]);
-    const [selectedProjectId, setselectedProjectIdId] = useState<string | null>(null);
+    const [selectedProjectId, setselectedProjectId] = useState<string | null>(null);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null)
     const [loading, setLoading] = useState<boolean>(false);
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const [createLoading, setCreateLoading] = useState<boolean>(false);
     const [createIsOpen, setCreateIsOpen] = useState<boolean>(false);
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         const fetch_current_semester = await semesterService.getCurrentSemester();
+    //         const fetch_all_semester = await semesterService.getAll();
+    //         if (fetch_all_semester.data && fetch_all_semester.data.results) {
+    //             setSemesters(fetch_all_semester.data.results)
+    //         }
+    //         setCurrentSemester(fetch_current_semester.data)
+    //         setSemesterPresent(fetch_current_semester.data)
+    //     }
+    //     fetchData()
+    // }, []);
     useEffect(() => {
         const fetchData = async () => {
-            const fetch_current_semester = await semesterService.getCurrentSemester();
-            const fetch_all_semester = await semesterService.getAll();
-            if (fetch_all_semester.data && fetch_all_semester.data.results) {
-                setSemesters(fetch_all_semester.data.results)
+            try {
+                const fetchCurrentSemester = await semesterService.getCurrentSemester();
+                const fetchAllSemester = await semesterService.getAll();
+                if (fetchAllSemester.data && fetchAllSemester.data.results) {
+                    setSemesters(fetchAllSemester.data.results);
+                }
+                setCurrentSemester(fetchCurrentSemester.data);
+                setSemesterPresent(fetchCurrentSemester.data);
+
+                if (fetchCurrentSemester.data) {
+                    const response = await projectService.getProjectBySemesterAndStage({
+                        semester: fetchCurrentSemester.data.id!,
+                        stage
+                    });
+                    if (response.data) {
+                        setProjects(response.data);
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                // Handle error appropriately (e.g., show error message to user)
             }
-            setCurrentSemester(fetch_current_semester.data)
-            setSemesterPresent(fetch_current_semester.data)
-        }
-        fetchData()
-    }, []);
+        };
+
+        fetchData();
+    }, [stage]);
     useEffect(() => {
         if (!file) return;
 
@@ -249,6 +277,7 @@ const Page = () => {
             const response = await projectService.getProjectBySemesterAndStage({semester: currentSemester.id!, stage})
             if (response.data) {
                 setProjects(response.data);
+
             }
         }
         if (currentSemester) {
@@ -269,25 +298,27 @@ const Page = () => {
             project.capstoneSchedules.push({
                 projectId: project.id!,
                 stage: stage,
-                time: "",
-                hallName: "",
-                date: ""
+                time: undefined,
+                hallName: undefined,
+                date: undefined
             } as CapstoneSchedule);
         }
 
         if (!project.capstoneSchedules.some(x => x.stage === stage)) {
             project.capstoneSchedules.push({
-                projectId: project.id!,
+                projectId: project.id,
                 stage: stage,
-                time: "",
-                hallName: "",
-                date: ""
+                time: undefined,
+                hallName: undefined,
+                date: undefined,
             } as CapstoneSchedule);
         }
 
         setSelectedProject(project);
     }, [selectedProjectId, projects, stage]);
-
+    useEffect(() => {
+        setSelectedProject(null);
+    }, [stage]);
     const handleSaveChange = async () => {
         if (file) {
             const result = await capstoneService.importExcelFile({file, stage: stage})
@@ -431,7 +462,7 @@ const Page = () => {
                                                 <div className={"flex flex-col gap-2"}>
                                                     <div className="space-y-1">
                                                         <Label htmlFor="current">Mã đề tài</Label>
-                                                        <Select onValueChange={(e) => {setselectedProjectIdId(e)}}>
+                                                        <Select onValueChange={(e) => {setselectedProjectId(e)}}>
                                                             <SelectTrigger className="w-[20vw]">
                                                                 <SelectValue placeholder="Chọn mã đề tài" />
                                                             </SelectTrigger>

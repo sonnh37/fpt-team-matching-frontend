@@ -209,6 +209,7 @@ const Page = () => {
                 setFile(null)
                 setLoading(false)
             }
+            setLoading(false)
         }
         fetchData()
     }, [currentSemester, stage]);
@@ -273,7 +274,7 @@ const Page = () => {
         <div className={"w-full"}>
 
             {capstoneFails.length > 0 && <DialogFailCapstoneSchedules capstoneScheduleFails={capstoneFails} open={failOpen} setOpen={setFailOpen} />}
-            {currentSemester && capstoneSchedule.length == 0 ? (
+            {capstoneSchedule.length == 0 ? (
                 <div className={"font-bold text-xl flex flex-col items-center justify-center"}>
                     <div className={"flex flex-col items-center justify-center"}>
                         <div className={"flex flex-row gap-2"}>
@@ -282,7 +283,7 @@ const Page = () => {
                                 {/*<span className={"text-red-600 px-0.5"}> {currentSemester.semesterCode} - {currentSemester.semesterName} </span>*/}
                                 {/*vẫn chưa được thêm lịch bảo vệ.*/}
                             </div>
-                            {semesters.length >0 && currentSemester &&  <DropdownSemester currentSemester={currentSemester} setCurrentSemester={setCurrentSemester} semesters={semesters} />}
+                            {semesters.length >0 && <DropdownSemester currentSemester={currentSemester ?? semesters[0]} setCurrentSemester={setCurrentSemester} semesters={semesters} />}
                             <div>vẫn chưa được thêm lịch bảo vệ.</div>
                         </div>
                         <div className={"pb-4"}>
@@ -296,7 +297,7 @@ const Page = () => {
                         // @ts-expect-error
                         window.location = filePath
                     }}>Tải mẫu bảo vệ lần {stage} tại đây!</Button>
-                    {currentSemester.id == semesterPresent?.id ?  <CapstoneDefenseImportExcel file={file} setFile={setFile} /> : (
+                    {currentSemester && currentSemester.id == semesterPresent?.id ?  <CapstoneDefenseImportExcel file={file} setFile={setFile} /> : (
                         <div className={"mt-16"}>Bạn không thể import tại kì này. Vui lòng liên hệ để biết thêm chi tiết</div>
                     )}
                     {capstoneScheduleData.length > 0 && (

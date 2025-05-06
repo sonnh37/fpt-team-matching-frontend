@@ -42,7 +42,7 @@ export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber, l
             return;
         }
         setFile(event.target?.files[0]);
-
+        setFileChange(true)
     }
     const user = useSelectorUser()
     useEffect(() => {
@@ -90,7 +90,6 @@ export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber, l
                 setComments(comments_list);
                 setSuggestions(suggestions_list)
 
-                setFileChange(true)
             }
             if (reviewNumber == 3) {
                 console.log(true)
@@ -120,11 +119,11 @@ export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber, l
                 setComments(comments_list);
                 setSuggestions(suggestions_list)
 
-                setFileChange(true)
             }
 
         }
     }, [file])
+    console.log(fileChange)
     return user && (
         <Sheet>
             <SheetTrigger asChild>
@@ -285,7 +284,7 @@ export default function SheetFileUpload({file, setFile, fileUrl, reviewNumber, l
                         file &&
                         currentRole &&
                         reviewDetailsRBAC.hasPermission(currentRole, "updateFile") &&
-                        <ReviewDetailsDialog reviewDate={reviewDate} setIsOpen={setIsOpen} isOpen={isOpen} file={file} />
+                        <ReviewDetailsDialog leaderId={leaderId} reviewDate={reviewDate} setIsOpen={setIsOpen} isOpen={isOpen} file={file} />
                     }
                 </SheetFooter>
             </SheetContent>

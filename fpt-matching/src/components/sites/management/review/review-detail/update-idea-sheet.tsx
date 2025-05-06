@@ -25,6 +25,8 @@ import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {TopicVersion} from "@/types/topic-version";
 import {TopicVersionStatus} from "@/types/enums/topic-version";
+import {useSelectorUser} from "@/hooks/use-auth";
+import {toast} from "sonner";
 
 function CollapsibleFile({ideaHis}:{ideaHis:TopicVersion[]}) {
     const [isOpen, setIsOpen] = React.useState(false)
@@ -70,8 +72,8 @@ function CollapsibleFile({ideaHis}:{ideaHis:TopicVersion[]}) {
                         {ideaHis.map((idea, index) => {
                             return (
                                 <div className={"rounded-md border px-4 py-3 font-mono text-sm w-[35vw] items-center flex justify-between gap-4"} key={index}>
-                                    <div className="flex gap-2" >
-                                        <p className={"overflow-ellipsis overflow-hidden w-[20vw]"}>CAPSTONE_REGISTER_{idea.fileUpdate?.split("CAPSTONE_REGISTER_")[1]}</p>
+                                    <div className="flex gap-2 justify-between" >
+                                        <p className={"overflow-ellipsis overflow-hidden"}>CAPSTONE_REGISTER_{idea.fileUpdate?.split("CAPSTONE_REGISTER_")[1]}</p>
                                         <Badge
                                             variant={"default"}
                                             className={`${idea.status == TopicVersionStatus.Pending ? "bg-amber-600" : idea.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
@@ -88,13 +90,21 @@ function CollapsibleFile({ideaHis}:{ideaHis:TopicVersion[]}) {
     )
 }
 
-export function UpdateIdeaSheet({topicVersionId,ideaHis, ideaId, reviewStage}: {topicVersionId:string, ideaHis: TopicVersion[], ideaId: string, reviewStage: number}) {
+export function UpdateIdeaSheet({leaderId, topicVersionId,ideaHis, ideaId, reviewStage}
+                                : {leaderId: string, topicVersionId:string, ideaHis: TopicVersion[], ideaId: string, reviewStage: number}) {
     const [fileChange, setFileChange] = React.useState<File | null>(null)
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [note, setNote] = React.useState<string | null>(null);
+    const user = useSelectorUser();
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files !== null && e.target.files.length > 0) {
             const file = e.target.files[0];
+            const regex = new RegExp(`^CAPSTONE_REGISTER_([A-Z0-9]+)_([A-Za-z]+)_REUP_${reviewStage}\\.docx$`)
+            const matching = e.target.files[0].name.match(regex)
+            if (!matching) {
+                toast.error(`Tên file phải match với CAPSTONE_REGISTER_<Mã nhóm>_<Tên GVHD>_REUP_${reviewStage}.docx`)
+                return;
+            }
             const filenameParts = file.name.split(".");
             const extension = filenameParts.pop();
             const baseName = filenameParts.join(".");
@@ -106,7 +116,7 @@ export function UpdateIdeaSheet({topicVersionId,ideaHis, ideaId, reviewStage}: {
         }
     }
     console.log(ideaHis)
-    return (
+    return user && (
         <div className="grid grid-cols-2 gap-2">
             <Sheet >
                 <SheetTrigger asChild>
@@ -120,6 +130,7 @@ export function UpdateIdeaSheet({topicVersionId,ideaHis, ideaId, reviewStage}: {
                                 {
                                     ideaHis.some(x => x.status == TopicVersionStatus.Pending) ? "Bạn đã nộp file chỉnh sửa trước đó. Vui lòng chờ được mentor cập nhật. Hiện tại đã khoá chờ duyệt" : "Vui lòng upload lại file đề tài mới tại đây để chỉnh sửa."
                                 }
+                                <p className={"font-bold text-red-500 text-sm"}>Tên file phải đặt theo mẫu: CAPSTONE_REGISTER_(Mã nhóm)_(Tên GVHD)_REUP_{reviewStage}.docx</p>
                             </SheetDescription>
                         </div>
                         <div>
@@ -127,7 +138,7 @@ export function UpdateIdeaSheet({topicVersionId,ideaHis, ideaId, reviewStage}: {
                         </div>
                     </SheetHeader>
                     <div className={"m-2 mt-0 h-1/2 flex flex-row gap-2 justify-between"}>
-                        {!fileChange ? (
+                        {user.id != leaderId ? <div></div> : !fileChange ? (
                             <div className="flex items-center justify-center w-1/2">
                                 <label htmlFor="dropzone-file"
                                        className="flex flex-col items-center justify-center w-full border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
@@ -156,7 +167,7 @@ export function UpdateIdeaSheet({topicVersionId,ideaHis, ideaId, reviewStage}: {
                             </div>
                         )}
 
-                        <div className={"w-1/2 flex flex-col "}>
+                        <div className={`${user.id != leaderId ? "w-full mt-4" : "w-1/2 flex flex-col"}  `}>
                             {
                                 ideaHis.length == 0 ? (<div></div>) : (
                                     <CollapsibleFile ideaHis={ideaHis} />

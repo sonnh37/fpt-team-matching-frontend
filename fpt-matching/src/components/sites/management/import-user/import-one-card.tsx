@@ -39,7 +39,7 @@ function ImportOneCardDialog({handleSaveChange, loading, open, setOpen}: {handle
         </Dialog>
     )
 }
-export const ImportOneCard = ({role}: {role: string}) => {
+export const ImportOneCard = ({role, semesterId}: {role: string, semesterId: string | null}) => {
     const [openConfirmDialog, setOpenConfirmDialog] = useState<boolean>(false);
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = React.useState(false);
@@ -59,6 +59,12 @@ export const ImportOneCard = ({role}: {role: string}) => {
         }
         let response;
         if (role == "Student") {
+            console.log(semesterId);
+            if (semesterId == null) {
+                toast.error("Kì hiện tại không tồn tại")
+                return;
+            }
+            userCreateCommand.semesterId = semesterId;
             response = await userService.createOneStudentByManager(userCreateCommand);
             if (response.status != 1 && response.status != 2) {
                 setOpen(false);
@@ -105,7 +111,7 @@ export const ImportOneCard = ({role}: {role: string}) => {
     }
     return (
         <>
-            {usersConfirm.length > 0 && <DialogConfirmUpdate role={role}  usersConfirm={usersConfirm} open={openConfirmDialog} setOpen={setOpenConfirmDialog} />}
+            {usersConfirm.length > 0 && <DialogConfirmUpdate semesterId={semesterId} role={role} usersConfirm={usersConfirm} open={openConfirmDialog} setOpen={setOpenConfirmDialog} />}
             <Card className={"w-1/2"}>
                 <CardHeader className={"flex justify-center items-center"}>
                     <CardTitle>Thêm 1 tài khoản mới</CardTitle>

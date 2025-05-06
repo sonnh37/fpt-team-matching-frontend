@@ -70,11 +70,15 @@ function DialogSaveChange({teamMemberUpdateDefense, stage} : {teamMemberUpdateDe
     )
 }
 
-export default function DefenseTeamMembersTable({sinhViens, stage}: {sinhViens: TeamMember[], stage: number}) {
+export default function DefenseTeamMembersTable({sinhViens, stage, defenseDate}: {sinhViens: TeamMember[], stage: number, defenseDate: string | null}) {
     const [teamMemberUpdateDefense, setTeamMemberUpdateDefense] = useState<TeamMemberUpdateDefenseCommand[]>();
     const [dictionary, setDictionary] = useState<Record<string, TeamMemberUpdateDefenseCommand> | null>(null)
     const [filterTeamMember, setFilterTeamMember] = useState<TeamMember[]>([]);
     const currentRole = useCurrentRole()
+    if (defenseDate) {
+        console.log(new Date(Date.now()).toLocaleDateString())
+        console.log(new Date(defenseDate).toLocaleDateString())
+    }
     useEffect(() => {
         const filteredSinhViens = sinhViens.filter((x) => !(stage === 2 && x.status === TeamMemberStatus.Pass1));
 
@@ -209,7 +213,14 @@ export default function DefenseTeamMembersTable({sinhViens, stage}: {sinhViens: 
                     </TableBody>
                 </Table>
             </div>
-            {currentRole == "Student" ? <div></div> :  <DialogSaveChange stage={stage} teamMemberUpdateDefense={teamMemberUpdateDefense} />}
+            {currentRole == "Student" ? <div></div>
+                : defenseDate && new Date(defenseDate).toLocaleDateString() != new Date(Date.now()).toLocaleDateString()
+                ? <Button
+                        onClick={(e) => e.preventDefault()}
+                        className={"bg-red-400 w-[15vw]"}
+                        disabled={true}
+                    >Hiện tại chưa tới ngày</Button>
+                    :<DialogSaveChange stage={stage} teamMemberUpdateDefense={teamMemberUpdateDefense} />}
         </>
     );
 }
