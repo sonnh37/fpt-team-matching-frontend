@@ -327,33 +327,33 @@ export default function SheetFileUpload({
                   </Table>
                 </div>
 
-                <div className="pt-6">
-                  <h2 className="font-bold text-lg pb-2">* Gợi ý</h2>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-10">#</TableHead>
-                        <TableHead>Gợi ý</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {suggestions && suggestions.length > 0 ? (
-                        suggestions.map((suggestion, index) => (
-                          <TableRow key={index}>
-                            <TableCell className="font-medium">
-                              {index + 1}
-                            </TableCell>
-                            <TableCell>{suggestion}</TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={2}>Không có gợi ý</TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
+                {/*<div className="pt-6">*/}
+                {/*  <h2 className="font-bold text-lg pb-2">* Gợi ý</h2>*/}
+                {/*  <Table>*/}
+                {/*    <TableHeader>*/}
+                {/*      <TableRow>*/}
+                {/*        <TableHead className="w-10">#</TableHead>*/}
+                {/*        <TableHead>Gợi ý</TableHead>*/}
+                {/*      </TableRow>*/}
+                {/*    </TableHeader>*/}
+                {/*    <TableBody>*/}
+                {/*      {suggestions && suggestions.length > 0 ? (*/}
+                {/*        suggestions.map((suggestion, index) => (*/}
+                {/*          <TableRow key={index}>*/}
+                {/*            <TableCell className="font-medium">*/}
+                {/*              {index + 1}*/}
+                {/*            </TableCell>*/}
+                {/*            <TableCell>{suggestion}</TableCell>*/}
+                {/*          </TableRow>*/}
+                {/*        ))*/}
+                {/*      ) : (*/}
+                {/*        <TableRow>*/}
+                {/*          <TableCell colSpan={2}>Không có gợi ý</TableCell>*/}
+                {/*        </TableRow>*/}
+                {/*      )}*/}
+                {/*    </TableBody>*/}
+                {/*  </Table>*/}
+                {/*</div>*/}
               </div>
             )}
           </div>

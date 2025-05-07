@@ -189,18 +189,18 @@ export default function SheetFileUpload({
                 )}
               </div>
 
-              <div className={"font-bold text-lg pt-6 pb-2"}>* Suggestion</div>
-              <div className={"flex flex-col text-sm gap-1.5"}>
-                {suggestions?.length != 0 && suggestions ? (
-                  suggestions.map((suggestion, index) => (
-                    <span className={"pl-2"} key={index}>
-                      {suggestion}
-                    </span>
-                  ))
-                ) : (
-                  <div>Không có gợi ý</div>
-                )}
-              </div>
+              {/*<div className={"font-bold text-lg pt-6 pb-2"}>* Suggestion</div>*/}
+              {/*<div className={"flex flex-col text-sm gap-1.5"}>*/}
+              {/*  {suggestions?.length != 0 && suggestions ? (*/}
+              {/*    suggestions.map((suggestion, index) => (*/}
+              {/*      <span className={"pl-2"} key={index}>*/}
+              {/*        {suggestion}*/}
+              {/*      </span>*/}
+              {/*    ))*/}
+              {/*  ) : (*/}
+              {/*    <div>Không có gợi ý</div>*/}
+              {/*  )}*/}
+              {/*</div>*/}
             </div>
           )}
         </div>
