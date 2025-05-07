@@ -43,7 +43,7 @@ export function EditIdeaDialog(
     return (
         <AlertDialog open={isOpen}>
             <AlertDialogTrigger asChild>
-                <Button className={"mb-8"} onClick={() => {setIsOpen(true)}} variant="destructive">Cập nhật</Button>
+                <Button className={"mb-8"} onClick={() => {setIsOpen(true)}} variant="default">Cập nhật</Button>
             </AlertDialogTrigger>
             <AlertDialogContent  className="sm:max-w-[425px]">
                 <AlertDialogHeader>
@@ -54,14 +54,15 @@ export function EditIdeaDialog(
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    {!loading ? <Button onClick={handleSaveChange} variant={"destructive"} type="submit">Cập nhật</Button>
+                  
+                    <AlertDialogCancel onClick={() => {setIsOpen(false)}}>Huỷ</AlertDialogCancel>
+                    {!loading ? <Button onClick={handleSaveChange} variant={"default"} type="submit">Cập nhật</Button>
                         : (
                             <Button disabled>
                                 <Loader2 className="animate-spin" />
                                 Đang xử lí
                             </Button>
                         )}
-                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Huỷ</AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

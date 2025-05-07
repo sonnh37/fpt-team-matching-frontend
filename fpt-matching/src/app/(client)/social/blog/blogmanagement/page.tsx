@@ -769,7 +769,7 @@ export default function Blogmanagement() {
                                                                     <span className="ml-2 text-lg">           <LikeBlog postId={post?.id ?? ""} /> </span>
                                                                 </span>
                                                                 <span className="flex items-center p-2 ">
-                                                                    <span className="ml-2 text-lg">{post.comments?.length ?? 0} Comments <FontAwesomeIcon icon={faComment} /></span>
+                                                                    <span className="ml-2 text-lg">{post.comments?.length ?? 0} Bình luận <FontAwesomeIcon icon={faComment} /></span>
                                                                 </span>
                                                                 {post?.type === BlogType.Recruit ? (
                                                                     <span className="ml-2 text-lg  hover:bg-slate-200">
@@ -778,7 +778,7 @@ export default function Blogmanagement() {
                                                                     </span>
                                                                 ) : (
 
-                                                                    <span className="ml-2 text-lg ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon icon={faPaperclip} /></span>
+                                                                    <span className="ml-2 text-lg ">{post.blogCvs?.length ?? 0} Nộp CV <FontAwesomeIcon icon={faPaperclip} /></span>
                                                                 )}
                                                             </div>
                                                         </div>

@@ -177,7 +177,7 @@ export function UpdateIdeaSheet({leaderId, topicVersionId,ideaHis, ideaId, revie
                     </div>
                     <SheetFooter className={"h-[15vh] justify-self-end items-end"}>
                         <SheetClose asChild>
-                            <Button className={"mb-8"} type="submit">Close</Button>
+                            <Button className={"mb-8"} variant={"outline"} type="submit">Hủy</Button>
                         </SheetClose>
                         {fileChange && (
                             <EditIdeaDialog note={note} isOpen={isOpen} setIsOpen={setIsOpen} file={fileChange} ideaId={ideaId} reviewNumber={reviewStage}  />

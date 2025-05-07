@@ -71,7 +71,7 @@ export function CapstoneScheduleCard({capstoneSchedule} : {capstoneSchedule: Cap
             <CardFooter className="flex justify-between">
                 <Button onClick={() => {
                     router.push(`${pathName}/defense-details?defenseId=${capstoneSchedule.id}`)
-                }}>View details</Button>
+                }}>Xem chi tiết</Button>
             </CardFooter>
         </Card>
     )

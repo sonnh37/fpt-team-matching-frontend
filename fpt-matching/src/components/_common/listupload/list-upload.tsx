@@ -193,7 +193,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
         <span className="flex items-center mr-3">
           <i className="fas fa-image text-red-500"></i>
           <span className="ml-2 text-lg">
-            {post?.data?.results?.length ?? 0} Uploads{" "}
+            {post?.data?.results?.length ?? 0} Nộp CV{" "}
             <FontAwesomeIcon icon={faPaperclip} />{" "}
           </span>
         </span>

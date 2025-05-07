@@ -61,7 +61,7 @@ export function ReviewCard({review} : {review: Review}) {
             <CardFooter className="flex justify-between">
                 <Button onClick={() => {
                     router.push(`${pathName}/review-details?reviewId=${review.id}`)
-                }}>View details</Button>
+                }}>Xem chi tiết</Button>
             </CardFooter>
         </Card>
     )
