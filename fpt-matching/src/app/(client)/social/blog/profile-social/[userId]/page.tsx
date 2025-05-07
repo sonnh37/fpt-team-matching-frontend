@@ -37,7 +37,7 @@ import ProjectInfo from '@/components/_common/projectInfo/project-info';
 import ListUploadCv from '@/components/_common/listupload/list-upload';
 import { useParams } from 'next/navigation';
 import { userService } from '@/services/user-service';
-import {SendMessageDialog} from "@/app/(client)/social/blog/profile-social/[userId]/send-message-dialog";
+import { SendMessageDialog } from "@/app/(client)/social/blog/profile-social/[userId]/send-message-dialog";
 import { Department } from '@/types/enums/user';
 
 
@@ -56,7 +56,7 @@ export default function ProfileSocial() {
         status: BlogStatus.Public // Trạng thái mặc định
     });
 
-    
+
     //làm filter
     const [filterType, setFilterType] = useState<BlogType | null>(null);
 
@@ -68,7 +68,7 @@ export default function ProfileSocial() {
     const handleNoFilter = () => {
         setFilterType(null);
         // window.location.href = "/social/blog/blogmanagerment"; // Chuyển hướng về trang chủ
-    
+
     };
 
     const {
@@ -147,18 +147,22 @@ export default function ProfileSocial() {
                                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user?.data?.lastName} {user?.data?.firstName}</h1>
                                     <p className="text-purple-600 dark:text-purple-400">Node.js Developer & Frontend Expert</p>
                                 </div>
-                                <div>  <a
-                                    href=""
-                                    target="_blank"
-                                    className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
-                                >
-                                    View Portfolio
-                                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                    </svg>
-                                </a>
-                                <SendMessageDialog /></div>
-                              
+                                <div>
+                                    {user?.data?.profileStudent?.fileCv && (
+                                        <a
+                                            href={user?.data?.profileStudent?.fileCv}
+                                            target="_blank"
+                                            className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
+                                        >
+                                            Xem CV
+                                            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                            </svg>
+                                        </a>
+                                    )}
+
+                                    <SendMessageDialog /></div>
+
                             </div>
 
 
@@ -220,7 +224,7 @@ export default function ProfileSocial() {
                                     <FontAwesomeIcon icon={faBriefcase} />
                                     <span className='ml-2'> {user?.data?.address ? (
                                         <p className="flex">
-                                            Học tại <span className="font-semibold ml-1">{Department[user?.data?.department ?? 5 ] }</span>
+                                            Học tại <span className="font-semibold ml-1">{Department[user?.data?.department ?? 5]}</span>
                                         </p>
                                     ) : (
                                         <p>Người dùng chưa cập nhật</p>
@@ -241,17 +245,17 @@ export default function ProfileSocial() {
                                 <a
                                     className="inline-flex items-center text-gray-600 mt-2 hover:underline"
                                 >
-                                      <FontAwesomeIcon icon={faEnvelope} />
-                                      <span className='ml-2'> {user?.data?.email ? (
+                                    <FontAwesomeIcon icon={faEnvelope} />
+                                    <span className='ml-2'> {user?.data?.email ? (
                                         <p className="flex">
-                                             <span className="font-semibold ml-1">{user?.data?.email}</span>
+                                            <span className="font-semibold ml-1">{user?.data?.email}</span>
                                         </p>
                                     ) : (
                                         <p>Người dùng chưa cập nhật</p>
 
                                     )}   </span>
-                                  
-                                   
+
+
                                 </a>
 
                             </div>
@@ -260,7 +264,7 @@ export default function ProfileSocial() {
                     </div>
                     {/* profile-right */}
                     <div className='profile-right  w-min-[680px] h-auto '>
-                     
+
                         {/* form filter */}
                         <div className='blog-center flex  w-full justify-center '>
                             <div className="mt-3 flex-row bg-white min-w-[680px] max-w-3xl mx-3  p-6 pb-3 rounded-xl shadow-md  ">
@@ -541,7 +545,7 @@ export default function ProfileSocial() {
 
             </div>
 
-        </div>
+        </div >
     )
 }
 

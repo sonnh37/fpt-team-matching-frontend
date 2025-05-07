@@ -239,16 +239,19 @@ export default function Blogmanagement() {
                                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user?.lastName} {user?.firstName}</h1>
                                     <p className="text-purple-600 dark:text-purple-400">Node.js Developer & Frontend Expert</p>
                                 </div>
-                                <a
-                                    href=""
-                                    target="_blank"
-                                    className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
-                                >
-                                    View Portfolio
-                                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                    </svg>
-                                </a>
+                                {user?.profileStudent?.fileCv && (
+                                        <a
+                                            href={user?.profileStudent?.fileCv}
+                                            target="_blank"
+                                            className="inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200 text-sm font-medium"
+                                        >
+                                            Xem CV
+                                            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                            </svg>
+                                        </a>
+                                    )}
+                              
                             </div>
 
 
