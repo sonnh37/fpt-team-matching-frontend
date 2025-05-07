@@ -300,6 +300,7 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
                                     : "outline"
                                 }
                               >
+                                Đánh giá
                                 <ListChecks className="h-4 w-4" />
                               </Button>
                             </Link>

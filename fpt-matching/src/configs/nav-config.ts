@@ -164,13 +164,13 @@ export const NAV_CONFIG = {
       title: "Quản lý người dùng",
       url: "/management/users",
       icon: Users,
-      roles: ["Manager"],
+      roles: ["Manager", "Admin"],
       items: [
         {
           title: "Danh sách",
           url: "/management/users",
           icon: Users,
-          roles: ["Manager"],
+          roles: ["Manager", "Admin"],
         },
         {
           title: "Thêm sinh viên",

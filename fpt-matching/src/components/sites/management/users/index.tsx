@@ -40,6 +40,7 @@ import { Department } from "@/types/enums/user";
 import { roleService } from "@/services/role-service";
 import { columns } from "./columns";
 import { semesterService } from "@/services/semester-service";
+import { useCurrentRole } from "@/hooks/use-current-role";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -49,12 +50,14 @@ const defaultSchema = z.object({
 export default function UserTable() {
   const searchParams = useSearchParams();
   const columnSearch = "emailOrFullname";
-
+  const roleCurrent = useCurrentRole();
   const { data: res_role } = useQuery({
     queryKey: ["get-all-role"],
     queryFn: () => roleService.getAll(),
     refetchOnWindowFocus: false,
   });
+
+  const roles = res_role?.data?.results?.filter((m) => m.roleName != "Admin");
 
   const { data: res_semester } = useQuery({
     queryKey: ["get-all-semester"],
@@ -67,7 +70,7 @@ export default function UserTable() {
       columnId: "role",
       title: "Role",
       options:
-        res_role?.data?.results?.map((role) => ({
+        roles?.map((role) => ({
           label: role.roleName,
           value: role.roleName,
         })) || [],
@@ -173,7 +176,7 @@ export default function UserTable() {
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    
+
     manualPagination: true,
     debugTable: true,
   });
@@ -208,12 +211,20 @@ export default function UserTable() {
               // handleSheetChange={handleSheetChange}
               // formFilterAdvanceds={formFilterAdvanceds}
             />
-            <DataTableComponent
-              isLoading={isFetching && !isTyping}
-              table={table}
-              restore={userService.restore}
-              deletePermanent={userService.deletePermanent}
-            />
+
+            {roleCurrent == "Admin" ? (
+              <DataTableComponent
+                isLoading={isFetching && !isTyping}
+                table={table}
+                restore={userService.restore}
+                deletePermanent={userService.deletePermanent}
+              />
+            ) : (
+              <DataTableComponent
+                isLoading={isFetching && !isTyping}
+                table={table}
+              />
+            )}
             <DataTablePagination table={table} />
           </div>
         </div>
