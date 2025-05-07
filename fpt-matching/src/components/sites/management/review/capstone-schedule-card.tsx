@@ -22,7 +22,7 @@ export function CapstoneScheduleCard({capstoneSchedule} : {capstoneSchedule: Cap
                                 x.status === TeamMemberStatus.Pending ||
                                 x.status === TeamMemberStatus.InProgress
                         ) ? (
-                            <Badge variant="outline">Not yet</Badge>
+                            <Badge variant="outline">Chưa có</Badge>
                         ) : capstoneSchedule.project?.teamMembers.some(
                             x => x.status !== TeamMemberStatus.Pass1
                         ) ? (
@@ -35,16 +35,15 @@ export function CapstoneScheduleCard({capstoneSchedule} : {capstoneSchedule: Cap
                             x =>
                                 x.status === TeamMemberStatus.Pending ||
                                 x.status === TeamMemberStatus.InProgress ||
-                                x.status === TeamMemberStatus.Fail1 ||
-                                x.status === TeamMemberStatus.Pass1
+                                x.status === TeamMemberStatus.Fail1
                         ) ? (
-                            <Badge variant="outline">Not yet</Badge>
-                        ) : capstoneSchedule.project?.teamMembers.some(
-                            x => x.status !== TeamMemberStatus.Pass2
+                            <Badge variant="outline">Chưa có</Badge>
+                        ) : capstoneSchedule.project?.teamMembers.every(
+                            x => x.status === TeamMemberStatus.Pass1 || x.status === TeamMemberStatus.Pass2
                         ) ? (
-                            <Badge variant="destructive">Fail</Badge>
-                        ) : (
                             <Badge className="bg-green-500" variant="outline">Pass</Badge>
+                        ) : (
+                            <Badge variant="destructive">Fail</Badge>
                         )
                     ) : (
                         <div></div>
@@ -71,7 +70,7 @@ export function CapstoneScheduleCard({capstoneSchedule} : {capstoneSchedule: Cap
             <CardFooter className="flex justify-between">
                 <Button onClick={() => {
                     router.push(`${pathName}/defense-details?defenseId=${capstoneSchedule.id}`)
-                }}>View details</Button>
+                }}>Xem chi tiết</Button>
             </CardFooter>
         </Card>
     )

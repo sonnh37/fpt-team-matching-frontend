@@ -16,6 +16,7 @@ import SheetFileUpload from './file-upload_review_details';
 import Link from "next/link";
 import {TopicVersion} from "@/types/topic-version";
 import {TopicVersionStatus} from "@/types/enums/topic-version";
+import { toast } from 'sonner';
 
 export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
 
@@ -71,6 +72,15 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
         registerRole()
         fetchCurrentSemester()
     }, []);
+
+    const handleUpdateDemo =async () => {
+        const response = await reviewService.updateDemo({reviewId: reviewId})
+        if (response.status == 1) {
+            toast.success("Cập nhật demo thành công.")
+        } else {
+            toast.error(response.message)
+        }
+    }
     return (
         <div className={"px-8 mt-4"}>
             {
@@ -87,13 +97,16 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                 {reviewDetails.project?.topic?.ideaVersion?.englishName}
                             </div>
                             <div className={"pt-4"}>
-                                {reviewDetailsRBAC.hasPermission(currentRole, "feedbackUpdatedCapstone")
-                                    ? (
-                                        <Link className={"font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/management/projects/detail/idea/update-idea?ideaId=${reviewDetails.project?.topic?.ideaVersion?.id}`} >Xem nội dùng đề tài chỉnh sửa</Link>
-                                    )
-                                    : (reviewDetails.number != 3 && reviewDetails.number != 4)
-                                        ? <UpdateIdeaSheet leaderId={reviewDetails.project?.leaderId ?? ""} topicVersionId={reviewDetails?.project?.topic?.ideaVersion?.id ? reviewDetails?.project?.topic?.ideaVersion?.id : ""} ideaId={reviewDetails && reviewDetails.project!.topic?.id ? reviewDetails.project!.topic?.id : ""} reviewStage={reviewDetails.number} ideaHis={topicVersion} />
-                                        : <div></div>}
+                                <div className={"w-full flex gap-2"}>
+                                    {reviewDetailsRBAC.hasPermission(currentRole, "feedbackUpdatedCapstone")
+                                        ? (
+                                            <Link className={"font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/management/projects/detail/idea/update-idea?ideaId=${reviewDetails.project?.topic?.ideaVersion?.id}`} >Xem nội dùng đề tài chỉnh sửa</Link>
+                                        )
+                                        : (reviewDetails.number != 3 && reviewDetails.number != 4)
+                                            ? <UpdateIdeaSheet leaderId={reviewDetails.project?.leaderId ?? ""} topicVersionId={reviewDetails?.project?.topic?.ideaVersion?.id ? reviewDetails?.project?.topic?.ideaVersion?.id : ""} ideaId={reviewDetails && reviewDetails.project!.topic?.id ? reviewDetails.project!.topic?.id : ""} reviewStage={reviewDetails.number} ideaHis={topicVersion} />
+                                            : null}
+                                    <Button onClick={() => {handleUpdateDemo()}}>Update demo</Button>
+                                </div>
                                 {
                                     (topicVersion &&
                                         topicVersion?.length > 0 &&

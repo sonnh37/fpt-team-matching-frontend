@@ -41,7 +41,7 @@ import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { IdeaDetailForm } from "../../idea/detail";
-import { Eye, EyeIcon, ListChecks, Send, Undo2 } from "lucide-react";
+import { Eye, EyeIcon, ListChecks, Loader2, Send, Undo2 } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { TypographyP } from "@/components/_common/typography/typography-p";
@@ -71,7 +71,7 @@ export const columns: ColumnDef<Topic>[] = [
   {
     accessorKey: "ideaVersion.enterpriseName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tên đề tài doanh nghiệp" />
+      <DataTableColumnHeader column={column} title="Tên doanh nghiệp" />
     ),
     cell: ({ row }) => {
       const model = row.original;
@@ -93,9 +93,28 @@ export const columns: ColumnDef<Topic>[] = [
     cell: ({ row }) => {
       const model = row.original;
       const idea = model.ideaVersion?.idea;
+
+      // Hàm chuyển đổi status sang tiếng Việt
+      const getStatusText = (status: IdeaStatus | undefined): string => {
+        switch (status) {
+          case IdeaStatus.Pending:
+            return "Đang chờ";
+          case IdeaStatus.Approved:
+            return "Đã duyệt";
+          case IdeaStatus.Rejected:
+            return "Đã từ chối";
+          case IdeaStatus.ConsiderByMentor:
+            return "Đang xem xét bởi Mentor";
+          case IdeaStatus.ConsiderByCouncil:
+            return "Đang xem xét bởi Hội đồng";
+          default:
+            return "Không xác định";
+        }
+      };
+
       return (
         <div className="flex items-center gap-2">
-          {IdeaStatus[idea?.status ?? 0]}
+          {getStatusText(idea?.status)}
         </div>
       );
     },
@@ -122,6 +141,7 @@ interface ActionsProps {
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const user = useSelectorUser();
   if (!user) return null;
+  const [isSubmitting, setIsSubmitting] = useState(false); // Thêm state cho loading
 
   const model = row.original;
   const ideaId = model.ideaVersion?.ideaId;
@@ -165,7 +185,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const showReturnButton =
     idea?.status === IdeaStatus.ConsiderByCouncil &&
     idea?.ownerId != idea?.mentorId;
-
+  console.log("check_idea", ideaVersionRequests)
   const showSubmitToCouncilButton =
     idea?.status === IdeaStatus.Pending &&
     allMentorApproved &&
@@ -232,19 +252,24 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   // Xử lý nộp cho hội đồng
   const handleSubmitToCouncil = async () => {
-    toast.custom((t) => (
-      <ConfirmDialog
-        title="Xác nhận nộp đề tài cho hội đồng?"
-        message="Bạn không thể hoàn tác hành động này sau khi nộp"
-        onConfirm={async () => {
-          toast.dismiss(t);
-          await executeSubmitToCouncil();
-        }}
-        onCancel={() => toast.dismiss(t)}
-        confirmText="Xác nhận"
-        cancelText="Huỷ"
-      />
-    ));
+    setIsSubmitting(true); // Bắt đầu loading
+    try {
+      toast.custom((t) => (
+        <ConfirmDialog
+          title="Xác nhận nộp đề tài cho hội đồng?"
+          message="Bạn không thể hoàn tác hành động này sau khi nộp"
+          onConfirm={async () => {
+            toast.dismiss(t);
+            await executeSubmitToCouncil();
+          }}
+          onCancel={() => toast.dismiss(t)}
+          confirmText="Xác nhận"
+          cancelText="Huỷ"
+        />
+      ));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const executeSubmitToCouncil = async () => {
@@ -312,6 +337,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       request.role == "SubMentor" &&
       request.status == IdeaVersionRequestStatus.Pending
   );
+  
   const handleSubmit = async () => {
     try {
       const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
@@ -353,9 +379,22 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 size="sm"
                 onClick={() => handleSubmit()}
-                disabled={hasCouncilRequests || hasSubmentorPendingRequest}
+                disabled={
+                  hasCouncilRequests ||
+                  hasSubmentorPendingRequest ||
+                  isSubmitting
+                }
               >
-                {hasCouncilRequests ? "Đã nộp" : "Nộp cho hội đồng"}
+                {isSubmitting ? ( // Hiển thị loading khi đang submit
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Đang xử lý...
+                  </div>
+                ) : hasCouncilRequests ? (
+                  "Đã nộp"
+                ) : (
+                  "Nộp cho hội đồng"
+                )}
               </Button>
             )}
           </DialogFooter>

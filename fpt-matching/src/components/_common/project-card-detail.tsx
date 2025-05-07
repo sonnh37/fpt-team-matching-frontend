@@ -280,19 +280,19 @@ export const TeamInfoCard = ({
                   variant: "default",
                 },
                 [TeamMemberStatus.Pass1]: {
-                  text: "Đạt đợt 1",
+                  text: "Đạt lần 1",
                   variant: "info",
                 },
                 [TeamMemberStatus.Pass2]: {
-                  text: "Đạt đợt 2",
+                  text: "Đạt lần 2",
                   variant: "info",
                 },
                 [TeamMemberStatus.Fail1]: {
-                  text: "Không đạt đợt 1",
+                  text: "Không đạt lần 1",
                   variant: "destructive",
                 },
                 [TeamMemberStatus.Fail2]: {
-                  text: "Không đạt đợt 2",
+                  text: "Không đạt lần 2",
                   variant: "destructive",
                 },
               };

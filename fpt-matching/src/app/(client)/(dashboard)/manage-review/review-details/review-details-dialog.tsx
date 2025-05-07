@@ -44,7 +44,7 @@ export function ReviewDetailsDialog(
         <AlertDialog open={isOpen}>
             <AlertDialogTrigger asChild>
                 {user.id != leaderId ? <div></div> : reviewDate && reviewDate.getDate() == new Date(Date.now()).getDate() ?
-                    <Button onClick={() => {setIsOpen(true)}} variant="destructive">Tải file lên</Button> : <Button disabled={true} className={"bg-red-400 hover:bg-red-400 "} variant="destructive">Tải file lên</Button>
+                    <Button onClick={() => {setIsOpen(true)}} variant="default">Tải file lên</Button> : <Button disabled={true} className={"bg-red-400 hover:bg-red-400 "} variant="destructive">Tải file lên</Button>
                 }
             </AlertDialogTrigger>
             <AlertDialogContent  className="sm:max-w-[425px]">
@@ -57,14 +57,15 @@ export function ReviewDetailsDialog(
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    {!loading ? <Button onClick={handleSaveChange} variant={"destructive"} type="submit">Cập nhật</Button>
+                   
+                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} >Huỷ</AlertDialogCancel>
+                    {!loading ? <Button onClick={handleSaveChange} variant={"default"} type="submit">Cập nhật</Button>
                         : (
                         <Button disabled>
                             <Loader2 className="animate-spin" />
                             Đang xử lí
                         </Button>
                         )}
-                    <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Huỷ</AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

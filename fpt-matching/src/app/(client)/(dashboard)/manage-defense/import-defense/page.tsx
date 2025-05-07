@@ -482,7 +482,7 @@ const Page = () => {
                                                     </div>
                                                     {projects.filter(x => x.id == selectedProjectId)[0]?.topic?.ideaVersion?.enterpriseName ?
                                                         <div className="space-y-1">
-                                                            <Label htmlFor="new">Tên đề tài doanh nghiệp</Label>
+                                                            <Label htmlFor="new">Tên doanh nghiệp</Label>
                                                             <Input disabled={true} value={projects.filter(x => x.id == selectedProjectId) ? projects.filter(x => x.id == selectedProjectId)[0]?.topic?.ideaVersion?.enterpriseName : undefined} />
                                                         </div>
                                                      : <div className="space-y-1">

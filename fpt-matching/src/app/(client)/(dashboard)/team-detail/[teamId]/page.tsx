@@ -175,9 +175,13 @@ export default function ProjectDetail() {
     ? project.topic?.ideaVersion?.teamSize ?? 6
     : 6;
   const currentTeamSize = teamMembers.length;
-  const availableSlots = Math.max(0, maxTeamSize - currentTeamSize);
 
   const hasPendingIdea = (result_idea_current?.data?.length ?? 0) > 0;
+
+  const availableSlots = isHasTopic
+    ? (project.topic?.ideaVersion?.teamSize ?? 0) -
+      (project.teamMembers?.length ?? 0)
+    : 5 - (project?.teamMembers?.length ?? 0);
   const canJoinTeam =
     availableSlots > 0 &&
     roleCurrent === "Student" &&
@@ -233,6 +237,8 @@ export default function ProjectDetail() {
   if (isLoadingIdeaCurrent || isLoadingTeam || isLoadingCurrent)
     return <LoadingComponent />;
   if (isErrorIdeaCurrent || isErrorTeam) return <ErrorSystem />;
+
+  
 
   return (
     <div className="container pt-6 max-w-4xl">
@@ -365,7 +371,7 @@ export default function ProjectDetail() {
                 <div className="flex items-center gap-3">
                   <Badge variant="outline" className="text-sm">
                     <Users className="h-3 w-3 mr-1" />
-                    {sortedMembers.length}/{ideaVersion?.teamSize || "?"} thành
+                    {sortedMembers.length} thành
                     viên
                   </Badge>
                   <p className="text-sm text-muted-foreground">

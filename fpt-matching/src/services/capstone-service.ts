@@ -50,6 +50,11 @@ class CapstoneScheduleService extends BaseService<CapstoneSchedule>{
         });
         return response.data;
     }
+
+    public async updateDemo ({capstoneScheduleId} : {capstoneScheduleId: string}): Promise<BusinessResult<void>> {
+        const response = await axiosInstance.put(`${this.endpoint}/update-demo?capstoneScheduleId=${capstoneScheduleId}`);
+        return response.data;
+    }
 }
 
 export const capstoneService = new CapstoneScheduleService();

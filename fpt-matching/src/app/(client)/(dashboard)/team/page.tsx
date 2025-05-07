@@ -645,19 +645,19 @@ export default function TeamInfo() {
                       variant: "default",
                     },
                     [TeamMemberStatus.Pass1]: {
-                      text: "Đạt đợt 1",
+                      text: "Đạt lần 1",
                       variant: "info",
                     },
                     [TeamMemberStatus.Pass2]: {
-                      text: "Đạt đợt 2",
+                      text: "Đạt lần 2",
                       variant: "info",
                     },
                     [TeamMemberStatus.Fail1]: {
-                      text: "Không đạt đợt 1",
+                      text: "Không đạt lần 1",
                       variant: "destructive",
                     },
                     [TeamMemberStatus.Fail2]: {
-                      text: "Không đạt đợt 2",
+                      text: "Không đạt lần 2",
                       variant: "destructive",
                     },
                   };
@@ -724,17 +724,20 @@ export default function TeamInfo() {
                               <Badge variant={roleInfo.variant as any}>
                                 {roleInfo.text}
                               </Badge>
-                              <Badge
-                                variant={statusInfo.variant as any}
-                                className={cn(
-                                  statusInfo.variant === "info"
-                                    ? "bg-green-500 text-white dark:text-black hover:bg-green-600"
-                                    : ""
-                                  // Thêm các class khác nếu cần
+                              {member.status !== TeamMemberStatus.Pending &&
+                                member.status !==
+                                  TeamMemberStatus.InProgress && (
+                                  <Badge
+                                    variant={statusInfo.variant as any}
+                                    className={cn(
+                                      statusInfo.variant === "info"
+                                        ? "bg-green-500 text-white dark:text-black hover:bg-green-600"
+                                        : ""
+                                    )}
+                                  >
+                                    {statusInfo.text}
+                                  </Badge>
                                 )}
-                              >
-                                {statusInfo.text}
-                              </Badge>
                             </div>
                           </div>
                         </div>
@@ -760,7 +763,8 @@ export default function TeamInfo() {
                                   Xem hồ sơ
                                 </Link>
                               </DropdownMenuItem>
-                              {member.role === TeamMemberRole.Leader &&
+                              {member.role !== TeamMemberRole.Leader &&
+                                isLeader &&
                                 !isLockTeamMember && (
                                   <>
                                     <DropdownMenuSeparator />
@@ -798,35 +802,37 @@ export default function TeamInfo() {
 
       <div className="lg:col-span-1 space-y-6">
         {/* Card đăng ký nhóm */}
-        {project.status == ProjectStatus.Pending && (
-          <Card className="rounded-lg">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg">Đăng ký nhóm</CardTitle>
-              <CardDescription>Nộp đăng ký đề tài chính thức</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm">
-                Lưu ý: Đề tài cần được thống nhất bởi tất cả thành viên trước
-                khi nộp và sẽ không được thay đổi tên nhóm
-              </p>
+        {project.status == ProjectStatus.Pending &&
+          project.topicId &&
+          availableSlots == 0 && (
+            <Card className="rounded-lg">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-lg">Đăng ký nhóm</CardTitle>
+                <CardDescription>Nộp đăng ký đề tài chính thức</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm">
+                  Lưu ý: Đề tài cần được thống nhất bởi tất cả thành viên trước
+                  khi nộp và sẽ không được thay đổi tên nhóm
+                </p>
 
-              <Button
-                className="w-full"
-                onClick={() =>
-                  handleAction(async () => {
-                    const command: ProjectUpdateCommand = {
-                      ...project,
-                      status: ProjectStatus.InProgress,
-                    };
-                    return projectService.update(command);
-                  }, "Đã nộp đề tài")
-                }
-              >
-                Nộp đề tài
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+                <Button
+                  className="w-full"
+                  onClick={() =>
+                    handleAction(async () => {
+                      const command: ProjectUpdateCommand = {
+                        ...project,
+                        status: ProjectStatus.InProgress,
+                      };
+                      return projectService.update(command);
+                    }, "Đã nộp đề tài")
+                  }
+                >
+                  Nộp đề tài
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         {/* Card xin đề tài từ GV (nếu có) */}
         {!teamInfo?.data?.topicId && (
           <Card className="rounded-lg">
@@ -856,9 +862,7 @@ export default function TeamInfo() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm">
-              Chỉ thực hiện sau Review 3 và trước ngày bảo vệ 1 tuần
-            </p>
+            <p className="text-sm">Chỉ thực hiện sau Review 3</p>
             {(() => {
               const review3 = project.reviews?.find((x) => x.number === 3);
               if (!review3?.reviewDate) {
@@ -878,7 +882,7 @@ export default function TeamInfo() {
 
               if (adjustedReviewDate < currentDate) {
                 return (
-                  <Button className="w-full" asChild>
+                  <Button disabled={!isLeader} className="w-full" asChild>
                     <Link href={`/team/rate?projectId=${project.id}`}>
                       Đánh giá thành viên
                     </Link>

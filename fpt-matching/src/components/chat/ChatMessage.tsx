@@ -7,19 +7,12 @@ import {Button} from "@/components/ui/button";
 import {Loader2} from "lucide-react";
 
 const ChatMessage = ({messages, loadMessage} : {messages:MessageModel[], loadMessage: boolean}) => {
-    // const uniqueMessages = messages.filter((msg, index, self) =>
-    //     index === self.findIndex((m) => m.id === msg.id)
-    // );
     const user = useSelectorUser()
-    const distinctMessages = Array.from(
-        new Map(messages.map(message => [message.id, message])).values()
-    );
+    
     return (
-            // Wrap with ChatMessageList
             <div className={""}>
-               {/*eslint-disable-next-line react/jsx-no-comment-textnodes*/}
                 <ChatMessageList className={""}>
-                    {!loadMessage ? messages && distinctMessages.map((message, index) => (
+                    {!loadMessage ? messages.map((message, index) => (
                         <div key={index} className={"flex flex-col"}>
                             <ChatBubble key={index} variant={user && user.id == message.sendById ? "sent" : "received"}>
                                 {user && <ChatBubbleAvatar fallback="us" src={user.avatar ?? ""} />}
@@ -33,9 +26,7 @@ const ChatMessage = ({messages, loadMessage} : {messages:MessageModel[], loadMes
                             })}
                                                  variant={user && user.id == message.sendById ? "send" : "received"}
                             />
-
                         </div>
-                        /*eslint-disable-next-line react/jsx-no-comment-textnodes*/
                     ))
                         : (
                             <div className={"w-full flex flex-row justify-center items-center"}>
@@ -45,10 +36,8 @@ const ChatMessage = ({messages, loadMessage} : {messages:MessageModel[], loadMes
                                 </Button>
                             </div>
                         )}
-
                 </ChatMessageList>
             </div>
-
     );
 };
 

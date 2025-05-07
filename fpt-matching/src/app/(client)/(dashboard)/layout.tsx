@@ -29,14 +29,6 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const user = useSelector((state: RootState) => state.user.user);
-  const currentRole = useCurrentRole();
-  // const { data: res_stage } = useQuery({
-  //   queryKey: ["getStageIdeaCurrent"],
-  //   queryFn: () => stageideaService.getCurrentStageIdea(),
-  //   refetchOnWindowFocus: false,
-  // });
-
-  // const isLock = res_stage?.status != 1 ? ((currentRole == "Manager" || currentRole == "Admin") ? false : true) : false;
 
   return (
     <SidebarProvider

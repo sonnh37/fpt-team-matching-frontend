@@ -11,6 +11,7 @@ import BreadcumbCapstoneDetails from "@/components/sites/management/defense-deta
 import { Label } from '@/components/ui/label';
 import {Input} from "@/components/ui/input";
 import DefenseTeamMembersTable from "@/components/sites/management/defense-details/defense-team-members-table";
+import {toast} from "sonner";
 
 const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: string}) => {
     const [capstoneSchedule, setCapstoneSchedule] = useState<CapstoneSchedule | null>();
@@ -38,7 +39,14 @@ const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: str
         fetchCurrentSemester()
     }, []);
     const currentRole = useCurrentRole();
-
+    const handeUpdateDemo = async () => {
+        const response = await capstoneService.updateDemo({capstoneScheduleId: capstoneScheduleId});
+        if (response.status == 1) {
+            toast.success("Cập nhật demo thành công");
+        }else {
+            toast.error(response.message);
+        }
+    }
     return (
         <div>
             <div className={"px-8 mt-4"}>
@@ -55,6 +63,7 @@ const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: str
                                 <div>
                                     {capstoneSchedule.project?.topic?.ideaVersion?.englishName}
                                 </div>
+                                <Button onClick={() => handeUpdateDemo()}>Update demo</Button>
                                 {/*<div>*/}
                                 {/*    <Button variant={"default"}>Chỉnh sửa đề tài</Button>*/}
                                 {/*</div>*/}

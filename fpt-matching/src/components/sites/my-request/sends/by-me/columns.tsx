@@ -23,10 +23,10 @@ export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "project.teamName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Project" />
+      <DataTableColumnHeader column={column} title="Tên nhóm" />
     ),
     cell: ({ row }) => {
-      const teamName = row.original.project?.teamName ?? "Unknown"; // Tránh lỗi undefined
+      const teamName = row.original.project?.teamName ?? "-"; // Tránh lỗi undefined
       const projectId = row.original.project?.id ?? "#";
 
       return (
@@ -39,7 +39,7 @@ export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "createdDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Data created" />
+      <DataTableColumnHeader column={column} title="Ngày tạo" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
@@ -49,7 +49,7 @@ export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "content",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Process Note" />
+      <DataTableColumnHeader column={column} title="Ghi chú" />
     ),
   },
   {
@@ -130,7 +130,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem onClick={handleViewDetailsClick}>
-            View details
+            Xem chi tiết
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
