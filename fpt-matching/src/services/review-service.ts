@@ -70,6 +70,11 @@ class ReviewService extends BaseService<Review>{
         const response = await axiosInstance.get(`${this.endpoint}/reviewer?reviewerId=${reviewerId}`);
         return response.data;
     }
+
+    public async updateDemo ({reviewId} :{reviewId: string}) : Promise<BusinessResult<void>> {
+        const response = await axiosInstance.put<BusinessResult<void>>(`${this.endpoint}/update-demo?reviewId=${reviewId}`);
+        return response.data;
+    }
 }
 
 

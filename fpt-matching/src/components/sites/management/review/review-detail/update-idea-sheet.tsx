@@ -117,7 +117,7 @@ export function UpdateIdeaSheet({leaderId, topicVersionId,ideaHis, ideaId, revie
     }
     console.log(ideaHis)
     return user && (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="gap-2">
             <Sheet >
                 <SheetTrigger asChild>
                     <Button className={"w-[15vw]"} variant="default">Chỉnh sửa đề tài</Button>
