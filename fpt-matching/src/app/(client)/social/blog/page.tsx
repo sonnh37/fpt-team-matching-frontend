@@ -276,7 +276,7 @@ export default function Blog() {
 
             <div className="h-[30px] my-40  flex items-center justify-center">
               <DirectionAwareHover
-                imageUrl={"https://daihoc.fpt.edu.vn/wp-content/uploads/2022/08/dai-hoc-fpt-tp-hcm-1.jpeg"}>
+                imageUrl={"/dai-hoc-fpt-tp-hcm-1.png"}>
                 <img className='h-20'
                   src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/FPT_Education_logo.svg/1200px-FPT_Education_logo.svg.png"
                   alt="" />
