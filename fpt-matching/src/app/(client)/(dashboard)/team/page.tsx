@@ -760,7 +760,7 @@ export default function TeamInfo() {
                                   Xem hồ sơ
                                 </Link>
                               </DropdownMenuItem>
-                              {member.role === TeamMemberRole.Leader &&
+                              {member.role !== TeamMemberRole.Leader && isLeader &&
                                 !isLockTeamMember && (
                                   <>
                                     <DropdownMenuSeparator />
@@ -798,7 +798,7 @@ export default function TeamInfo() {
 
       <div className="lg:col-span-1 space-y-6">
         {/* Card đăng ký nhóm */}
-        {project.status == ProjectStatus.Pending && (
+        {project.status == ProjectStatus.Pending && project.topicId && availableSlots == 0 && (
           <Card className="rounded-lg">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Đăng ký nhóm</CardTitle>
@@ -857,7 +857,7 @@ export default function TeamInfo() {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm">
-              Chỉ thực hiện sau Review 3 và trước ngày bảo vệ 1 tuần
+              Chỉ thực hiện sau Review 3 
             </p>
             {(() => {
               const review3 = project.reviews?.find((x) => x.number === 3);
@@ -878,7 +878,7 @@ export default function TeamInfo() {
 
               if (adjustedReviewDate < currentDate) {
                 return (
-                  <Button className="w-full" asChild>
+                  <Button disabled={!isLeader} className="w-full" asChild>
                     <Link href={`/team/rate?projectId=${project.id}`}>
                       Đánh giá thành viên
                     </Link>

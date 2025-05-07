@@ -39,7 +39,7 @@ import { IdeaVersionRequestUpdateStatusCommand } from "@/types/models/commands/i
 import { User } from "@/types/user";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { Eye, ListChecks, MoreHorizontal } from "lucide-react";
+import { Eye, ListChecks, Loader2, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -113,6 +113,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const ideaId = idea.id;
   const [open, setOpen] = useState(false);
   const role = useCurrentRole();
+  const [isSubmitting, setIsSubmitting] = useState(false); // Thêm state cho loading
 
   const highestVersion =
     idea.ideaVersions.length > 0
@@ -133,23 +134,27 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       request.role == "SubMentor" &&
       request.status == IdeaVersionRequestStatus.Pending
   );
+
   const handleSubmit = async () => {
+    setIsSubmitting(true); // Bắt đầu loading
     try {
       const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
         highestVersion?.id
       );
-      if (res.status != 1) return toast.error(res.message);
+      if (res.status != 1) {
+        toast.error(res.message);
+        return;
+      }
 
       toast.success(res.message);
-
       queryClient.refetchQueries({
         queryKey: ["data"],
       });
-      setOpen(false);
     } catch (error: any) {
       toast.error(error || "An unexpected error occurred");
+    } finally {
+      setIsSubmitting(false); // Kết thúc loading dù có lỗi hay không
       setOpen(false);
-      return;
     }
   };
 
@@ -168,10 +173,19 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
               <Button
                 variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 size="sm"
-                onClick={() => handleSubmit()}
-                disabled={hasCouncilRequests || hasSubmentorPendingRequest}
+                onClick={handleSubmit}
+                disabled={hasCouncilRequests || hasSubmentorPendingRequest || isSubmitting} // Thêm isSubmitting vào điều kiện disabled
               >
-                {hasCouncilRequests ? "Đã nộp" : "Nộp cho hội đồng"}
+                {isSubmitting ? ( // Hiển thị loading khi đang submit
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Đang xử lý...
+                  </div>
+                ) : hasCouncilRequests ? (
+                  "Đã nộp"
+                ) : (
+                  "Nộp cho hội đồng"
+                )}
               </Button>
             )}
           </DialogFooter>

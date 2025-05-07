@@ -13,7 +13,7 @@ const SendMessageForm = ({sendMessage} : {sendMessage: any}) => {
                        onChange={e => setMessage(e.target.value)}
                        value={msg}
                 />
-                <button className={"p-4 bg-amber-600"} type="submit">Send</button>
+                <button className={"p-4 bg-amber-600"} type="submit">Gửi</button>
             </div>
         </form>
     )

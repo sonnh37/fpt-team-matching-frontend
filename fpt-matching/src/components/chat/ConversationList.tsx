@@ -75,7 +75,7 @@ function DialogAddConversation({userId, setConnection, setToggle}:{userId: strin
             }
 
             const conn = new HubConnectionBuilder()
-                .withUrl(`${process.env.NEXT_PUBLIC_API_BASE}/Chat`)
+                .withUrl(`${process.env.NEXT_PUBLIC_API_BASE}/chat`)
                 .configureLogging(LogLevel.Information)
                 .build();
             conn.on("JoinSpecificChatRoom", (username: string, msg: string) => {

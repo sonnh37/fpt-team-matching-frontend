@@ -50,7 +50,7 @@ export function SendMessageDialog() {
     const handleSendMessage = async () => {
 
         const conn = new HubConnectionBuilder()
-            .withUrl(`${process.env.NEXT_PUBLIC_API_BASE}/Chat`)
+            .withUrl(`${process.env.NEXT_PUBLIC_API_BASE}/chat`)
             .configureLogging(LogLevel.Information)
             .build();
         conn.on("JoinSpecificChatRoom", (username: string, msg: string) => {
@@ -82,7 +82,7 @@ export function SendMessageDialog() {
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="message" className="text-right">
-                            Message
+                            Tin nhắn
                         </Label>
                         <Input
                             id="message"
@@ -96,7 +96,7 @@ export function SendMessageDialog() {
                     <Button type="submit" onClick={() => {
 
                         handleSendMessage()
-                    }}>Send message</Button>
+                    }}>Gửi tin nhắn</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

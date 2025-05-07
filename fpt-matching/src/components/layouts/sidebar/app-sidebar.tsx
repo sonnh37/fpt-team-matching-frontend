@@ -32,9 +32,8 @@ import { TypographySmall } from "@/components/_common/typography/typography-smal
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch<AppDispatch>();
-  const user = useSelector((state: RootState) => state.user.user);
+  const user = useSelector((state: RootState) => state.user?.user);
   const role = useCurrentRole();
-  const currentCache = useSelector((state: RootState) => state.cache.cache); // Lấy toàn bộ cache
   const { setTheme } = useTheme();
   const { data: semesterData } = useQuery({
     queryKey: ["getSemesterLatest_AppSidebar"],
@@ -42,22 +41,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     refetchOnWindowFocus: false,
   });
 
-  React.useEffect(() => {
-    if (!user) return;
+  // React.useEffect(() => {
+  //   if (!user) return;
 
-    if (user.cache) {
-      const cache = JSON.parse(user.cache) as UserCache;
-      setTheme(cache.theme ?? "light");
-      dispatch(initializeCache(user.cache));
-    } else {
-      const primaryRole = user.userXRoles.find((role) => role.isPrimary)?.role
-        ?.roleName;
-      if (primaryRole) {
-        setTheme("light");
-        dispatch(updateUserCache({ role: primaryRole, theme: "light" }));
-      }
-    }
-  }, [user, dispatch]);
+  //   if (user.cache) {
+  //     const cache = JSON.parse(user.cache) as UserCache;
+  //     setTheme(cache.theme ?? "light");
+  //     dispatch(initializeCache(user.cache));
+  //   } else {
+  //     const primaryRole = user.userXRoles.find((role) => role.isPrimary)?.role
+  //       ?.roleName;
+  //     if (primaryRole) {
+  //       setTheme("light");
+  //       dispatch(updateUserCache({ role: primaryRole, theme: "light" }));
+  //     }
+  //   }
+  // }, [user, dispatch]);
 
   if (!user) return null;
 

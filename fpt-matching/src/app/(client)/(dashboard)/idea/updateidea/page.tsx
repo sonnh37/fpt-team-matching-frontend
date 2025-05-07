@@ -205,7 +205,7 @@ const InviteUsersForm = () => {
           <Label className="text-base font-medium">Thành viên hiện tại</Label>
           <Badge variant="outline" className="px-2 py-0.5">
             {sortedMembers?.length}/
-            {isHasTopic ? project?.topic?.ideaVersion?.teamSize ?? 6 : 6}
+            {isHasTopic ? project?.topic?.ideaVersion?.teamSize ?? 5 : 5}
           </Badge>
         </div>
 
