@@ -28,14 +28,11 @@ export default function Page() {
         const newMessage : MessageModel = {
           content: msg,
           sendById: username,
-          id: "",
+          id: `msg_${Date.now().toString()}`,
           conversationId: conversationId,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-          createdDate: Date.now()
+          createdDate: new Date().toISOString()
         }
-        setToggle((prev) => !prev);
-        setMessages(messages => [...messages, newMessage]);
+        setMessages(prevMessages => [...prevMessages, newMessage]);
       })
       await conn.start();
       await conn.invoke("JoinSpecificChatRoom", {UserId: username, PartnerId: partnerId, ConversationId: chatroom});
