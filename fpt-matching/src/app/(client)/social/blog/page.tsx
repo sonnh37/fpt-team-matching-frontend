@@ -74,7 +74,7 @@ import BlogRecommend from '@/components/blogforuser/blog-recommend';
 
 export default function Blog() {
 
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [projectUser, setProject] = useState<Project>();
@@ -116,26 +116,39 @@ export default function Blog() {
   // };
   // tạo blog
   const handleSubmit = async () => {
+    if (isSubmitting) return; // Chặn nếu đang submit
+    setIsSubmitting(true);
+
+    // Hiện loading toast
+    const toastId = toast.loading("⏳ Đang tạo blog, vui lòng chờ...");
+    
     try {
       if (!formData.title || !formData.content) {
+        toast.dismiss(toastId);
         toast.error("⚠️ Vui lòng nhập tiêu đề hoặc nội dung!");
         return;
       }
 
       if (!formData.title || formData.title.trim().length < 10) {
+        toast.dismiss(toastId);
         toast.error("⚠️ Tiêu đề phải có ít nhất 10 ký tự!");
         return;
       }
 
       if (!formData.content || formData.content.trim().length < 10) {
+        toast.dismiss(toastId);
         toast.error("⚠️ Nội dung phải có ít nhất 10 ký tự!");
         return;
       }
-
-      if (!formData.skillRequired || formData.skillRequired.trim().length < 5) {
-        toast.error("⚠️ Kỹ năng yêu cầu phải có ít nhất 5 ký tự!");
-        return;
+      if(postType == BlogType.Recruit){
+        if (!formData.skillRequired || formData.skillRequired.trim().length < 5) {
+          toast.dismiss(toastId);
+          toast.error("⚠️ Kỹ năng yêu cầu phải có ít nhất 5 ký tự!");
+          return;
+        }
       }
+
+   
       const blognew: BlogCreateCommand = {
         title: formData.title,
         content: formData.content,
@@ -147,6 +160,7 @@ export default function Blog() {
       };
 
       const result = await blogService.create(blognew);
+      toast.dismiss(toastId);
 
       if (result?.status === 1) {
         toast.success("🎉 Chúc mừng bạn đã tạo blog thành công!");
@@ -159,8 +173,11 @@ export default function Blog() {
     } catch (error) {
       console.error("Lỗi khi tạo blog:", error);
       toast.error("⚠️ Lỗi hệ thống, vui lòng thử lại sau!");
+    } finally {
+      setIsSubmitting(false);
     }
   };
+
 
 
   //gọi thông tin user đã đăng nhập
@@ -830,7 +847,7 @@ export default function Blog() {
                                     <div
                                       className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
                                       <span className="flex items-center ml-3">
-                                        <LikeBlog postId={post?.id ?? ""} />
+                                     <LikeBlog  postId={post?.id ?? ""}/>
                                       </span>
                                       <div className='flex'>
                                         <span className="flex items-center">
@@ -856,7 +873,7 @@ export default function Blog() {
                                     className="flex w-full text-base justify-between  items-center space-x-4">
                                     <span className="flex items-center">
                                       <i className="fas fa-thumbs-up text-blue-500"></i>
-                                      <span className="ml-2">  <FontAwesomeIcon icon={faThumbsUp} />  Lượt thích </span>
+                                      <span className="ml-2">  <LikeBlog postId={post?.id ?? ""}/> </span>
                                     </span>
                                     <span className="flex items-center">
                                       <i className="fas fa-comment text-green-500"></i>
