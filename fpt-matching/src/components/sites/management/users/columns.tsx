@@ -15,6 +15,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useCurrentRole } from "@/hooks/use-current-role";
 import { formatDate } from "@/lib/utils";
 import { userService } from "@/services/user-service";
 import { Department } from "@/types/enums/user";
@@ -25,27 +26,35 @@ import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
-
 export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-      />
-    ),
+    header: ({ table }) => {
+      const currentRole = useCurrentRole();
+
+      return currentRole == "Admin" ? (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ||
+            (table.getIsSomePageRowsSelected() && "indeterminate")
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          aria-label="Select all"
+        />
+      ) : null;
+    },
+
+    cell: ({ row }) => {
+      const currentRole = useCurrentRole();
+
+      return currentRole == "Admin" ? (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+        />
+      ) : null;
+    },
   },
   {
     accessorKey: "avatar",
@@ -135,6 +144,7 @@ export const columns: ColumnDef<User>[] = [
     header: "Thao tác",
     cell: ({ row }) => {
       const [showDeleteTaskDialog, setShowDeleteTaskDialog] = useState(false);
+      const currentRole = useCurrentRole();
 
       const user = row.original;
 
@@ -147,11 +157,11 @@ export const columns: ColumnDef<User>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
               <DropdownMenuItem
                 onClick={() => {
-                  navigator.clipboard.writeText(user.id || "")
-                  toast.success("Đã sao chép!")
+                  navigator.clipboard.writeText(user.id || "");
+                  toast.success("Đã sao chép!");
                 }}
               >
                 Sao chép Id
@@ -159,16 +169,21 @@ export const columns: ColumnDef<User>[] = [
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href={`/management/users/assignments/roles/${user.id}`}>
-                  Assign Roles
+                  Xem chi tiết
                 </Link>
               </DropdownMenuItem>
 
-              <DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>
-                Delete
-                <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-              </DropdownMenuItem>
+              {currentRole == "Admin" && (
+                <DropdownMenuItem
+                  onSelect={() => setShowDeleteTaskDialog(true)}
+                >
+                  Xóa
+                  <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
+
           <DeleteBaseEntitysDialog
             deleteById={userService.delete}
             open={showDeleteTaskDialog}
