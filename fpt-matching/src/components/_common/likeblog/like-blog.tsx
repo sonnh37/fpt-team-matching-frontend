@@ -72,7 +72,7 @@ const LikeBlog: React.FC<LikeButtonProps> = ({ postId }) =>{
     return (
   
             <button className="flex items-center cursor-pointer" onClick={handleLike}>
-                {likes.length ?? 0} Likes
+                {likes.length ?? 0} Lượt thích
                 <FontAwesomeIcon
                     icon={faThumbsUp}
                     className={`ml-2 transition ${hasLiked ? "text-blue-500" : "text-gray-500 hover:text-blue-500"}`}

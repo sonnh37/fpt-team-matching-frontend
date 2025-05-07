@@ -43,12 +43,13 @@ import { RootState } from "@/lib/redux/store";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import { ProjectStatus } from "@/types/enums/project";
 import { TeamMemberStatus } from "@/types/enums/team-member";
+import { useState } from "react";
 
 const ListUploadCv = ({ blogId }: { blogId: string }) => {
     //gọi thông tin user đã đăng nhập
     const user = useSelector((state: RootState) => state.user.user)
-
-
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
     const tabs = {
         form: "Gợi ý người dùng phù hợp",
         upload: "Quản lí các đơn nộp vào team  "
@@ -119,13 +120,15 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
 
 
     const handleInvite = async (email: string) => {
-
+        if (isSubmitting) return; // Nếu API đang chạy, không cho phép bấm tiếp
+        setIsSubmitting(true); // Đánh dấu API đang chạy
         // if(avaibleIsTrue){
         //     toast.error("Nhóm của bạn đã đủ thành viên")
         //     return
         // }
         if(prj !== ProjectStatus.Pending){
-            toast.error("Nhóm của bạn đang trong quá trình làm.Không thể mời")
+            toast.error("Nhóm của bạn đang trong quá trình làm hoặc chưa có nhóm.Không thể mời")
+            setIsSubmitting(false);
             return
         }
 
@@ -139,9 +142,6 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
         if (confirmed) {
             try {
                 const receiver = await userService.getByEmail(email);
-
-
-
                 if (receiver.status === 1 && receiver.data) {
                     const idReceiver = receiver.data.id;
                     const prj = await projectService.getProjectInfo();
@@ -156,6 +156,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                     const checkIsExistInvitation = await invitationService.getAll(query);
                     if (checkIsExistInvitation?.data?.results?.length && checkIsExistInvitation?.data?.results?.length > 0) {
                         toast.error("Bạn đã mời người dùng này rồi,xin hãy đợi họ trả lời.");
+                        setIsSubmitting(false);
                         return
                     }
 
@@ -168,15 +169,20 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                     const result = await invitationService.sendByTeam(invitation);
                     if (result.status == 1) {
                         toast.success("Chúc mừng bạn đã gửi lời mời thành công");
+                        setIsSubmitting(false); 
                     } else {
                         toast.error(result.message || "Failed to send invitation");
+                        setIsSubmitting(false); 
                     }
                 } else {
                     toast("Nguời dùng không tồn tại");
+                    setIsSubmitting(false);
                 }
             } catch (error) {
                 toast.error("An error occurred while sending the invitation");
                 console.error("Invitation error:", error);
+            }finally{
+                setIsSubmitting(false); 
             }
         } else {
             return
