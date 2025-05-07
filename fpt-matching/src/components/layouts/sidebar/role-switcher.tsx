@@ -39,7 +39,6 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelectorUser();
 
-  console.log("check_user", user);
   if (!user) {
     return null;
   }
@@ -63,7 +62,6 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
   let activeRole =
     sortedRoles.find((role) => role.role?.roleName === activeRolePlan) ||
     sortedRoles.find((role) => role.isPrimary);
-  console.log("check_user_role", activeRole);
   if (!activeRole) {
     if (sortedRoles.length == 0) return null;
     activeRole = sortedRoles[0];

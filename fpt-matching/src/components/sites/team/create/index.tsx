@@ -15,6 +15,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   teamName: z
@@ -56,6 +57,9 @@ export const TeamForm = () => {
 
       toast.success(response.message);
       await queryClient.refetchQueries({ queryKey: ["getTeamInfo"] });
+      // await queryClient.refetchQueries({ queryKey: ["getTeamInfoCurrentSemester"] });
+      // await queryClient.refetchQueries({ queryKey: ["getIdeaInTeam"] });
+      // await queryClient.refetchQueries({ queryKey: ["getCurrentSemester"] });
       router.push("/team");
     } catch (error: any) {
       console.error(error);
@@ -76,8 +80,15 @@ export const TeamForm = () => {
             placeholder="Nhập tên nhóm"
           />
 
-          <Button className="w-fit" type="submit">
-            Tạo mới
+          <Button className="w-fit" disabled={loading} type="submit">
+            {loading ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Đang tạo...
+              </div>
+            ) : (
+              "Tạo mới"
+            )}
           </Button>
         </form>
       </Form>

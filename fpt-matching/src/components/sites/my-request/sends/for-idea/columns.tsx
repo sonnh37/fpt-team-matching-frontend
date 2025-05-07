@@ -22,7 +22,7 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
   {
     accessorKey: "project.teamName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Project" />
+      <DataTableColumnHeader column={column} title="Tên nhóm" />
     ),
     cell: ({ row }) => {
       const teamName = row.original.project?.teamName ?? "-"; // Tránh lỗi undefined
@@ -39,7 +39,7 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
   {
     accessorKey: "idea.englishName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Idea" />
+      <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
     cell: ({ row }) => {
       const englishName = row.original.topic?.ideaVersion?.englishName ?? "-"; // Tránh lỗi undefined

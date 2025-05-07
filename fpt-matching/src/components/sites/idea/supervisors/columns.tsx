@@ -2,6 +2,7 @@
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
+import TimeStageIdea from "@/components/_common/time-stage-idea";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,11 +31,12 @@ import { Semester } from "@/types/semester";
 import { Topic } from "@/types/topic";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { AlertTriangle, Loader2, Send } from "lucide-react";
+import { AlertTriangle, Eye, Loader2, Send } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { IdeaDetailForm } from "../detail";
 
 export const useTopicColumns = () => {
   // Fetch all required data once
@@ -201,7 +203,7 @@ const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
   return (
     <>
       {role == "Student" && (
-        <>
+        <div className="flex gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -219,6 +221,23 @@ const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
               <p>{hasSentRequest ? "Yêu cầu đã được gửi" : "Gửi yêu cầu"}</p>
             </TooltipContent>
           </Tooltip>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button size="icon" variant="outline">
+                <Eye/>
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
+              <div className="flex justify-between p-4 gap-4">
+                <TimeStageIdea stageIdea={highestVersion?.stageIdea} />
+                {/* <HorizontalLinearStepper idea={idea} /> */}
+              </div>
+              <div className="p-4 gap-4">
+                <IdeaDetailForm ideaId={topic.ideaVersion?.ideaId} />
+              </div>
+            </DialogContent>
+          </Dialog>
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogContent>
@@ -257,7 +276,7 @@ const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </>
+        </div>
       )}
     </>
   );

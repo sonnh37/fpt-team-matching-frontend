@@ -105,7 +105,7 @@ export default function InvitationReceiveByTeamTable() {
   return (
     <>
       <div className="space-y-8">
-        <DataTableComponent isEnableHeader={false} table={table} />
+        <DataTableComponent  table={table} />
       </div>
     </>
   );

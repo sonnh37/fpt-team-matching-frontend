@@ -287,7 +287,6 @@ export const IdeaDetailForm = ({ ideaId }: IdeaDetailFormProps) => {
                       </div>
 
                       {isRequestForCurrentUser &&
-                        request.status == IdeaVersionRequestStatus.Pending &&
                         idea.ownerId != user.id && (
                           <div className="space-y-1">
                             <Link href={`/idea/reviews/${request.id}`} passHref>

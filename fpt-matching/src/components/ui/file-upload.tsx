@@ -32,23 +32,31 @@ export const FileUpload = ({
 }) => {
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const handleFileChange = (newFiles: File[]) => {
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
-    onChange && onChange(newFiles);
+    // Chỉ lấy file đầu tiên nếu có nhiều file
+    const singleFile = newFiles.length > 0 ? [newFiles[0]] : [];
+    setFiles(singleFile);
+    onChange && onChange(singleFile);
   };
-
+  
   const handleClick = () => {
+    // Reset files trước khi chọn file mới
+    setFiles([]);
     fileInputRef.current?.click();
   };
-
+  
   const { getRootProps, isDragActive } = useDropzone({
-    multiple: false,
+    multiple: false, // Chỉ cho phép 1 file
     noClick: true,
-    onDrop: handleFileChange,
+    onDrop: (acceptedFiles) => {
+      handleFileChange(acceptedFiles);
+    },
     onDropRejected: (error) => {
       console.log(error);
+      // Có thể thêm thông báo lỗi ở đây
+      alert('Chỉ được phép upload 1 file');
     },
+    maxFiles: 1
   });
 
   return (

@@ -18,19 +18,20 @@ import { Invitation } from "@/types/invitation";
 import { InvitationUpdateCommand } from "@/types/models/commands/invitation/invitation-update-command";
 import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { Loader2, MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "project.teamName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Project" />
+      <DataTableColumnHeader column={column} title="Tên nhóm" />
     ),
     cell: ({ row }) => {
-      const teamName = row.original.project?.teamName ?? "Unknown"; // Tránh lỗi undefined
+      const teamName = row.original.project?.teamName ?? "-"; // Tránh lỗi undefined
       const projectId = row.original.project?.id ?? "#";
 
       return (
@@ -43,7 +44,7 @@ export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "createdDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Date created" />
+      <DataTableColumnHeader column={column} title="Ngày tạo" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
@@ -53,7 +54,7 @@ export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "content",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Process Note" />
+      <DataTableColumnHeader column={column} title="Ghi chú" />
     ),
   },
   {
@@ -125,8 +126,11 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const router = useRouter();
   const pathName = usePathname();
   const queryClient = useQueryClient();
+  const [isApproving, setIsApproving] = useState(false);
+  const [isCanceling, setIsCanceling] = useState(false);
 
   const handleCancel = async () => {
+    setIsCanceling(true);
     try {
       // Gọi API cancelInvite
       if (!model.projectId) throw new Error("Project ID is undefined");
@@ -144,10 +148,13 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       queryClient.refetchQueries({ queryKey: ["data"] });
     } catch (error) {
       toast.error(error as string);
+    } finally {
+      setIsCanceling(false);
     }
   };
 
   const handleApprove = async () => {
+    setIsApproving(true);
     try {
       // Gọi API approveInvite
       if (!model.projectId) throw new Error("Project ID is undefined");
@@ -167,21 +174,38 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       queryClient.refetchQueries({ queryKey: ["data"] });
     } catch (error) {
       toast.error(error as string);
+    } finally {
+      setIsApproving(false);
     }
   };
 
   return (
     <>
       <div className="isolate flex -space-x-px">
-        <Button className="rounded-r-none focus:z-10" onClick={handleApprove}>
-          Đồng ý
+        <Button 
+          className="rounded-r-none focus:z-10" 
+          onClick={handleApprove}
+          disabled={isApproving || isCanceling}
+        >
+          {isApproving ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Đang xử lý...
+            </div>
+          ) : "Đồng ý"}
         </Button>
         <Button
           variant="outline"
           className="rounded-l-none focus:z-10"
           onClick={handleCancel}
+          disabled={isApproving || isCanceling}
         >
-          Từ chối
+          {isCanceling ? (
+            <div className="flex items-center gap-2">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Đang xử lý...
+            </div>
+          ) : "Từ chối"}
         </Button>
       </div>
     </>
