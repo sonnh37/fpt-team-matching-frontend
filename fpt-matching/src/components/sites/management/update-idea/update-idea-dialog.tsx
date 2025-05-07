@@ -45,7 +45,7 @@ export function UpdateIdeaDialog(
             })
 
             if (result && result.status == 1) {
-                toast.success("Cập nhập lại đề tài thành công!");
+                toast.success("cập nhật lại đề tài thành công!");
                 setStatus(decision);
             } else {
                 toast.error(`Error updating idea history: ${result.message}`);
@@ -98,7 +98,7 @@ export function UpdateIdeaDialog(
                         : (
                             <Button disabled>
                                 <Loader2 className="animate-spin" />
-                                Please wait
+                                Đang xử lí
                             </Button>
                         )}
                     <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Huỷ</AlertDialogCancel>

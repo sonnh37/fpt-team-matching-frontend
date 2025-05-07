@@ -120,7 +120,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const isHasTopic = project?.topicId ? true : false;
 
-  let availableSlots = 6;
+  let availableSlots = 5;
   if (!isHasTopic) {
     availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
   } else {

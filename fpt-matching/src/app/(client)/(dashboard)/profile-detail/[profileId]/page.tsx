@@ -7,16 +7,8 @@ import { Department, Gender } from "@/types/enums/user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDate } from "@/lib/utils";
-import { ProfileStudent } from "@/types/profile-student";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -24,13 +16,6 @@ import {
   Phone,
   Home,
   Cake,
-  GraduationCap,
-  BookOpen,
-  Award,
-  Briefcase,
-  Heart,
-  FileText,
-  Calendar,
   User as UserIcon,
   Loader2,
 } from "lucide-react";
@@ -52,13 +37,13 @@ export default function ProfilePage() {
   if (isLoading) return <ProfileSkeleton />;
   if (isError)
     return (
-      <div className="container mx-auto py-4 text-center text-destructive">
+      <div className="container mx-auto py-4 text-center text-destructive text-lg">
         Lỗi: {error.message}
       </div>
     );
   if (!result)
     return (
-      <div className="container mx-auto py-4 text-center">
+      <div className="container mx-auto py-4 text-center text-lg">
         Không có dữ liệu
       </div>
     );
@@ -72,16 +57,15 @@ export default function ProfilePage() {
 
 const ProfileLayout = ({ user }: { user: User }) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
-      {/* Cột bên trái */}
-      <div className="lg:col-span-1 space-y-2">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+      {/* Left Column - Profile Card */}
+      <div className="lg:col-span-1">
         <UserProfileCard user={user} />
-        <ContactInfoCard user={user} />
       </div>
 
-      {/* Nội dung chính */}
+      {/* Main Content - Personal Info */}
       <div className="lg:col-span-3">
-        <ProfileTabs user={user} />
+        <PersonalInfoSection user={user} />
       </div>
     </div>
   );
@@ -95,26 +79,32 @@ const UserProfileCard = ({ user }: { user: User }) => {
 
   return (
     <Card className="shadow-sm">
-      <CardHeader className="items-center pb-2 space-y-1">
-        <Avatar className="h-16 w-16 mb-1 border-2 border-primary">
+      <CardHeader className="items-center pb-4 space-y-2">
+        <Avatar className="h-24 w-24 mb-2 text-xl">
           <AvatarImage src={user.avatar} />
-          <AvatarFallback className="bg-primary/10 text-primary font-medium">
-            {initials || <UserIcon className="h-5 w-5" />}
+          <AvatarFallback className="font-medium">
+            {initials || <UserIcon className="h-6 w-6" />}
           </AvatarFallback>
         </Avatar>
 
-        <div className="text-center space-y-0.5">
-          <h2 className="text-md font-bold tracking-tight">
+        <div className="text-center space-y-1">
+          <h2 className="text-xl font-bold tracking-tight">
             {fullName || "Không có tên"}
           </h2>
-          <div className="flex justify-center gap-1">
+          <div className="flex justify-center gap-2">
             {user.department && (
-              <Badge variant="secondary" className="text-xs font-normal">
+              <Badge
+                variant="secondary"
+                className="text-sm font-normal px-2 py-1"
+              >
                 {Department[user.department]}
               </Badge>
             )}
             {user.code && (
-              <Badge variant="outline" className="text-xs font-normal">
+              <Badge
+                variant="outline"
+                className="text-sm font-normal px-2 py-1"
+              >
                 {user.code}
               </Badge>
             )}
@@ -122,245 +112,80 @@ const UserProfileCard = ({ user }: { user: User }) => {
         </div>
       </CardHeader>
 
-      <Separator className="my-1" />
+      <Separator className="my-2" />
 
-      <CardContent className="pt-2 space-y-1">
+      <CardContent className="pt-4 space-y-3">
         <InfoItem
-          icon={<Cake className="h-3 w-3" />}
+          icon={<Cake className="h-4 w-4" />}
           label="Ngày sinh"
           value={user.dob ? formatDate(user.dob) : "Không có"}
+          largeText
         />
         <InfoItem
-          icon={<UserIcon className="h-3 w-3" />}
+          icon={<UserIcon className="h-4 w-4" />}
           label="Giới tính"
           value={user.gender ? Gender[user.gender] : "Không có"}
+          largeText
         />
-      </CardContent>
-    </Card>
-  );
-};
-
-const ContactInfoCard = ({ user }: { user: User }) => {
-  return (
-    <Card className="shadow-sm">
-      <CardHeader className="pb-1">
-        <CardTitle className="text-sm flex items-center gap-1">
-          <Mail className="h-3 w-3" />
-          <span>Liên hệ</span>
-        </CardTitle>
-      </CardHeader>
-
-      <Separator className="my-1" />
-
-      <CardContent className="pt-1 space-y-1">
         <InfoItem
-          icon={<Mail className="h-3 w-3" />}
+          icon={<Mail className="h-4 w-4" />}
           label="Email"
           value={user.email || "Không có"}
+          largeText
         />
         <InfoItem
-          icon={<Phone className="h-3 w-3" />}
+          icon={<Phone className="h-4 w-4" />}
           label="Điện thoại"
           value={user.phone || "Không có"}
+          largeText
         />
         <InfoItem
-          icon={<Home className="h-3 w-3" />}
+          icon={<Home className="h-4 w-4" />}
           label="Địa chỉ"
           value={user.address || "Không có"}
+          largeText
         />
       </CardContent>
     </Card>
-  );
-};
-
-const ProfileTabs = ({ user }: { user: User }) => {
-  return (
-    <Tabs defaultValue="personal" className="w-full">
-      <TabsList className="grid w-full grid-cols-3 h-9">
-        <TabsTrigger value="personal" className="flex items-center gap-1 text-xs">
-          <UserIcon className="h-3 w-3" />
-          Cá nhân
-        </TabsTrigger>
-        <TabsTrigger value="academic" className="flex items-center gap-1 text-xs">
-          <GraduationCap className="h-3 w-3" />
-          Học vấn
-        </TabsTrigger>
-        <TabsTrigger value="activities" className="flex items-center gap-1 text-xs">
-          <Award className="h-3 w-3" />
-          Hoạt động
-        </TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="personal" className="pt-2">
-        <PersonalInfoSection user={user} />
-      </TabsContent>
-
-      <TabsContent value="academic" className="pt-2">
-        <AcademicInfoSection profile={user.profileStudent} />
-      </TabsContent>
-
-      <TabsContent value="activities" className="pt-2">
-        <ActivitiesSection />
-      </TabsContent>
-    </Tabs>
   );
 };
 
 const PersonalInfoSection = ({ user }: { user: User }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-      <InfoCard
-        title="Thông tin cơ bản"
-        icon={<UserIcon className="h-3 w-3" />}
-        items={[
-          { label: "Họ", value: user.lastName },
-          { label: "Tên", value: user.firstName },
-          { label: "Giới tính", value: user.gender ? Gender[user.gender] : null },
-          {
-            label: "Ngày sinh",
-            value: user.dob ? formatDate(user.dob) : null,
-          },
-        ]}
-      />
+    <Card className="shadow-sm">
+      <CardHeader>
+        <CardTitle className="text-xl flex items-center gap-2">
+          <UserIcon className="h-5 w-5" />
+          <span>Thông tin cá nhân</span>
+        </CardTitle>
+      </CardHeader>
 
-      <InfoCard
-        title="Thông tin học vấn"
-        icon={<GraduationCap className="h-3 w-3" />}
-        items={[
-          {
-            label: "Khoa",
-            value: user.department ? Department[user.department] : null,
-          },
-          { label: "Mã sinh viên", value: user.code },
-        ]}
-      />
-    </div>
-  );
-};
+      <Separator className="my-2" />
 
-const AcademicInfoSection = ({ profile }: { profile?: ProfileStudent }) => {
-  if (!profile) {
-    return (
-      <Card>
-        <CardContent className="py-6 text-center">
-          <BookOpen className="mx-auto h-5 w-5 text-muted-foreground mb-2" />
-          <h3 className="text-sm font-medium text-muted-foreground">
-            Không có thông tin học vấn
-          </h3>
-        </CardContent>
-      </Card>
-    );
-  }
+      <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-4">
+          <InfoField label="Họ" value={user.lastName} largeText />
+          <InfoField label="Tên" value={user.firstName} largeText />
+          <InfoField
+            label="Giới tính"
+            value={user.gender ? Gender[user.gender] : null}
+            largeText
+          />
+        </div>
 
-  return (
-    <div className="space-y-2">
-      <InfoCard
-        title="Học vấn"
-        icon={<GraduationCap className="h-3 w-3" />}
-        items={[
-          { label: "Chuyên ngành", value: profile.specialty?.specialtyName },
-          { label: "Học kỳ", value: profile.semester?.semesterName },
-          { label: "Mã sinh viên", value: profile.code },
-          {
-            label: "Đủ điều kiện dự án",
-            value: profile.isQualifiedForAcademicProject
-              ? "Đủ điều kiện"
-              : "Không đủ",
-            highlight: profile.isQualifiedForAcademicProject,
-          },
-        ]}
-      />
-
-      {profile.bio && (
-        <InfoCard
-          title="Giới thiệu"
-          icon={<FileText className="h-3 w-3" />}
-          content={<p className="text-xs whitespace-pre-line">{profile.bio}</p>}
-        />
-      )}
-
-      {profile.skillProfiles?.length > 0 && (
-        <InfoCard
-          title="Kỹ năng"
-          icon={<Briefcase className="h-3 w-3" />}
-          content={
-            <div className="flex flex-wrap gap-1">
-              {profile.skillProfiles.map((skill, index) => (
-                <Badge key={index} variant="outline" className="text-xs font-normal py-0.5 px-1.5">
-                  {skill.fullSkill || `Kỹ năng ${index + 1}`}
-                </Badge>
-              ))}
-            </div>
-          }
-        />
-      )}
-
-      {profile.achievement && (
-        <InfoCard
-          title="Thành tích"
-          icon={<Award className="h-3 w-3" />}
-          content={
-            <p className="text-xs whitespace-pre-line">{profile.achievement}</p>
-          }
-        />
-      )}
-
-      {profile.experienceProject && (
-        <InfoCard
-          title="Kinh nghiệm dự án"
-          icon={<Briefcase className="h-3 w-3" />}
-          content={
-            <p className="text-xs whitespace-pre-line">
-              {profile.experienceProject}
-            </p>
-          }
-        />
-      )}
-
-      {profile.interest && (
-        <InfoCard
-          title="Sở thích"
-          icon={<Heart className="h-3 w-3" />}
-          content={
-            <p className="text-xs whitespace-pre-line">{profile.interest}</p>
-          }
-        />
-      )}
-
-      {profile.fileCv && (
-        <InfoCard
-          title="CV cá nhân"
-          icon={<FileText className="h-3 w-3" />}
-          content={
-            <Button variant="outline" size="sm" asChild className="h-8">
-              <a
-                href={profile.fileCv}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1 text-xs"
-              >
-                <FileText className="h-3 w-3" />
-                Tải CV
-              </a>
-            </Button>
-          }
-        />
-      )}
-    </div>
-  );
-};
-
-const ActivitiesSection = () => {
-  return (
-    <Card>
-      <CardContent className="py-6 text-center">
-        <Award className="mx-auto h-5 w-5 text-muted-foreground mb-2" />
-        <h3 className="text-sm font-medium text-muted-foreground">
-          Hoạt động sẽ hiển thị tại đây
-        </h3>
-        <p className="text-xs text-muted-foreground mt-1">
-          Bài viết, dự án, ý tưởng và các hoạt động khác
-        </p>
+        <div className="space-y-4">
+          <InfoField
+            label="Ngày sinh"
+            value={user.dob ? formatDate(user.dob) : null}
+            largeText
+          />
+          <InfoField
+            label="Khoa"
+            value={user.department ? Department[user.department] : null}
+            largeText
+          />
+          <InfoField label="Mã người dùng" value={user.code} largeText />
+        </div>
       </CardContent>
     </Card>
   );
@@ -370,142 +195,107 @@ const InfoItem = ({
   icon,
   label,
   value,
+  largeText = false,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string | null | undefined;
+  largeText?: boolean;
 }) => {
   if (!value) return null;
 
   return (
-    <div className="flex items-start gap-1">
+    <div className="flex items-start gap-3">
       <div className="mt-0.5 text-muted-foreground">{icon}</div>
       <div>
-        <p className="text-xs font-medium text-muted-foreground">{label}</p>
-        <p className="text-xs leading-tight">{value}</p>
+        <p
+          className={`${
+            largeText ? "text-sm" : "text-xs"
+          } font-medium text-muted-foreground`}
+        >
+          {label}
+        </p>
+        <p className={`${largeText ? "text-base" : "text-xs"} leading-tight`}>
+          {value}
+        </p>
       </div>
     </div>
   );
 };
 
-const InfoCard = ({
-  title,
-  icon,
-  items,
-  content,
+const InfoField = ({
+  label,
+  value,
+  largeText = false,
 }: {
-  title: string;
-  icon?: React.ReactNode;
-  items?: Array<{
-    label: string;
-    value: string | null | undefined;
-    highlight?: boolean;
-  }>;
-  content?: React.ReactNode;
+  label: string;
+  value: string | null | undefined;
+  largeText?: boolean;
 }) => {
+  if (!value) return null;
+
   return (
-    <Card className="shadow-sm">
-      <CardHeader className="pb-1">
-        <div className="flex items-center gap-1">
-          {icon}
-          <CardTitle className="text-sm">{title}</CardTitle>
-        </div>
-      </CardHeader>
-
-      <Separator className="my-1" />
-
-      <CardContent className="pt-2">
-        {content ? (
-          content
-        ) : (
-          <div className="space-y-2">
-            {items?.map(
-              (item, index) =>
-                item.value && (
-                  <div key={index} className="grid grid-cols-3 gap-2">
-                    <p className="text-xs text-muted-foreground col-span-1">
-                      {item.label}
-                    </p>
-                    <p
-                      className={`text-xs col-span-2 ${
-                        item.highlight ? "font-medium text-primary" : ""
-                      }`}
-                    >
-                      {item.value}
-                    </p>
-                  </div>
-                )
-            )}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <div>
+      <p
+        className={`${
+          largeText ? "text-sm" : "text-xs"
+        } font-medium text-muted-foreground`}
+      >
+        {label}
+      </p>
+      <p className={`${largeText ? "text-lg" : "text-sm"} font-normal`}>
+        {value}
+      </p>
+    </div>
   );
 };
 
 const ProfileSkeleton = () => {
   return (
     <div className="container mx-auto py-4 px-2 sm:px-4">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Left Sidebar Skeleton */}
-        <div className="lg:col-span-1 space-y-2">
+        <div className="lg:col-span-1">
           <Card>
-            <CardHeader className="items-center pb-2 space-y-1">
-              <Skeleton className="h-16 w-16 rounded-full mb-1" />
-              <Skeleton className="h-4 w-3/4" />
-              <div className="flex justify-center gap-1">
-                <Skeleton className="h-3 w-12" />
-                <Skeleton className="h-3 w-12" />
+            <CardHeader className="items-center pb-4 space-y-2">
+              <Skeleton className="h-24 w-24 rounded-full mb-2" />
+              <Skeleton className="h-6 w-3/4" />
+              <div className="flex justify-center gap-2">
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-5 w-16" />
               </div>
             </CardHeader>
-            <Separator className="my-1" />
-            <CardContent className="pt-2 space-y-1">
-              <Skeleton className="h-3 w-full" />
-              <Skeleton className="h-3 w-full" />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-1">
-              <Skeleton className="h-3 w-1/3" />
-            </CardHeader>
-            <Separator className="my-1" />
-            <CardContent className="pt-1 space-y-1">
-              <Skeleton className="h-3 w-full" />
-              <Skeleton className="h-3 w-full" />
-              <Skeleton className="h-3 w-full" />
+            <Separator className="my-2" />
+            <CardContent className="pt-4 space-y-3">
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-full" />
             </CardContent>
           </Card>
         </div>
 
         {/* Main Content Skeleton */}
         <div className="lg:col-span-3">
-          <div className="flex space-x-1 mb-2">
-            <Skeleton className="h-8 w-1/3" />
-            <Skeleton className="h-8 w-1/3" />
-            <Skeleton className="h-8 w-1/3" />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-3 w-1/4" />
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Skeleton className="h-3 w-full" />
-                <Skeleton className="h-3 w-full" />
-                <Skeleton className="h-3 w-full" />
-                <Skeleton className="h-3 w-full" />
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-3 w-1/4" />
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Skeleton className="h-3 w-full" />
-                <Skeleton className="h-3 w-full" />
-              </CardContent>
-            </Card>
-          </div>
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-6 w-48" />
+            </CardHeader>
+            <Separator className="my-2" />
+            <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+              </div>
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

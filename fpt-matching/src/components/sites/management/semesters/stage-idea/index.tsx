@@ -195,7 +195,7 @@ export default function StageIdeaTable() {
     ...columns,
     {
       accessorKey: "actions",
-      header: "Actions",
+      header: "Thao tác",
       cell: ({ row }) => {
         return <Actions row={row} onEdit={handleEdit} />;
       },

@@ -265,7 +265,7 @@ export default function Blogmanagement() {
                         <div className='info-profile bg-white px-5 py-6 rounded-md shadow-lg'>
                             <h1 className='font-bold text-xl'>Giới thiệu</h1>
                             <p className="mt-3 text-gray-600 dark:text-gray-300">
-                                {user?.profileStudent?.bio ?? "Hiện tại người dùng chưa cập nhập bio"}
+                                {user?.profileStudent?.bio ?? "Hiện tại người dùng chưa cập nhật bio"}
                             </p>
                             <div className='mt-3 w-full'>
                                 <div className='bg-gray-300 w-full flex items-center justify-center p-2 rounded'>
@@ -321,7 +321,7 @@ export default function Blogmanagement() {
                                             Học tại <span className="font-semibold ml-1">{Department[user?.department ?? 5]}</span>
                                         </p>
                                     ) : (
-                                        <p>Người dùng chưa cập nhập</p>
+                                        <p>Người dùng chưa cập nhật</p>
 
                                     )}   </span>
                                 </div>
@@ -332,7 +332,7 @@ export default function Blogmanagement() {
                                             Sống tại <span className="font-semibold ml-1">{user?.address}</span>
                                         </p>
                                     ) : (
-                                        <p>Người dùng chưa cập nhập</p>
+                                        <p>Người dùng chưa cập nhật</p>
 
                                     )}   </span>
                                 </div>
@@ -345,7 +345,7 @@ export default function Blogmanagement() {
                                             <span className="font-semibold ml-1">{user?.email}</span>
                                         </p>
                                     ) : (
-                                        <p>Người dùng chưa cập nhập</p>
+                                        <p>Người dùng chưa cập nhật</p>
 
                                     )}   </span>
 

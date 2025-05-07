@@ -51,11 +51,19 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const status = row.original.status as MentorTopicRequestStatus;
-      const statusText = MentorTopicRequestStatus[status];
+
+      // Map status to Vietnamese text
+      const statusText =
+        {
+          [MentorTopicRequestStatus.Pending]: "Chờ phê duyệt",
+          [MentorTopicRequestStatus.Approved]: "Đã chấp nhận",
+          [MentorTopicRequestStatus.Rejected]: "Đã từ chối",
+          // Add other statuses if needed
+        }[status] || "Khác";
 
       let badgeVariant:
         | "secondary"
@@ -66,16 +74,16 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
 
       switch (status) {
         case MentorTopicRequestStatus.Pending:
-          badgeVariant = "secondary";
+          badgeVariant = "secondary"; // Neutral color for pending state
           break;
         case MentorTopicRequestStatus.Approved:
-          badgeVariant = "default";
+          badgeVariant = "default"; // Positive color for approved
           break;
         case MentorTopicRequestStatus.Rejected:
-          badgeVariant = "destructive";
+          badgeVariant = "destructive"; // Negative color for rejected
           break;
         default:
-          badgeVariant = "outline";
+          badgeVariant = "outline"; // Outline for unknown states
       }
 
       return <Badge variant={badgeVariant}>{statusText}</Badge>;
@@ -86,7 +94,7 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       const model = row.original;
 

@@ -136,7 +136,6 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
     try {
       const createdValues: SemesterCreateCommand = {
         ...pendingValues,
-        file: file,
       };
       const response = await semesterService.create(createdValues);
       if (response.status !== 1) throw new Error(response.message);
@@ -329,7 +328,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
             <div className="mt-6">
               <Card>
                 <CardHeader className="border-b">
-                  <CardTitle className="text-lg">Danh sách đề tài</CardTitle>
+                  <CardTitle className="text-lg">Danh sách đợt duyệt</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
                   <StageIdeaTable />

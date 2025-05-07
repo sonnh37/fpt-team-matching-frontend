@@ -28,7 +28,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -39,17 +38,10 @@ import { Semester } from "@/types/semester";
 import { TypographyList } from "@/components/_common/typography/typography-list";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
 import { cn, formatDate } from "@/lib/utils";
-import {
-  ChevronDown,
-  MoreHorizontal,
-  Trash,
-  Trash2,
-  UndoDot,
-} from "lucide-react";
+import { CalendarDays, MoreHorizontal, Trash2, UndoDot } from "lucide-react";
 import Link from "next/link";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -60,6 +52,8 @@ import {
 import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
 import { semesterService } from "@/services/semester-service";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TableComponentProps<TData> {
   table: ReactTable<TData>;
@@ -75,18 +69,12 @@ export function DataTableSemesterComponent<TData>({
   deletePermanent,
 }: TableComponentProps<TData>) {
   const queryClient = useQueryClient();
-  const [showDeleteTaskDialog, setShowDeleteTaskDialog] = useState(false);
   const [selectedModel, setSelectedModel] = useState<Semester | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
-  const searchParams = useSearchParams();
-  const q = searchParams.get("q");
   const pathName = usePathname();
-  const columnsLength = table
-    .getHeaderGroups()
-    .flatMap((group) => group.headers).length;
 
-  const handleRestore = async (model: any) => {
+  const handleRestore = async (model: Semester) => {
     if (restore) {
       try {
         const command: UpdateCommand = { id: model.id };
@@ -95,9 +83,10 @@ export function DataTableSemesterComponent<TData>({
           queryClient.refetchQueries({ queryKey: ["data"] });
           toast.success(result.message);
         } else {
-          toast.error(`Failed to restore row with id ${model.id}:`);
+          toast.error(`Failed to restore: ${result.message}`);
         }
       } catch (error) {
+        toast.error("An error occurred while restoring");
         console.error(`Error restoring row with id ${model.id}:`, error);
       }
     }
@@ -111,131 +100,142 @@ export function DataTableSemesterComponent<TData>({
           queryClient.refetchQueries({ queryKey: ["data"] });
           toast.success(result.message);
         } else {
-          toast.error(`Failed to delete row with id ${id}:`);
+          toast.error(`Failed to delete: ${result.message}`);
         }
       } catch (error) {
+        toast.error("An error occurred while deleting");
         console.error(`Error deleting row with id ${id}:`, error);
       }
     }
   };
 
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {table.getRowModel().rows.length > 0 ? (
         table.getRowModel().rows.map((row) => {
           const model = row.original as Semester;
           const isDeleted = model.isDeleted;
-          const id = model.id as string;
+          
           return (
-            <div>
+            <div key={row.id} className="relative group">
               <Card
-                key={row.id}
-                data-state={row.getIsSelected() ? "selected" : undefined}
-                style={{
-                  position: "relative",
-                  transformOrigin: "left",
-                  pointerEvents: isDeleted ? "none" : "auto",
-                }}
                 className={cn(
-                  "w-[250px] sm:w-[280px]",
-                  isDeleted ? "hover:opacity-100" : ""
+                  "h-full flex flex-col transition-all hover:shadow-lg border rounded-xl overflow-hidden",
+                  isDeleted 
+                    ? "opacity-80 bg-muted/30 border-destructive/20" 
+                    : "bg-card/80 hover:border-primary/30 border-border"
                 )}
               >
-                <CardHeader className="pb-2">
-                  <CardTitle>
-                    <div className="flex items-center justify-between">
-                      <Link
-                        href={`${pathName}/${id}`}
-                        className="hover:border-b-2 border-black"
-                      >
-                        {model.semesterName}
-                      </Link>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onSelect={() => {
-                              setSelectedModel(model);
-                              setDeleteDialogOpen(true);
-                            }}
-                          >
-                            Delete
-                            <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </CardTitle>
-                  <CardDescription>
-                    {formatDate(model.startDate)}
-                    {" "}-{" "}
-                    {formatDate(model.endDate)}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid w-full items-center gap-4">
-                    <TypographyList className="py-0 my-0">
-                      <li className="">
-                        <TypographyP className="flex text-sm items-center gap-1">
-                          Code:
-                          <TypographyP className="italic">
-                            {model.semesterCode}
-                          </TypographyP>
-                        </TypographyP>
-                      </li>
-                      <li className="">
-                        <TypographyP className="flex text-sm items-center gap-1">
-                          Prefix:
-                          <TypographyP className="italic">
-                            {model.semesterPrefixName}
-                          </TypographyP>
-                        </TypographyP>
-                      </li>
-                    </TypographyList>
-
-                    {isDeleted && (
-                      <>
-                        {/* Lớp nền mờ */}
-                        <div className="pointer-events-none absolute rounded-2xl inset-0 flex items-center justify-center gap-1 backdrop-blur-[2px] dark:bg-black/30"></div>
-
-                        {/* Lớp chứa nút Restore & Delete */}
-                        <div className="pointer-events-auto absolute rounded-2xl inset-0 flex items-center justify-center gap-1 opacity-0 hover:opacity-100 backdrop-blur-md dark:bg-black/40">
-                          <Button
-                            variant={"outline"}
-                            size={"icon"}
-                            onClick={() => handleRestore(model)}
-                          >
-                            <UndoDot />
-                          </Button>
-                          <Button
-                            variant={"destructive"}
-                            size={"icon"}
-                            onClick={() => handleDeletePermanently(model.id!)}
-                          >
-                            <Trash2 />
-                          </Button>
+                <CardHeader className="pb-3 px-5 pt-4">
+                  <div className="flex justify-between items-start gap-3">
+                    <div className="space-y-1.5">
+                      <CardTitle className="text-lg font-semibold flex items-center gap-2">
+                        <Link
+                          href={`${pathName}/details?semesterId=${model.id}`}
+                          className="hover:underline hover:text-primary decoration-primary/50"
+                        >
+                          {model.semesterName}
+                        </Link>
+                        <Badge 
+                          variant={isDeleted ? "destructive" : "secondary"} 
+                          className="px-2 py-0.5 text-xs font-medium"
+                        >
+                          {isDeleted ? "Đã xóa" : "Hoạt động"}
+                        </Badge>
+                      </CardTitle>
+                      
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <CalendarDays className="h-4 w-4 opacity-70" />
+                          <span>
+                            {formatDate(model.startDate)} - {formatDate(model.endDate)}
+                          </span>
                         </div>
-                      </>
-                    )}
+                      </div>
+                    </div>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="h-8 w-8 rounded-full opacity-70 group-hover:opacity-100 transition-opacity"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                          <span className="sr-only">Menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-48">
+                        <DropdownMenuLabel className="font-medium">Thao tác</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onSelect={() => {
+                            setSelectedModel(model);
+                            setDeleteDialogOpen(true);
+                          }}
+                          className="text-destructive focus:text-destructive focus:bg-destructive/10"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Xóa
+                          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </CardHeader>
+          
+                <CardContent className="flex-1 px-5 pb-4">
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Mã học kỳ</p>
+                        <p className="text-sm font-mono bg-muted/50 px-2 py-1 rounded">
+                          {model.semesterCode}
+                        </p>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-muted-foreground mb-1">Tiền tố</p>
+                        <p className="text-sm bg-muted/50 px-2 py-1 rounded">
+                          {model.semesterPrefixName}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
-                {/* <CardFooter className="flex justify-between">
-                <Button variant="outline">Cancel</Button>
-                <Button>Deploy</Button>
-              </CardFooter> */}
+          
+                {isDeleted && (
+                  <CardFooter className="bg-muted/40 p-4 border-t flex justify-end gap-3">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRestore(model)}
+                      className="gap-1.5 px-4"
+                    >
+                      <UndoDot className="h-4 w-4" />
+                      Khôi phục
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeletePermanently(model.id!)}
+                      className="gap-1.5 px-4"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Xóa vĩnh viễn
+                    </Button>
+                  </CardFooter>
+                )}
               </Card>
             </div>
           );
         })
       ) : (
-        <TypographyP>Không có kết quả.</TypographyP>
+        <div className="col-span-full flex flex-col items-center justify-center py-12">
+          <TypographyP className="text-muted-foreground mb-4">
+            Không tìm thấy học kỳ nào
+          </TypographyP>
+          <Button variant="outline">Tạo học kỳ mới</Button>
+        </div>
       )}
 
       {selectedModel && (

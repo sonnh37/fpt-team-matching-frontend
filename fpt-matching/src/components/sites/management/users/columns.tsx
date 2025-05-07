@@ -132,7 +132,7 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     id: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       const [showDeleteTaskDialog, setShowDeleteTaskDialog] = useState(false);
 

@@ -47,7 +47,7 @@ export const columns: ColumnDef<Invitation>[] = [
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("createdDate"));
-      return formatDate(date)
+      return formatDate(date);
     },
   },
   {
@@ -59,11 +59,20 @@ export const columns: ColumnDef<Invitation>[] = [
   {
     accessorKey: "status",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Status" />
+      <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as InvitationStatus;
-      const statusText = InvitationStatus[status];
+
+      // Ánh xạ status sang tiếng Việt
+      const statusText: Record<InvitationStatus, string> = {
+        [InvitationStatus.Pending]: "Đang chờ",
+        [InvitationStatus.Accepted]: "Đã chấp nhận",
+        [InvitationStatus.Rejected]: "Đã từ chối",
+        [InvitationStatus.Cancel]: "Đã bị hủy",
+      };
+
+      const statusDisplay = statusText[status] || "Không xác định";
 
       let badgeVariant:
         | "secondary"
@@ -86,7 +95,7 @@ export const columns: ColumnDef<Invitation>[] = [
           badgeVariant = "outline";
       }
 
-      return <Badge variant={badgeVariant}>{statusText}</Badge>;
+      return <Badge variant={badgeVariant}>{statusDisplay}</Badge>;
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id));
@@ -94,7 +103,7 @@ export const columns: ColumnDef<Invitation>[] = [
   },
   {
     accessorKey: "actions",
-    header: "Actions",
+    header: "Thao tác",
     cell: ({ row }) => {
       const model = row.original;
 
@@ -146,7 +155,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         id: model.id,
         status: InvitationStatus.Accepted,
         senderId: model.senderId,
-        receiverId: model.receiverId
+        receiverId: model.receiverId,
       };
       const res = await invitationService.approveOrRejectFromTeamByMe(command);
       if (res.status != 1) {

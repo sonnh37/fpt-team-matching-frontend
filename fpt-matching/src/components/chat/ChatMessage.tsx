@@ -41,7 +41,7 @@ const ChatMessage = ({messages, loadMessage} : {messages:MessageModel[], loadMes
                             <div className={"w-full flex flex-row justify-center items-center"}>
                                 <Button className={"w-full mx-40 py-4"} disabled>
                                     <Loader2 className="animate-spin" />
-                                    Please wait
+                                    Đang xử lí
                                 </Button>
                             </div>
                         )}

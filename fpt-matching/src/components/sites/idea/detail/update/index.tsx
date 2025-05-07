@@ -532,9 +532,17 @@ export const IdeaUpdateForm = ({ ideaId }: IdeaUpdateFormProps) => {
 
 // Status Badge Component
 const StatusBadge = ({ status }: { status?: IdeaStatus }) => {
-  if (status === undefined) return <Badge variant="outline">Unknown</Badge>;
+  if (status === undefined) return <Badge variant="outline">Không xác định</Badge>;
 
-  const statusText = IdeaStatus[status];
+  // Ánh xạ status sang tiếng Việt
+  const statusText = {
+    [IdeaStatus.Pending]: "Đang chờ",
+    [IdeaStatus.Approved]: "Đã duyệt",
+    [IdeaStatus.Rejected]: "Đã từ chối",
+    [IdeaStatus.ConsiderByMentor]: "Được xem xét bởi giáo viên hướng dẫn",
+    [IdeaStatus.ConsiderByCouncil]: "Được xem xét bởi Hội đồng",
+    // Thêm các trạng thái khác nếu cần
+  }[status] || "Khác";
 
   let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
     "default";
@@ -555,16 +563,22 @@ const StatusBadge = ({ status }: { status?: IdeaStatus }) => {
 
   return <Badge variant={badgeVariant}>{statusText}</Badge>;
 };
-
 // Request Status Badge Component
 const RequestStatusBadge = ({
   status,
 }: {
   status?: IdeaVersionRequestStatus;
 }) => {
-  if (status === undefined) return <Badge variant="outline">Unknown</Badge>;
+  if (status === undefined) return <Badge variant="outline">Không xác định</Badge>;
 
-  const statusText = IdeaVersionRequestStatus[status];
+  // Ánh xạ status sang tiếng Việt
+  const statusText = {
+    [IdeaVersionRequestStatus.Pending]: "Đang chờ xử lý",
+    [IdeaVersionRequestStatus.Approved]: "Đã phê duyệt",
+    [IdeaVersionRequestStatus.Rejected]: "Đã từ chối",
+    [IdeaVersionRequestStatus.Consider]: "Được xem xét",
+    // Thêm các trạng thái khác nếu cần
+  }[status] || "Trạng thái khác";
 
   let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
     "default";
@@ -585,3 +599,4 @@ const RequestStatusBadge = ({
 
   return <Badge variant={badgeVariant}>{statusText}</Badge>;
 };
+

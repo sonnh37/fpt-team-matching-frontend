@@ -28,7 +28,7 @@ export function UpdateCapstoneScheduleDialog(
                         : (
                             <Button disabled>
                                 <Loader2 className="animate-spin" />
-                                Please wait
+                                Đang xử lí
                             </Button>
                         )}
                     <AlertDialogCancel onClick={() => {setIsOpen(false)}} className={"bg-amber-600"}>Huỳ</AlertDialogCancel>

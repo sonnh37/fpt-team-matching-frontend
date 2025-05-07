@@ -60,18 +60,26 @@ export function AuthDropdown({ user = null }: AuthDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button size={"icon"} variant="outline">
-          <Avatar className="p-0 m-0">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="p-0 border rounded-full relative overflow-hidden focus-visible:ring-0"
+        >
+          <Avatar className="h-full w-full">
             <AvatarImage
               src={user.avatar?.trim() || undefined}
-              className={cn("w-full h-full object-cover")}
               alt={user.username || "User avatar"}
+              className="object-cover"
               onError={(e) => {
-                e.currentTarget.style.display = "none";
-                e.currentTarget.src = "";
+                const target = e.currentTarget;
+                target.src = "";
+                target.style.display = "none";
               }}
             />
-            <AvatarFallback className="rounded-md" delayMs={600}>
+            <AvatarFallback
+              className="h-full w-full flex items-center justify-center bg-muted text-sm font-medium"
+              delayMs={600}
+            >
               {initials}
             </AvatarFallback>
           </Avatar>

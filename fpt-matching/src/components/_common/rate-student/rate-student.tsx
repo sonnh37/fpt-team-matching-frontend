@@ -36,7 +36,7 @@ const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
         }));
     }, [rated, rated1, rated2]); // Chạy lại khi giá trị thay đổi
 
-    // cập nhập id khi bấm vào đánh giá
+    // cập nhật id khi bấm vào đánh giá
     React.useEffect(() => {
         setFormData((prev) => ({
             ...prev,

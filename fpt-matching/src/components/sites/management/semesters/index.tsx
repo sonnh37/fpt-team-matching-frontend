@@ -50,28 +50,22 @@ import { FilterEnum } from "@/types/models/filter-enum";
 import { isDeleted_options } from "@/lib/filter-options";
 import { LoadingComponent } from "@/components/_common/loading-page";
 
-//#region INPUT
 const defaultSchema = z.object({
-  emailOrFullname: z.string().optional(),
+  semesterName: z.string().optional(),
 });
-//#endregion
+
 export default function SemesterTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
-    { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
+    { columnId: "isDeleted", title: "Trạng thái", options: isDeleted_options },
   ];
-  //#region DEFAULT
+
+  //#region State Management
   const [sorting, setSorting] = React.useState<SortingState>([
-    {
-      id: "createdDate",
-      desc: true,
-    },
+    { id: "createdDate", desc: true },
   ]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -79,16 +73,13 @@ export default function SemesterTable() {
   const [isTyping, setIsTyping] = useState(false);
   //#endregion
 
-  //#region CREATE TABLE
+  //#region Form and Table Setup
   const form = useForm<z.infer<typeof defaultSchema>>({
     resolver: zodResolver(defaultSchema),
   });
 
-  // input field
-  const [inputFields, setInputFields] =
-    useState<z.infer<typeof defaultSchema>>();
+  const [inputFields, setInputFields] = useState<z.infer<typeof defaultSchema>>();
 
-  // default field in table
   const queryParams = useMemo(() => {
     const params: SemesterGetAllQuery = useQueryParams(
       inputFields,
@@ -96,7 +87,6 @@ export default function SemesterTable() {
       pagination,
       sorting
     );
-
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
 
@@ -116,7 +106,18 @@ export default function SemesterTable() {
     refetchOnWindowFocus: false,
   });
 
-  if (error) return <div>Error loading data</div>;
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Card className="p-4 text-center">
+          <TypographyH2>Error loading data</TypographyH2>
+          <Button onClick={() => refetch()} className="mt-4">
+            Retry
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
@@ -131,7 +132,6 @@ export default function SemesterTable() {
     manualPagination: true,
     debugTable: true,
   });
-
   //#endregion
 
   const onSubmit = (values: z.infer<typeof defaultSchema>) => {
@@ -139,64 +139,82 @@ export default function SemesterTable() {
   };
 
   return (
-    <>
-      <div className="container mx-auto space-y-8">
-        <div className="w-fit mx-auto space-y-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="emailOrFullname"
-                render={({ field }) => {
-                  return (
-                    <FormItem>
-                      <FormLabel>Search name or code</FormLabel>
-                      <div className="flex items-center gap-2">
-                        <FormControl>
-                          <Input
-                            placeholder=""
-                            className="focus-visible:ring-none"
-                            type="text"
-                            {...field}
-                          />
-                        </FormControl>
-                        <Button type="submit" variant="default" size="icon">
-                          <Search />
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  );
-                }}
-              />
-            </form>
-          </Form>
-        </div>
-
-        <div className="">
-          <div className="space-y-4 p-4 mx-auto">
-            <DataTableToolbar
-              form={form}
-              table={table}
-              filterEnums={filterEnums}
-              isSelectColumns={false}
-              isSortColumns={false}
-              // columnSearch={columnSearch}
-              // handleSheetChange={handleSheetChange}
-              // formFilterAdvanceds={formFilterAdvanceds}
-            />
-
-            <DataTableSemesterComponent
-              // isLoading={isFetching && !isTyping}
-              table={table}
-              restore={semesterService.restore}
-              deletePermanent={semesterService.deletePermanent}
-            />
-
-            <DataTablePagination table={table} />
-          </div>
-        </div>
+    <div className="container mx-auto py-8 space-y-6">
+      {/* Header Section */}
+      <div className="flex justify-between items-center">
+        <TypographyH2>Quản lý học kỳ</TypographyH2>
+        {/* Add create button if needed */}
+        {/* <Button variant="default">
+          Thêm học kỳ mới
+        </Button> */}
       </div>
-    </>
+
+      {/* Search Card */}
+      <Card className="p-6 shadow-sm">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <FormField
+              control={form.control}
+              name="semesterName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Tìm kiếm theo tên kì</FormLabel>
+                  <div className="flex items-center gap-2 mt-2">
+                    <FormControl>
+                      <Input
+                        placeholder="Nhập tên học kỳ..."
+                        className="focus-visible:ring-0 focus-visible:ring-offset-0"
+                        type="text"
+                        {...field}
+                      />
+                    </FormControl>
+                    <Button 
+                      type="submit" 
+                      variant="default" 
+                      size="icon"
+                      className="shrink-0"
+                    >
+                      <Search className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <FormMessage className="text-xs" />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
+      </Card>
+
+      {/* Table Section */}
+      <Card className="p-6 shadow-sm">
+        <div className="space-y-4">
+          <DataTableToolbar
+            form={form}
+            table={table}
+            filterEnums={filterEnums}
+            isSelectColumns={false}
+            isSortColumns={false}
+          />
+
+          {isFetching ? (
+            <div className="flex justify-center items-center h-64">
+              <LoadingComponent />
+            </div>
+          ) : (
+            <>
+              <DataTableSemesterComponent
+                table={table}
+                restore={semesterService.restore}
+                deletePermanent={semesterService.deletePermanent}
+              />
+              
+              <div className="mt-4">
+                <DataTablePagination table={table} />
+              </div>
+            </>
+          )}
+        </div>
+      </Card>
+    </div>
   );
 }

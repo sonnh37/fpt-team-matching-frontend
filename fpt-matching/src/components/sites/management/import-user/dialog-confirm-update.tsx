@@ -24,7 +24,7 @@ function UserConfirmationTable({users} : {users: User[]}) {
             <TableCaption>Danh sách các tài khoản đã tồn tại trong hệ thống</TableCaption>
             <TableHeader>
                 <TableRow>
-                    <TableHead className="text-center">Mã sinh viên</TableHead>
+                    <TableHead className="text-center">Mã người dùng</TableHead>
                     <TableHead className={"text-center"}>
                         Họ và tên
                     </TableHead>
@@ -83,7 +83,7 @@ const DialogConfirmUpdate = ({open, setOpen, usersConfirm, role, semesterId} : {
                 </DialogHeader>
                 {role == "Student" ? (
                     <div className="grid gap-4 pb-4 text-[14px] text-gray-600">
-                        Đây là những tài khoản đã tồn tại. Nếu tiếp tục thì CHỈ sẽ cập nhập lại KỲ của những tài khoản này vào KỲ tiếp theo. <br /> Vui lòng cân nhắc trước khi tiếp tục.
+                        Đây là những tài khoản đã tồn tại. Nếu tiếp tục thì CHỈ sẽ cập nhật lại KỲ của những tài khoản này vào KỲ tiếp theo. <br /> Vui lòng cân nhắc trước khi tiếp tục.
                     </div>
                 ) : (
                     <div className="grid gap-4 pb-4 text-[14px] text-gray-600">
@@ -97,7 +97,7 @@ const DialogConfirmUpdate = ({open, setOpen, usersConfirm, role, semesterId} : {
                     {loading ?
                         <Button disabled>
                             <Loader2 className="animate-spin"/>
-                            Please wait
+                            Đang xử lí
                         </Button> :
                        <>
                        {

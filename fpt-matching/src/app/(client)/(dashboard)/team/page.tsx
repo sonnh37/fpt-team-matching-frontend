@@ -32,12 +32,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useSelectorUser } from "@/hooks/use-auth";
-import { formatDate } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import { ideaService } from "@/services/idea-service";
 import { projectService } from "@/services/project-service";
 import { semesterService } from "@/services/semester-service";
@@ -45,7 +46,11 @@ import { teammemberService } from "@/services/team-member-service";
 import { IdeaStatus } from "@/types/enums/idea";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import { ProjectStatus } from "@/types/enums/project";
-import { TeamMemberRole } from "@/types/enums/team-member";
+import {
+  MentorConclusionOptions,
+  TeamMemberRole,
+  TeamMemberStatus,
+} from "@/types/enums/team-member";
 import { ProjectUpdateCommand } from "@/types/models/commands/projects/project-update-command";
 import { TeamMember } from "@/types/team-member";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
@@ -166,7 +171,7 @@ export default function TeamInfo() {
   const project = currentSemesterTeam?.data ?? teamInfo?.data;
   if (!project) return <NoTeam />;
 
-  const isLockProject = project.status === ProjectStatus.InProgress;
+  const isLockProject = project.status !== ProjectStatus.Pending;
   const isLockTrash = project.topicId != undefined || project.topicId != null;
   const latestTopicVersion = (project.topic?.topicVersions ?? []).sort(
     (a, b) =>
@@ -221,7 +226,7 @@ export default function TeamInfo() {
   const availableSlots = isHasTopic
     ? (project.topic?.ideaVersion?.teamSize ?? 0) -
       (project.teamMembers?.length ?? 0)
-    : 6 - (project.teamMembers?.length ?? 0);
+    : 5 - (project.teamMembers?.length ?? 0);
 
   const isLockTeamMember = availableSlots === 0;
 
@@ -426,7 +431,6 @@ export default function TeamInfo() {
             {/* Thông tin đề tài */}
             {project.topic?.ideaVersion != null ? (
               <>
-                <Separator className="my-4" />
                 <div className="space-y-6">
                   <h3 className="text-xl font-semibold text-foreground">
                     Thông tin đề tài
@@ -437,6 +441,7 @@ export default function TeamInfo() {
                     <Card className="col-span-1">
                       <CardHeader className="pb-3">
                         <CardTitle>Thông tin chung</CardTitle>
+                        <Separator />
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="space-y-1">
@@ -465,6 +470,7 @@ export default function TeamInfo() {
                     <Card className="col-span-1">
                       <CardHeader className="pb-3">
                         <CardTitle>Chi tiết đề tài</CardTitle>
+                        <Separator />
                       </CardHeader>
                       <CardContent className="space-y-4">
                         <div className="space-y-1">
@@ -489,6 +495,7 @@ export default function TeamInfo() {
                     <Card className="md:col-span-2">
                       <CardHeader className="pb-3">
                         <CardTitle>Mô tả đề tài</CardTitle>
+                        <Separator />
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-line">
@@ -502,6 +509,7 @@ export default function TeamInfo() {
                     <Card className="md:col-span-2">
                       <CardHeader className="pb-3">
                         <CardTitle>Thông tin bổ sung</CardTitle>
+                        <Separator />
                       </CardHeader>
                       <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-4">
@@ -584,6 +592,7 @@ export default function TeamInfo() {
 
             {/* Danh sách thành viên */}
             <Separator className="my-6" />
+
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h3 className="text-xl font-semibold text-foreground">
@@ -594,22 +603,98 @@ export default function TeamInfo() {
                 </Badge>
               </div>
 
-              <div className="space-y-3">
-                {sortedMembers.map((member: TeamMember, index) => {
+              <div className="grid gap-4">
+                {sortedMembers.map((member: TeamMember) => {
                   const initials = `${
                     member.user?.lastName?.charAt(0).toUpperCase() || ""
                   }`;
-                  const isLeaderInMembers =
-                    member.role === TeamMemberRole.Leader;
+                  const joinDate = formatDate(member.joinDate);
+                  const leaveDate = formatDate(member.leaveDate);
+                  // Role mapping
+                  const roleMap = {
+                    [TeamMemberRole.Member]: {
+                      text: "Thành viên",
+                      variant: "secondary",
+                    },
+                    [TeamMemberRole.Leader]: {
+                      text: "Trưởng nhóm",
+                      variant: "default",
+                    },
+                    [TeamMemberRole.Mentor]: {
+                      text: "Mentor",
+                      variant: "default",
+                    },
+                    [TeamMemberRole.SubMentor]: {
+                      text: "Phụ mentor",
+                      variant: "outline",
+                    },
+                  };
+                  const roleInfo =
+                    member.role !== undefined
+                      ? roleMap[member.role]
+                      : { text: "Không xác định", variant: "secondary" };
+
+                  // Status mapping
+                  const statusMap = {
+                    [TeamMemberStatus.Pending]: {
+                      text: "Đang chờ",
+                      variant: "outline",
+                    },
+                    [TeamMemberStatus.InProgress]: {
+                      text: "Đang thực hiện",
+                      variant: "default",
+                    },
+                    [TeamMemberStatus.Pass1]: {
+                      text: "Đạt đợt 1",
+                      variant: "info",
+                    },
+                    [TeamMemberStatus.Pass2]: {
+                      text: "Đạt đợt 2",
+                      variant: "info",
+                    },
+                    [TeamMemberStatus.Fail1]: {
+                      text: "Không đạt đợt 1",
+                      variant: "destructive",
+                    },
+                    [TeamMemberStatus.Fail2]: {
+                      text: "Không đạt đợt 2",
+                      variant: "destructive",
+                    },
+                  };
+                  const statusInfo =
+                    member.status !== undefined
+                      ? statusMap[member.status]
+                      : { text: "Không xác định", variant: "outline" };
+
+                  // Mentor conclusion mapping
+                  const mentorConclusionMap = {
+                    [MentorConclusionOptions.Agree_to_defense]: {
+                      text: "Đồng ý bảo vệ",
+                      variant: "success",
+                    },
+                    [MentorConclusionOptions.Revised_for_the_second_defense]: {
+                      text: "Chỉnh sửa bảo vệ lần 2",
+                      variant: "warning",
+                    },
+                    [MentorConclusionOptions.Disagree_to_defense]: {
+                      text: "Không đồng ý bảo vệ",
+                      variant: "destructive",
+                    },
+                  };
+                  const mentorConclusionInfo =
+                    member.mentorConclusion !== undefined
+                      ? mentorConclusionMap[member.mentorConclusion]
+                      : null;
 
                   return (
                     <Card
-                      key={index}
-                      className="hover:shadow-sm transition-shadow"
+                      key={member.id}
+                      className="hover:shadow-md transition-shadow"
                     >
-                      <div className="flex items-center justify-between p-4">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12 border">
+                      <div className="flex flex-col md:flex-row gap-4 p-4">
+                        {/* Avatar and basic info */}
+                        <div className="flex items-start gap-4 flex-1 min-w-0">
+                          <Avatar className="h-12 w-12 flex-shrink-0">
                             <AvatarImage
                               src={member.user?.avatar}
                               alt={member.user?.email}
@@ -619,29 +704,50 @@ export default function TeamInfo() {
                             </AvatarFallback>
                           </Avatar>
 
-                          <div>
-                            <p className="font-medium">
-                              {member.user?.lastName} {member.user?.firstName}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {member.user?.email}
-                            </p>
+                          <div className="flex-1 min-w-0 space-y-1">
+                            <div className="flex justify-between items-start gap-2">
+                              <div className="min-w-0">
+                                <h4 className="font-medium truncate">
+                                  {member.user?.lastName}{" "}
+                                  {member.user?.firstName}
+                                </h4>
+                                <p className="text-sm text-muted-foreground truncate">
+                                  {member.user?.email}
+                                </p>
+                              </div>
+                              <div className="text-sm mt-1 text-muted-foreground whitespace-nowrap">
+                                Ngày tham gia: {joinDate}
+                              </div>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2">
+                              <Badge variant={roleInfo.variant as any}>
+                                {roleInfo.text}
+                              </Badge>
+                              <Badge
+                                variant={statusInfo.variant as any}
+                                className={cn(
+                                  statusInfo.variant === "info"
+                                    ? "bg-green-500 text-white dark:text-black hover:bg-green-600"
+                                    : ""
+                                  // Thêm các class khác nếu cần
+                                )}
+                              >
+                                {statusInfo.text}
+                              </Badge>
+                            </div>
                           </div>
                         </div>
 
-                        <div className="flex items-center gap-4">
-                          <Badge
-                            variant={
-                              isLeaderInMembers ? "default" : "secondary"
-                            }
-                            className="min-w-[100px] justify-center"
-                          >
-                            {isLeaderInMembers ? "Trưởng nhóm" : "Thành viên"}
-                          </Badge>
-
+                        {/* Actions and additional info */}
+                        <div className="flex flex-col items-end gap-2">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8"
+                              >
                                 <MoreVertical className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
@@ -654,24 +760,26 @@ export default function TeamInfo() {
                                   Xem hồ sơ
                                 </Link>
                               </DropdownMenuItem>
-                              {isLeader &&
-                                !isLeaderInMembers &&
+                              {member.role === TeamMemberRole.Leader &&
                                 !isLockTeamMember && (
-                                  <DropdownMenuItem
-                                    className="text-destructive"
-                                    onClick={() =>
-                                      handleAction(
-                                        () =>
-                                          teammemberService.deletePermanent(
-                                            member.id ?? ""
-                                          ),
-                                        "Đã xóa thành viên"
-                                      )
-                                    }
-                                  >
-                                    <Trash2 className="mr-2 h-4 w-4" />
-                                    Xóa thành viên
-                                  </DropdownMenuItem>
+                                  <>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem
+                                      className="text-destructive focus:bg-destructive/10"
+                                      onClick={() =>
+                                        handleAction(
+                                          () =>
+                                            teammemberService.deletePermanent(
+                                              member.id ?? ""
+                                            ),
+                                          "Đã xóa thành viên"
+                                        )
+                                      }
+                                    >
+                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      Xóa thành viên
+                                    </DropdownMenuItem>
+                                  </>
                                 )}
                             </DropdownMenuContent>
                           </DropdownMenu>
@@ -771,7 +879,7 @@ export default function TeamInfo() {
               if (adjustedReviewDate < currentDate) {
                 return (
                   <Button className="w-full" asChild>
-                    <Link href={`/team/rate/${project.id}`}>
+                    <Link href={`/team/rate?projectId=${project.id}`}>
                       Đánh giá thành viên
                     </Link>
                   </Button>

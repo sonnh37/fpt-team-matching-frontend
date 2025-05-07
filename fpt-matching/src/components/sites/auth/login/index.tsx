@@ -128,9 +128,7 @@ export const LoginGoogleForm = ({
                   <h1 className="text-2xl font-bold text-center text-gray-900 dark:text-white">
                     Đăng nhập hệ thống
                   </h1>
-                  <p className="text-sm text-muted-foreground text-center">
-                    Chọn khu vực và đăng nhập bằng tài khoản Google của bạn
-                  </p>
+                 
                 </div>
 
                 <div className="space-y-4">

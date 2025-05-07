@@ -20,7 +20,7 @@ function NotificationDialog({handleSaveChange, loading, open, setOpen}: {handleS
                     {loading ?
                         <Button disabled>
                             <Loader2 className="animate-spin"/>
-                            Please wait
+                            Đang xử lí
                         </Button> :
                         <Button onClick={() => {
                             handleSaveChange()

@@ -175,7 +175,7 @@ export default function ProfileSocial() {
                         <div className='info-profile bg-white px-5 py-6 rounded-md shadow-lg'>
                             <h1 className='font-bold text-xl'>Giới thiệu</h1>
                             <p className="mt-3 text-gray-600 dark:text-gray-300">
-                                {user?.data?.profileStudent?.bio ?? "Hiện tại người dùng chưa cập nhập bio"}
+                                {user?.data?.profileStudent?.bio ?? "Hiện tại người dùng chưa cập nhật bio"}
                             </p>
                             <div className="mt-6">
                                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Kỹ năng</h2>
@@ -223,7 +223,7 @@ export default function ProfileSocial() {
                                             Học tại <span className="font-semibold ml-1">{Department[user?.data?.department ?? 5 ] }</span>
                                         </p>
                                     ) : (
-                                        <p>Người dùng chưa cập nhập</p>
+                                        <p>Người dùng chưa cập nhật</p>
 
                                     )}   </span>
                                 </div>
@@ -234,7 +234,7 @@ export default function ProfileSocial() {
                                             Sống tại <span className="font-semibold ml-1">{user?.data?.address}</span>
                                         </p>
                                     ) : (
-                                        <p>Người dùng chưa cập nhập</p>
+                                        <p>Người dùng chưa cập nhật</p>
 
                                     )}   </span>
                                 </div>
@@ -247,7 +247,7 @@ export default function ProfileSocial() {
                                              <span className="font-semibold ml-1">{user?.data?.email}</span>
                                         </p>
                                     ) : (
-                                        <p>Người dùng chưa cập nhập</p>
+                                        <p>Người dùng chưa cập nhật</p>
 
                                     )}   </span>
                                   

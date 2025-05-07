@@ -116,11 +116,21 @@ export const columns: ColumnDef<Idea>[] = [
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as IdeaStatus | undefined;
-      const statusText = status !== undefined ? IdeaStatus[status] : "-";
-
+      
+      // Ánh xạ status sang tiếng Việt
+      const statusText = status !== undefined 
+        ? {
+            [IdeaStatus.Pending]: "Đang chờ",
+            [IdeaStatus.Approved]: "Đã duyệt",
+            [IdeaStatus.Rejected]: "Đã từ chối",
+            [IdeaStatus.ConsiderByMentor]: "Được xem xét bởi giáo viên hướng dẫn",
+            [IdeaStatus.ConsiderByCouncil]: "Được xem xét bởi Hội đồng",
+          }[status] || "Khác"
+        : "-";
+  
       let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
         "default";
-
+  
       switch (status) {
         case IdeaStatus.Pending:
           badgeVariant = "secondary";
@@ -134,7 +144,7 @@ export const columns: ColumnDef<Idea>[] = [
         default:
           badgeVariant = "outline";
       }
-
+  
       return <Badge variant={badgeVariant}>{statusText}</Badge>;
     },
     filterFn: (row, id, value) => {
