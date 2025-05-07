@@ -130,7 +130,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuItem onClick={handleViewDetailsClick}>
-            View details
+            Xem chi tiết
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

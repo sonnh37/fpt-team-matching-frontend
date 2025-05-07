@@ -71,7 +71,7 @@ export const columns: ColumnDef<Topic>[] = [
   {
     accessorKey: "ideaVersion.enterpriseName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tên đề tài doanh nghiệp" />
+      <DataTableColumnHeader column={column} title="Tên doanh nghiệp" />
     ),
     cell: ({ row }) => {
       const model = row.original;

@@ -907,7 +907,7 @@ export default function Blog() {
                               <span className="ml-2 text-base">           <LikeBlog postId={post?.id ?? ""} /> </span>
                             </span>
                             <span className="flex items-center p-2 ">
-                              <span className="ml-2 text-base">{post.comments?.length ?? 0} Comments <FontAwesomeIcon
+                              <span className="ml-2 text-base">{post.comments?.length ?? 0} Bình luận <FontAwesomeIcon
                                 icon={faComment} /></span>
                             </span>
                             {(post?.type === BlogType.Recruit && post?.projectId) ? (
@@ -919,7 +919,7 @@ export default function Blog() {
                             ) : (
 
                               <button onClick={() =>sendMessage() }
-                                className="ml-2 text-base ">{post.blogCvs?.length ?? 0} Uploads <FontAwesomeIcon
+                                className="ml-2 text-base ">{post.blogCvs?.length ?? 0} Nộp CV <FontAwesomeIcon
                                   icon={faPaperclip} /></button>
                             )}
                           </div>

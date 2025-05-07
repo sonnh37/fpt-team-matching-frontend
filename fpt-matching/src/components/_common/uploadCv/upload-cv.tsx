@@ -154,7 +154,7 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
       <DialogTrigger asChild>
         <div>
           <span className="ml-2 text-[16px] ">
-            {result?.data?.blogCvs.length} Uploads{" "}
+            {result?.data?.blogCvs.length} Nộp CV{" "}
             <FontAwesomeIcon icon={faPaperclip} />
           </span>
         </div>
