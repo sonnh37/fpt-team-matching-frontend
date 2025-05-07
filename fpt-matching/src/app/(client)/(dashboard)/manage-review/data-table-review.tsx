@@ -270,7 +270,7 @@ export function ReviewDataTable<TData, TValue>({
             </div>
 
             {/*------- Table part --------------*/}
-            <div className="rounded-md border">
+            <div className="rounded-md border w-[80vw] overflow-auto">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
