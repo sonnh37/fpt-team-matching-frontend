@@ -48,7 +48,7 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
 
     // const {
     //     data: prj,
-       
+
     // } = useQuery({
     //     queryKey: ["getProjectInfo", result?.data?.projectId],
     //     queryFn: () => blogService.getById(blogId),
@@ -60,23 +60,25 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
     const prj = result?.data?.project?.status
 
     const submit = async () => {
-
         if (isSubmitting) return; // Nếu API đang chạy, không cho phép bấm tiếp
         setIsSubmitting(true); // Đánh dấu API đang chạy
-
+    
         if (prj !== ProjectStatus.Pending) {
+            // toast.dismiss(uploaddId);
             toast.error("Bạn không thể gửi vì nhóm này đang trong quá trình làm!")
-            setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
+            setIsSubmitting(false);
             return
         }
         if (user?.id == userIsExist) {
+            // toast.dismiss(uploaddId);
             toast.error("Bạn không thể gửi vì đây bài viết của bạn!")
-            setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
+            setIsSubmitting(false);
             return
         }
-        if(role !== "Student"){
+        if (role !== "Student") {
+            // toast.dismiss(uploaddId);
             toast.error("Bạn không thể gửi vì bạn không có quyền hạn")
-            setIsSubmitting(false); // Reset trạng thái để có thể bấm lại
+            setIsSubmitting(false);
             return
         }
 
@@ -84,57 +86,67 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
 
         //check xem người nộp có team chưa
         if (projectInfo.status === 1) {
+            // toast.dismiss(uploaddId);
             toast.error("Bạn đã có team rồi không thể nộp ứng tuyển")
             setIsSubmitting(false);
             return
-        }
-
-
-        let checkCv: BlogCvGetAllQuery = {
-            userId: user?.id,
-            blogId: blogId,
-            isDeleted: false,
-            isPagination: false
-        };
-
-        const existUpload = await blogCvService.getAll(checkCv);
-
-        if (existUpload?.data?.results?.length && existUpload.data.results.length > 0) {
-            toast.error("Bạn đã đã nộp ứng tuyển cho nhóm này rồi");
-            setIsSubmitting(false);
-            return;
-        }
-        
-
-        let fileurl = "";
-
-        if (files?.length) {
-            try {
-                fileurl = await cloudinaryService.uploadFile(files[0]) ?? "";
-            } catch (error) {
-                console.error("Upload failed:", error);
-                setIsSubmitting(false);
-                return
-            }
-        }
-        console.log("check", fileurl)
-
-        let query: BlogCvCommand = {
-            blogId: blogId,
-            userId: user?.id ?? "",
-            fileCv: fileurl
-        };
-
-
-        // if(query.fileCv)
-        const result = await blogCvService.create(query);
-        if (result.status == 1) {
-            toast.success("Chúc mừng bạn đã nộp đơn thành công.");
-            refetch();
         } else {
-            toast.error("Đã xảy ra lỗi ,bạn đã nộp đơn thất bại!")
+            toast.error("Đã xảy ra lỗi, bạn đã nộp đơn thất bại!");
         }
-        setIsSubmitting(false); // Hoàn tất, cho phép bấm tiếp
+
+        try {
+            const uploaddId = toast.loading("⏳ Đang đợi nộp...");
+            let checkCv: BlogCvGetAllQuery = {
+                userId: user?.id,
+                blogId: blogId,
+                isDeleted: false,
+                isPagination: false
+            };
+
+            const existUpload = await blogCvService.getAll(checkCv);
+
+
+            if (existUpload?.data?.results?.length && existUpload.data.results.length > 0) {
+                toast.dismiss(uploaddId);
+                toast.error("Bạn đã đã nộp ứng tuyển cho nhóm này rồi");
+                setIsSubmitting(false);
+                return;
+            }
+
+            let fileurl = "";
+            if (files?.length) {
+                try {
+                    fileurl = await cloudinaryService.uploadFile(files[0]) ?? "";
+                } catch (error) {
+                    toast.dismiss(uploaddId);
+                    console.error("Upload failed:", error);
+                    setIsSubmitting(false);
+                    return
+                }
+            }
+
+            let query: BlogCvCommand = {
+                blogId: blogId,
+                userId: user?.id ?? "",
+                fileCv: fileurl
+            };
+
+            // if(query.fileCv)
+            const result = await blogCvService.create(query);
+            toast.dismiss(uploaddId);
+            if (result.status == 1) {
+                toast.success("Chúc mừng bạn đã nộp đơn thành công.");
+                refetch();
+            } else {
+                toast.error("Đã xảy ra lỗi ,bạn đã nộp đơn thất bại!")
+            }
+            setIsSubmitting(false); // Hoàn tất, cho phép bấm tiếp
+        } catch (error) {
+            console.error(error);
+            toast.error("Có lỗi hệ thống xảy ra.");
+        } finally {
+            setIsSubmitting(false); // Đánh dấu API đang chạy
+        }
     }
 
     return (
