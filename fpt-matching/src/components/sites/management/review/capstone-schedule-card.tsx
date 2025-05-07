@@ -35,8 +35,8 @@ export function CapstoneScheduleCard({capstoneSchedule} : {capstoneSchedule: Cap
                             x =>
                                 x.status === TeamMemberStatus.Pending ||
                                 x.status === TeamMemberStatus.InProgress ||
-                                x.status === TeamMemberStatus.Fail1 ||
-                                x.status === TeamMemberStatus.Pass1
+                                x.status === TeamMemberStatus.Fail1
+                                // x.status === TeamMemberStatus.Pass1
                         ) ? (
                             <Badge variant="outline">Not yet</Badge>
                         ) : capstoneSchedule.project?.teamMembers.some(
