@@ -72,7 +72,7 @@ export const NAV_CONFIG = {
           roles: ["Student", "Mentor"],
         },
         {
-          title: "Đề xuất từ giảng viên",
+          title: "Đề tài từ giảng viên",
           icon: FileUser,
           url: "/idea/supervisors",
           roles: ["*"],
