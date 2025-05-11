@@ -8,6 +8,7 @@ import { IdeaHistoryRequest } from "./idea-history-request";
 import { IdeaVersionRequest } from "./idea-version-request";
 import { Invitation } from "./invitation";
 import { Like } from "./like";
+import { NotificationXUser } from "./notification-x-user";
 import { ProfileStudent } from "./profile-student";
 import { Project } from "./project";
 import { Rate } from "./rate";
@@ -53,4 +54,5 @@ export interface User extends BaseEntity {
   teamMembers: TeamMember[];
   review1s: Review[];
   review2s: Review[];
+  notificationXUser: NotificationXUser[];
 }
