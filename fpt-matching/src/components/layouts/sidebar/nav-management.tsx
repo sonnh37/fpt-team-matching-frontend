@@ -39,11 +39,10 @@ export function NavManagement({
 }) {
   const styleCommon =
     " group-data-[collapsible=icon]:!p-[6px] transition-colors duration-200 ease-in-out";
-
   const pathName = usePathname();
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>Quản lí</SidebarGroupLabel>
+      {/* <SidebarGroupLabel>Platform</SidebarGroupLabel> */}
       <SidebarMenu>
         {items.map((item) => {
           const isActive =
@@ -67,7 +66,7 @@ export function NavManagement({
                         "py-4"
                       )}
                     >
-                      <div className="flex aspect-square size-5 items-center justify-start">
+                      <div className="flex aspect-square size-4 items-center justify-start">
                         {item.icon && <item.icon />}
                       </div>
                       <span>{item.title}</span>
@@ -75,7 +74,7 @@ export function NavManagement({
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent className="overflow-hidden text-sm transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
-                    <SidebarMenuSub>
+                    <SidebarMenuSub className="pr-0 mx-0 ml-3.5">
                       {item.items?.map((subItem) => {
                         const isActiveSub = pathName === subItem.url;
                         return (
@@ -84,12 +83,12 @@ export function NavManagement({
                               className={cn(
                                 styleCommon,
                                 isActiveSub ? "!bg-orange-500 !text-white" : "",
-                                "py-3"
+                                "py-2.5"
                               )}
                               asChild
                             >
                               <Link href={subItem.url}>
-                                <div className="flex aspect-square size-5 items-center justify-start">
+                                <div className="flex aspect-square size-4 items-center justify-start">
                                   {subItem.icon && <subItem.icon />}
                                 </div>
                                 <span>{subItem.title}</span>
@@ -113,7 +112,7 @@ export function NavManagement({
                   // isActive={isActive}
                 >
                   <Link href={item.url}>
-                    <div className="flex aspect-square size-5 items-center justify-start">
+                    <div className="flex aspect-square size-4 items-center justify-start">
                       {item.icon && <item.icon />}
                     </div>
                     <span>{item.title}</span>

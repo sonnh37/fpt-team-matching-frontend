@@ -68,7 +68,7 @@ export function NavMain({
                         "py-4"
                       )}
                     >
-                      <div className="flex aspect-square size-5 items-center justify-start">
+                      <div className="flex aspect-square size-4 items-center justify-start">
                         {item.icon && <item.icon />}
                       </div>
                       <span>{item.title}</span>
@@ -115,7 +115,7 @@ export function NavMain({
                   // isActive={isActive}
                 >
                   <Link href={item.url}>
-                    <div className="flex aspect-square size-5 items-center justify-start">
+                    <div className="flex aspect-square size-4 items-center justify-start">
                       {item.icon && <item.icon />}
                     </div>
                     <span>{item.title}</span>
@@ -129,30 +129,3 @@ export function NavMain({
     </SidebarGroup>
   );
 }
-
-
-const TooltipWrapper = ({ children, text }: { children: React.ReactNode; text: string }) => {
-  const [isOverflowed, setIsOverflowed] = useState(false);
-  const textRef = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    if (textRef.current) {
-      setIsOverflowed(
-        textRef.current.scrollWidth > textRef.current.clientWidth
-      );
-    }
-  }, [text]);
-
-  return isOverflowed ? (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        {children}
-      </TooltipTrigger>
-      <TooltipContent side="right">
-        <p>{text}</p>
-      </TooltipContent>
-    </Tooltip>
-  ) : (
-    children
-  );
-};

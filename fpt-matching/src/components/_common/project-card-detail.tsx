@@ -1,6 +1,6 @@
 "use client";
 
-import { MenuAction } from "@/app/(client)/(dashboard)/management/projects/detail/menu-action";
+import { MenuAction } from "@/app/(client)/(dashboard)/management/mentor/projects/detail/menu-action";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";

@@ -2,18 +2,31 @@
 import { AlertMessage } from "@/components/_common/alert-message";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
+import { TypographyH3 } from "@/components/_common/typography/typography-h3";
+import { TypographyMuted } from "@/components/_common/typography/typography-muted";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import { RootState } from "@/lib/redux/store";
+import { formatDate } from "@/lib/utils";
 
 import { projectService } from "@/services/project-service";
 import { TeamMemberRole } from "@/types/enums/team-member";
 
+import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 
-import { TeamInfoCard } from "@/components/_common/project-card-detail";
 import { useSelector } from "react-redux";
+import { TeamInfoCard } from "@/components/_common/project-card-detail";
 
 export default function ProjectDetail() {
   const searchParams = useSearchParams();

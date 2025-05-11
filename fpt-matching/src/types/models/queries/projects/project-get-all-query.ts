@@ -12,8 +12,13 @@ export interface ProjectGetAllQuery extends BaseQueryableQuery {
   status?: ProjectStatus;
   teamSize?: number;
 
+  topicId?: string;
+  defenseStage?: number;
+
   isHasTeam: boolean;
   englishName?: string;
   specialtyId?: string;
+  leaderEmail?: string;
+  // leaderEmail?: string;
   professionId?: string;
 }
