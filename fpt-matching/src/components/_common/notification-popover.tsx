@@ -251,7 +251,7 @@ function NotificationItem({
     <div
       className={cn(
         "flex items-start gap-3 p-4 hover:bg-accent transition-colors",
-        !noti.isRead && "bg-blue-50/50 dark:bg-blue-900/10"
+        !noti.notificationXUsers.filter(x => x.notificationId)[0].isRead && "bg-blue-50/50 dark:bg-blue-900/10"
       )}
     >
       <div className="mt-0.5 flex-shrink-0">
