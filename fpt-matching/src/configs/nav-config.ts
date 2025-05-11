@@ -1,21 +1,31 @@
 import {
+  Bell,
+  BookMarked,
+  Briefcase,
+  CalendarCheck,
+  CalendarDays,
   CircleHelp,
   CircleUser,
+  Edit,
+  FileCheck,
   FileUser,
   History,
   Home,
+  List,
+  ListChecks,
   Pencil,
   PencilRuler,
+  ProjectorIcon,
+  ShieldCheck,
   ShieldHalf,
   SquareUserRound,
   Telescope,
+  UserCog,
   UserPlus,
   Users,
-  UsersRound
+  UsersRound,
 } from "lucide-react";
-import {
-  MdOutlineRateReview
-} from "react-icons/md";
+import { MdOutlineRateReview } from "react-icons/md";
 
 export const NAV_CONFIG = {
   main: [
@@ -125,39 +135,52 @@ export const NAV_CONFIG = {
 
   management: [
     {
-      title: "Quản lý review",
+      title: "Quản lý đánh giá",
       url: "/manage-review",
-      icon: SquareUserRound,
+      icon: FileCheck,
       roles: ["Manager"],
     },
     {
       title: "Quản lý học kỳ",
       url: "/management/semesters",
-      icon: ShieldHalf,
+      icon: CalendarDays,
       roles: ["Manager"],
     },
     {
-      title: "Quản lý các tiêu chí",
+      title: "Quản lý tiêu chí",
       url: "/manage-criteria",
-      icon: ShieldHalf,
+      icon: ListChecks,
       roles: ["Manager"],
     },
     {
       title: "Quản lý dự án",
-      url: "/management/projects",
-      icon: null,
+      url: "/management/mentor/projects",
+      icon: Briefcase,
       roles: ["Mentor"],
     },
     {
       title: "Quản lý đề tài",
-      url: "/management/topics",
-      icon: null,
+      url: "/management/mentor/topics",
+      icon: BookMarked,
       roles: ["Mentor"],
     },
+
+    {
+      title: "Quản lý nhóm",
+      url: "/management/projects",
+      icon: Briefcase,
+      roles: ["Manager"],
+    },
+    // {
+    //   title: "Quản lý đề tài",
+    //   url: "/management/topics",
+    //   icon: BookMarked,
+    //   roles: ["Manager"],
+    // },
     {
       title: "Quản lý bảo vệ",
       url: "/manage-defense",
-      icon: ShieldHalf,
+      icon: ShieldCheck,
       roles: ["Manager"],
     },
     {
@@ -167,27 +190,27 @@ export const NAV_CONFIG = {
       roles: ["Manager", "Admin"],
       items: [
         {
-          title: "Danh sách",
+          title: "Danh sách người dùng",
           url: "/management/users",
-          icon: Users,
+          icon: List,
           roles: ["Manager", "Admin"],
         },
         {
           title: "Thêm sinh viên",
           url: "/management/users/import-students",
-          icon: Users,
+          icon: UserPlus,
           roles: ["Manager"],
         },
         {
           title: "Thêm giảng viên",
           url: "/management/users/import-lecturers",
-          icon: Users,
+          icon: UserPlus,
           roles: ["Manager"],
         },
         {
-          title: "Yêu cầu chờ của hội đồng",
+          title: "Yêu cầu hội đồng",
           url: "/management/users/councils/pending-requests",
-          icon: Users,
+          icon: UserCog,
           roles: ["Manager"],
         },
       ],
@@ -195,19 +218,19 @@ export const NAV_CONFIG = {
     {
       title: "Quản lý thông báo",
       url: "/management/notifications",
-      icon: ShieldHalf,
+      icon: Bell,
       roles: ["Manager"],
     },
     {
-      title: "Xem lịch review",
+      title: "Lịch đánh giá",
       url: "/calendar",
-      icon: ShieldHalf,
+      icon: CalendarCheck,
       roles: ["Reviewer"],
     },
     {
-      title: "Quản lý chỉnh sửa đề tài",
+      title: "Yêu cầu chỉnh sửa đề tài",
       url: "/management/update-topic-management",
-      icon: ShieldHalf,
+      icon: Edit,
       roles: ["Manager"],
     },
   ],

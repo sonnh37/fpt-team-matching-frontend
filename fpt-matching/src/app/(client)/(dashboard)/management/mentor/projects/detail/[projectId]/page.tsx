@@ -26,6 +26,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 
 import { useSelector } from "react-redux";
+import { MenuAction } from "@/app/(client)/(dashboard)/management/projects/detail/menu-action";
 
 export default function ProjectDetail() {
   const { projectId } = useParams();
@@ -86,6 +87,7 @@ export default function ProjectDetail() {
                   </TypographyMuted>
                 </div>
               </CardTitle>
+              <MenuAction ideaId={project?.topic?.ideaVersion?.id!} />
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Abbreviation & Vietnamese Title */}
