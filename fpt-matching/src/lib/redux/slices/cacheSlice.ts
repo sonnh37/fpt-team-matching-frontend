@@ -1,10 +1,12 @@
 import { userService } from "@/services/user-service";
+import { Semester } from "@/types/semester";
 import { createSlice, PayloadAction, createAsyncThunk } from "@reduxjs/toolkit";
 
 export interface UserCache {
   role?: string;
   theme?: string;
   sidebar?: boolean;
+  semester?: string;
   // Thêm các trường cache khác tùy nhu cầu
 }
 
