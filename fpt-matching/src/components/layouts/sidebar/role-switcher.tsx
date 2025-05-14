@@ -23,18 +23,20 @@ import {
 } from "@/lib/redux/slices/cacheSlice";
 import { AppDispatch } from "@/lib/redux/store";
 import { useDispatch } from "react-redux";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import {
+  useCurrentRole,
+  useCurrentSemester,
+  useCurrentSemesterId,
+} from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { Badge } from "@/components/ui/badge";
 import { Semester } from "@/types/semester";
 
-interface RoleSwitcherProps {
-  currentSemester?: Semester;
-}
+export function RoleSwitcher() {
+  const currentSemester = useCurrentSemesterId();
 
-export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
-  const currentSemesterId = currentSemester?.id;
+  // if (!currentSemester) return;
   const { isMobile } = useSidebar();
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelectorUser();
@@ -43,8 +45,18 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
     return null;
   }
 
+  const isAdminOrManager = (user.userXRoles || []).some((userRole) =>
+    ["Manager", "Admin"].includes(userRole.role?.roleName || "")
+  );
+
   const filteredRoles = (user.userXRoles || [])
-    .filter((userRole) => userRole?.role)
+    .filter((userRole) => {
+      if (!userRole?.role) return false;
+
+      if (isAdminOrManager) return true;
+
+      return userRole.semesterId == currentSemester;
+    })
     .map((userRole) => ({
       ...userRole,
       roleInfo: getRoleInfo(userRole.role?.roleName || ""),
@@ -65,19 +77,7 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
   if (!activeRole) {
     if (sortedRoles.length == 0) return null;
     activeRole = sortedRoles[0];
-    dispatch(updateUserCache({ role: activeRole.role?.roleName }));
   }
-
-  //  React.useEffect(() => {
-  //   const shouldUpdate = activeRole?.role?.roleName &&
-  //                      activeRole.role.roleName !== activeRolePlan;
-
-  //   if (shouldUpdate) {
-  //     const newRole = activeRole.role?.roleName;
-  //     dispatch(updateLocalCache({ role: newRole }));
-  //     dispatch(updateUserCache({ role: newRole }));
-  //   }
-  // }, [activeRole?.role?.roleName, activeRolePlan, dispatch]);
 
   return (
     <SidebarMenu>
@@ -93,7 +93,7 @@ export function RoleSwitcher({ currentSemester }: RoleSwitcherProps) {
                   Vai trò: {activeRole.roleInfo?.describe}
                   {activeRole.isPrimary && (
                     <Badge variant="outline" className="ml-2">
-                      Mặc định
+                      Đang chọn
                     </Badge>
                   )}
                 </TypographyP>

@@ -10,7 +10,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { filterNavItemsByRole, NAV_CONFIG } from "@/configs/nav-config";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import { useCurrentRole, useCurrentSemester } from "@/hooks/use-current-role";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import { semesterService } from "@/services/semester-service";
 import { useQuery } from "@tanstack/react-query";
@@ -29,34 +29,12 @@ import {
 } from "@/lib/redux/slices/cacheSlice";
 import { useTheme } from "next-themes";
 import { TypographySmall } from "@/components/_common/typography/typography-small";
+import { SemesterSwitcher } from "./semester-switcher";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user?.user);
   const role = useCurrentRole();
-  const { setTheme } = useTheme();
-  const { data: semesterData } = useQuery({
-    queryKey: ["getSemesterLatest_AppSidebar"],
-    queryFn: () => semesterService.getCurrentSemester(),
-    refetchOnWindowFocus: false,
-  });
-
-  // React.useEffect(() => {
-  //   if (!user) return;
-
-  //   if (user.cache) {
-  //     const cache = JSON.parse(user.cache) as UserCache;
-  //     setTheme(cache.theme ?? "light");
-  //     dispatch(initializeCache(user.cache));
-  //   } else {
-  //     const primaryRole = user.userXRoles.find((role) => role.isPrimary)?.role
-  //       ?.roleName;
-  //     if (primaryRole) {
-  //       setTheme("light");
-  //       dispatch(updateUserCache({ role: primaryRole, theme: "light" }));
-  //     }
-  //   }
-  // }, [user, dispatch]);
 
   if (!user) return null;
 
@@ -90,22 +68,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenuButton>
         <Separator />
         <div>
-          <RoleSwitcher currentSemester={semesterData?.data} />
+          <SemesterSwitcher />
+          <RoleSwitcher  />
 
-          <SidebarMenuButton
-            className="flex py-4 items-center data-[state=open]:bg-sidebar-accent hover:cursor-default hover:bg-transparent data-[state=open]:text-sidebar-accent-foreground"
-            tooltip={semesterData?.data?.semesterName}
-          >
-            <div className="flex aspect-square size-4 items-center justify-center rounded-lg">
-              <Calendar className="dark:text-white text-black" />
-            </div>
-            <div>
-              <TypographyP className="truncate">
-                Học kì:
-                {` ` + (semesterData?.data?.semesterName ?? "Chưa vô kì") + ""}
-              </TypographyP>
-            </div>
-          </SidebarMenuButton>
         </div>
       </SidebarHeader>
 
