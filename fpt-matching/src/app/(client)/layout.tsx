@@ -1,5 +1,5 @@
 "use client";
-import { useCurrentSemester, useCurrentSemesterId } from "@/hooks/use-current-role";
+import { useCurrentSemester } from "@/hooks/use-current-role";
 import {
   initializeCache,
   updateUserCache,
@@ -7,8 +7,9 @@ import {
 } from "@/lib/redux/slices/cacheSlice";
 import { AppDispatch, RootState } from "@/lib/redux/store";
 import { useTheme } from "next-themes";
+
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 
@@ -19,61 +20,54 @@ export default function ClientLayout({
 }) {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user?.user);
-  const {currentSemester} = useCurrentSemester();
+  const { currentSemester, isLoading } = useCurrentSemester();
   const router = useRouter();
   const { setTheme } = useTheme();
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [initialized, setInitialized] = React.useState(false);
 
   useEffect(() => {
+    if (initialized || isLoading || typeof window === "undefined") return;
     if (!user) {
       router.replace("/login");
       return;
     }
+    if (!currentSemester) return;
 
-    const initializeUserCache = async () => {
-      try {
-        if (user.cache) {
-          const cache = JSON.parse(user.cache) as UserCache;
-          setTheme(cache.theme ?? "light");
-          
-          // Đảm bảo semester trong cache khớp với semesterId hiện tại
-          const updatedCache = {
-            ...cache,
-            semester: currentSemester?.id ?? cache.semester
-          };
-          
-          await dispatch(initializeCache(JSON.stringify(updatedCache)));
-        } else {
-          const roleCurrent = user.userXRoles[0]?.role?.roleName;
-          console.log("check_rolecurrent", roleCurrent)
-          console.log("check_currentsemester", currentSemester)
-          if (roleCurrent && currentSemester?.id) {
-            setTheme("light");
-            await dispatch(
-              updateUserCache({
-                role: roleCurrent,
-                theme: "light",
-                semester: currentSemester.id,
-              })
-            );
-          }
-        }
+    // Xử lý khởi tạo
+    if (localStorage.getItem("showToast") === "true") {
+      toast.success(`${user.firstName} ơi, hôm nay có dự định gì nào?`);
+      localStorage.removeItem("showToast");
+    }
 
-        if (localStorage.getItem("showToast") === "true") {
-          toast.success(`${user.firstName} ơi, hôm nay có dự định gì nào?`);
-          localStorage.removeItem("showToast");
-        }
-      } catch (error) {
-        console.error("Cache initialization error:", error);
-      } finally {
-        setIsInitializing(false);
+    if (user.cache) {
+      const cache = JSON.parse(user.cache) as UserCache;
+      setTheme(cache.theme ?? "light");
+      dispatch(initializeCache(user.cache));
+    } else {
+      const roleCurrent = user.userXRoles[0]?.role?.roleName;
+      if (roleCurrent) {
+        setTheme("light");
+        dispatch(
+          updateUserCache({
+            role: roleCurrent,
+            theme: "light",
+            semester: currentSemester.id,
+          })
+        );
       }
-    };
+    }
+    setInitialized(true);
+  }, [
+    user,
+    currentSemester,
+    isLoading,
+    dispatch,
+    router,
+    setTheme,
+    initialized,
+  ]);
 
-    initializeUserCache();
-  }, [user, currentSemester, dispatch, setTheme, router]);
-
-  if (!user || isInitializing) {
+  if (!user || isLoading) {
     return null;
   }
 

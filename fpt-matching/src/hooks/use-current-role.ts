@@ -79,8 +79,6 @@ export function useCurrentSemester() {
 
   const currentSemester = getCurrentSemester();
 
-  console.log("check_currentsemesterin", currentSemester);
-
   return {
     currentSemester,
     semesterList,
