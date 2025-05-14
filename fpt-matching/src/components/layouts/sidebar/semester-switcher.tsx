@@ -69,27 +69,42 @@ export function SemesterSwitcher() {
     : semesterList;
 
   const handleSemesterChange = async (semester: Semester) => {
-    if (isChanging || semester.id === activeSemester.id) return;
+  if (isChanging || semester.id === activeSemester.id) return;
 
-    setIsChanging(true);
+  setIsChanging(true);
 
-    try {
-      const payload = { semester: semester.id };
-      setActiveSemester(semester); // Optimistic update
+  try {
+    // Tìm role đầu tiên của user trong semester mới
+    const newRole = user.userXRoles.find(
+      (userRole) => userRole.semesterId === semester.id
+    )?.role?.roleName;
 
-      await Promise.all([
-        dispatch(updateLocalCache(payload)),
-        dispatch(updateUserCache(payload)),
-      ]);
-
-      toast.success(`Đã chuyển sang học kì ${semester.semesterName}`);
-    } catch (error) {
-      toast.error("Có lỗi khi thay đổi học kì");
-      setActiveSemester(currentSemester || semesterList[0]); // Rollback
-    } finally {
-      setIsChanging(false);
+    if (!newRole) {
+      throw new Error("Không tìm thấy role trong học kỳ này");
     }
-  };
+
+    const payload = { 
+      semester: semester.id, 
+      role: newRole // Thêm role vào payload
+    };
+
+    // Optimistic update
+    setActiveSemester(semester);
+
+    await Promise.all([
+      dispatch(updateLocalCache(payload)),
+      dispatch(updateUserCache(payload)),
+    ]);
+
+    toast.success(`Đã chuyển sang học kì ${semester.semesterName} với role ${newRole}`);
+  } catch (error) {
+    console.error("Change semester error:", error);
+    toast.error(error as string || "Có lỗi khi thay đổi học kì");
+    setActiveSemester(currentSemester || semesterList[0]); // Rollback
+  } finally {
+    setIsChanging(false);
+  }
+};
 
   return (
     <SidebarMenu>

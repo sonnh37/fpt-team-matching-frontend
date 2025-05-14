@@ -45,10 +45,18 @@ export function RoleSwitcher() {
     return null;
   }
 
+  const isAdminOrManager = (user.userXRoles || []).some((userRole) =>
+    ["Manager", "Admin"].includes(userRole.role?.roleName || "")
+  );
+
   const filteredRoles = (user.userXRoles || [])
-    .filter(
-      (userRole) => userRole?.role || userRole.semesterId == currentSemester
-    )
+    .filter((userRole) => {
+      if (!userRole?.role) return false;
+
+      if (isAdminOrManager) return true;
+
+      return userRole.semesterId == currentSemester;
+    })
     .map((userRole) => ({
       ...userRole,
       roleInfo: getRoleInfo(userRole.role?.roleName || ""),
