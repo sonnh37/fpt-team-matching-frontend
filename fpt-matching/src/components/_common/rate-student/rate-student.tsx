@@ -14,9 +14,9 @@ import { RateCreateCommand } from '@/types/models/commands/rate/rate-create-comm
 import { toast } from 'sonner';
 import { ideaHistoryService } from '@/services/idea-history-service';
 const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
-    const [rated, setRated] = React.useState(4);
-    const [rated1, setRated1] = React.useState(4);
-    const [rated2, setRated2] = React.useState(4);
+    const [rated, setRated] = React.useState(20);
+    const [rated1, setRated1] = React.useState(20);
+
 
     //gọi thông tin user đã đăng nhập
     const user = useSelector((state: RootState) => state.user.user)
@@ -32,9 +32,9 @@ const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
     React.useEffect(() => {
         setFormData((prev) => ({
             ...prev,
-            numbOfStar: Math.round((rated + rated1 + rated2) / 3 * 10) / 10,
+            numbOfStar: Math.round((rated + rated1) / 2 * 10) / 10,
         }));
-    }, [rated, rated1, rated2]); // Chạy lại khi giá trị thay đổi
+    }, [rated, rated1]); // Chạy lại khi giá trị thay đổi
 
     // cập nhật id khi bấm vào đánh giá
     React.useEffect(() => {
@@ -47,7 +47,7 @@ const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
     const [formData, setFormData] = useState({
         rateById: user?.teamMembers.find(x => x.userId === user?.id)?.id ?? "", // hoặc x.id nếu đó là teamMemberId
         rateForId: id,
-        numbOfStar: 1,
+        numbOfStar: 0,
         content: ""
     })
 
@@ -169,7 +169,7 @@ const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
                     <button className='bg-orange-500 p-2 rounded-md' >Đánh giá</button>
                 </ModalTrigger>
 
-                <ModalBody className="min-h-[70%] max-h-[90%] min-w-[30%] md:max-w-[40%] overflow-auto">
+                <ModalBody className="min-h-[70%] max-h-[60%] min-w-[30%] md:max-w-[40%] overflow-auto">
                     <div className='flex flex-col items-center text-center bg-orange-500 p-3  shadow-lg w-full'>   {/* Title */}
                         <h2 className="text-2xl w-full font-bold text-white">Feedback Form</h2></div>
                     <ModalContent className="flex flex-col items-center text-center bg-white p-6 rounded-lg shadow-lg w-full">
@@ -193,55 +193,51 @@ const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
 
                         {/* Rating Field */}
                         <div className="w-full mb-4 text-left">
-                            <label className="block  font-semibold mb-2">Đánh giá:</label>
-                            <div className="flex items-center space-x-2  font-bold">
+                            <label className="block font-semibold mb-2">Đánh giá:</label>
 
-                                <Rating
-                                    name="rating"
+                            {/* Phần trăm làm docs */}
+                            <div className="flex items-center space-x-2 font-bold">
+                                <input
+                                    type="number"
+                                    min={0}
+                                    max={100}
                                     value={rated}
-                                    onChange={(event, value) => setRated(value ?? 1)}
-                                    className="text-orange-500"
+                                    onChange={(e) => setRated(Number(e.target.value))}
+                                    className="border p-2 rounded w-20"
                                 />
-                                <span>{rated}</span>
-                                <label className="block  font-semibold ">Teamworking</label>
-
+                                <span>%</span>
+                                <label className="block font-semibold">Phần trăm đóng góp làm Docs</label>
                             </div>
-                            <div className="flex items-center space-x-2  font-bold">
 
-                                <Rating
-                                    name="rating"
+                            {/* Phần trăm làm code */}
+                            <div className="flex items-center space-x-2 font-bold mt-2">
+                                <input
+                                    type="number"
+                                    min={0}
+                                    max={100}
                                     value={rated1}
-                                    onChange={(event, value) => setRated1(value ?? 1)}
-                                    className="text-orange-500"
+                                    onChange={(e) => setRated1(Number(e.target.value))}
+                                    className="border p-2 rounded w-20"
                                 />
-                                <span>{rated1}</span>
-                                <label className="block  font-semibold ">Good knownledge/Skills</label>
-
+                                <span>%</span>
+                                <label className="block font-semibold">Phần trăm đóng góp Code</label>
                             </div>
-                            <div className="flex items-center space-x-2  font-bold">
 
-                                <Rating
-                                    name="rating"
-                                    value={rated2}
-                                    onChange={(event, value) => setRated2(value ?? 1)}
-                                    className="text-orange-500"
-                                />
-                                <span>{rated2}</span>
-                                <label className="block font-semibold ">HardWorking</label>
+                            {/* Tổng điểm */}
+                            <div className="block font-semibold mt-3">
+                                Tổng điểm: {(Math.round((rated + rated1) / 2 * 10) / 10)}
+                                <span> %</span>
+                            </div>
 
-                            </div>
-                            <div className="block  font-semibold mt-2 "
-                            >Tổng điểm: {(Math.round((rated + rated1 + rated2) / 3 * 10) / 10)}
-                            </div>
-                            {/* Nếu bạn cần lưu giá trị vào formData, hãy dùng input hidden */}
+                            {/* Ẩn để lưu formData nếu cần submit form truyền hidden */}
                             <input
                                 type="hidden"
                                 name="numbOfStar"
-                                value={Math.round((rated + rated1 + rated2) / 3 * 10) / 10}
+                                value={formData.numbOfStar}
                                 onChange={handleChange}
                             />
-
                         </div>
+
 
                         {/* Message Field */}
                         <div className="w-full mb-4 text-left">

@@ -28,6 +28,7 @@ import {
 import RateStudent from '@/components/_common/rate-student/rate-student';
 import { rateService } from '@/services/rate-service';
 import { useParams } from 'next/navigation';
+import { TeamMemberRole } from '@/types/enums/team-member';
 
 export default function Page() {
     const { projectId } = useParams<{ projectId: string }>(); // Lấy giá trị từ params
@@ -37,20 +38,26 @@ export default function Page() {
         data: result,
         refetch,
     } = useQuery({
-        queryKey: ["getTeamInfo",projectId],
-        queryFn: () =>projectService.getById(projectId),
+        queryKey: ["getTeamInfo", projectId],
+        queryFn: () => projectService.getById(projectId),
         refetchOnWindowFocus: false,
     });
-    
-    //   Loc member ngoai thang danh gia
-    const member = result?.data?.teamMembers.filter(x => x.userId != user?.id)
 
+    //   Loc member ngoai thang danh gia
+    const member = result?.data?.teamMembers
+
+
+    console.log(member, "test")
 
     const { data: ratingData } = useQuery({
         queryKey: ["getAllRates"],
         queryFn: () => rateService.getAll(), // API trả về danh sách các đánh giá
         refetchOnWindowFocus: false,
     });
+    const checkLeader = result?.data?.teamMembers
+    .filter(x => x.role == TeamMemberRole.Leader) // Lọc ra các thành viên có vai trò là Leader
+    .some(r => r.userId == user?.id);   
+
 
     return (
         <div>
@@ -71,7 +78,7 @@ export default function Page() {
                 <TableBody>
                     {member?.map((cv, index) => {
                         const hasRated = ratingData?.data?.results?.some(
-                            (r) => r.rateById === user?.teamMembers.find(x=> x.userId == user?.id)?.id && r.rateForId === cv.id
+                            (r) => r.rateById === user?.teamMembers.find(x => x.userId == user?.id)?.id && r.rateForId === cv.id
                         );
 
                         return (
@@ -90,9 +97,12 @@ export default function Page() {
                                 <TableCell>
                                     {hasRated ? (
                                         <span className="text-green-600 font-semibold">Bạn đã đánh giá</span>
-                                    ) : (
+                                    ) : checkLeader ? (
                                         <RateStudent id={cv.id ?? ""} projectId={projectId ?? ""} />
+                                    ) : (
+                                        <span className="text-red-500">Không có quyền hạn đánh giá</span>
                                     )}
+
                                 </TableCell>
                             </TableRow>
                         );
