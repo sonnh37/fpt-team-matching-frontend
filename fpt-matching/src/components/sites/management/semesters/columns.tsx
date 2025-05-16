@@ -1,21 +1,9 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Semester } from "@/types/semester";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
 export const columns: ColumnDef<Semester>[] = [
   {
     accessorKey: "semesterCode",

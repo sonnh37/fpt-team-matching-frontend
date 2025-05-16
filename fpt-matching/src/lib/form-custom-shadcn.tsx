@@ -47,7 +47,7 @@ import { addDays, format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { ReactElement, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import {
   FieldPath,
   FieldValues,
@@ -201,6 +201,7 @@ interface FormSelectEnumProps<TFieldValues extends FieldValues> {
   enumOptions: { label: string; value: number | string }[]; // Các tùy chọn enum
   placeholder?: string;
   disabled?: boolean;
+  default?: boolean;
 }
 
 export const FormSelectEnum = <TFieldValues extends FieldValues>({
@@ -211,7 +212,15 @@ export const FormSelectEnum = <TFieldValues extends FieldValues>({
   enumOptions,
   placeholder = "Select an option",
   disabled = false,
+  default: shouldSetDefault = false, // New prop with default value false
 }: FormSelectEnumProps<TFieldValues>) => {
+  // Set default value if shouldSetDefault is true and enumOptions has items
+  useEffect(() => {
+    if (shouldSetDefault && enumOptions.length > 0 && !form.getValues(name)) {
+      form.setValue(name, Number(enumOptions[0].value));
+    }
+  }, [shouldSetDefault, enumOptions, form, name]);
+
   return (
     <FormField
       control={form.control}

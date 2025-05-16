@@ -17,6 +17,7 @@ import ConfirmationDialog, {
   FormInputDate,
   FormInputDateTimePicker,
   FormInputNumber,
+  FormSelectEnum,
   FormSelectObject,
 } from "@/lib/form-custom-shadcn";
 import { SemesterCreateCommand } from "@/types/models/commands/semesters/semester-create-command";
@@ -26,8 +27,6 @@ import { Semester } from "@/types/semester";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { DataOnlyTable } from "@/components/_common/data-table-client/data-table";
-import { columns } from "./stage-topic/columns";
-import StageTopicTable from "./stage-topic";
 import { criteriaFormService } from "@/services/criteria-form-service";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
@@ -35,6 +34,9 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/ui/icons";
 import { FileUpload } from "@/components/ui/file-upload";
 import {hangfireService} from "@/services/hangfire-service";
+import StageTopicTable from "./stage-idea";
+import { SemesterStatus } from "@/types/enums/semester";
+import { getEnumOptions } from "@/lib/utils";
 
 interface SemesterFormProps {
   initialData?: Semester | null;
@@ -51,6 +53,11 @@ const formSchema = z.object({
   startDate: z.date(),
   endDate: z.date(),
   publicTopicDate: z.date(),
+  onGoingDate: z.date(),
+  maxTeamSize: z.number(),
+  minTeamSize: z.number(),
+  numberOfTeam: z.number(),
+  status: z.nativeEnum(SemesterStatus).nullable(),
 });
 
 export const SemesterForm: React.FC<SemesterFormProps> = ({
@@ -253,6 +260,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                     <FormInput
                       form={form}
                       name="semesterName"
@@ -265,6 +273,14 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                       name="semesterPrefixName"
                       label="Tên tiền tố"
                       placeholder="VD: Năm học 2023-2024"
+                    />
+
+                    <FormSelectEnum
+                      form={form}
+                      name="status"
+                      label="Trạng thái"
+                      enumOptions={getEnumOptions(SemesterStatus)}
+                      default
                     />
                   </div>
                 </CardContent>
@@ -281,6 +297,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                       name="startDate"
                       label="Ngày bắt đầu"
                     />
+                    
                     <FormInputDateTimePicker
                       form={form}
                       name="endDate"
@@ -290,6 +307,11 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                       form={form}
                       name="publicTopicDate"
                       label="Công bố đề tài"
+                    />
+                    <FormInputDateTimePicker
+                      form={form}
+                      name="onGoingDate"
+                      label="Ngày diễn ra"
                     />
                   </div>
                 </CardContent>
@@ -306,7 +328,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                   <FormInputNumber
                     form={form}
                     name="limitTopicMentorOnly"
-                    label="Mentor chính"
+                    label="Mentor 1"
                     placeholder="Nhập số lượng"
                     min={0}
                   />
@@ -314,7 +336,31 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                   <FormInputNumber
                     form={form}
                     name="limitTopicSubMentor"
-                    label="Mentor phụ"
+                    label="Mentor 2"
+                    placeholder="Nhập số lượng"
+                    min={0}
+                  />
+
+                  <FormInputNumber
+                    form={form}
+                    name="minTeamSize"
+                    label="Số lượng tối thiểu của Team"
+                    placeholder="Nhập số lượng"
+                    min={2}
+                  />
+
+                  <FormInputNumber
+                    form={form}
+                    name="maxTeamSize"
+                    label="Số lượng tối đa của Team"
+                    placeholder="Nhập số lượng"
+                    min={0}
+                  />
+
+                  <FormInputNumber
+                    form={form}
+                    name="numberOfTeam"
+                    label="Số lượng Team trong kì này"
                     placeholder="Nhập số lượng"
                     min={0}
                   />

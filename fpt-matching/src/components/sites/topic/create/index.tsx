@@ -1,5 +1,5 @@
 "use client";
-import PageIsTopic from "@/app/(client)/(dashboard)/topic/topic-is-exist/page";
+import PageIsTopic from "@/app/(client)/(dashboard)/topic/idea-is-exist/page";
 import { AlertMessage } from "@/components/_common/alert-message";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
@@ -32,26 +32,26 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useSelectorUser } from "@/hooks/use-auth";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import { useCurrentRole, useCurrentSemester } from "@/hooks/use-current-role";
 import { FormInput, FormSwitch } from "@/lib/form-custom-shadcn";
+import { isActiveTopic } from "@/lib/utils";
 import { fileUploadService } from "@/services/file-upload-service";
-import { topicService } from "@/services/topic-service";
 import { invitationService } from "@/services/invitation-service";
 import { professionService } from "@/services/profession-service";
 import { profilestudentService } from "@/services/profile-student-service";
 import { projectService } from "@/services/project-service";
 import { semesterService } from "@/services/semester-service";
-import { stagetopicService } from "@/services/stage-topic-service";
+import { topicService } from "@/services/topic-service";
 import { userService } from "@/services/user-service";
-import { TopicStatus } from "@/types/enums/topic";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
+import { SemesterStatus } from "@/types/enums/semester";
 import { TeamMemberRole } from "@/types/enums/team-member";
 import { TopicCreateCommand } from "@/types/models/commands/topic/topic-create-command";
 import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/invitation-get-by-status-query";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, FileText, Send } from "lucide-react";
+import { AlertCircle, Send } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -116,6 +116,7 @@ const formSchema = z.object({
 export const CreateProjectForm = () => {
   const role = useCurrentRole();
   const user = useSelectorUser();
+  const { currentSemester } = useCurrentSemester();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -127,24 +128,10 @@ export const CreateProjectForm = () => {
   const isEnterpriseTopic = form.watch("isEnterpriseTopic");
 
   // Check user role
-  const isStudent = user?.userXRoles.some(
-    (m) => m.role?.roleName === "Student"
-  );
-  const isLecturer = user?.userXRoles.some(
-    (m) => m.role?.roleName === "Lecturer"
-  );
+  const isStudent = role == "Student";
+  const isLecturer = role == "Mentor";
 
   // Fetch all necessary data in parallel
-  const {
-    data: resStage,
-    isLoading: isLoadingCurrentStage,
-    error: errorCurrentStage,
-  } = useQuery({
-    queryKey: ["getCurrentStageTopic"],
-    queryFn: () => stagetopicService.getCurrentStageTopic(),
-    refetchOnWindowFocus: false,
-  });
-
   const {
     data: result_project,
     isLoading: isLoadingProject,
@@ -227,12 +214,6 @@ export const CreateProjectForm = () => {
     refetchOnWindowFocus: false,
   });
 
-  // Derived state
-  const isLockStageTopic = !resStage?.data;
-  // const isLock = resStage?.data?.endDate
-  //   ? new Date() <= new Date(resStage.data.endDate)
-  //   : false;
-
   const project = result_project?.data;
   const teamMembers = project?.teamMembers;
 
@@ -256,28 +237,23 @@ export const CreateProjectForm = () => {
     enabled: !!profileData?.data,
   });
 
-  // Check for active topics
   const { data: hasActiveTopics } = useQuery({
     queryKey: ["checkActiveTopics"],
     queryFn: async () => {
       if (!topicsData?.data || !upcomingSemesterData?.data) return false;
 
-      const topicsCurrentSemester = topicsData.data.filter((m) =>
-        m.topicVersions.some(
-          (iv) => iv.stageTopic?.semesterId === upcomingSemesterData.data?.id
+      return topicsData.data
+        .filter(
+          (m) => m.stageTopic?.semesterId === upcomingSemesterData.data?.id
         )
-      );
-
-      return topicsCurrentSemester.some((m) => m.status !== TopicStatus.Rejected);
+        .some(isActiveTopic);
     },
     enabled: !!topicsData?.data && !!upcomingSemesterData?.data,
     refetchOnWindowFocus: false,
   });
-
   // Loading and error states
   const isLoading =
     // isLoadingStage ||
-    isLoadingCurrentStage ||
     isLoadingProject ||
     isLoadingProfile ||
     isLoadingProfessions ||
@@ -289,8 +265,7 @@ export const CreateProjectForm = () => {
   console.log(
     "check_error",
     // errorStage ||
-    errorCurrentStage ||
-      errorProject ||
+    errorProject ||
       errorProfile ||
       errorProfessions ||
       errorTopics ||
@@ -300,7 +275,6 @@ export const CreateProjectForm = () => {
 
   const isError =
     // errorStage ||
-    errorCurrentStage ||
     errorProject ||
     errorProfile ||
     errorProfessions ||
@@ -312,8 +286,40 @@ export const CreateProjectForm = () => {
   if (isLoading) return <LoadingComponent />;
   if (isError) return <ErrorSystem />;
 
+  if (!currentSemester) {
+    return (
+      <AlertMessage
+        messageType="error"
+        message="Không tìm thấy học kì hiện tại. Vui lòng chọn học kì trước khi tạo dự án."
+      />
+    );
+  }
+
+  switch (currentSemester.status) {
+    case SemesterStatus.Closed:
+      return (
+        <AlertMessage
+          messageType="error"
+          message="Học kì đã kết thúc. Không thể tạo dự án mới."
+        />
+      );
+    case SemesterStatus.OnGoing:
+      return (
+        <AlertMessage
+          messageType="warning"
+          message="Học kì đang diễn ra. Không thể tạo dự án mới vào lúc này."
+        />
+      );
+    case SemesterStatus.NotStarted:
+      return (
+        <AlertMessage
+          messageType="info"
+          message="Học kì chưa bắt đầu. Vui lòng đợi đến giai đoạn chuẩn bị để tạo dự án."
+        />
+      );
+  }
+
   // Student-specific checks
-  if (isLockStageTopic) return <AlertMessage message="Chưa tới đợt duyệt!" />;
 
   if (isStudent) {
     if (project) {
