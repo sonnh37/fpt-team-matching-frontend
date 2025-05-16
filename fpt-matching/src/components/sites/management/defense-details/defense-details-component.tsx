@@ -55,13 +55,13 @@ const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: str
                         <div className={""}>
                             <BreadcumbCapstoneDetails
                                 semesterName={semester!.semesterName!}
-                                ideaCode={capstoneSchedule!.project?.topic?.topicCode ?? ""}
+                                topicCode={capstoneSchedule!.project?.topic?.topicCode ?? ""}
                                 projectCode={capstoneSchedule.project!.teamCode!}
                                 stage={capstoneSchedule.stage ?? 0}
                             />
                             <div className={"font-bold text-xl mt-6"}>
                                 <div>
-                                    {capstoneSchedule.project?.topic?.ideaVersion?.englishName}
+                                    {capstoneSchedule.project?.topic?.topicVersion?.englishName}
                                 </div>
                                 <Button onClick={() => handeUpdateDemo()}>Update demo</Button>
                                 {/*<div>*/}
@@ -91,14 +91,14 @@ const DefenseDetailsComponent = ({capstoneScheduleId} : {capstoneScheduleId: str
                                                 <AccordionContent>
                                                     <div className={"flex flex-col gap-1.5 font-bold"}>
                                                         <div>Mã đề tài: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.topicCode}</span></div>
-                                                        <div>Tên tiếng Anh: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.ideaVersion?.englishName}</span></div>
-                                                        <div>Ten tiếng Việt: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.ideaVersion?.vietNamName}</span></div>
-                                                        <div>Tên viết tắt: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.ideaVersion?.abbreviations}</span></div>
-                                                        <div>Mô tả: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.ideaVersion?.description}</span></div>
+                                                        <div>Tên tiếng Anh: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.topicVersion?.englishName}</span></div>
+                                                        <div>Ten tiếng Việt: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.topicVersion?.vietNamName}</span></div>
+                                                        <div>Tên viết tắt: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.topicVersion?.abbreviations}</span></div>
+                                                        <div>Mô tả: <span className={"font-medium ml-2"}>{capstoneSchedule.project?.topic?.topicVersion?.description}</span></div>
                                                         <div>Đề tài doanh nghiệp:
                                                             <Button
                                                                 className={"ml-4"}
-                                                                variant={capstoneSchedule.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic != null ? "destructive" : "ghost"}>{capstoneSchedule.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic != null ? "No" : capstoneSchedule.project?.topic?.ideaVersion?.enterpriseName}</Button>
+                                                                variant={capstoneSchedule.project?.topic?.topicVersion?.topic?.isEnterpriseTopic != null ? "destructive" : "ghost"}>{capstoneSchedule.project?.topic?.topicVersion?.topic?.isEnterpriseTopic != null ? "No" : capstoneSchedule.project?.topic?.topicVersion?.enterpriseName}</Button>
                                                         </div>
                                                     </div>
                                                 </AccordionContent>

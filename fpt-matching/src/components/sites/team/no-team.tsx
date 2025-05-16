@@ -12,10 +12,10 @@ import {
 import { LuUsersRound } from "react-icons/lu";
 import { TbUsersPlus } from "react-icons/tb";
 import { TeamForm } from "@/components/sites/team/create";
-import { ideaService } from "@/services/idea-service";
+import { topicService } from "@/services/topic-service";
 import { useQuery } from "@tanstack/react-query";
-import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-get-current-by-status";
-import { IdeaStatus } from "@/types/enums/idea";
+import { TopicGetCurrentByStatusQuery } from "@/types/models/queries/topics/topic-get-current-by-status";
+import { TopicStatus } from "@/types/enums/topic";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import {
   Tooltip,
@@ -32,11 +32,12 @@ export const NoTeam = () => {
   const searchParams = useSearchParams();
   let showCreateModal = searchParams.get("create") === "true";
 
-  const query: IdeaGetCurrentByStatusQuery = {
-    status: IdeaStatus.Approved,
+  const query: TopicGetCurrentByStatusQuery = {
+    statusList: [
+        TopicStatus.ManagerApproved
+    ],
     isPagination: false,
-  };
-
+};
   const query_invitations: InvitationGetByStatudQuery = {
     status: InvitationStatus.Pending,
     isPagination: true,
@@ -51,8 +52,8 @@ export const NoTeam = () => {
     error,
     refetch,
   } = useQuery({
-    queryKey: ["getIdeaCurrentAccepted", query],
-    queryFn: () => ideaService.getCurrentIdeaOfMeByStatus(query),
+    queryKey: ["getTopicCurrentAccepted", query],
+    queryFn: () => topicService.getCurrentTopicOfMeByStatus(query),
     refetchOnWindowFocus: false,
   });
 

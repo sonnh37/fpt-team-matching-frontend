@@ -14,10 +14,10 @@ import {
 import { formatDate } from "@/lib/utils";
 import { mentortopicrequestService } from "@/services/mentor-topic-request-service";
 import { InvitationStatus } from "@/types/enums/invitation";
-import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
+import { MentorTopicRequestStatus } from "@/types/enums/mentor-topic-request";
 import { Invitation } from "@/types/invitation";
 import { MentorTopicRequest } from "@/types/mentor-topic-request";
-import { MentorTopicRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
+import { MentorTopicRequestUpdateCommand } from "@/types/models/commands/mentor-topic-requests/mentor-topic-request-update-command";
 import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";

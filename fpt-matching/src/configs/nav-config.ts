@@ -65,44 +65,44 @@ export const NAV_CONFIG = {
 
     {
       title: "Ý tưởng",
-      url: "/idea",
+      url: "/topic",
       icon: Telescope,
       roles: ["*"],
       items: [
         {
           title: "Tạo ý tưởng",
           icon: PencilRuler,
-          url: "/idea/create",
+          url: "/topic/create",
           roles: ["Student", "Mentor"],
         },
         {
           title: "Lịch sử duyệt ý tưởng",
           icon: History,
-          url: "/idea/request",
+          url: "/topic/request",
           roles: ["Student", "Mentor"],
         },
         {
           title: "Đề tài từ giảng viên",
           icon: FileUser,
-          url: "/idea/supervisors",
+          url: "/topic/supervisors",
           roles: ["*"],
         },
         {
           title: "Duyệt ý tưởng (Mentor)",
           icon: MdOutlineRateReview,
-          url: "/idea/reviews/mentor",
+          url: "/topic/reviews/mentor",
           roles: ["Mentor"],
         },
         {
           title: "Duyệt ý tưởng (SubMentor)",
           icon: MdOutlineRateReview,
-          url: "/idea/reviews/submentor",
+          url: "/topic/reviews/submentor",
           roles: ["Mentor"],
         },
         {
           title: "Duyệt đề tài",
           icon: MdOutlineRateReview,
-          url: "/idea/reviews/council",
+          url: "/topic/reviews/council",
           roles: ["Council"],
         },
       ],

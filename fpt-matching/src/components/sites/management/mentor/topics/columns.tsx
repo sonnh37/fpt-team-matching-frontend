@@ -20,11 +20,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useSelectorUser } from "@/hooks/use-auth";
-import { ideaService } from "@/services/idea-service";
-import { ideaVersionRequestService } from "@/services/idea-version-request-service";
-import { IdeaStatus } from "@/types/enums/idea";
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
-import { IdeaUpdateStatusCommand } from "@/types/models/commands/idea/idea-update-status-command";
+import { topicService } from "@/services/topic-service";
+import { topicVersionRequestService } from "@/services/topic-version-request-service";
+import { TopicStatus } from "@/types/enums/topic";
+import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
+import { TopicUpdateStatusCommand } from "@/types/models/commands/topic/topic-update-status-command";
 import { Topic } from "@/types/topic";
 import {
   faCheck,
@@ -40,7 +40,7 @@ import { ColumnDef, Row } from "@tanstack/react-table";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { IdeaDetailForm } from "../../../idea/detail";
+import { TopicDetailForm } from "../../../topic/detail";
 import { Eye, EyeIcon, ListChecks, Loader2, Send, Undo2 } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -58,54 +58,54 @@ export const columns: ColumnDef<Topic>[] = [
     },
   },
   {
-    accessorKey: "ideaVersion.vietNamName",
+    accessorKey: "topicVersion.vietNamName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
     cell: ({ row }) => {
       const model = row.original;
-      const vietNamName = model.ideaVersion?.vietNamName;
+      const vietNamName = model.topicVersion?.vietNamName;
       return <TypographyP>{vietNamName ?? "Không có tên"}</TypographyP>;
     },
   },
   {
-    accessorKey: "ideaVersion.enterpriseName",
+    accessorKey: "topicVersion.enterpriseName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tên doanh nghiệp" />
     ),
     cell: ({ row }) => {
       const model = row.original;
-      const enterpriseName = model.ideaVersion?.enterpriseName;
+      const enterpriseName = model.topicVersion?.enterpriseName;
       return <TypographyP>{enterpriseName ?? "Không có tên"}</TypographyP>;
     },
   },
   {
-    accessorKey: "ideaVersion.version",
+    accessorKey: "topicVersion.version",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Phiên bản" />
     ),
   },
   {
-    accessorKey: "ideaVersion.idea.status",
+    accessorKey: "topicVersion.topic.status",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Trạng thái" />
     ),
     cell: ({ row }) => {
       const model = row.original;
-      const idea = model.ideaVersion?.idea;
+      const topic = model.topicVersion?.topic;
 
       // Hàm chuyển đổi status sang tiếng Việt
-      const getStatusText = (status: IdeaStatus | undefined): string => {
+      const getStatusText = (status: TopicStatus | undefined): string => {
         switch (status) {
-          case IdeaStatus.Pending:
+          case TopicStatus.Pending:
             return "Đang chờ";
-          case IdeaStatus.Approved:
+          case TopicStatus.Approved:
             return "Đã duyệt";
-          case IdeaStatus.Rejected:
+          case TopicStatus.Rejected:
             return "Đã từ chối";
-          case IdeaStatus.ConsiderByMentor:
+          case TopicStatus.ConsiderByMentor:
             return "Đang xem xét bởi Mentor";
-          case IdeaStatus.ConsiderByCouncil:
+          case TopicStatus.ConsiderByCouncil:
             return "Đang xem xét bởi Hội đồng";
           default:
             return "Không xác định";
@@ -114,7 +114,7 @@ export const columns: ColumnDef<Topic>[] = [
 
       return (
         <div className="flex items-center gap-2">
-          {getStatusText(idea?.status)}
+          {getStatusText(topic?.status)}
         </div>
       );
     },
@@ -144,54 +144,54 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const [isSubmitting, setIsSubmitting] = useState(false); // Thêm state cho loading
 
   const model = row.original;
-  const ideaId = model.ideaVersion?.ideaId;
-  const idea = model.ideaVersion?.idea;
-  const ideaVersion = model.ideaVersion;
-  const ideaVersionRequests = model.ideaVersion?.ideaVersionRequests;
+  const topicId = model.topicVersion?.topicId;
+  const topic = model.topicVersion?.topic;
+  const topicVersion = model.topicVersion;
+  const topicVersionRequests = model.topicVersion?.topicVersionRequests;
   const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
 
   // Các điều kiện logic
-  const mentorReceiveRequest = ideaVersionRequests?.find(
+  const mentorReceiveRequest = topicVersionRequests?.find(
     (m) =>
       m.role === "Mentor" &&
-      m.status === IdeaVersionRequestStatus.Pending &&
+      m.status === TopicVersionRequestStatus.Pending &&
       m.reviewerId === user.id
   );
 
-  const hasCouncilRequests = ideaVersionRequests?.some(
+  const hasCouncilRequests = topicVersionRequests?.some(
     (request) => request.role === "Council"
   );
 
-  const isNeedToApprove = ideaVersionRequests?.some(
+  const isNeedToApprove = topicVersionRequests?.some(
     (request) =>
       request.role === "Mentor" &&
-      request.status === IdeaVersionRequestStatus.Pending
+      request.status === TopicVersionRequestStatus.Pending
   );
 
-  const isApproved = ideaVersionRequests?.some(
+  const isApproved = topicVersionRequests?.some(
     (request) =>
       request.role === "Mentor" &&
-      request.status !== IdeaVersionRequestStatus.Pending
+      request.status !== TopicVersionRequestStatus.Pending
   );
 
-  const allMentorApproved = ideaVersionRequests?.every(
+  const allMentorApproved = topicVersionRequests?.every(
     (request) =>
       request.role === "Mentor" &&
-      request.status === IdeaVersionRequestStatus.Approved
+      request.status === TopicVersionRequestStatus.Approved
   );
 
   // Điều kiện hiển thị các nút
-  const showEditButton = idea?.status === IdeaStatus.ConsiderByCouncil;
+  const showEditButton = topic?.status === TopicStatus.ConsiderByCouncil;
   const showReturnButton =
-    idea?.status === IdeaStatus.ConsiderByCouncil &&
-    idea?.ownerId != idea?.mentorId;
-  console.log("check_idea", ideaVersionRequests)
+    topic?.status === TopicStatus.ConsiderByCouncil &&
+    topic?.ownerId != topic?.mentorId;
+  console.log("check_topic", topicVersionRequests)
   const showSubmitToCouncilButton =
-    idea?.status === IdeaStatus.Pending &&
+    topic?.status === TopicStatus.Pending &&
     allMentorApproved &&
     !hasCouncilRequests;
   const showApproveButton =
-    idea?.status === IdeaStatus.Pending && isNeedToApprove && !isApproved;
+    topic?.status === TopicStatus.Pending && isNeedToApprove && !isApproved;
 
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -223,12 +223,12 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     try {
       toast.loading("Đang trả đề tài về nhóm...", { id: "return-status" });
 
-      const command: IdeaUpdateStatusCommand = {
-        id: ideaId,
-        status: IdeaStatus.ConsiderByMentor,
+      const command: TopicUpdateStatusCommand = {
+        id: topicId,
+        status: TopicStatus.ConsiderByMentor,
       };
 
-      const res = await ideaService.updateStatus(command);
+      const res = await topicService.updateStatus(command);
 
       if (res.status != 1) {
         toast.error(res.message || "Có lỗi xảy ra", { id: "return-status" });
@@ -276,8 +276,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     try {
       toast.loading("Đang nộp đề tài cho hội đồng...", { id: "submit-status" });
 
-      const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
-        ideaVersion?.id
+      const res = await topicVersionRequestService.createCouncilRequestsForTopic(
+        topicVersion?.id
       );
 
       if (res.status != 1) {
@@ -331,17 +331,17 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       </div>
     </div>
   );
-  const isMentorOfIdea = idea?.mentorId == user?.id;
-  const hasSubmentorPendingRequest = ideaVersionRequests?.some(
+  const isMentorOfTopic = topic?.mentorId == user?.id;
+  const hasSubmentorPendingRequest = topicVersionRequests?.some(
     (request) =>
       request.role == "SubMentor" &&
-      request.status == IdeaVersionRequestStatus.Pending
+      request.status == TopicVersionRequestStatus.Pending
   );
   
   const handleSubmit = async () => {
     try {
-      const res = await ideaVersionRequestService.createCouncilRequestsForIdea(
-        ideaVersion?.id
+      const res = await topicVersionRequestService.createCouncilRequestsForTopic(
+        topicVersion?.id
       );
       if (res.status != 1) return toast.error(res.message);
 
@@ -372,9 +372,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           <DialogHeader>
             <DialogTitle>Chi tiết ý tưởng</DialogTitle>
           </DialogHeader>
-          <IdeaDetailForm ideaId={ideaId} />
+          <TopicDetailForm topicId={topicId} />
           <DialogFooter>
-            {isMentorOfIdea && (
+            {isMentorOfTopic && (
               <Button
                 variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 size="sm"
@@ -406,7 +406,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       <>
         {showEditButton && (
           <Button variant="ghost" size="sm" asChild>
-            <Link href={`/idea/detail/${ideaId}`} className="flex items-center">
+            <Link href={`/topic/detail/${topicId}`} className="flex items-center">
               <FaEdit className="h-4 w-4" />
               Sửa
             </Link>
@@ -444,7 +444,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           variant="ghost"
           size="sm"
           onClick={() =>
-            router.push(`/idea/reviews/${mentorReceiveRequest?.id}`)
+            router.push(`/topic/reviews/${mentorReceiveRequest?.id}`)
           }
           className="flex items-center"
         >

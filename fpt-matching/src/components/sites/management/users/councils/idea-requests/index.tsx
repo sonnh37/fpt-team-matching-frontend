@@ -48,7 +48,7 @@ const formSchema = z.object({
   searchTerm: z.string().optional(),
 });
 
-export default function CouncilIdeaVersionRequestPendingTable() {
+export default function CouncilTopicVersionRequestPendingTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -92,7 +92,7 @@ export default function CouncilIdeaVersionRequestPendingTable() {
 
   const { data, isFetching, error } = useQuery({
     queryKey: ["get-all-user", queryParams],
-    queryFn: () => userService.getAllByCouncilWithIdeaVersionRequestPending(queryParams),
+    queryFn: () => userService.getAllByCouncilWithTopicVersionRequestPending(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

@@ -72,13 +72,13 @@ const Page = () => {
                     <div className={""}>
                         <BreadcrumbReviewDetails
                             semesterName={semester!.semesterName!}
-                            ideaCode={reviewDetails.project!.topic?.topicCode ?? ""}
+                            topicCode={reviewDetails.project!.topic?.topicCode ?? ""}
                             projectCode={reviewDetails.project!.teamCode!}
                             reviewNumber={reviewDetails.number}
                         />
                         <div className={"font-bold text-xl mt-6"}>
                              <div>
-                                 {reviewDetails.project?.topic?.ideaVersion?.englishName}
+                                 {reviewDetails.project?.topic?.topicVersion?.englishName}
                              </div>
                             {/*<div>*/}
                             {/*    <Button variant={"default"}>Chỉnh sửa đề tài</Button>*/}
@@ -107,14 +107,14 @@ const Page = () => {
                                             <AccordionContent>
                                                 <div className={"flex flex-col gap-1.5 font-bold"}>
                                                     <div>Mã đề tài: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.topicCode}</span></div>
-                                                    <div>Tên tiếng Anh/Nhật: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.englishName}</span></div>
-                                                    <div>Tên tiếng Việt: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.vietNamName}</span></div>
-                                                    <div>Viết tắt: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.abbreviations}</span></div>
-                                                    <div>Mô tả: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.description}</span></div>
+                                                    <div>Tên tiếng Anh/Nhật: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.topicVersion?.englishName}</span></div>
+                                                    <div>Tên tiếng Việt: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.topicVersion?.vietNamName}</span></div>
+                                                    <div>Viết tắt: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.topicVersion?.abbreviations}</span></div>
+                                                    <div>Mô tả: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.topicVersion?.description}</span></div>
                                                     <div>Đề tài doanh nghiệp:
                                                         <Button
                                                             className={"ml-4"}
-                                                            variant={reviewDetails.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic != null ? "destructive" : "ghost"}>{reviewDetails.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic != null ? "No" : reviewDetails.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic}</Button>
+                                                            variant={reviewDetails.project?.topic?.topicVersion?.topic?.isEnterpriseTopic != null ? "destructive" : "ghost"}>{reviewDetails.project?.topic?.topicVersion?.topic?.isEnterpriseTopic != null ? "No" : reviewDetails.project?.topic?.topicVersion?.topic?.isEnterpriseTopic}</Button>
                                                     </div>
                                                 </div>
                                             </AccordionContent>

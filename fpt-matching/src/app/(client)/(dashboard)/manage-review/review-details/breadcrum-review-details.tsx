@@ -8,8 +8,8 @@ import {
 import React from "react";
 
 export default function BreadcrumbReviewDetails(
-    {semesterName, projectCode, ideaCode, reviewNumber}:
-    { semesterName: string, projectCode: string, ideaCode: string, reviewNumber: number }
+    {semesterName, projectCode, topicCode, reviewNumber}:
+    { semesterName: string, projectCode: string, topicCode: string, reviewNumber: number }
 ) {
     return (
         <Breadcrumb>
@@ -19,7 +19,7 @@ export default function BreadcrumbReviewDetails(
                 </BreadcrumbItem>
                 <BreadcrumbSeparator/>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>{ideaCode}</BreadcrumbPage>
+                    <BreadcrumbPage>{topicCode}</BreadcrumbPage>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator/>
                 <BreadcrumbItem>

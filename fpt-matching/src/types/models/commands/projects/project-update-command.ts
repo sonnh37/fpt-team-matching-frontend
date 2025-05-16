@@ -3,7 +3,7 @@ import { UpdateCommand } from "../_base/base-command";
 
 export interface ProjectUpdateCommand extends UpdateCommand {
   leaderId?: string;
-  ideaId?: string;
+  topicId?: string;
   teamName?: string;
   teamCode?: string;
   description?: string;

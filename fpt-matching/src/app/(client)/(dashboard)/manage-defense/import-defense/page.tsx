@@ -478,12 +478,12 @@ const Page = () => {
                                                     </div>
                                                     <div className="space-y-1">
                                                         <Label htmlFor="new">Tên đề tài tiếng anh</Label>
-                                                        <Input disabled={true} value={projects.filter(x => x.id == selectedProjectId) ? projects.filter(x => x.id == selectedProjectId)[0]?.topic?.ideaVersion?.englishName : undefined} />
+                                                        <Input disabled={true} value={projects.filter(x => x.id == selectedProjectId) ? projects.filter(x => x.id == selectedProjectId)[0]?.topic?.topicVersion?.englishName : undefined} />
                                                     </div>
-                                                    {projects.filter(x => x.id == selectedProjectId)[0]?.topic?.ideaVersion?.enterpriseName ?
+                                                    {projects.filter(x => x.id == selectedProjectId)[0]?.topic?.topicVersion?.enterpriseName ?
                                                         <div className="space-y-1">
                                                             <Label htmlFor="new">Tên doanh nghiệp</Label>
-                                                            <Input disabled={true} value={projects.filter(x => x.id == selectedProjectId) ? projects.filter(x => x.id == selectedProjectId)[0]?.topic?.ideaVersion?.enterpriseName : undefined} />
+                                                            <Input disabled={true} value={projects.filter(x => x.id == selectedProjectId) ? projects.filter(x => x.id == selectedProjectId)[0]?.topic?.topicVersion?.enterpriseName : undefined} />
                                                         </div>
                                                      : <div className="space-y-1">
                                                             <Label htmlFor="new">Đề tài doanh nghiệp</Label>

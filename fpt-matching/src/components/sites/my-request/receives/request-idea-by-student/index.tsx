@@ -28,13 +28,13 @@ import { z } from "zod";
 import { columns } from "./columns";
 import { InvitationGetByTypeQuery } from "@/types/models/queries/invitations/invitation-get-by-type-query";
 import { BaseQueryableQuery } from "@/types/models/queries/_base/base-query";
-import { MentorTopicRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
+import { MentorTopicRequestGetAllQuery } from "@/types/models/queries/mentor-topic-requests/mentor-topic-request-get-all-query";
 import { mentortopicrequestService } from "@/services/mentor-topic-request-service";
 
 //#region INPUT
 const defaultSchema = z.object({});
 //#endregion
-export default function InvitationReceiveToGetIdeaByStudentTable() {
+export default function InvitationReceiveToGetTopicByStudentTable() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([

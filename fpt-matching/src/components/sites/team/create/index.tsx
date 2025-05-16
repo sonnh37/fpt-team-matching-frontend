@@ -57,9 +57,6 @@ export const TeamForm = () => {
 
       toast.success(response.message);
       await queryClient.refetchQueries({ queryKey: ["getTeamInfo"] });
-      // await queryClient.refetchQueries({ queryKey: ["getTeamInfoCurrentSemester"] });
-      // await queryClient.refetchQueries({ queryKey: ["getIdeaInTeam"] });
-      // await queryClient.refetchQueries({ queryKey: ["getCurrentSemester"] });
       router.push("/team");
     } catch (error: any) {
       console.error(error);

@@ -1,11 +1,11 @@
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import { BaseQueryableQuery } from "../_base/base-query";
 import { ProjectStatus } from "@/types/enums/project";
-import { Idea } from "@/types/idea";
+import { Topic } from "@/types/topic";
 
 export interface ProjectGetAllQuery extends BaseQueryableQuery {
   leaderId?: string;
-  ideaId?: string;
+  topicId?: string;
   teamName?: string;
   teamCode?: string;
   description?: string;

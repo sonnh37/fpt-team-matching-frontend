@@ -26,8 +26,8 @@ import { Semester } from "@/types/semester";
 import { useQueries, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { DataOnlyTable } from "@/components/_common/data-table-client/data-table";
-import { columns } from "./stage-idea/columns";
-import StageIdeaTable from "./stage-idea";
+import { columns } from "./stage-topic/columns";
+import StageTopicTable from "./stage-topic";
 import { criteriaFormService } from "@/services/criteria-form-service";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
@@ -331,7 +331,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                   <CardTitle className="text-lg">Danh sách đợt duyệt</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6">
-                  <StageIdeaTable />
+                  <StageTopicTable />
                 </CardContent>
               </Card>
             </div>

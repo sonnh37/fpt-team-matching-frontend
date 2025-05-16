@@ -39,11 +39,11 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { cn, formatDate } from "@/lib/utils";
-import { ideaService } from "@/services/idea-service";
+import { topicService } from "@/services/topic-service";
 import { projectService } from "@/services/project-service";
 import { semesterService } from "@/services/semester-service";
 import { teammemberService } from "@/services/team-member-service";
-import { IdeaStatus } from "@/types/enums/idea";
+import { TopicStatus } from "@/types/enums/topic";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import { ProjectStatus } from "@/types/enums/project";
 import {
@@ -71,7 +71,7 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import InviteUsersForm from "../idea/updateidea/page";
+import InviteUsersForm from "../topic/updatetopic/page";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -126,26 +126,26 @@ export default function TeamInfo() {
     refetchOnWindowFocus: false,
   });
 
-  const ideaId = teamInfo?.data?.topic?.ideaVersion?.ideaId;
+  const topicId = teamInfo?.data?.topic?.topicVersion?.topicId;
   const {
-    data: idea,
-    isLoading: isLoadingIdea,
-    isError: isErrorIdea,
+    data: topic,
+    isLoading: isLoadingTopic,
+    isError: isErrorTopic,
   } = useQuery({
-    queryKey: ["getIdeaInTeam", ideaId],
-    queryFn: () => ideaService.getById(ideaId).then((res) => res.data),
+    queryKey: ["getTopicInTeam", topicId],
+    queryFn: () => topicService.getById(topicId).then((res) => res.data),
     refetchOnWindowFocus: false,
-    enabled: !!ideaId,
+    enabled: !!topicId,
   });
 
   // Combine loading and error states
   const isLoading =
     isLoadingStage ||
     isLoadingTeam ||
-    isLoadingIdea ||
+    isLoadingTopic ||
     isLoadingCurrentSemester;
   const isError =
-    isErrorStage || isErrorTeam || isErrorIdea || isErrorCurrentSemester;
+    isErrorStage || isErrorTeam || isErrorTopic || isErrorCurrentSemester;
 
   useEffect(() => {
     if (teamInfo?.data?.teamName) {
@@ -224,7 +224,7 @@ export default function TeamInfo() {
 
   const isHasTopic = !!project.topicId;
   const availableSlots = isHasTopic
-    ? (project.topic?.ideaVersion?.teamSize ?? 0) -
+    ? (project.topic?.topicVersion?.teamSize ?? 0) -
       (project.teamMembers?.length ?? 0)
     : 5 - (project.teamMembers?.length ?? 0);
 
@@ -429,7 +429,7 @@ export default function TeamInfo() {
 
           <CardContent className="p-6 space-y-8">
             {/* Thông tin đề tài */}
-            {project.topic?.ideaVersion != null ? (
+            {project.topic?.topicVersion != null ? (
               <>
                 <div className="space-y-6">
                   <h3 className="text-xl font-semibold text-foreground">
@@ -447,20 +447,20 @@ export default function TeamInfo() {
                         <div className="space-y-1">
                           <Label>Viết tắt:</Label>
                           <p>
-                            {project.topic.ideaVersion.abbreviations ||
+                            {project.topic.topicVersion.abbreviations ||
                               "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <Label>Tên tiếng Việt:</Label>
                           <p>
-                            {project.topic.ideaVersion.vietNamName || "Chưa có"}
+                            {project.topic.topicVersion.vietNamName || "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <Label>Tên tiếng Anh:</Label>
                           <p>
-                            {project.topic.ideaVersion.englishName || "Chưa có"}
+                            {project.topic.topicVersion.englishName || "Chưa có"}
                           </p>
                         </div>
                       </CardContent>
@@ -480,13 +480,13 @@ export default function TeamInfo() {
                         <div className="space-y-1">
                           <Label>Ngành:</Label>
                           <p>
-                            {idea?.specialty?.profession?.professionName ||
+                            {topic?.specialty?.profession?.professionName ||
                               "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <Label>Chuyên ngành:</Label>
-                          <p>{idea?.specialty?.specialtyName || "Chưa có"}</p>
+                          <p>{topic?.specialty?.specialtyName || "Chưa có"}</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -499,7 +499,7 @@ export default function TeamInfo() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-line">
-                          {project.topic.ideaVersion.description ||
+                          {project.topic.topicVersion.description ||
                             "Chưa có mô tả"}
                         </p>
                       </CardContent>
@@ -516,17 +516,17 @@ export default function TeamInfo() {
                           <div className="space-y-1">
                             <Label>Đề tài doanh nghiệp:</Label>
                             <p>
-                              {project.topic.ideaVersion.idea?.isEnterpriseTopic
+                              {project.topic.topicVersion.topic?.isEnterpriseTopic
                                 ? "Có"
                                 : "Không"}
                             </p>
                           </div>
-                          {project.topic.ideaVersion.idea
+                          {project.topic.topicVersion.topic
                             ?.isEnterpriseTopic && (
                             <div className="space-y-1">
                               <Label>Tên doanh nghiệp:</Label>
                               <p>
-                                {project.topic.ideaVersion.enterpriseName ||
+                                {project.topic.topicVersion.enterpriseName ||
                                   "Chưa có"}
                               </p>
                             </div>
@@ -535,17 +535,17 @@ export default function TeamInfo() {
                         <div className="space-y-4">
                           <div className="space-y-1">
                             <Label>Người hướng dẫn:</Label>
-                            <p>{idea?.mentor?.email || "Chưa có"}</p>
+                            <p>{topic?.mentor?.email || "Chưa có"}</p>
                           </div>
                           <div className="space-y-1">
                             <Label>Người hướng dẫn 2:</Label>
-                            <p>{idea?.subMentor?.email || "Chưa có"}</p>
+                            <p>{topic?.subMentor?.email || "Chưa có"}</p>
                           </div>
                         </div>
                         <div className="space-y-1">
                           <Label>Số lượng thành viên tối đa:</Label>
                           <p>
-                            {project.topic.ideaVersion.teamSize || "Chưa có"}
+                            {project.topic.topicVersion.teamSize || "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
@@ -577,7 +577,7 @@ export default function TeamInfo() {
                   Nhóm của bạn chưa đăng ký đề tài.{" "}
                   <Button variant="link" className="p-0 h-auto" asChild>
                     <Link
-                      href="/idea/supervisors"
+                      href="/topic/supervisors"
                       className="text-primary font-semibold"
                     >
                       <div className="font-bold text-black">
@@ -847,7 +847,7 @@ export default function TeamInfo() {
                 Cần có sự đồng ý của tất cả thành viên trong nhóm
               </p>
               <Button className="w-full" asChild>
-                <Link href="/idea/supervisors">Danh sách đề tài</Link>
+                <Link href="/topic/supervisors">Danh sách đề tài</Link>
               </Button>
             </CardContent>
           </Card>

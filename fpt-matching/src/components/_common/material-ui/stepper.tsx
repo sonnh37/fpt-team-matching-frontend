@@ -7,8 +7,8 @@ import StepLabel from "@mui/material/StepLabel";
 import { Box, Typography } from "@mui/material";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useCallback } from "react";
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
-import { Idea } from "@/types/idea";
+import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
+import { Topic } from "@/types/topic";
 
 interface StepperProps {
   label: string;
@@ -17,14 +17,14 @@ interface StepperProps {
 }
 
 interface HorizontalLinearStepperProps {
-  idea?: Idea;
+  topic?: Topic;
 }
 
 export default function HorizontalLinearStepper({
-  idea,
+  topic,
 }: HorizontalLinearStepperProps) {
-  if (!idea) return null;
-  if (!idea.ideaVersions) return <>Không có version hiện tại..</>;
+  if (!topic) return null;
+  if (!topic.topicVersions) return <>Không có version hiện tại..</>;
   const user = useSelectorUser();
   if (!user) return null;
 
@@ -39,19 +39,19 @@ export default function HorizontalLinearStepper({
   };
 
   const calculateStepData = useCallback(() => {
-    const highestVersion = idea.ideaVersions.length > 0
-      ? idea.ideaVersions.reduce((prev, current) =>
+    const highestVersion = topic.topicVersions.length > 0
+      ? topic.topicVersions.reduce((prev, current) =>
           (prev.version ?? 0) > (current.version ?? 0) ? prev : current
         )
       : undefined;
     
     if (!highestVersion) return { newSteps: [], newActiveStep: 0, averageScore: 0 };
 
-    const ideaVersionRequests = highestVersion?.ideaVersionRequests || [];
+    const topicVersionRequests = highestVersion?.topicVersionRequests || [];
     const isStudent = user.userXRoles?.some(m => m.role?.roleName === "Student");
     const isLecturer = user.userXRoles?.some(m => m.role?.roleName === "Lecturer");
-    const resultDate = highestVersion?.stageIdea?.resultDate
-      ? new Date(highestVersion.stageIdea.resultDate)
+    const resultDate = highestVersion?.stageTopic?.resultDate
+      ? new Date(highestVersion.stageTopic.resultDate)
       : null;
       
     const todayUtcMidnight = getTodayUtcMidnight();
@@ -61,22 +61,22 @@ export default function HorizontalLinearStepper({
         resultDate.getUTCDate() <= todayUtcMidnight.getUTCDate()
       : false;
 
-    const mentorApproval = ideaVersionRequests.find(req => req.role === "Mentor");
-    const councilApprovals = ideaVersionRequests.filter(req => req.role === "Council");
+    const mentorApproval = topicVersionRequests.find(req => req.role === "Mentor");
+    const councilApprovals = topicVersionRequests.filter(req => req.role === "Council");
 
     const totalCouncils = councilApprovals.length;
     const MIN_REVIEWERS = 1;
-    const requiredReviewers = highestVersion?.stageIdea?.numberReviewer ?? MIN_REVIEWERS;
+    const requiredReviewers = highestVersion?.stageTopic?.numberReviewer ?? MIN_REVIEWERS;
     
     let averageScore = 0;
     let councilStatus: 'approved' | 'rejected' | 'pending' | 'consider-by-council' = 'pending';
     
     if (totalCouncils >= requiredReviewers) {
       const totalApproved = councilApprovals.filter(
-        req => req.status === IdeaVersionRequestStatus.Approved
+        req => req.status === TopicVersionRequestStatus.Approved
       ).length;
       const totalConsider = councilApprovals.filter(
-        req => req.status === IdeaVersionRequestStatus.Consider
+        req => req.status === TopicVersionRequestStatus.Consider
       ).length;
       
       const totalScore = (totalApproved * 1.0) + (totalConsider * 0.5);
@@ -99,16 +99,16 @@ export default function HorizontalLinearStepper({
       },
       {
         label: "Duyệt bởi người hướng dẫn",
-        status: mentorApproval?.status === IdeaVersionRequestStatus.Rejected
+        status: mentorApproval?.status === TopicVersionRequestStatus.Rejected
           ? "rejected"
-          : mentorApproval?.status === IdeaVersionRequestStatus.Approved
+          : mentorApproval?.status === TopicVersionRequestStatus.Approved
           ? "approved"
-          : mentorApproval?.status === IdeaVersionRequestStatus.Consider
+          : mentorApproval?.status === TopicVersionRequestStatus.Consider
           ? "consider-by-mentor"
           : "pending",
-        optionalLabel: mentorApproval?.status === IdeaVersionRequestStatus.Rejected 
+        optionalLabel: mentorApproval?.status === TopicVersionRequestStatus.Rejected 
           ? "Đã từ chối" 
-          : mentorApproval?.status === IdeaVersionRequestStatus.Consider
+          : mentorApproval?.status === TopicVersionRequestStatus.Consider
           ? "Cần xem xét"
           : undefined,
       },
@@ -125,18 +125,18 @@ export default function HorizontalLinearStepper({
 
     let newActiveStep = 0;
     if (isLecturer) {
-      if (mentorApproval?.status === IdeaVersionRequestStatus.Approved) {
+      if (mentorApproval?.status === TopicVersionRequestStatus.Approved) {
         newActiveStep = councilApprovals.length > 0 ? 2 : 1;
       }
     } else if (isStudent) {
-      if (mentorApproval?.status === IdeaVersionRequestStatus.Approved) {
+      if (mentorApproval?.status === TopicVersionRequestStatus.Approved) {
         newActiveStep = isResultDay ? 2 : 1;
       }
       
     }
 
     return { newSteps, newActiveStep, averageScore };
-  }, [idea, user]);
+  }, [topic, user]);
 
   React.useEffect(() => {
     const { newSteps, newActiveStep, averageScore } = calculateStepData();

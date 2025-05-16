@@ -8,9 +8,9 @@ import {toast} from "sonner";
 import {topicVersionService} from "@/services/topic-version-service";
 
 
-export function EditIdeaDialog(
-    {file, reviewNumber, ideaId, note ,isOpen, setIsOpen} :
-    {file: File, reviewNumber: number, ideaId:string ,isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, note: string | null}
+export function EditTopicDialog(
+    {file, reviewNumber, topicId, note ,isOpen, setIsOpen} :
+    {file: File, reviewNumber: number, topicId:string ,isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, note: string | null}
 ) {
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -24,7 +24,7 @@ export function EditIdeaDialog(
             //2. upload file
             const result = await cloudinaryService.uploadFile(file)
             if (result) {
-                const response = await topicVersionService.updateByStudent({topicId: ideaId, fileUpdate: result, reviewStage: reviewNumber, note})
+                const response = await topicVersionService.updateByStudent({topicId: topicId, fileUpdate: result, reviewStage: reviewNumber, note})
                     if (response.status == 1) {
                         toast.success("Cập nhật thành công");
                     } else {

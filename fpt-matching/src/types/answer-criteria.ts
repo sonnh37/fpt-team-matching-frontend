@@ -1,11 +1,11 @@
 import { BaseEntity } from "./_base/base";
 import { Criteria } from "./criteria";
-import { IdeaVersionRequest } from "./idea-version-request";
+import { TopicVersionRequest } from "./topic-version-request";
 
 export interface AnswerCriteria extends BaseEntity {
-  ideaVersionRequestId?: string;
+  topicVersionRequestId?: string;
   criteriaId?: string;
   value?: string;
-  ideaVersionRequest?: IdeaVersionRequest;
+  topicVersionRequest?: TopicVersionRequest;
   criteria?: Criteria;
 }

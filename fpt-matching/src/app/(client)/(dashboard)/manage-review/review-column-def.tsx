@@ -45,18 +45,18 @@ export const ReviewColumns: ColumnDef<Review>[] = [
     },
     {
         accessorKey: "project.topic.topicCode",
-        id: "ideaCode",
+        id: "topicCode",
         header: "Mã đề tài",
         size: 150
     },
     {
-        accessorKey: "project.topic.ideaVersion.vietNamName",
+        accessorKey: "project.topic.topicVersion.vietNamName",
         id: "vietnameseName",
         header: "Tên tiếng Việt",
         size: 250
     },
     {
-        accessorKey: "project.topic.ideaVersion.englishName",
+        accessorKey: "project.topic.topicVersion.englishName",
         id: "englishName",
         header: "Tên tiếng Anh / Nhật",
         size: 250

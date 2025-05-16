@@ -19,8 +19,8 @@ class TopicVersionService extends BaseService<TopicVersion> {
         return response.data;
     }
 
-    public getByIdeaId = async (ideaId: string): Promise<BusinessResult<TopicVersion[]>> => {
-        const response = await axiosInstance.get<BusinessResult<TopicVersion[]>>(`${this.endpoint}/get-by-idea-version-id?id=${ideaId}`);
+    public getByTopicId = async (topicId: string): Promise<BusinessResult<TopicVersion[]>> => {
+        const response = await axiosInstance.get<BusinessResult<TopicVersion[]>>(`${this.endpoint}/get-by-topic-version-id?id=${topicId}`);
         return response.data
     }
 }
