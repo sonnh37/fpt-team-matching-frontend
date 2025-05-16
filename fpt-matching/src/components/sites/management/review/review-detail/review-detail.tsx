@@ -10,7 +10,7 @@ import {semesterService} from "@/services/semester-service";
 import {Semester} from '@/types/semester';
 import {reviewDetailsRBAC} from "@/app/(client)/(dashboard)/manage-review/review-details/mange-role";
 import {useCurrentRole} from '@/hooks/use-current-role';
-import {UpdateIdeaSheet} from "@/components/sites/management/review/review-detail/update-idea-sheet";
+import {UpdateTopicSheet} from "@/components/sites/management/review/review-detail/update-topic-sheet";
 import BreadcrumbReviewDetails from './breadcrum-review-details';
 import SheetFileUpload from './file-upload_review_details';
 import Link from "next/link";
@@ -25,7 +25,7 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
     const [fileUpload, setFileupload] = useState<File | null>(null)
     const currentRole = useCurrentRole()
     const [topicVersion, setTopicVersion] = useState<TopicVersion[]>([])
-    // const [fileEditIdea, setFileEditIdea] = React.useState<File[]>([]);
+    // const [fileEditTopic, setFileEditTopic] = React.useState<File[]>([]);
 
     useEffect( () => {
         if (reviewId){
@@ -43,9 +43,9 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                     if ( result.data.project != null && result.data.project?.topic?.topicVersions?.length && result.data.project?.topic?.topicVersions?.length > 0){
                         const listTopicVersion : TopicVersion[] = []
                         // const listFile : File[] = []
-                        for (const ideaHistory of result.data?.project?.topic?.topicVersions) {
-                            if (ideaHistory.reviewStage === result.data?.number) {
-                                listTopicVersion.push(ideaHistory);
+                        for (const topicHistory of result.data?.project?.topic?.topicVersions) {
+                            if (topicHistory.reviewStage === result.data?.number) {
+                                listTopicVersion.push(topicHistory);
                             }
                         }
                         setTopicVersion(listTopicVersion)
@@ -88,22 +88,22 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                     <div className={""}>
                         <BreadcrumbReviewDetails
                             semesterName={semester!.semesterName!}
-                            ideaCode={reviewDetails.project!.topic?.topicCode ? reviewDetails.project!.topic?.topicCode : ""}
+                            topicCode={reviewDetails.project!.topic?.topicCode ? reviewDetails.project!.topic?.topicCode : ""}
                             projectCode={reviewDetails.project!.teamCode!}
                             reviewNumber={reviewDetails.number}
                         />
                         <div className={"font-bold text-xl mt-6"}>
                             <div>
-                                {reviewDetails.project?.topic?.ideaVersion?.englishName}
+                                {reviewDetails.project?.topic?.topicVersion?.englishName}
                             </div>
                             <div className={"pt-4"}>
                                 <div className={"w-full flex gap-2"}>
                                     {reviewDetailsRBAC.hasPermission(currentRole, "feedbackUpdatedCapstone")
                                         ? (
-                                            <Link className={"font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/management/projects/detail/idea/update-idea?ideaId=${reviewDetails.project?.topic?.ideaVersion?.id}`} >Xem nội dùng đề tài chỉnh sửa</Link>
+                                            <Link className={"font-medium text-sm bg-amber-500 px-4 py-2 rounded-md text-white"} href={`/management/projects/detail/topic/update-topic?topicId=${reviewDetails.project?.topic?.topicVersion?.id}`} >Xem nội dùng đề tài chỉnh sửa</Link>
                                         )
                                         : (reviewDetails.number != 3 && reviewDetails.number != 4)
-                                            ? <UpdateIdeaSheet leaderId={reviewDetails.project?.leaderId ?? ""} topicVersionId={reviewDetails?.project?.topic?.ideaVersion?.id ? reviewDetails?.project?.topic?.ideaVersion?.id : ""} ideaId={reviewDetails && reviewDetails.project!.topic?.id ? reviewDetails.project!.topic?.id : ""} reviewStage={reviewDetails.number} ideaHis={topicVersion} />
+                                            ? <UpdateTopicSheet leaderId={reviewDetails.project?.leaderId ?? ""} topicVersionId={reviewDetails?.project?.topic?.topicVersion?.id ? reviewDetails?.project?.topic?.topicVersion?.id : ""} topicId={reviewDetails && reviewDetails.project!.topic?.id ? reviewDetails.project!.topic?.id : ""} reviewStage={reviewDetails.number} topicHis={topicVersion} />
                                             : null}
                                     <Button onClick={() => {handleUpdateDemo()}}>Update demo</Button>
                                 </div>
@@ -141,14 +141,14 @@ export const ReviewDetail = ({reviewId}: {reviewId: string}) => {
                                             <AccordionContent>
                                                 <div className={"flex flex-col gap-1.5 font-bold"}>
                                                     <div>Mã đề tài: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.topicCode}</span></div>
-                                                    <div>Tên đề tài tiếng Anh: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.englishName}</span></div>
-                                                    <div>Tên đề tài tiếng Việt: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.vietNamName}</span></div>
-                                                    <div>Viết tắt: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.abbreviations}</span></div>
-                                                    <div>Mô tả: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.ideaVersion?.description}</span></div>
+                                                    <div>Tên đề tài tiếng Anh: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.topicVersion?.englishName}</span></div>
+                                                    <div>Tên đề tài tiếng Việt: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.topicVersion?.vietNamName}</span></div>
+                                                    <div>Viết tắt: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.topicVersion?.abbreviations}</span></div>
+                                                    <div>Mô tả: <span className={"font-medium ml-2"}>{reviewDetails.project?.topic?.topicVersion?.description}</span></div>
                                                     <div>Đề tài doanh nghiệp:
                                                         <Button
                                                             className={"ml-4"}
-                                                            variant={reviewDetails.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic != null ? "destructive" : "ghost"}>{!reviewDetails.project?.topic?.ideaVersion?.idea?.isEnterpriseTopic ? "No" : reviewDetails.project?.topic.ideaVersion?.idea?.isEnterpriseTopic}</Button>
+                                                            variant={reviewDetails.project?.topic?.topicVersion?.topic?.isEnterpriseTopic != null ? "destructive" : "ghost"}>{!reviewDetails.project?.topic?.topicVersion?.topic?.isEnterpriseTopic ? "No" : reviewDetails.project?.topic.topicVersion?.topic?.isEnterpriseTopic}</Button>
                                                     </div>
                                                 </div>
                                             </AccordionContent>

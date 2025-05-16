@@ -13,7 +13,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { ModeToggle } from "@/components/_common/mode-toggle";
 import { Card } from "@/components/ui/card"; // Thêm Card component
-import { stageideaService } from "@/services/stage-idea-service";
+import { stagetopicService } from "@/services/stage-topic-service";
 import { useQuery } from "@tanstack/react-query";
 import { AlertMessage } from "@/components/_common/alert-message";
 import { useCurrentRole } from "@/hooks/use-current-role";

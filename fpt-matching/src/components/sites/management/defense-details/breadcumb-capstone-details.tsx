@@ -8,8 +8,8 @@ import {
 import React from "react";
 
 export default function BreadcumbCapstoneDetails(
-    {semesterName, projectCode, ideaCode, stage}:
-    { semesterName: string, projectCode: string, ideaCode: string, stage: number }
+    {semesterName, projectCode, topicCode, stage}:
+    { semesterName: string, projectCode: string, topicCode: string, stage: number }
 ) {
     return (
         <Breadcrumb>
@@ -19,7 +19,7 @@ export default function BreadcumbCapstoneDetails(
                 </BreadcrumbItem>
                 <BreadcrumbSeparator/>
                 <BreadcrumbItem>
-                    <BreadcrumbPage>{ideaCode}</BreadcrumbPage>
+                    <BreadcrumbPage>{topicCode}</BreadcrumbPage>
                 </BreadcrumbItem>
                 <BreadcrumbSeparator/>
                 <BreadcrumbItem>

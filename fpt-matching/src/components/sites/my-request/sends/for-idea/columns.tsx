@@ -10,7 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
+import { MentorTopicRequestStatus } from "@/types/enums/mentor-topic-request";
 import { Invitation } from "@/types/invitation";
 import { MentorTopicRequest } from "@/types/mentor-topic-request";
 import { ColumnDef, Row } from "@tanstack/react-table";
@@ -37,17 +37,17 @@ export const columns: ColumnDef<MentorTopicRequest>[] = [
   },
 
   {
-    accessorKey: "idea.englishName",
+    accessorKey: "topic.englishName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
     cell: ({ row }) => {
-      const englishName = row.original.topic?.ideaVersion?.englishName ?? "-"; // Tránh lỗi undefined
-      const ideaId = row.original.topic?.ideaVersion?.idea?.id ?? "#";
+      const englishName = row.original.topic?.topicVersion?.englishName ?? "-"; // Tránh lỗi undefined
+      const topicId = row.original.topic?.topicVersion?.topic?.id ?? "#";
 
       return (
         <Button variant="link" className="p-0 m-0" asChild>
-          <Link href={`/idea-detail/${ideaId}`}>{englishName}</Link>
+          <Link href={`/topic-detail/${topicId}`}>{englishName}</Link>
         </Button>
       );
     },

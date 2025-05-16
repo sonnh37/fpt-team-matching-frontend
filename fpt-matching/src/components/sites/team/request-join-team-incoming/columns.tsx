@@ -1,7 +1,6 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,23 +9,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/utils";
 import { invitationService } from "@/services/invitation-service";
 import { projectService } from "@/services/project-service";
+import { semesterService } from "@/services/semester-service";
 import { InvitationStatus } from "@/types/enums/invitation";
 import { Invitation } from "@/types/invitation";
 import { InvitationUpdateCommand } from "@/types/models/commands/invitation/invitation-update-command";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -104,6 +95,18 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     refetchOnWindowFocus: false,
   });
 
+  const {
+    data: res_current_semester,
+    isLoading: isLoadingStage,
+    isError: isErrorStage,
+    error: errorStage,
+    refetch: refetchCurrentSemester,
+  } = useQuery({
+    queryKey: ["getCurrentSemester"],
+    queryFn: () => semesterService.getCurrentSemester(),
+    refetchOnWindowFocus: false,
+  });
+
   if (isLoading) return <p>Loading...</p>;
   if (isError) {
     toast.error("Failed to load team information.", {
@@ -120,14 +123,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const isHasTopic = project?.topicId ? true : false;
 
-  let availableSlots = 5;
-  if (!isHasTopic) {
-    availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
-  } else {
-    availableSlots =
-      (project?.topic?.ideaVersion?.teamSize ?? 0) -
-      (project?.teamMembers?.length ?? 0);
-  }
+  let availableSlots = res_current_semester?.data?.maxTeamSize ?? 5;
+  availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
 
   const handleCancel = async () => {
     try {

@@ -84,8 +84,8 @@ export const capstoneScheduleSchemaColumns: ColumnDef<CapstoneSchedule>[] = [
     },
     {
         header: "Mã đề tài",
-        id: "idea-code",
-        accessorKey: "project.idea.ideaCode",
+        id: "topic-code",
+        accessorKey: "project.topic.topicCode",
         cell: ({row}) => {
             const project = row.original.project;
             return (
@@ -97,12 +97,12 @@ export const capstoneScheduleSchemaColumns: ColumnDef<CapstoneSchedule>[] = [
         header: ({column}) => (
             <DataTableColumnHeader className={"flex justify-center items-center"} column={column} title={"Tên đề tài tiếng anh"} />
         ),
-        id: "idea-name",
-        accessorKey: "project.idea.englishName",
+        id: "topic-name",
+        accessorKey: "project.topic.englishName",
         cell: ({row}) => {
             const project = row.original.project;
             return (
-                <div className={"flex justify-center"}>{project?.topic?.ideaVersion?.englishName}</div>
+                <div className={"flex justify-center"}>{project?.topic?.topicVersion?.englishName}</div>
             )
         }
     },
@@ -110,13 +110,13 @@ export const capstoneScheduleSchemaColumns: ColumnDef<CapstoneSchedule>[] = [
         header: "GVHD",
         id: "mentor-name",
         accessorFn: (row) => {
-          return   row.project?.topic?.ideaVersion?.idea?.mentor?.username + "" + row.project?.topic?.ideaVersion?.idea?.subMentor && " - " + row.project?.topic?.ideaVersion?.idea?.subMentor?.username
+          return   row.project?.topic?.topicVersion?.topic?.mentor?.username + "" + row.project?.topic?.topicVersion?.topic?.subMentor && " - " + row.project?.topic?.topicVersion?.topic?.subMentor?.username
         },
         cell: ({row}) => {
             const project = row.original.project;
             return (
                 <div>
-                    {project?.topic?.ideaVersion?.idea?.mentor?.username}{project?.topic?.ideaVersion?.idea?.subMentor && " - " + project?.topic.ideaVersion?.idea?.subMentor?.username}
+                    {project?.topic?.topicVersion?.topic?.mentor?.username}{project?.topic?.topicVersion?.topic?.subMentor && " - " + project?.topic.topicVersion?.topic?.subMentor?.username}
                 </div>
             )
         }

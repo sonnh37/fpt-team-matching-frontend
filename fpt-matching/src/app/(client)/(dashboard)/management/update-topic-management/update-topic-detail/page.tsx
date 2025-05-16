@@ -1,12 +1,12 @@
 "use client"
 import React from 'react';
 import {useSearchParams} from "next/navigation";
-import UpdateIdea from "@/components/sites/management/update-idea/update-idea";
+import UpdateTopic from "@/components/sites/management/update-topic/update-topic";
 
 const Page = () => {
     const searchParams = useSearchParams();
-    const ideaId = searchParams.get("ideaId");
-    return ideaId && <UpdateIdea ideaId={ideaId} />
+    const topicId = searchParams.get("topicId");
+    return topicId && <UpdateTopic topicId={topicId} />
 };
 
 export default Page;

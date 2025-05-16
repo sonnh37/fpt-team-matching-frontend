@@ -9,8 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cn, formatDate } from "@/lib/utils";
 import { ProjectStatus } from "@/types/enums/project";
-import { Idea } from "@/types/idea";
-import { IdeaVersion } from "@/types/idea-version";
+import { Topic } from "@/types/topic";
+import { TopicVersion } from "@/types/topic-version";
 import { Project } from "@/types/project";
 import { User } from "@/types/user";
 import { ColumnDef } from "@tanstack/react-table";
@@ -22,8 +22,8 @@ export const columns: ColumnDef<Project>[] = [
     header: () => <></>,
     cell: ({ row }) => {
       const project = row.original;
-      const ideaVersion = project.topic?.ideaVersion ?? {} as IdeaVersion;
-      const leader = ideaVersion?.idea?.owner ?? {} as User;
+      const topicVersion = project.topic?.topicVersion ?? {} as TopicVersion;
+      const leader = topicVersion?.topic?.owner ?? {} as User;
       
       const initials = `${leader.firstName?.charAt(0) ?? ''}${leader.lastName?.charAt(0) ?? ''}`.toUpperCase();
       
@@ -77,11 +77,11 @@ export const columns: ColumnDef<Project>[] = [
               <div className="flex-1 space-y-2">
                 <Link href={`/team-detail/${project.id}`} className="group block">
                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
-                    {ideaVersion.englishName}
+                    {topicVersion.englishName}
                   </h3>
-                  {ideaVersion.vietNamName && (
+                  {topicVersion.vietNamName && (
                     <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                      {ideaVersion.vietNamName}
+                      {topicVersion.vietNamName}
                     </p>
                   )}
                 </Link>
@@ -93,13 +93,13 @@ export const columns: ColumnDef<Project>[] = [
                   </div>
                   <div className="flex items-center text-zinc-600 dark:text-zinc-400">
                     <span className="mr-1.5 text-orange-500">📅</span>
-                    <span>{formatDate(ideaVersion.createdDate)}</span>
+                    <span>{formatDate(topicVersion.createdDate)}</span>
                   </div>
                 </div>
 
-                {ideaVersion.description && (
+                {topicVersion.description && (
                   <p className="text-sm text-zinc-700 dark:text-zinc-300 line-clamp-2 mt-2">
-                    {ideaVersion.description}
+                    {topicVersion.description}
                   </p>
                 )}
               </div>

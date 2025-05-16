@@ -40,14 +40,14 @@ class UserService extends BaseService<User> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-  public getAllByCouncilWithIdeaVersionRequestPending = (
+  public getAllByCouncilWithTopicVersionRequestPending = (
     query?: UserGetAllQuery
   ): Promise<BusinessResult<QueryResult<User>>> => {
     const cleanedQuery = cleanQueryParams(query);
 
     return axiosInstance
       .get<BusinessResult<QueryResult<User>>>(
-        `${this.endpoint}/council/pending-ideas?${cleanedQuery}`
+        `${this.endpoint}/council/pending-topics?${cleanedQuery}`
       )
       .then((response) => {
         return response.data;

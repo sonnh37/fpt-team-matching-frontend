@@ -31,9 +31,9 @@ import { PlusCircle } from 'lucide-react';
 import DetailFormCriteria from '../criteria-form-detail/detail-form';
 import { Pagination } from '@/components/ui/pagination';
 import { CriteriaFormGetAllQuery } from '@/types/models/queries/criteria-form-get-all-query.ts/criteria-form-get-all-query';
-import { ideaVersionRequestService } from '@/services/idea-version-request-service';
-import { IdeaVersionRequestGetAllQuery } from '@/types/models/queries/idea-version-requests/idea-version-request-get-all-query';
-import { IdeaVersionRequestStatus } from '@/types/enums/idea-version-request';
+import { topicVersionRequestService } from '@/services/topic-version-request-service';
+import { TopicVersionRequestGetAllQuery } from '@/types/models/queries/topic-version-requests/topic-version-request-get-all-query';
+import { TopicVersionRequestStatus } from '@/types/enums/topic-request';
 import FormAnswer from './detail-form-answer';
 
 
@@ -42,7 +42,7 @@ const CriteriaAnswerManagement = () => {
     const [totalPages, setTotalPages] = useState<number>(1);
     const [title, setTitle] = useState<string>("");
     const [search, setSearch] = useState<string>("");
-    const [queryParams, setQueryParams] = useState<IdeaVersionRequestGetAllQuery>({
+    const [queryParams, setQueryParams] = useState<TopicVersionRequestGetAllQuery>({
 
         pageNumber: 1,
         pageSize: 5,
@@ -58,8 +58,8 @@ const CriteriaAnswerManagement = () => {
         data: form,
         refetch
     } = useQuery({
-        queryKey: ["getAllIdeaVersion", queryParams],
-        queryFn: () => ideaVersionRequestService.getAllExceptPending(queryParams),
+        queryKey: ["getAllTopicVersion", queryParams],
+        queryFn: () => topicVersionRequestService.getAllExceptPending(queryParams),
         refetchOnWindowFocus: false,
     });
 
@@ -122,15 +122,15 @@ const CriteriaAnswerManagement = () => {
 
     }
     const statusMap = {
-        [IdeaVersionRequestStatus.Approved]: {
+        [TopicVersionRequestStatus.Approved]: {
             text: "Đã duyệt",
             className: "bg-green-500 text-white",
         },
-        [IdeaVersionRequestStatus.Rejected]: {
+        [TopicVersionRequestStatus.Rejected]: {
             text: "Đã từ chối",
             className: "bg-red-600 text-white",
         },
-        [IdeaVersionRequestStatus.Consider]: {
+        [TopicVersionRequestStatus.Consider]: {
             text: "Yêu cầu sửa",
             className: "bg-yellow-500 text-white",
         },
@@ -212,7 +212,7 @@ const CriteriaAnswerManagement = () => {
                                             : "Không có ngày"}
                                     </TableCell>
                                     <TableCell>{as.reviewer?.email}</TableCell>
-                                    <TableCell>{as?.ideaVersion?.abbreviations}</TableCell>
+                                    <TableCell>{as?.topicVersion?.abbreviations}</TableCell>
                                     <TableCell>{as.criteriaForm?.title}</TableCell>
                                     <TableCell className="justify-center">
                                         {statusInfo && (
@@ -224,7 +224,7 @@ const CriteriaAnswerManagement = () => {
                                     <TableCell className="flex justify-center items-center">
                                         <FormAnswer
                                             criteriaId={as.criteriaFormId}
-                                            ideaVersionRequestId={as.id}
+                                            topicVersionRequestId={as.id}
                                             isAnswered={(as?.answerCriterias?.length ?? 0) > 0}
                                         />
                                     </TableCell>

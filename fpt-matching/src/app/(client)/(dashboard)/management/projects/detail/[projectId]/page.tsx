@@ -18,6 +18,7 @@ import { RootState } from "@/lib/redux/store";
 import { formatDate } from "@/lib/utils";
 
 import { projectService } from "@/services/project-service";
+import { semesterService } from "@/services/semester-service";
 import { TeamMemberRole } from "@/types/enums/team-member";
 
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
@@ -38,6 +39,18 @@ export default function ProjectDetail() {
   } = useQuery({
     queryKey: ["getProjectDetailById", projectId as string],
     queryFn: () => projectService.getById(projectId as string),
+    refetchOnWindowFocus: false,
+  });
+
+  const {
+    data: res_current_semester,
+    isLoading: isLoadingStage,
+    isError: isErrorStage,
+    error: errorStage,
+    refetch: refetchCurrentSemester,
+  } = useQuery({
+    queryKey: ["getCurrentSemester"],
+    queryFn: () => semesterService.getCurrentSemester(),
     refetchOnWindowFocus: false,
   });
 
@@ -62,14 +75,8 @@ export default function ProjectDetail() {
   //  Tính số slot trống
   const isHasTopic = project?.topicId ? true : false;
 
-  let availableSlots = 5;
-  if (!isHasTopic) {
-    availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
-  } else {
-    availableSlots =
-      (project?.topic?.ideaVersion?.teamSize ?? 0) -
-      (project?.teamMembers?.length ?? 0);
-  }
+  let availableSlots = res_current_semester?.data?.maxTeamSize ?? 5;
+  availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
 
   return (
     <div className="p-4">
@@ -93,13 +100,13 @@ export default function ProjectDetail() {
                 <div>
                   <p className="text-gray-500">Abbreviations</p>
                   <p className="font-semibold italic">
-                    {project?.topic?.ideaVersion?.abbreviations}
+                    {project?.topic?.abbreviation}
                   </p>
                 </div>
                 <div>
                   <p className="text-gray-500">Vietnamese Title</p>
                   <p className="font-semibold italic">
-                    {project?.topic?.ideaVersion?.vietNamName}
+                    {project?.topic?.vietNameseName}
                   </p>
                 </div>
               </div>
@@ -110,7 +117,7 @@ export default function ProjectDetail() {
                   <p className="text-gray-500">Profession</p>
                   <p className="font-semibold italic">
                     {
-                      project?.topic?.ideaVersion?.idea?.specialty?.profession
+                      project?.topic?.specialty?.profession
                         ?.professionName
                     }
                   </p>
@@ -119,7 +126,7 @@ export default function ProjectDetail() {
                   <p className="text-gray-500">Specialty</p>
                   <p className="font-semibold italic">
                     {
-                      project?.topic?.ideaVersion?.idea?.specialty
+                      project?.topic?.specialty
                         ?.specialtyName
                     }
                   </p>
@@ -130,7 +137,7 @@ export default function ProjectDetail() {
               <div>
                 <p className="text-gray-500">Description</p>
                 <p className="italic">
-                  {project?.topic?.ideaVersion?.description}
+                  {project.topic?.description}
                 </p>
               </div>
 

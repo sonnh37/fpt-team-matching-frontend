@@ -27,6 +27,7 @@ import { useSearchParams } from "next/navigation";
 
 import { useSelector } from "react-redux";
 import { TeamInfoCard } from "@/components/_common/project-card-detail";
+import { semesterService } from "@/services/semester-service";
 
 export default function ProjectDetail() {
   const searchParams = useSearchParams();
@@ -43,6 +44,18 @@ export default function ProjectDetail() {
     refetchOnWindowFocus: false,
   });
 
+   const {
+      data: res_current_semester,
+      isLoading: isLoadingStage,
+      isError: isErrorStage,
+      error: errorStage,
+      refetch: refetchCurrentSemester,
+    } = useQuery({
+      queryKey: ["getCurrentSemester"],
+      queryFn: () => semesterService.getCurrentSemester(),
+      refetchOnWindowFocus: false,
+    });
+    
   if (isLoading) return <LoadingComponent />;
   if (isError) return <ErrorSystem />;
   if (!result?.data)
@@ -64,14 +77,8 @@ export default function ProjectDetail() {
   //  Tính số slot trống
   const isHasTopic = project?.topicId ? true : false;
 
-  let availableSlots = 5;
-  if (!isHasTopic) {
-    availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
-  } else {
-    availableSlots =
-      (project?.topic?.ideaVersion?.teamSize ?? 0) -
-      (project?.teamMembers?.length ?? 0);
-  }
+  let availableSlots = res_current_semester?.data?.maxTeamSize ?? 5;
+  availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 p-4 gap-6">

@@ -15,12 +15,12 @@ import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import {useSearchParams} from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ideaService } from "@/services/idea-service";
-import { IdeaStatus } from "@/types/enums/idea";
-import { IdeaUpdateStatusCommand } from "@/types/models/commands/idea/idea-update-status-command";
+import { topicService } from "@/services/topic-service";
+import { TopicStatus } from "@/types/enums/topic";
+import { TopicUpdateStatusCommand } from "@/types/models/commands/topic/topic-update-status-command";
 import { toast } from "sonner";
 
-export function MenuAction({ ideaId }: { ideaId: string }) {
+export function MenuAction({ topicId }: { topicId: string }) {
   // const { projectId } = useParams();
   const searchParams = useSearchParams();
   const projectId = searchParams.get("projectId");
@@ -30,12 +30,12 @@ export function MenuAction({ ideaId }: { ideaId: string }) {
     isLoading: isLoading,
     isError: isError,
   } = useQuery({
-    queryKey: ["getIdeaById", ideaId as string],
-    queryFn: () => ideaService.getById(ideaId as string),
+    queryKey: ["getTopicById", topicId as string],
+    queryFn: () => topicService.getById(topicId as string),
     refetchOnWindowFocus: false,
   });
 
-  const idea = result?.data;
+  const topic = result?.data;
 
   const handleReturnToGroup = async () => {
     // Hiển thị confirm dialog dạng toast
@@ -68,12 +68,12 @@ export function MenuAction({ ideaId }: { ideaId: string }) {
     try {
       toast.loading("Đang trả đề tài về nhóm...", { id: "return-status" });
 
-      const command: IdeaUpdateStatusCommand = {
-        id: ideaId,
-        status: IdeaStatus.ConsiderByMentor,
+      const command: TopicUpdateStatusCommand = {
+        id: topicId,
+        status: TopicStatus.ConsiderByMentor,
       };
 
-      const res = await ideaService.updateStatus(command);
+      const res = await topicService.updateStatus(command);
 
       if (res.status != 1) {
         toast.error(res.message || "Có lỗi xảy ra", { id: "return-status" });
@@ -81,7 +81,7 @@ export function MenuAction({ ideaId }: { ideaId: string }) {
       }
 
       await queryClient.invalidateQueries({
-        queryKey: ["getIdeaById", ideaId],
+        queryKey: ["getTopicById", topicId],
       });
 
       toast.success("Đã trả đề tài về nhóm thành công!", {
@@ -115,7 +115,7 @@ export function MenuAction({ ideaId }: { ideaId: string }) {
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Book />
-            <Link href={`detail/idea/update-idea?ideaId=${ideaId}`}>
+            <Link href={`detail/topic/update-topic?topicId=${topicId}`}>
               Quản lí cập nhật đề tài
             </Link>
           </DropdownMenuItem>
@@ -129,10 +129,10 @@ export function MenuAction({ ideaId }: { ideaId: string }) {
               Đánh giá nhóm
             </Link>
           </DropdownMenuItem>
-          {idea?.status === IdeaStatus.ConsiderByCouncil && (
+          {topic?.status === TopicStatus.ConsiderByCouncil && (
             <>
               <DropdownMenuItem>
-                <Link href={`/idea/detail/${ideaId}`}>Sửa</Link>
+                <Link href={`/topic/detail/${topicId}`}>Sửa</Link>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleReturnToGroup}>
                 Trả về nhóm

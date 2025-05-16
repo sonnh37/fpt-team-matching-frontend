@@ -20,9 +20,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
+import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { Department } from "@/types/enums/user";
-import { IdeaVersionRequest } from "@/types/idea-version-request";
+import { TopicVersionRequest } from "@/types/topic-version-request";
 import { User } from "@/types/user";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
@@ -94,9 +94,9 @@ export const columns: ColumnDef<User>[] = [
     ),
     cell: ({ row }) => {
       const [isDialogOpen, setIsDialogOpen] = useState(false);
-      const requests: IdeaVersionRequest[] =
-        row.original.ideaVersionRequestOfReviewers?.filter(
-          (req) => req.status === IdeaVersionRequestStatus.Pending
+      const requests: TopicVersionRequest[] =
+        row.original.topicVersionRequestOfReviewers?.filter(
+          (req) => req.status === TopicVersionRequestStatus.Pending
         ) || [];
 
       return (
@@ -140,19 +140,19 @@ export const columns: ColumnDef<User>[] = [
                     {requests.map((request) => (
                       <TableRow key={request.id}>
                         <TableCell>
-                          {request.ideaVersion?.topic?.topicCode || "-"}
+                          {request.topicVersion?.topic?.topicCode || "-"}
                         </TableCell>
                         <TableCell>
-                          {request.ideaVersion?.englishName || "-"}
+                          {request.topicVersion?.englishName || "-"}
                         </TableCell>
-                        <TableCell>V{request.ideaVersion?.version}</TableCell>
+                        <TableCell>V{request.topicVersion?.version}</TableCell>
 
                         <TableCell>
-                          {request.ideaVersion?.stageIdea?.semester
+                          {request.topicVersion?.stageTopic?.semester
                             ?.semesterName || "-"}
                         </TableCell>
                         <TableCell>
-                          {request.ideaVersion?.stageIdea?.stageNumber || "-"}
+                          {request.topicVersion?.stageTopic?.stageNumber || "-"}
                         </TableCell>
                       </TableRow>
                     ))}

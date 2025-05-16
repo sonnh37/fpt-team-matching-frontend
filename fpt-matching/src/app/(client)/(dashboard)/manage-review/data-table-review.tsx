@@ -150,13 +150,13 @@ export function ReviewDataTable<TData, TValue>({
                         />
                     </div>
                     <div className={"w-auto"}>
-                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="idea-code">Mã đề tài</Label>
+                        <Label className={"text-xs pl-2 font-bold text-gray-600"} htmlFor="topic-code">Mã đề tài</Label>
                         <Input
-                            id={"idea-code"}
+                            id={"topic-code"}
                             placeholder="Filter mã đề tài..."
-                            value={(table.getColumn("ideaCode")?.getFilterValue() as string) ?? ""}
+                            value={(table.getColumn("topicCode")?.getFilterValue() as string) ?? ""}
                             onChange={(event) =>
-                                table.getColumn("ideaCode")?.setFilterValue(event.target.value)
+                                table.getColumn("topicCode")?.setFilterValue(event.target.value)
                             }
                             className="max-w-sm"
                         />

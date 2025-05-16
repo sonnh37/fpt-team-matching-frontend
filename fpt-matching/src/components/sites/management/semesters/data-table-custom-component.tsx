@@ -1,45 +1,16 @@
 "use client";
 
-import * as React from "react";
-import { flexRender, Table as ReactTable } from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
+import { TypographyP } from "@/components/_common/typography/typography-p";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { usePathname, useSearchParams } from "next/navigation";
-import { UpdateCommand } from "@/types/models/commands/_base/base-command";
-import { BusinessResult } from "@/types/models/responses/business-result";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import { Semester } from "@/types/semester";
-import { TypographyList } from "@/components/_common/typography/typography-list";
-import { TypographyMuted } from "@/components/_common/typography/typography-muted";
-import { cn, formatDate } from "@/lib/utils";
-import { CalendarDays, MoreHorizontal, Trash2, UndoDot } from "lucide-react";
-import Link from "next/link";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -49,11 +20,39 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
+import { cn, formatDate } from "@/lib/utils";
 import { semesterService } from "@/services/semester-service";
+import { SemesterStatus } from "@/types/enums/semester";
+import { UpdateCommand } from "@/types/models/commands/_base/base-command";
+import { BusinessResult } from "@/types/models/responses/business-result";
+import { Semester } from "@/types/semester";
+import { useQueryClient } from "@tanstack/react-query";
+import { Table as ReactTable } from "@tanstack/react-table";
+import { CalendarDays, MoreHorizontal, Trash2, UndoDot } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+
+// Status mapping to Vietnamese
+const statusMap = {
+  [SemesterStatus.NotStarted]: {
+    label: "Chưa bắt đầu",
+    variant: "secondary" as const,
+  },
+  [SemesterStatus.Preparing]: {
+    label: "Đang chuẩn bị",
+    variant: "outline" as const,
+  },
+  [SemesterStatus.OnGoing]: {
+    label: "Đang diễn ra",
+    variant: "default" as const,
+  },
+  [SemesterStatus.Closed]: {
+    label: "Đã kết thúc",
+    variant: "destructive" as const,
+  },
+};
 
 interface TableComponentProps<TData> {
   table: ReactTable<TData>;
@@ -71,7 +70,6 @@ export function DataTableSemesterComponent<TData>({
   const queryClient = useQueryClient();
   const [selectedModel, setSelectedModel] = useState<Semester | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
   const pathName = usePathname();
 
   const handleRestore = async (model: Semester) => {
@@ -115,14 +113,14 @@ export function DataTableSemesterComponent<TData>({
         table.getRowModel().rows.map((row) => {
           const model = row.original as Semester;
           const isDeleted = model.isDeleted;
-          
+
           return (
             <div key={row.id} className="relative group">
               <Card
                 className={cn(
                   "h-full flex flex-col transition-all hover:shadow-lg border rounded-xl overflow-hidden",
-                  isDeleted 
-                    ? "opacity-80 bg-muted/30 border-destructive/20" 
+                  isDeleted
+                    ? "opacity-80 bg-muted/30 border-destructive/20"
                     : "bg-card/80 hover:border-primary/30 border-border"
                 )}
               >
@@ -136,29 +134,32 @@ export function DataTableSemesterComponent<TData>({
                         >
                           {model.semesterName}
                         </Link>
-                        <Badge 
-                          variant={isDeleted ? "destructive" : "secondary"} 
-                          className="px-2 py-0.5 text-xs font-medium"
-                        >
-                          {isDeleted ? "Đã xóa" : "Hoạt động"}
-                        </Badge>
+                        <div className="flex gap-2">
+                          <Badge
+                            variant={statusMap[model.status].variant}
+                            className="px-2 py-0.5 text-xs font-medium"
+                          >
+                            {statusMap[model.status].label}
+                          </Badge>
+                        </div>
                       </CardTitle>
-                      
+
                       <div className="flex items-center gap-3 text-sm">
                         <div className="flex items-center gap-1.5 text-muted-foreground">
                           <CalendarDays className="h-4 w-4 opacity-70" />
                           <span>
-                            {formatDate(model.startDate)} - {formatDate(model.endDate)}
+                            {formatDate(model.startDate)} -{" "}
+                            {formatDate(model.endDate)}
                           </span>
                         </div>
                       </div>
                     </div>
-                    
+
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-8 w-8 rounded-full opacity-70 group-hover:opacity-100 transition-opacity"
                         >
                           <MoreHorizontal className="h-4 w-4" />
@@ -166,7 +167,9 @@ export function DataTableSemesterComponent<TData>({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuLabel className="font-medium">Thao tác</DropdownMenuLabel>
+                        <DropdownMenuLabel className="font-medium">
+                          Thao tác
+                        </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onSelect={() => {
@@ -183,26 +186,48 @@ export function DataTableSemesterComponent<TData>({
                     </DropdownMenu>
                   </div>
                 </CardHeader>
-          
+
                 <CardContent className="flex-1 px-5 pb-4">
                   <div className="space-y-3">
                     <div className="flex items-start gap-3">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-muted-foreground mb-1">Mã học kỳ</p>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">
+                          Mã học kỳ
+                        </p>
                         <p className="text-sm font-mono bg-muted/50 px-2 py-1 rounded">
                           {model.semesterCode}
                         </p>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-muted-foreground mb-1">Tiền tố</p>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">
+                          Tiền tố
+                        </p>
                         <p className="text-sm bg-muted/50 px-2 py-1 rounded">
                           {model.semesterPrefixName}
                         </p>
                       </div>
                     </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">
+                          Số nhóm tối đa
+                        </p>
+                        <p className="text-sm bg-muted/50 px-2 py-1 rounded">
+                          {model.maxTeamSize}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground mb-1">
+                          Số nhóm tối thiểu
+                        </p>
+                        <p className="text-sm bg-muted/50 px-2 py-1 rounded">
+                          {model.minTeamSize}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
-          
+
                 {isDeleted && (
                   <CardFooter className="bg-muted/40 p-4 border-t flex justify-end gap-3">
                     <Button

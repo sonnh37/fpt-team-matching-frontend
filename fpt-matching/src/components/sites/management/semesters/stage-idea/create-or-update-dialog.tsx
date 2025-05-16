@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { StageIdea } from "@/types/stage-idea";
-import { stageideaService } from "@/services/stage-idea-service";
+import { StageTopic } from "@/types/stage-topic";
+import { stagetopicService } from "@/services/stage-topic-service";
 import { toast } from "sonner";
 import {
   FormInput,
@@ -29,8 +29,8 @@ import {
   FormInputNumber,
 } from "@/lib/form-custom-shadcn";
 import { useParams } from "next/navigation";
-import { StageIdeaUpdateCommand } from "@/types/models/commands/stage-ideas/stage-idea-update-command";
-import { StageIdeaCreateCommand } from "@/types/models/commands/stage-ideas/stage-idea-create-command";
+import { StageTopicUpdateCommand } from "@/types/models/commands/stage-topics/stage-topic-update-command";
+import { StageTopicCreateCommand } from "@/types/models/commands/stage-topics/stage-topic-create-command";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
@@ -45,34 +45,34 @@ const formSchema = z.object({
   resultDate: z.date(),
 });
 
-interface StageIdeaFormDialogProps {
+interface StageTopicFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  stageIdea?: StageIdea | null;
+  stageTopic?: StageTopic | null;
   onSuccess?: () => void;
 }
 
-export function StageIdeaFormDialog({
+export function StageTopicFormDialog({
   open,
   onOpenChange,
-  stageIdea,
+  stageTopic,
   onSuccess,
-}: StageIdeaFormDialogProps) {
+}: StageTopicFormDialogProps) {
   const queryClient = useQueryClient();
   const params = useParams();
 
   const getDefaultValues = () => {
-    if (stageIdea) {
+    if (stageTopic) {
       return {
-        ...stageIdea,
-        startDate: stageIdea.startDate
-          ? new Date(stageIdea.startDate)
+        ...stageTopic,
+        startDate: stageTopic.startDate
+          ? new Date(stageTopic.startDate)
           : new Date(),
-        endDate: stageIdea.endDate ? new Date(stageIdea.endDate) : new Date(),
-        resultDate: stageIdea.resultDate
-          ? new Date(stageIdea.resultDate)
+        endDate: stageTopic.endDate ? new Date(stageTopic.endDate) : new Date(),
+        resultDate: stageTopic.resultDate
+          ? new Date(stageTopic.resultDate)
           : new Date(),
-          numberReviewer: stageIdea.numberReviewer ?? 2,
+          numberReviewer: stageTopic.numberReviewer ?? 2,
       };
     }
     return {
@@ -90,18 +90,18 @@ export function StageIdeaFormDialog({
     if (open) {
       form.reset(getDefaultValues());
     }
-  }, [open, stageIdea]);
+  }, [open, stageTopic]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      if (stageIdea) {
+      if (stageTopic) {
         // Edit mode
-        const res = await stageideaService.update(values);
+        const res = await stagetopicService.update(values);
         if (res.status == 1) toast.success(res.message);
         else throw Error(res.message);
       } else {
         // Create mode
-        const res = await stageideaService.create(values);
+        const res = await stagetopicService.create(values);
         if (res.status == 1) {
           toast.success(res.message);
         } else throw Error(res.message);
@@ -118,7 +118,7 @@ export function StageIdeaFormDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {stageIdea ? "Chỉnh sửa đợt đề tài" : "Tạo mới đợt đề tài"}
+            {stageTopic ? "Chỉnh sửa đợt đề tài" : "Tạo mới đợt đề tài"}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -147,7 +147,7 @@ export function StageIdeaFormDialog({
             <FormInputDateTimePicker form={form} name="endDate" label="Ngày kết thúc" />
             <FormInputDateTimePicker form={form} name="resultDate" label="Ngày có kết quả" />
             <Button type="submit" className="w-full">
-              {stageIdea ? "Cập nhật" : "Tạo mới"}
+              {stageTopic ? "Cập nhật" : "Tạo mới"}
             </Button>
           </form>
         </Form>

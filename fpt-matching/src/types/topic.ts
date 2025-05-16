@@ -1,14 +1,37 @@
 import { BaseEntity } from "./_base/base";
-import { IdeaVersion } from "./idea-version";
+import { TopicStatus, TopicType } from "./enums/topic";
 import { MentorTopicRequest } from "./mentor-topic-request";
 import { Project } from "./project";
+import { Specialty } from "./specialty";
+import { StageTopic } from "./stage-topic";
+import { TopicRequest } from "./topic-request";
 import { TopicVersion } from "./topic-version";
+import { User } from "./user";
 
 export interface Topic extends BaseEntity {
-  ideaVersionId?: string;
+  ownerId?: string;
+  mentorId?: string;
+  subMentorId?: string;
+  specialtyId?: string;
+  stageTopicId?: string;
   topicCode?: string;
-  ideaVersion?: IdeaVersion;
+  type?: TopicType;
+  status?: TopicStatus;
+  isExistedTeam: boolean;
+  vietNameseName?: string;
+  englishName?: string;
+  description?: string;
+  abbreviation?: string;
+  isEnterpriseTopic: boolean;
+  enterpriseName?: string;
+  fileUrl?: string;
   project?: Project;
-  mentorTopicRequests: MentorTopicRequest[];
-  topicVersions: TopicVersion[];
+  owner?: User;
+  mentor?: User;
+  subMentor?: User;
+  specialty?: Specialty;
+  stageTopic?: StageTopic;
+  topicRequests?: TopicRequest[];
+  topicVersions?: TopicVersion[];
+  mentorTopicRequests?: MentorTopicRequest[];
 }

@@ -3,7 +3,9 @@ import { type ClassValue, clsx } from "clsx";
 import { format } from "date-fns";
 import { twMerge } from "tailwind-merge";
 import { vi } from "date-fns/locale";
-import * as XLSX from "xlsx"
+import * as XLSX from "xlsx";
+import { TopicStatus } from "@/types/enums/topic";
+import { Topic } from "@/types/topic";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -108,6 +110,15 @@ export function getEnumOptions(enumObject: any) {
     }));
 }
 
+export const isActiveTopic = (topic: Topic) => {
+  const excludedStatuses = [
+    TopicStatus.Draft,
+    TopicStatus.ManagerRejected,
+    TopicStatus.MentorRejected,
+  ];
+  return topic.status !== undefined && !excludedStatuses.includes(topic.status);
+};
+
 type EnumType = { [key: string]: string | number };
 
 export function getEnumLabel<T extends EnumType>(
@@ -161,31 +172,33 @@ export function toLocalISOString(date: Date) {
 }
 
 export const cleanQueryParams = (query?: BaseQueryableQuery | null): string => {
-  if (!query) return '';
+  if (!query) return "";
 
   const params = new URLSearchParams();
   const booleanFields: Record<string, Set<string>> = {};
 
   for (const key in query) {
     if (!Object.prototype.hasOwnProperty.call(query, key)) continue;
-    
+
     const value = query[key as keyof BaseQueryableQuery];
 
     // Bỏ qua giá trị null hoặc undefined
     if (value === null || value === undefined) continue;
 
     // Xử lý trường hợp các giá trị boolean (bắt đầu bằng 'is')
-    if (key.startsWith('is')) {
+    if (key.startsWith("is")) {
       if (Array.isArray(value)) {
         // Lọc bỏ các giá trị null/undefined trong mảng
-        const filteredValues = value.filter(item => item !== null && item !== undefined);
-        
+        const filteredValues = value.filter(
+          (item) => item !== null && item !== undefined
+        );
+
         // Theo dõi các giá trị boolean cho từng key
         if (!booleanFields[key]) {
           booleanFields[key] = new Set();
         }
-        
-        filteredValues.forEach(val => {
+
+        filteredValues.forEach((val) => {
           booleanFields[key].add(val.toString());
         });
       } else {
@@ -199,7 +212,9 @@ export const cleanQueryParams = (query?: BaseQueryableQuery | null): string => {
 
     // Xử lý mảng
     if (Array.isArray(value)) {
-      const filteredArray = value.filter(item => item !== null && item !== undefined);
+      const filteredArray = value.filter(
+        (item) => item !== null && item !== undefined
+      );
       filteredArray.forEach((item, index) => {
         params.append(`${key}[${index}]`, item.toString());
       });
@@ -207,7 +222,7 @@ export const cleanQueryParams = (query?: BaseQueryableQuery | null): string => {
     }
 
     // Xử lý object
-    if (typeof value === 'object') {
+    if (typeof value === "object") {
       try {
         params.append(key, JSON.stringify(value));
       } catch {
@@ -223,10 +238,10 @@ export const cleanQueryParams = (query?: BaseQueryableQuery | null): string => {
   // Xử lý các trường boolean sau khi thu thập đầy đủ
   for (const [key, values] of Object.entries(booleanFields)) {
     // Nếu có cả true và false thì bỏ qua (coi như undefined)
-    if (values.has('true') && values.has('false')) {
+    if (values.has("true") && values.has("false")) {
       continue;
     }
-    
+
     // Thêm các giá trị boolean hợp lệ vào params
     for (const val of Array.from(values)) {
       params.append(key, val);
@@ -236,7 +251,9 @@ export const cleanQueryParams = (query?: BaseQueryableQuery | null): string => {
   return params.toString();
 };
 
-export const buildQueryParams = <T extends Record<string, any>>(params: T): URLSearchParams => {
+export const buildQueryParams = <T extends Record<string, any>>(
+  params: T
+): URLSearchParams => {
   const searchParams = new URLSearchParams();
 
   Object.entries(params).forEach(([key, value]) => {

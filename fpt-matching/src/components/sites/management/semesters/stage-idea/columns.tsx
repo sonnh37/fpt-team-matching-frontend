@@ -12,12 +12,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatDate } from "@/lib/utils";
-import { StageIdea } from "@/types/stage-idea";
+import { StageTopic } from "@/types/stage-topic";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-export const columns: ColumnDef<StageIdea>[] = [
+export const columns: ColumnDef<StageTopic>[] = [
   {
     accessorKey: "stageNumber",
     header: ({ column }) => (
@@ -64,5 +64,5 @@ export const columns: ColumnDef<StageIdea>[] = [
 ];
 
 interface ActionsProps {
-  row: Row<StageIdea>;
+  row: Row<StageTopic>;
 }

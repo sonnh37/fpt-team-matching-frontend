@@ -8,8 +8,8 @@ import { cleanQueryParams } from "@/lib/utils";
 import axiosInstance from "@/lib/interceptors/axios-instance";
 import { BusinessResultWithoutData } from "@/types/models/responses/business-result-without-data";
 import { MentorTopicRequest } from "@/types/mentor-topic-request";
-import { MentorTopicRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
-import { MentorTopicRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
+import { MentorTopicRequestGetAllQuery } from "@/types/models/queries/mentor-topic-requests/mentor-topic-request-get-all-query";
+import { MentorTopicRequestUpdateCommand } from "@/types/models/commands/mentor-topic-requests/mentor-topic-request-update-command";
 import {CreateCommand} from "@/types/models/commands/_base/base-command";
 
 class MentorTopicRequestService extends BaseService<MentorTopicRequest> {
@@ -55,7 +55,7 @@ class MentorTopicRequestService extends BaseService<MentorTopicRequest> {
         .catch((error) => this.handleError(error));
     };
 
-  public sendRequestIdeaByStudent = (command: CreateCommand): Promise<BusinessResult<null>> => {
+  public sendRequestTopicByStudent = (command: CreateCommand): Promise<BusinessResult<null>> => {
     return axiosInstance
         .post<BusinessResult<null>>(`${this.endpoint}/student-request-topic`, command)
         .then((response) => response.data)

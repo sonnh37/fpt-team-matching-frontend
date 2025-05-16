@@ -44,7 +44,7 @@ export default function ClientLayout({
       setTheme(cache.theme ?? "light");
       dispatch(initializeCache(user.cache));
     } else {
-      const roleCurrent = user.userXRoles[0]?.role?.roleName;
+      const roleCurrent = user.userXRoles?.[0]?.role?.roleName;
       if (roleCurrent) {
         setTheme("light");
         dispatch(
