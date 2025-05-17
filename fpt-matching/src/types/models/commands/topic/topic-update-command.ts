@@ -1,11 +1,22 @@
+import { TopicStatus, TopicType } from "@/types/enums/topic";
 import { UpdateCommand } from "../_base/base-command";
 
 export interface TopicUpdateCommand extends UpdateCommand{
+    ownerId?: string;
     mentorId?: string;
     subMentorId?: string;
-    description?: string;
-    abbreviations?: string;
-    vietNamName?: string;
+    specialtyId?: string;
+    stageTopicId?: string;
+    topicCode?: string;
+    type?: TopicType;
+    status?: TopicStatus;
+    isExistedTeam: boolean;
+    vietNameseName?: string;
     englishName?: string;
-    file?: string;
+    description?: string;
+    abbreviation?: string;
+    isEnterpriseTopic: boolean;
+    enterpriseName?: string;
+    fileUrl?: string;
+    semesterId?: string;
 }

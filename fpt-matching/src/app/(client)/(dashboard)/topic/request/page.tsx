@@ -77,15 +77,15 @@ export default function QuanLyYTuongPage() {
               <TabsTrigger value={TABS.PENDING}>
                 <div className="flex items-center gap-2">
                   {TABS.PENDING}
-                  {countTopicsByStatus(TopicStatus.Pending) > 0 && (
+                  {countTopicsByStatus(TopicStatus.ManagerPending) > 0 && (
                     <Badge variant="secondary">
-                      {countTopicsByStatus(TopicStatus.Pending)}
+                      {countTopicsByStatus(TopicStatus.ManagerPending)}
                     </Badge>
                   )}
                 </div>
               </TabsTrigger>
 
-              <TabsTrigger value={TABS.CONSIDER}>
+              {/* <TabsTrigger value={TABS.CONSIDER}>
                 <div className="flex items-center gap-2">
                   {TABS.CONSIDER}
                   {role === "Student" ? (
@@ -102,9 +102,9 @@ export default function QuanLyYTuongPage() {
                     )
                   )}
                 </div>
-              </TabsTrigger>
+              </TabsTrigger> */}
 
-              <TabsTrigger value={TABS.APPROVED}>
+              {/* <TabsTrigger value={TABS.APPROVED}>
                 <div className="flex items-center gap-2">
                   {TABS.APPROVED}
                   {countTopicsByStatus(TopicStatus.Approved) > 0 && (
@@ -113,9 +113,9 @@ export default function QuanLyYTuongPage() {
                     </Badge>
                   )}
                 </div>
-              </TabsTrigger>
+              </TabsTrigger> */}
 
-              <TabsTrigger value={TABS.REJECTED}>
+              {/* <TabsTrigger value={TABS.REJECTED}>
                 <div className="flex items-center gap-2">
                   {TABS.REJECTED}
                   {countTopicsByStatus(TopicStatus.Rejected) > 0 && (
@@ -124,7 +124,7 @@ export default function QuanLyYTuongPage() {
                     </Badge>
                   )}
                 </div>
-              </TabsTrigger>
+              </TabsTrigger> */}
             </TabsList>
 
             {/* Nội dung các tab */}
@@ -132,7 +132,7 @@ export default function QuanLyYTuongPage() {
               <TabsContent value={TABS.PENDING}>
                 <TopicVersionRequestPendingTable />
               </TabsContent>
-
+{/* 
               <TabsContent value={TABS.CONSIDER}>
                 {role === "Student" ? (
                   <TopicVersionRequestConsiderByMentorTable />
@@ -147,7 +147,7 @@ export default function QuanLyYTuongPage() {
 
               <TabsContent value={TABS.REJECTED}>
                 <TopicVersionRequestRejectedTable />
-              </TabsContent>
+              </TabsContent> */}
             </div>
           </Tabs>
         </CardContent>

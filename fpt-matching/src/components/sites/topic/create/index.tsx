@@ -46,6 +46,7 @@ import { userService } from "@/services/user-service";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import { SemesterStatus } from "@/types/enums/semester";
 import { TeamMemberRole } from "@/types/enums/team-member";
+import { TopicStatus, TopicType } from "@/types/enums/topic";
 import { TopicCreateCommand } from "@/types/models/commands/topic/topic-create-command";
 import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/invitation-get-by-status-query";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
@@ -72,11 +73,11 @@ const formSchema = z.object({
     })
     .gte(4, { message: "Số lượng thành viên tối thiểu là 4" }),
 
-  abbreviations: z
+  abbreviation: z
     .string({ required_error: "Vui lòng nhập tên viết tắt" })
     .max(20, { message: "Tên viết tắt không được quá 20 ký tự" }),
 
-  vietNamName: z
+  vietNameseName: z
     .string({ required_error: "Vui lòng nhập tên tiếng Việt" })
     .min(2, { message: "Tên tiếng Việt phải có ít nhất 2 ký tự" }),
 
@@ -131,6 +132,7 @@ export const CreateProjectForm = () => {
   const isStudent = role == "Student";
   const isLecturer = role == "Mentor";
 
+  console.log(currentSemester, "Test")
   // Fetch all necessary data in parallel
   const {
     data: result_project,
@@ -266,11 +268,11 @@ export const CreateProjectForm = () => {
     "check_error",
     // errorStage ||
     errorProject ||
-      errorProfile ||
-      errorProfessions ||
-      errorTopics ||
-      errorUpComingSemester ||
-      errorInvitations
+    errorProfile ||
+    errorProfessions ||
+    errorTopics ||
+    errorUpComingSemester ||
+    errorInvitations
   );
 
   const isError =
@@ -360,6 +362,7 @@ export const CreateProjectForm = () => {
 
   if (hasActiveTopics && isStudent) return <PageIsTopic />;
 
+  
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Hiển thị confirm dialog trước khi submit
     const confirmSubmit = await new Promise((resolve) => {
@@ -440,7 +443,9 @@ export const CreateProjectForm = () => {
         isEnterpriseTopic: isStudent ? false : values.isEnterpriseTopic,
         enterpriseName: isStudent ? undefined : values.enterpriseName,
         mentorId: isLecturer ? undefined : values.mentorId,
-        file: fileUpload.data,
+        fileUrl: fileUpload.data,
+        isExistedTeam: false,
+        semesterId: currentSemester?.id,
       };
 
       const res = isStudent
@@ -466,6 +471,122 @@ export const CreateProjectForm = () => {
       toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi");
     }
   }
+
+  async function handleCreateDraft() {
+   const values = form.getValues()
+    // Hiển thị confirm dialog trước khi submit
+    const confirmSubmit = await new Promise((resolve) => {
+      toast.custom(
+        (t) => (
+          <Card className="w-[380px]">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-yellow-500" />
+                <span>Xác nhận tạo bản nháp ý tưởng</span>
+              </CardTitle>
+              <CardDescription className="pt-2">
+                Bạn có chắc chắn muốn tạo bản nháp này không?
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="flex justify-between">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  resolve(false);
+                  toast.dismiss(t);
+                }}
+              >
+                Hủy
+              </Button>
+              <Button
+                onClick={() => {
+                  resolve(true);
+                  toast.dismiss(t);
+                }}
+                className="gap-2"
+              >
+                <Send className="h-4 w-4" />
+                Chắc chắn
+              </Button>
+            </CardFooter>
+          </Card>
+        ),
+        {
+          duration: Infinity, // Không tự động đóng
+        }
+      );
+    });
+
+    if (!confirmSubmit) return;
+
+    try {
+      // Hiển thị loading khi bắt đầu xử lý
+      const loadingToastId = toast.loading("Đang xử lý yêu cầu...", {
+        duration: Infinity,
+      });
+
+
+      // Upload file
+      const fileUpload = await fileUploadService.uploadFile(
+        values.fileschema,
+        "Topic"
+      );
+      if (fileUpload.status != 1) {
+        toast.dismiss(loadingToastId);
+        return toast.error(fileUpload.message);
+      }
+
+      // Create daft based on user role
+      const commandStudent: TopicCreateCommand = {
+        ...values,
+        isEnterpriseTopic: isStudent ? false : values.isEnterpriseTopic,
+        enterpriseName: isStudent ? undefined : values.enterpriseName,
+        mentorId: isLecturer ? undefined : values.mentorId,
+        fileUrl: fileUpload.data,
+        status: TopicStatus.Draft,
+        type: TopicType.Student,
+        semesterId: currentSemester?.id,
+        ownerId: user?.id,
+        isExistedTeam: false
+
+      };
+
+      const commandLecture: TopicCreateCommand = {
+        ...values,
+        isEnterpriseTopic: isStudent ? false : values.isEnterpriseTopic,
+        enterpriseName: isStudent ? undefined : values.enterpriseName,
+        mentorId: isLecturer ? undefined : values.mentorId,
+        fileUrl: fileUpload.data,
+        status: TopicStatus.Draft,
+        type: TopicType.Lecturer,
+        semesterId: currentSemester?.id,
+        ownerId: user?.id,
+        isExistedTeam: false
+      };
+      const res = isStudent
+        ? await topicService.create(commandStudent)
+        : await topicService.create(commandLecture);
+
+      // Cập nhật trạng thái loading
+      toast.dismiss(loadingToastId);
+
+      if (res.status == 1) {
+        toast.success(res.message, {
+          action: {
+            label: "Xem danh sách",
+            onClick: () => router.push("/topic/request"),
+          },
+        });
+        setTimeout(() => router.push("/topic/request"), 2000);
+        return;
+      }
+
+      toast.error(res.message);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi");
+    }
+  }
+
 
   return (
     <Form {...form}>
@@ -613,7 +734,7 @@ export const CreateProjectForm = () => {
 
                 <FormField
                   control={form.control}
-                  name="vietNamName"
+                  name="vietNameseName"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Tên tiếng Việt</FormLabel>
@@ -632,7 +753,7 @@ export const CreateProjectForm = () => {
 
               <FormField
                 control={form.control}
-                name="abbreviations"
+                name="abbreviation"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Viết tắt</FormLabel>
@@ -913,9 +1034,13 @@ export const CreateProjectForm = () => {
           </CardContent>
 
           <CardFooter className="flex justify-end">
-            <Button type="submit" className="w-full md:w-auto">
+          <Button variant={"secondary"} type="button" onClick={() => handleCreateDraft()}>
+              Tạo bảng nháp
+            </Button>
+            <Button type="submit" className="w-full ml-2 md:w-auto">
               Gửi Ý tưởng
             </Button>
+          
           </CardFooter>
         </Card>
       </form>
