@@ -6,13 +6,13 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs-shadcn";
 import InvitationSentByStudentTable from "./by-me";
-import InvitationSentForIdeaTable from "./for-idea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import InvitationSentForTopicTable from "./for-idea";
 
 export function InivitationSent() {
   const tabs = {
     joinTeam: "Tham gia nhóm",
-    supervisorIdea: "Ý tưởng GVHD"
+    supervisorTopic: "Ý tưởng GVHD"
   };
 
   return (
@@ -30,10 +30,10 @@ export function InivitationSent() {
               {tabs.joinTeam}
             </TabsTrigger>
             <TabsTrigger 
-              value={tabs.supervisorIdea}
+              value={tabs.supervisorTopic}
               className="data-[state=active]:bg-primary data-[state=active]:text-white"
             >
-              {tabs.supervisorIdea}
+              {tabs.supervisorTopic}
             </TabsTrigger>
           </TabsList>
           
@@ -41,8 +41,8 @@ export function InivitationSent() {
             <InvitationSentByStudentTable />
           </TabsContent>
           
-          <TabsContent value={tabs.supervisorIdea}>
-            <InvitationSentForIdeaTable />
+          <TabsContent value={tabs.supervisorTopic}>
+            <InvitationSentForTopicTable />
           </TabsContent>
         </Tabs>
       </CardContent>

@@ -5,13 +5,13 @@ import {ChevronsUpDown, Download} from "lucide-react";
 import Link from "next/link";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {Badge} from "@/components/ui/badge";
-import {IdeaHistoryStatus} from "@/types/enums/idea-history";
+import {TopicHistoryStatus} from "@/types/enums/topic-history";
 import {TopicVersion} from "@/types/topic-version";
 import {TopicVersionStatus} from "@/types/enums/topic-version";
 
-export default function CollapsibleIdeaHistory(
-    {ideaHis, selectedIdeaHistory, setSelectedIdeaHistory}:
-    {ideaHis:TopicVersion[], selectedIdeaHistory:TopicVersion | null, setSelectedIdeaHistory:Dispatch<SetStateAction<TopicVersion | null>>}
+export default function CollapsibleTopicHistory(
+    {topicHis, selectedTopicHistory, setSelectedTopicHistory}:
+    {topicHis:TopicVersion[], selectedTopicHistory:TopicVersion | null, setSelectedTopicHistory:Dispatch<SetStateAction<TopicVersion | null>>}
 ) {
     const [isOpen, setIsOpen] = React.useState(false)
     return (
@@ -32,12 +32,12 @@ export default function CollapsibleIdeaHistory(
                 </CollapsibleTrigger>
             </div>
             <div className="rounded-md border px-4 py-3 font-mono text-sm">
-                {selectedIdeaHistory && (
+                {selectedTopicHistory && (
                     <div className={"items-center flex justify-between gap-4"}>
                         <div className="overflow-ellipsis overflow-hidden flex gap-2">
-                            <p>CAPSTONE_REGISTER_{selectedIdeaHistory.fileUpdate?.split("CAPSTONE_REGISTER_")[1]}</p>
+                            <p>CAPSTONE_REGISTER_{selectedTopicHistory.fileUpdate?.split("CAPSTONE_REGISTER_")[1]}</p>
                         </div>
-                        <Link className={""} href={selectedIdeaHistory.fileUpdate ? selectedIdeaHistory.fileUpdate : ""}><Download /></Link>
+                        <Link className={""} href={selectedTopicHistory.fileUpdate ? selectedTopicHistory.fileUpdate : ""}><Download /></Link>
                     </div>
                 )}
 
@@ -49,19 +49,19 @@ export default function CollapsibleIdeaHistory(
                             <h4>Các file đã nộp</h4>
                         </div>
 
-                        {ideaHis.map((idea, index) => {
+                        {topicHis.map((topic, index) => {
                             return (
                                 <div className={"rounded-md border px-4 py-3 font-mono mx-2 text-[0.6rem] w-[95%] items-center flex justify-between mt-2 gap-4 hover:cursor-pointer"} key={index}>
                                     <div className="flex gap-2" >
                                         <p onClick={() => {
-                                            setSelectedIdeaHistory(idea);
-                                        }}  className={"text-center w-[7vw] flex flex-col justify-center overflow-ellipsis overflow-hidden flex-nowrap"}>CAPSTONE_REGISTER_{idea.fileUpdate?.split("CAPSTONE_REGISTER_")[1]}</p>
+                                            setSelectedTopicHistory(topic);
+                                        }}  className={"text-center w-[7vw] flex flex-col justify-center overflow-ellipsis overflow-hidden flex-nowrap"}>CAPSTONE_REGISTER_{topic.fileUpdate?.split("CAPSTONE_REGISTER_")[1]}</p>
                                         <Badge
                                             variant={"default"}
-                                            className={`p-1 ${idea.status == TopicVersionStatus.Pending ? "bg-amber-600" : idea.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"}`}
-                                        >{IdeaHistoryStatus[idea.status!]}</Badge>
+                                            className={`p-1 ${topic.status == TopicVersionStatus.Pending ? "bg-amber-600" : topic.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"}`}
+                                        >{TopicHistoryStatus[topic.status!]}</Badge>
                                     </div>
-                                    <Link className={""} href={idea.fileUpdate ? idea.fileUpdate : ""}><Download /></Link>
+                                    <Link className={""} href={topic.fileUpdate ? topic.fileUpdate : ""}><Download /></Link>
                                 </div>
                             )
                         })}

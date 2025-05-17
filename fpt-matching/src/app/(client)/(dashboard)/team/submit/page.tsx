@@ -26,7 +26,7 @@ const formSchema = z.object({
 })
 
 
-const SubmitIdea = () => {
+const SubmitTopic = () => {
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -78,7 +78,7 @@ const SubmitIdea = () => {
               <FormItem>
                 <FormLabel>English Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="What's your idea?" {...field} />
+                  <Input placeholder="What's your topic?" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -108,7 +108,7 @@ const SubmitIdea = () => {
               <FormItem>
                 <FormLabel>Vietnamese Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="What's your idea in Vietnamese" {...field} />
+                  <Input placeholder="What's your topic in Vietnamese" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -129,7 +129,7 @@ const SubmitIdea = () => {
             name="inviteEmail"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>You can choose 2 supervisor and one of their ideas for you Capstone Project(Optional)</FormLabel>
+                <FormLabel>You can choose 2 supervisor and one of their topics for you Capstone Project(Optional)</FormLabel>
                 <p className="text-black text-xs mb-2 font-bold">
                   You have to fill fullname in the following form: fullname(FPT Mail) <p className="text-red-600">ex: Nguyen Van Anh(anhntv@fpt.edu.vn)</p>
                 </p>
@@ -181,4 +181,4 @@ const SubmitIdea = () => {
   );
 };
 
-export default SubmitIdea;
+export default SubmitTopic;

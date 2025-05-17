@@ -12,7 +12,7 @@ import { userService } from '@/services/user-service';
 import { teammemberService } from '@/services/team-member-service';
 import { RateCreateCommand } from '@/types/models/commands/rate/rate-create-command';
 import { toast } from 'sonner';
-import { ideaHistoryService } from '@/services/idea-history-service';
+import { topicHistoryService } from '@/services/topic-history-service';
 const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
     const [rated, setRated] = React.useState(20);
     const [rated1, setRated1] = React.useState(20);

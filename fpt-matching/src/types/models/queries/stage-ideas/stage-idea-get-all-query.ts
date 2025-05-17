@@ -1,7 +1,7 @@
-import { IdeaVersionRequestStatus } from "@/types/enums/idea-version-request";
+import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { BaseQueryableQuery } from "../_base/base-query";
 
-export interface StageIdeaGetAllQuery extends BaseQueryableQuery {
+export interface StageTopicGetAllQuery extends BaseQueryableQuery {
   semesterId?: string;
   startDate?: string;
   endDate?: string;

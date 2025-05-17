@@ -1,7 +1,7 @@
 import { BaseEntity } from "./_base/base";
 import { Topic } from "./topic";
 import { Project } from "./project";
-import { MentorTopicRequestStatus } from "./enums/mentor-idea-request";
+import { MentorTopicRequestStatus } from "./enums/mentor-topic-request";
 
 export interface MentorTopicRequest extends BaseEntity {
   projectId?: string;

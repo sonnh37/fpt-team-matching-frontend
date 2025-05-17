@@ -34,7 +34,7 @@ export const TeamInfoCard = ({
   availableSlots,
 }: TeamInfoCardProps) => {
   const latestTopicVersion = project.topic?.topicVersions?.[0];
-  const idea = project.topic?.ideaVersion?.idea;
+  const topic = project.topic?.topicVersion?.topic;
 
   const sortedMembers = project?.teamMembers
     ?.slice()
@@ -62,14 +62,14 @@ export const TeamInfoCard = ({
             </p>
           </div>
           <div>
-            <MenuAction ideaId={project?.topic?.ideaVersion?.id!} />
+            <MenuAction topicId={project?.topic?.topicVersion?.id!} />
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="p-6 space-y-8">
         {/* Thông tin đề tài */}
-        {project.topic?.ideaVersion != null ? (
+        {project.topic?.topicVersion != null ? (
           <>
             <div className="space-y-6">
               <h3 className="text-xl font-semibold text-foreground">
@@ -88,19 +88,19 @@ export const TeamInfoCard = ({
                     <div className="space-y-1">
                       <Label>Viết tắt:</Label>
                       <p>
-                        {project.topic.ideaVersion.abbreviations || "Chưa có"}
+                        {project.topic.topicVersion.abbreviations || "Chưa có"}
                       </p>
                     </div>
                     <div className="space-y-1">
                       <Label>Tên tiếng Việt:</Label>
                       <p>
-                        {project.topic.ideaVersion.vietNamName || "Chưa có"}
+                        {project.topic.topicVersion.vietNamName || "Chưa có"}
                       </p>
                     </div>
                     <div className="space-y-1">
                       <Label>Tên tiếng Anh:</Label>
                       <p>
-                        {project.topic.ideaVersion.englishName || "Chưa có"}
+                        {project.topic.topicVersion.englishName || "Chưa có"}
                       </p>
                     </div>
                   </CardContent>
@@ -120,13 +120,13 @@ export const TeamInfoCard = ({
                     <div className="space-y-1">
                       <Label>Ngành:</Label>
                       <p>
-                        {idea?.specialty?.profession?.professionName ||
+                        {topic?.specialty?.profession?.professionName ||
                           "Chưa có"}
                       </p>
                     </div>
                     <div className="space-y-1">
                       <Label>Chuyên ngành:</Label>
-                      <p>{idea?.specialty?.specialtyName || "Chưa có"}</p>
+                      <p>{topic?.specialty?.specialtyName || "Chưa có"}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -139,7 +139,7 @@ export const TeamInfoCard = ({
                   </CardHeader>
                   <CardContent>
                     <p className="whitespace-pre-line">
-                      {project.topic.ideaVersion.description || "Chưa có mô tả"}
+                      {project.topic.topicVersion.description || "Chưa có mô tả"}
                     </p>
                   </CardContent>
                 </Card>
@@ -155,16 +155,16 @@ export const TeamInfoCard = ({
                       <div className="space-y-1">
                         <Label>Đề tài doanh nghiệp:</Label>
                         <p>
-                          {project.topic.ideaVersion.idea?.isEnterpriseTopic
+                          {project.topic.topicVersion.topic?.isEnterpriseTopic
                             ? "Có"
                             : "Không"}
                         </p>
                       </div>
-                      {project.topic.ideaVersion.idea?.isEnterpriseTopic && (
+                      {project.topic.topicVersion.topic?.isEnterpriseTopic && (
                         <div className="space-y-1">
                           <Label>Tên doanh nghiệp:</Label>
                           <p>
-                            {project.topic.ideaVersion.enterpriseName ||
+                            {project.topic.topicVersion.enterpriseName ||
                               "Chưa có"}
                           </p>
                         </div>
@@ -173,16 +173,16 @@ export const TeamInfoCard = ({
                     <div className="space-y-4">
                       <div className="space-y-1">
                         <Label>Người hướng dẫn:</Label>
-                        <p>{idea?.mentor?.email || "Chưa có"}</p>
+                        <p>{topic?.mentor?.email || "Chưa có"}</p>
                       </div>
                       <div className="space-y-1">
                         <Label>Người hướng dẫn 2:</Label>
-                        <p>{idea?.subMentor?.email || "Chưa có"}</p>
+                        <p>{topic?.subMentor?.email || "Chưa có"}</p>
                       </div>
                     </div>
                     <div className="space-y-1">
                       <Label>Số lượng thành viên tối đa:</Label>
-                      <p>{project.topic.ideaVersion.teamSize || "Chưa có"}</p>
+                      <p>{project.topic.topicVersion.teamSize || "Chưa có"}</p>
                     </div>
                     <div className="space-y-1">
                       <Label>Tệp đính kèm:</Label>
@@ -213,7 +213,7 @@ export const TeamInfoCard = ({
               Nhóm của bạn chưa đăng ký đề tài.{" "}
               <Button variant="link" className="p-0 h-auto" asChild>
                 <Link
-                  href="/idea/supervisors"
+                  href="/topic/supervisors"
                   className="text-primary font-semibold"
                 >
                   <div className="font-bold text-black">

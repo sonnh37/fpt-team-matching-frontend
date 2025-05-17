@@ -37,7 +37,7 @@ export const columns: ColumnDef<Project>[] = [
     ),
   },
   {
-    accessorKey: "topic.ideaVersion.englishName",
+    accessorKey: "topic.topicVersion.englishName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),

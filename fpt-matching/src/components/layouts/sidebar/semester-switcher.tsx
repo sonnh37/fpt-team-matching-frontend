@@ -1,5 +1,4 @@
 "use client";
-
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -24,11 +23,31 @@ import {
   updateUserCache,
 } from "@/lib/redux/slices/cacheSlice";
 import { AppDispatch } from "@/lib/redux/store";
+import { SemesterStatus } from "@/types/enums/semester";
 import { Semester } from "@/types/semester";
 import { Calendar, ChevronsUpDown, Loader2, Star } from "lucide-react";
 import * as React from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
+
+const statusBadgeVariants = {
+  [SemesterStatus.NotStarted]: {
+    text: "Chưa bắt đầu",
+    variant: "secondary" as const,
+  },
+  [SemesterStatus.Preparing]: {
+    text: "Đang chuẩn bị",
+    variant: "outline" as const,
+  },
+  [SemesterStatus.OnGoing]: {
+    text: "Đang diễn ra",
+    variant: "default" as const,
+  },
+  [SemesterStatus.Closed]: {
+    text: "Đã kết thúc",
+    variant: "destructive" as const,
+  },
+};
 
 export function SemesterSwitcher() {
   const { isMobile } = useSidebar();
@@ -78,25 +97,17 @@ export function SemesterSwitcher() {
     setIsChanging(true);
 
     try {
-      // Tìm role đầu tiên của user trong semester mới
-
-      let newRole;
-
-      if (!rolePrimaries) {
-        newRole = user.userXRoles.find(
-          (userRole) => userRole.semesterId === semester.id
-        )?.role?.roleName;
-      } else {
-        newRole = user.userXRoles.find((userRole) => userRole.isPrimary)?.role
-          ?.roleName;
-      }
+      let newRole = rolePrimaries
+        ? user.userXRoles?.find((userRole) => userRole.isPrimary)?.role?.roleName
+        : user.userXRoles?.find(
+            (userRole) => userRole.semesterId === semester.id
+          )?.role?.roleName;
 
       const payload = {
         semester: semester.id,
-        role: newRole, 
+        role: newRole,
       };
 
-      // Optimistic update
       setActiveSemester(semester);
 
       await Promise.all([
@@ -110,7 +121,7 @@ export function SemesterSwitcher() {
     } catch (error) {
       console.error("Change semester error:", error);
       toast.error((error as string) || "Có lỗi khi thay đổi học kì");
-      setActiveSemester(currentSemester || semesterList[0]); // Rollback
+      setActiveSemester(currentSemester || semesterList[0]);
     } finally {
       setIsChanging(false);
     }
@@ -121,25 +132,28 @@ export function SemesterSwitcher() {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild disabled={isChanging}>
-            <SidebarMenuButton className="py-4 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-              <div className="flex aspect-square size-4 items-center justify-center rounded-lg">
-                {isChanging ? (
-                  <Loader2 className="animate-spin h-4 w-4" />
-                ) : (
-                  <Calendar className="dark:text-white text-black" />
-                )}
-              </div>
-              <div className="flex flex-row items-center gap-2 text-sm leading-tight">
-                <TypographyP className="truncate">
-                  Học kì: {activeSemester?.semesterName || "Chọn học kì"}
-                  {activeSemester && (
-                    <Badge variant="outline" className="ml-2">
-                      {isChanging ? "Đang chuyển..." : "Đang chọn"}
-                    </Badge>
+            <SidebarMenuButton className="py-3 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
+              <div className="flex items-center gap-2 w-full">
+                <div className="flex items-center justify-center">
+                  {isChanging ? (
+                    <Loader2 className="animate-spin h-4 w-4" />
+                  ) : (
+                    <Calendar className="h-4 w-4 dark:text-white text-black" />
                   )}
-                </TypographyP>
+                </div>
+                <div className="flex-1 min-w-0 flex items-center gap-2">
+                  <TypographyP className="truncate text-sm">
+                    {activeSemester?.semesterName || "Chọn học kì"}
+                  </TypographyP>
+                  <Badge
+                    variant={statusBadgeVariants[activeSemester.status].variant}
+                    className="text-xs py-0 px-1.5 h-5 flex items-center"
+                  >
+                    {statusBadgeVariants[activeSemester.status].text}
+                  </Badge>
+                </div>
+                <ChevronsUpDown className="h-4 w-4 opacity-50" />
               </div>
-              <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -160,7 +174,7 @@ export function SemesterSwitcher() {
                 className="gap-2 p-2"
                 disabled={isChanging}
               >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 w-full">
                   <div className="flex size-6 items-center justify-center rounded-sm border">
                     {isChanging && activeSemester?.id === semester.id ? (
                       <Loader2 className="animate-spin h-4 w-4" />
@@ -168,13 +182,19 @@ export function SemesterSwitcher() {
                       <Calendar className="size-4 shrink-0" />
                     )}
                   </div>
-                  <div>
-                    <div className="flex items-center gap-1">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1 truncate">
                       {semester.semesterName}
                       {activeSemester?.id === semester.id && (
                         <Star className="size-3 text-yellow-500 fill-yellow-500" />
                       )}
                     </div>
+                    <Badge
+                      variant={statusBadgeVariants[semester.status].variant}
+                      className="text-xs py-0 px-1.5 h-5 mt-0.5 flex items-center"
+                    >
+                      {statusBadgeVariants[semester.status].text}
+                    </Badge>
                   </div>
                 </div>
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>

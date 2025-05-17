@@ -30,22 +30,22 @@ export function TopicVersionRequestCard({topicVersionRequest} : {topicVersionReq
                     <div className="grid w-full items-center gap-4">
                         <div className="flex flex-col space-y-1.5">
                             <Label className={"font-bold pl-2"} htmlFor="englishName">Tên tiếng Việt</Label>
-                            <Input disabled={true} id="englishName" value={topicVersionRequest.topicVersion?.topic?.ideaVersion?.vietNamName} />
+                            <Input disabled={true} id="englishName" value={topicVersionRequest.topicVersion?.topic?.topicVersion?.vietNamName} />
                         </div>
                         <div className="flex flex-col space-y-1.5">
                             <Label className={"font-bold pl-2"} htmlFor="englishName">Tên tiếng Anh</Label>
-                            <Input disabled={true} id="englishName" value={topicVersionRequest.topicVersion?.topic?.ideaVersion?.englishName} />
+                            <Input disabled={true} id="englishName" value={topicVersionRequest.topicVersion?.topic?.topicVersion?.englishName} />
                         </div>
                         <div className="flex flex-col space-y-1.5">
                             <Label className={"font-bold pl-2"} htmlFor="englishName">Đề tài doanh nghiệp</Label>
-                            <Input disabled={true} id="englishName" value={topicVersionRequest.topicVersion?.topic?.ideaVersion?.idea?.isEnterpriseTopic ? topicVersionRequest.topicVersion?.topic?.ideaVersion.enterpriseName : "N/A"} />
+                            <Input disabled={true} id="englishName" value={topicVersionRequest.topicVersion?.topic?.topicVersion?.topic?.isEnterpriseTopic ? topicVersionRequest.topicVersion?.topic?.topicVersion.enterpriseName : "N/A"} />
                         </div>
                     </div>
                 </form>
             </CardContent>
             <CardFooter className="flex w-full justify-between">
                 <Button onClick={() => {
-                    window.location.href = `update-topic-management/update-topic-detail?ideaId=${topicVersionRequest.topicVersion?.topic?.ideaVersion?.id}`;
+                    window.location.href = `update-topic-management/update-topic-detail?topicId=${topicVersionRequest.topicVersion?.topic?.topicVersion?.id}`;
                 }} className={"w-full"}>Xem chi tiết</Button>
             </CardFooter>
         </Card>

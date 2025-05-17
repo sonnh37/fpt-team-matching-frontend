@@ -1,8 +1,9 @@
 import { BaseEntity } from "./_base/base";
 import { CriteriaForm } from "./criteria-form";
+import { SemesterStatus } from "./enums/semester";
 import { ProfileStudent } from "./profile-student";
-import { StageIdea } from "./stage-idea";
-import { Timeline } from "./timeline";
+import { Project } from "./project";
+import { StageTopic } from "./stage-topic";
 import { UserXRole } from "./user-x-role";
 
 export interface Semester extends BaseEntity {
@@ -10,18 +11,19 @@ export interface Semester extends BaseEntity {
   semesterCode?: string;
   semesterName?: string;
   semesterPrefixName?: string;
-  publicTopicDate?: Date | string;
-  startDate?: Date | string;
-  endDate?: Date | string;
-  onGoingDate?: Date | string;
-  maxTeamSize?: number;
-  minTeamSize?: number;
+  startDate?: Date;
+  endDate?: Date;
+  onGoingDate?: Date;
+  publicTopicDate?: Date;
+  status: SemesterStatus;
+  maxTeamSize: number;
+  minTeamSize: number;
   numberOfTeam: number;
   limitTopicMentorOnly: number;
   limitTopicSubMentor: number;
   criteriaForm?: CriteriaForm;
-  profileStudents: ProfileStudent[];
-  stageIdeas: StageIdea[];
-  timelines: Timeline[];
-  userXRoles: UserXRole[];
+  profileStudents?: ProfileStudent[];
+  stageTopics?: StageTopic[];
+  userXRoles?: UserXRole[];
+  projects?: Project[];
 }

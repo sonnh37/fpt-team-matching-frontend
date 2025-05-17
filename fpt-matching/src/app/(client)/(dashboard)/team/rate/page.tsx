@@ -82,7 +82,7 @@ export default function Page() {
                                 <TableCell>
                                     {cv.user?.profileStudent?.specialty?.specialtyName}
                                 </TableCell>
-                                {/* <TableCell>{result?.data?.topic?.ideaVersion?.}</TableCell> */}
+                                {/* <TableCell>{result?.data?.topic?.topicVersion?.}</TableCell> */}
                                 <TableCell>
                                     {cv.user?.lastName} {cv.user?.firstName}
                                 </TableCell>

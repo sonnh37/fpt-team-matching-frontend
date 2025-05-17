@@ -1,22 +1,11 @@
 "use client";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
-import { TypographyH3 } from "@/components/_common/typography/typography-h3";
-import { TypographyH4 } from "@/components/_common/typography/typography-h4";
-import { TypographyMuted } from "@/components/_common/typography/typography-muted";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import { TypographySmall } from "@/components/_common/typography/typography-small";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogClose,
@@ -43,29 +32,23 @@ import {
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useCurrentRole } from "@/hooks/use-current-role";
 import { formatDate } from "@/lib/utils";
-import { ideaService } from "@/services/idea-service";
 import { invitationService } from "@/services/invitation-service";
 import { projectService } from "@/services/project-service";
 import { semesterService } from "@/services/semester-service";
-import { stageideaService } from "@/services/stage-idea-service";
-import { IdeaStatus } from "@/types/enums/idea";
+import { topicService } from "@/services/topic-service";
 import { TeamMemberRole } from "@/types/enums/team-member";
+import { TopicStatus } from "@/types/enums/topic";
 import { InvitationStudentCreatePendingCommand } from "@/types/models/commands/invitation/invitation-student-command";
-import { IdeaGetCurrentByStatusQuery } from "@/types/models/queries/ideas/idea-get-current-by-status";
-import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { TopicGetCurrentByStatusQuery } from "@/types/models/queries/topics/topic-get-current-by-status";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { is } from "date-fns/locale";
 import {
   CalendarDays,
   FileText,
   Info,
   Loader2,
-  LoaderCircle,
   MoreVertical,
   Send,
   User,
-  User as UserIcon,
   UserPlus,
   Users,
   X,
@@ -73,7 +56,6 @@ import {
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import { TbUsersPlus } from "react-icons/tb";
 import { toast } from "sonner";
 
 export default function ProjectDetail() {
@@ -83,8 +65,15 @@ export default function ProjectDetail() {
   const roleCurrent = useCurrentRole();
   const [isLoading, setIsLoading] = useState(false);
 
-  const query: IdeaGetCurrentByStatusQuery = {
-    status: IdeaStatus.Pending,
+  const query: TopicGetCurrentByStatusQuery = {
+    statusList: [
+      TopicStatus.StudentEditing,
+      TopicStatus.MentorPending,
+      TopicStatus.MentorConsider,
+      TopicStatus.MentorApproved,
+      TopicStatus.MentorSubmitted,
+      TopicStatus.ManagerPending,
+    ],
     isPagination: false,
   };
 
@@ -107,14 +96,14 @@ export default function ProjectDetail() {
     return true;
   }, [res_current_semester?.data]);
 
-  // Query: Idea của user
+  // Query: Topic của user
   const {
-    data: result_idea_current,
-    isLoading: isLoadingIdeaCurrent,
-    isError: isErrorIdeaCurrent,
+    data: result_topic_current,
+    isLoading: isLoadingTopicCurrent,
+    isError: isErrorTopicCurrent,
   } = useQuery({
-    queryKey: ["getIdeaCurrentAccepted", query],
-    queryFn: () => ideaService.getCurrentIdeaOfMeByStatus(query),
+    queryKey: ["getTopicCurrentAccepted", query],
+    queryFn: () => topicService.getCurrentTopicOfMeByStatus(query),
     refetchOnWindowFocus: false,
   });
 
@@ -126,18 +115,8 @@ export default function ProjectDetail() {
   } = useQuery({
     queryKey: ["project", teamId],
     queryFn: () =>
-      projectService.getById(teamId!.toString()).then((res) => res.data),
+      projectService.getById(teamId.toString()).then((res) => res.data),
     enabled: !!teamId,
-  });
-
-  const { data: idea } = useQuery({
-    queryKey: ["project", project?.topic?.ideaVersion?.ideaId],
-    queryFn: () =>
-      ideaService
-        .getById(project?.topic?.ideaVersion?.ideaId)
-        .then((res) => res.data),
-    enabled: !!project?.topic?.ideaVersion?.ideaId,
-    refetchOnWindowFocus: false,
   });
 
   // Query: Thông tin user hiện tại đã có project chưa
@@ -164,23 +143,17 @@ export default function ProjectDetail() {
     a.role === TeamMemberRole.Leader
       ? -1
       : b.role === TeamMemberRole.Leader
-        ? 1
-        : 0
+      ? 1
+      : 0
   );
-
+  const semester = res_current_semester?.data;
   const isHasTopic = !!project?.topic;
   const topic = project?.topic;
-  const ideaVersion = project?.topic?.ideaVersion;
-  const maxTeamSize = isHasTopic
-    ? project.topic?.ideaVersion?.teamSize ?? 6
-    : 6;
-  const currentTeamSize = teamMembers.length;
 
-  const hasPendingIdea = (result_idea_current?.data?.length ?? 0) > 0;
+  const hasPendingTopic = (result_topic_current?.data?.length ?? 0) > 0;
 
   const availableSlots = isHasTopic
-    ? (project.topic?.ideaVersion?.teamSize ?? 0) -
-      (project.teamMembers?.length ?? 0)
+    ? (semester?.maxTeamSize ?? 0) - (project.teamMembers?.length ?? 0)
     : 5 - (project?.teamMembers?.length ?? 0);
   const canJoinTeam =
     availableSlots > 0 &&
@@ -188,27 +161,27 @@ export default function ProjectDetail() {
     !isCurrentUserInTeam &&
     !teamUserLogin;
 
-    const role = useCurrentRole()
+  const role = useCurrentRole();
 
   const requestJoinTeam = async (id: string) => {
     setIsLoading(true);
 
-    if(role !== "Student"){
-      toast.error("Bạn không có quyền xin vào nhóm ")
-      return
+    if (role !== "Student") {
+      toast.error("Bạn không có quyền xin vào nhóm ");
+      return;
     }
     try {
-      // Kiểm tra size idea có lớn hơn số thành viên hiện tại không
+      // Kiểm tra size topic có lớn hơn số thành viên hiện tại không
       if (availableSlots <= 0) {
         toast.error("Nhóm đã đủ thành viên.Bạn không thể xin vào");
         return;
       }
 
-      const ideacreate: InvitationStudentCreatePendingCommand = {
+      const topiccreate: InvitationStudentCreatePendingCommand = {
         projectId: id,
         content: "Muốn tham gia vào nhóm bạn",
       };
-      const result = await invitationService.sendByStudent(ideacreate);
+      const result = await invitationService.sendByStudent(topiccreate);
 
       if (result?.status === 1) {
         toast.success(result.message);
@@ -234,11 +207,9 @@ export default function ProjectDetail() {
     }
   };
 
-  if (isLoadingIdeaCurrent || isLoadingTeam || isLoadingCurrent)
+  if (isLoadingTopicCurrent || isLoadingTeam || isLoadingCurrent)
     return <LoadingComponent />;
-  if (isErrorIdeaCurrent || isErrorTeam) return <ErrorSystem />;
-
-  
+  if (isErrorTopicCurrent || isErrorTeam) return <ErrorSystem />;
 
   return (
     <div className="container pt-6 max-w-4xl">
@@ -263,7 +234,7 @@ export default function ProjectDetail() {
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
-                            disabled={hasPendingIdea}
+                            disabled={hasPendingTopic}
                             className="gap-2"
                             variant="default"
                           >
@@ -348,7 +319,7 @@ export default function ProjectDetail() {
                   )}
                 </div>
               </TooltipTrigger>
-              {hasPendingIdea && (
+              {hasPendingTopic && (
                 <TooltipContent side="bottom" className="max-w-[300px]">
                   <p className="text-sm">
                     Bạn không thể yêu cầu tham gia nhóm khi có ý tưởng đang chờ
@@ -371,8 +342,7 @@ export default function ProjectDetail() {
                 <div className="flex items-center gap-3">
                   <Badge variant="outline" className="text-sm">
                     <Users className="h-3 w-3 mr-1" />
-                    {sortedMembers.length} thành
-                    viên
+                    {sortedMembers.length} thành viên
                   </Badge>
                   <p className="text-sm text-muted-foreground">
                     <CalendarDays className="h-3 w-3 inline mr-1" />
@@ -392,7 +362,7 @@ export default function ProjectDetail() {
 
           <CardContent className="p-6 space-y-8">
             {/* Thông tin đề tài */}
-            {isHasTopic && ideaVersion && (
+            {isHasTopic && (
               <>
                 <Separator className="my-4" />
                 <div className="space-y-6">
@@ -412,19 +382,19 @@ export default function ProjectDetail() {
                         <div className="space-y-1">
                           <Label>Viết tắt:</Label>
                           <p className="font-medium">
-                            {ideaVersion.abbreviations || "Chưa có"}
+                            {project.topic?.abbreviation || "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <Label>Tên tiếng Việt:</Label>
                           <p className="font-medium">
-                            {ideaVersion.vietNamName || "Chưa có"}
+                            {project.topic?.vietNameseName || "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <Label>Tên tiếng Anh:</Label>
                           <p className="font-medium">
-                            {ideaVersion.englishName || "Chưa có"}
+                            {project.topic?.englishName || "Chưa có"}
                           </p>
                         </div>
                       </CardContent>
@@ -447,14 +417,14 @@ export default function ProjectDetail() {
                         <div className="space-y-1">
                           <Label>Ngành:</Label>
                           <p className="font-medium">
-                            {idea?.specialty?.profession?.professionName ||
+                            {topic?.specialty?.profession?.professionName ||
                               "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <Label>Chuyên ngành:</Label>
                           <p className="font-medium">
-                            {idea?.specialty?.specialtyName || "Chưa có"}
+                            {topic?.specialty?.specialtyName || "Chưa có"}
                           </p>
                         </div>
                       </CardContent>
@@ -469,7 +439,7 @@ export default function ProjectDetail() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-line text-foreground">
-                          {ideaVersion.description || "Chưa có mô tả"}
+                          {project.topic?.description || "Chưa có mô tả"}
                         </p>
                       </CardContent>
                     </Card>
@@ -486,14 +456,14 @@ export default function ProjectDetail() {
                           <div className="space-y-1">
                             <Label>Đề tài doanh nghiệp:</Label>
                             <p className="font-medium">
-                              {idea?.isEnterpriseTopic ? "Có" : "Không"}
+                              {topic?.isEnterpriseTopic ? "Có" : "Không"}
                             </p>
                           </div>
-                          {idea?.isEnterpriseTopic && (
+                          {topic?.isEnterpriseTopic && (
                             <div className="space-y-1">
                               <Label>Tên doanh nghiệp:</Label>
                               <p className="font-medium">
-                                {ideaVersion.enterpriseName || "Chưa có"}
+                                {project.topic?.enterpriseName || "Chưa có"}
                               </p>
                             </div>
                           )}
@@ -502,32 +472,26 @@ export default function ProjectDetail() {
                           <div className="space-y-1">
                             <Label>Mentor:</Label>
                             <p className="font-medium">
-                              {idea?.mentor?.email || "Chưa có"}
+                              {topic?.mentor?.email || "Chưa có"}
                             </p>
                           </div>
                           <div className="space-y-1">
                             <Label>Mentor phụ:</Label>
                             <p className="font-medium">
-                              {idea?.subMentor?.email || "Chưa có"}
+                              {topic?.subMentor?.email || "Chưa có"}
                             </p>
                           </div>
                         </div>
                         <div className="space-y-1">
-                          <Label>Số lượng thành viên tối đa:</Label>
-                          <p className="font-medium">
-                            {ideaVersion.teamSize || "Chưa có"}
-                          </p>
-                        </div>
-                        <div className="space-y-1">
                           <Label>Tệp đính kèm:</Label>
-                          {ideaVersion.file ? (
+                          {project.topic?.fileUrl ? (
                             <Button
                               variant="link"
                               className="px-0 h-auto"
                               asChild
                             >
                               <a
-                                href={ideaVersion.file}
+                                href={project.topic?.fileUrl}
                                 target="_blank"
                                 className="text-primary font-medium"
                               >
@@ -555,8 +519,9 @@ export default function ProjectDetail() {
 
               <div className="space-y-3">
                 {sortedMembers.map((member, index) => {
-                  const initials = `${member.user?.lastName?.charAt(0).toUpperCase() || ""
-                    }`;
+                  const initials = `${
+                    member.user?.lastName?.charAt(0).toUpperCase() || ""
+                  }`;
                   const isLeader = member.role === TeamMemberRole.Leader;
 
                   return (

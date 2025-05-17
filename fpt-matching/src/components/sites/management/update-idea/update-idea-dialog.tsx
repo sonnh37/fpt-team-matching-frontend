@@ -16,9 +16,9 @@ import {Loader2} from "lucide-react";
 import {topicVersionRequestService} from "@/services/topic-version-request-service";
 import {TopicVersionRequestStatus} from "@/types/enums/topic-version-request";
 
-export function UpdateIdeaDialog(
-    {isOpen, setIsOpen, comment, decision, ideaHistoryId, setDecision, setStatus} :
-    {isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, comment: string | null, decision: TopicVersionRequestStatus | null, ideaHistoryId : string, setDecision:Dispatch<SetStateAction<TopicVersionRequestStatus | null>>, setStatus: Dispatch<SetStateAction<TopicVersionRequestStatus | null>>}
+export function UpdateTopicDialog(
+    {isOpen, setIsOpen, comment, decision, topicHistoryId, setDecision, setStatus} :
+    {isOpen: boolean, setIsOpen: Dispatch<SetStateAction<boolean>>, comment: string | null, decision: TopicVersionRequestStatus | null, topicHistoryId : string, setDecision:Dispatch<SetStateAction<TopicVersionRequestStatus | null>>, setStatus: Dispatch<SetStateAction<TopicVersionRequestStatus | null>>}
 ) {
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -41,14 +41,14 @@ export function UpdateIdeaDialog(
             const result = await topicVersionRequestService.responseByManagerOrMentor({
                 feedback: comment,
                 status: decision,
-                id: ideaHistoryId
+                id: topicHistoryId
             })
 
             if (result && result.status == 1) {
                 toast.success("cập nhật lại đề tài thành công!");
                 setStatus(decision);
             } else {
-                toast.error(`Error updating idea history: ${result.message}`);
+                toast.error(`Error updating topic history: ${result.message}`);
             }
 
         } catch (error) {

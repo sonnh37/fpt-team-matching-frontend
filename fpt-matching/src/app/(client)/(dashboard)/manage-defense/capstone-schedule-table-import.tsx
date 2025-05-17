@@ -163,17 +163,17 @@ export function CapstoneScheduleTableImport<TData, TValue>({
                 />
                 <Input
                     placeholder="Filter mã đề tài..."
-                    value={(table.getColumn("idea-code")?.getFilterValue() as string) ?? ""}
+                    value={(table.getColumn("topic-code")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("idea-code")?.setFilterValue(event.target.value)
+                        table.getColumn("topic-code")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
                 <Input
                     placeholder="Filter tên đề tài..."
-                    value={(table.getColumn("idea-name")?.getFilterValue() as string) ?? ""}
+                    value={(table.getColumn("topic-name")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("idea-name")?.setFilterValue(event.target.value)
+                        table.getColumn("topic-name")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />

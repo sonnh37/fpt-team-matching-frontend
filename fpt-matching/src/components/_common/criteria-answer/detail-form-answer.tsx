@@ -33,19 +33,19 @@ type EvaluationFormValues = z.infer<typeof evaluationFormSchema>;
 
 interface FormCriteriaAnswer {
     criteriaId?: string;
-    ideaVersionRequestId?: string;
+    topicVersionRequestId?: string;
     isAnswered: boolean;
 }
 
 const FormAnswer = ({
     criteriaId,
-    ideaVersionRequestId,
+    topicVersionRequestId,
     isAnswered = false,
 }: FormCriteriaAnswer) => {
 
 
     const queryAnswer: AnswerCriteriaGetAllQuery = {
-        ideaVersionRequestId: ideaVersionRequestId,
+        topicVersionRequestId: topicVersionRequestId,
         isPagination: false,
     };
 
@@ -58,7 +58,7 @@ const FormAnswer = ({
     const { data: res_answer } = useQuery({
         queryKey: ["getAnswerCriterias", queryAnswer],
         queryFn: async () => await answerCriteriaService.getAll(queryAnswer),
-        enabled: !!ideaVersionRequestId,
+        enabled: !!topicVersionRequestId,
         refetchOnWindowFocus: false,
     });
 

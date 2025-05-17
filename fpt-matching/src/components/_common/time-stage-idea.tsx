@@ -5,17 +5,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn, formatDate } from "@/lib/utils";
-import { StageIdea } from "@/types/stage-idea";
+import { StageTopic } from "@/types/stage-topic";
 import { Badge } from "../ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Info, CalendarDays, Clock, Award } from "lucide-react";
 import { Separator } from "../ui/separator";
 
-interface StageIdeaProps {
-  stageIdea?: StageIdea | undefined;
+interface StageTopicProps {
+  stageTopic?: StageTopic | undefined;
 }
 
-const TimeStageIdea = ({ stageIdea }: StageIdeaProps) => {
+const TimeStageTopic = ({ stageTopic }: StageTopicProps) => {
   return (
     <div className="w-full max-w-4xl mx-auto">
       <Card className="shadow-sm">
@@ -28,7 +28,7 @@ const TimeStageIdea = ({ stageIdea }: StageIdeaProps) => {
         </CardHeader>
         
         <CardContent className="space-y-4">
-          {stageIdea ? (
+          {stageTopic ? (
             <div className="grid gap-4 md:grid-cols-2">
               {/* Timeline Item 1 */}
               <div className="flex items-start gap-4 p-4 rounded-lg border bg-muted/50">
@@ -41,11 +41,11 @@ const TimeStageIdea = ({ stageIdea }: StageIdeaProps) => {
                   <h3 className="font-medium">Thời gian đánh giá</h3>
                   <div className="mt-1 flex flex-wrap gap-2">
                     <Badge variant="secondary" className="text-sm font-normal">
-                      {formatDate(stageIdea.startDate)}
+                      {formatDate(stageTopic.startDate)}
                     </Badge>
                     <span className="text-muted-foreground">đến</span>
                     <Badge variant="secondary" className="text-sm font-normal">
-                      {formatDate(stageIdea.endDate)}
+                      {formatDate(stageTopic.endDate)}
                     </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
@@ -65,7 +65,7 @@ const TimeStageIdea = ({ stageIdea }: StageIdeaProps) => {
                   <h3 className="font-medium">Công bố kết quả</h3>
                   <div className="mt-1">
                     <Badge variant="secondary" className="text-sm font-normal">
-                      {formatDate(stageIdea.resultDate)}
+                      {formatDate(stageTopic.resultDate)}
                     </Badge>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
@@ -89,4 +89,4 @@ const TimeStageIdea = ({ stageIdea }: StageIdeaProps) => {
   );
 };
 
-export default TimeStageIdea;
+export default TimeStageTopic;

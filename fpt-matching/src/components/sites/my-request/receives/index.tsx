@@ -6,7 +6,6 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs-shadcn";
 import InvitationReceiveByTeamTable from "./by-team";
-import InvitationReceiveToGetIdeaByStudentTable from "./request-idea-by-student";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export function InivitationReceive() {
@@ -42,7 +41,7 @@ export function InivitationReceive() {
           </TabsContent>
           
           {/* <TabsContent value={tabs.studentRequests}>
-            <InvitationReceiveToGetIdeaByStudentTable />
+            <InvitationReceiveToGetTopicByStudentTable />
           </TabsContent> */}
         </Tabs>
       </CardContent>

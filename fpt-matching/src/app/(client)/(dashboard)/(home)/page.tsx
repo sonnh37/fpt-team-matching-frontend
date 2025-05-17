@@ -1,12 +1,11 @@
 "use client";
 
-import IdeaSearchList from "@/components/sites/home";
-import { z } from "zod";
+import TopicSearchList from "@/components/sites/home";
 export default function HomePage() {
   // Home page
   return (
     <>
-      <IdeaSearchList />
+      <TopicSearchList />
     </>
   );
 }

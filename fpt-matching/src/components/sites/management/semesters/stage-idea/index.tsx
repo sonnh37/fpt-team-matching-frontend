@@ -52,8 +52,8 @@ import { columns } from "./columns";
 import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { isDeleted_options } from "@/lib/filter-options";
-import { StageIdeaGetAllQuery } from "@/types/models/queries/stage-ideas/stage-idea-get-all-query";
-import { stageideaService } from "@/services/stage-idea-service";
+import { StageTopicGetAllQuery } from "@/types/models/queries/stage-topics/stage-topic-get-all-query";
+import { stagetopicService } from "@/services/stage-topic-service";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -63,9 +63,9 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { StageIdea } from "@/types/stage-idea";
+import { StageTopic } from "@/types/stage-topic";
 import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
-import { StageIdeaFormDialog } from "./create-or-update-dialog";
+import { StageTopicFormDialog } from "./create-or-update-dialog";
 import { LoadingComponent } from "@/components/_common/loading-page";
 //#region INPUT
 const defaultSchema = z.object({
@@ -73,8 +73,8 @@ const defaultSchema = z.object({
 });
 
 interface ActionsProps {
-  row: Row<StageIdea>;
-  onEdit: (stageIdea: StageIdea) => void; // Thêm callback để mở dialog
+  row: Row<StageTopic>;
+  onEdit: (stageTopic: StageTopic) => void; // Thêm callback để mở dialog
 }
 
 const Actions: React.FC<ActionsProps> = ({ row, onEdit }) => {
@@ -105,7 +105,7 @@ const Actions: React.FC<ActionsProps> = ({ row, onEdit }) => {
         </DropdownMenuContent>
       </DropdownMenu>
       <DeleteBaseEntitysDialog
-        deleteById={stageideaService.delete}
+        deleteById={stagetopicService.delete}
         open={showDeleteTaskDialog}
         onOpenChange={setShowDeleteTaskDialog}
         list={[model]}
@@ -116,7 +116,7 @@ const Actions: React.FC<ActionsProps> = ({ row, onEdit }) => {
   );
 };
 //#endregion
-export default function StageIdeaTable() {
+export default function StageTopicTable() {
   const params_ = useParams();
   const filterEnums: FilterEnum[] = [
     { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
@@ -139,7 +139,7 @@ export default function StageIdeaTable() {
   });
   const [isTyping, setIsTyping] = useState(false);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
-  const [currentStageIdea, setCurrentStageIdea] = useState<StageIdea | null>(
+  const [currentStageTopic, setCurrentStageTopic] = useState<StageTopic | null>(
     null
   );
 
@@ -156,7 +156,7 @@ export default function StageIdeaTable() {
 
   // default field in table
   const queryParams = useMemo(() => {
-    const params: StageIdeaGetAllQuery = useQueryParams(
+    const params: StageTopicGetAllQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
@@ -179,19 +179,19 @@ export default function StageIdeaTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => stageideaService.getAll(queryParams),
+    queryFn: () => stagetopicService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
   if (error) return <div>Error loading data</div>;
 
-  const handleEdit = (stageIdea: StageIdea) => {
-    setCurrentStageIdea(stageIdea);
+  const handleEdit = (stageTopic: StageTopic) => {
+    setCurrentStageTopic(stageTopic);
     setIsFormDialogOpen(true);
   };
 
-  const columns_: ColumnDef<StageIdea>[] = [
+  const columns_: ColumnDef<StageTopic>[] = [
     ...columns,
     {
       accessorKey: "actions",
@@ -223,7 +223,7 @@ export default function StageIdeaTable() {
 
   // Thêm nút "Create" vào Toolbar
   const handleCreateClick = () => {
-    setCurrentStageIdea(null); // Reset để tạo mới
+    setCurrentStageTopic(null); // Reset để tạo mới
     setIsFormDialogOpen(true);
   };
 
@@ -246,17 +246,17 @@ export default function StageIdeaTable() {
             <DataTableComponent
               isLoading={isFetching && !isTyping}
               table={table}
-              restore={stageideaService.restore}
-              deletePermanent={stageideaService.deletePermanent}
+              restore={stagetopicService.restore}
+              deletePermanent={stagetopicService.deletePermanent}
             />
 
             <DataTablePagination table={table} />
           </div>
         </div>
-        <StageIdeaFormDialog
+        <StageTopicFormDialog
           open={isFormDialogOpen}
           onOpenChange={setIsFormDialogOpen}
-          stageIdea={currentStageIdea}
+          stageTopic={currentStageTopic}
           onSuccess={handleSuccess}
         />
       </div>

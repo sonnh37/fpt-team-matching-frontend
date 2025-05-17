@@ -1,4 +1,4 @@
-import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
+import { MentorTopicRequestStatus } from "@/types/enums/mentor-topic-request";
 import { CreateCommand } from "../_base/base-command";
 
 export interface MentorTopicRequestCreateCommand extends CreateCommand {
