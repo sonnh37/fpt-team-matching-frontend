@@ -167,9 +167,22 @@ export const NAV_CONFIG = {
 
     {
       title: "Quản lý nhóm",
-      url: "/management/projects",
       icon: Briefcase,
       roles: ["Manager"],
+      items: [
+        {
+          url: "/management/projects",
+          title: "Xem nhóm",
+          icon: Briefcase,
+          roles: ["Manager"],
+        },
+        {
+          url: "/management/projects/add-to-project",
+          title: "Thêm sinh viên vào nhóm",
+          icon: Briefcase,
+          roles: ["Manager"],
+        }
+      ]
     },
     // {
     //   title: "Quản lý đề tài",
