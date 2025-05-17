@@ -240,6 +240,11 @@ class UserService extends BaseService<User> {
       return this.handleError(error);
     }
   };
+
+  public getStudentDoNotHaveTeam = async ({semesterId}:{semesterId: string}): Promise<BusinessResult<User[]>> => {
+    const response = await axiosInstance.get<BusinessResult<User[]>>(`${this.endpoint}/get-student-do-not-have-team?semesterId=${semesterId}`)
+    return response.data;
+  }
 }
 
 export const userService = new UserService();

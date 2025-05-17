@@ -51,6 +51,10 @@ const formSchema = z.object({
   startDate: z.date(),
   endDate: z.date(),
   publicTopicDate: z.date(),
+  onGoingDate: z.date(),
+  maxTeamSize: z.number().optional(),
+  minTeamSize: z.number().optional(),
+  numberOfTeam: z.number().optional(),
 });
 
 export const SemesterForm: React.FC<SemesterFormProps> = ({
@@ -252,7 +256,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <FormInput
                       form={form}
                       name="semesterName"
@@ -266,6 +270,13 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                       label="Tên tiền tố"
                       placeholder="VD: Năm học 2023-2024"
                     />
+
+                    <FormInputNumber
+                        form={form}
+                        name="numberOfTeam"
+                        label="Số lượng nhóm"
+                        placeholder="VD: 150"
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -275,7 +286,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                   <CardTitle className="text-lg">Thời gian</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-6 grid gap-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <FormInputDateTimePicker
                       form={form}
                       name="startDate"
@@ -290,6 +301,11 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                       form={form}
                       name="publicTopicDate"
                       label="Công bố đề tài"
+                    />
+                    <FormInputDateTimePicker
+                        form={form}
+                        name="onGoingDate"
+                        label="Ngày bắt đầu"
                     />
                   </div>
                 </CardContent>
@@ -318,6 +334,22 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                     placeholder="Nhập số lượng"
                     min={0}
                   />
+                  <div className={"grid grid-cols-2 gap-6"}>
+                    <FormInputNumber
+                        form={form}
+                        name="minTeamSize"
+                        label="Số lượng thành viên tối thiểu"
+                        placeholder="VD: 4"
+                        min={0}
+                    />
+                    <FormInputNumber
+                        form={form}
+                        name="maxTeamSize"
+                        label="Số lượng thành viên tối đa"
+                        placeholder="VD: 5"
+                        min={0}
+                    />
+                  </div>
                 </CardContent>
               </Card>
 

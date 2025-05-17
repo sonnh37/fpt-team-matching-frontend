@@ -186,7 +186,10 @@ export function ProfileStudentForm({ user }: { user?: User }) {
       setIsLoadingUpload(true);
       const response = await apiHubsService.scanCv(newFiles[0]);
       if (response) {
-        form.setValue("fullSkill", response.skill?.toString());
+        // form.setValue("fullSkill", response.skill?.toString());
+        // form.setValue("experienceProject", response.?.toString())
+        form.setValue("bio", response.context?.toString())
+        form.setValue("experienceProject", response.skill?.toString())
         form.setValue("json", JSON.stringify(response));
         toast.success("Quét CV thành công!");
       }

@@ -1,6 +1,5 @@
 import { BaseEntity } from "./_base/base";
 import { CriteriaForm } from "./criteria-form";
-import { Idea } from "./idea";
 import { ProfileStudent } from "./profile-student";
 import { StageIdea } from "./stage-idea";
 import { Timeline } from "./timeline";
@@ -14,6 +13,10 @@ export interface Semester extends BaseEntity {
   publicTopicDate?: Date | string;
   startDate?: Date | string;
   endDate?: Date | string;
+  onGoingDate?: Date | string;
+  maxTeamSize?: number;
+  minTeamSize?: number;
+  numberOfTeam: number;
   limitTopicMentorOnly: number;
   limitTopicSubMentor: number;
   criteriaForm?: CriteriaForm;
