@@ -145,6 +145,11 @@ class TopicService extends BaseService<Topic> {
   //       return this.handleError(error);
   //     });
   // };
+
+  public async getApprovedTopicsDoNotHaveTeam() : Promise<BusinessResult<Topic[]>> {
+      const response = await axiosInstance.get<BusinessResult<Topic[]>>(`${this.endpoint}/get-approved-topics-do-not-have-team`);
+    return response.data;
+  }
 }
 
 export const topicService = new TopicService();
