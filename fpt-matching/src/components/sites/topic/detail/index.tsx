@@ -165,7 +165,7 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
                     {getFileNameFromUrl(version.fileUrl)}
                   </p>
 
-                  <Link
+                  {/* <Link
                     href={getPreviewUrl(version.fileUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -178,7 +178,7 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
                       <Eye className="h-4 w-4" />
                       Xem nhanh
                     </Button>
-                  </Link>
+                  </Link> */}
 
                   <Link
                     href={version.fileUrl}
