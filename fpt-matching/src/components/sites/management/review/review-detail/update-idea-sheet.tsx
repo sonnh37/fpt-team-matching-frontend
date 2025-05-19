@@ -18,9 +18,8 @@ import {ChevronsUpDown, Download, Paperclip} from "lucide-react"
 import {Collapsible, CollapsibleContent, CollapsibleTrigger,} from "@/components/ui/collapsible"
 import {ScrollArea} from "@/components/ui/scroll-area";
 import Link from "next/link";
-import {TopicHistoryStatus} from "@/types/enums/topic-history";
 import {Badge} from "@/components/ui/badge";
-import {EditTopicDialog} from "@/components/sites/management/review/review-detail/edit-topic-dialog";
+import {EditTopicDialog} from "@/components/sites/management/review/review-detail/edit-idea-dialog";
 import {Label} from "@/components/ui/label";
 import {Textarea} from "@/components/ui/textarea";
 import {TopicVersion} from "@/types/topic-version";
@@ -55,7 +54,7 @@ function CollapsibleFile({topicHis}:{topicHis:TopicVersion[]}) {
                             <Badge
                                 variant={"default"}
                                 className={`${topic.status == TopicVersionStatus.Pending ? "bg-amber-600" : topic.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
-                            >{TopicHistoryStatus[topic.status!]}</Badge>
+                            >{TopicVersionStatus[topic.status!]}</Badge>
                         </div>
                         <Link className={""} href={topic.fileUpdate ? topic.fileUpdate : ""}><Download /></Link>
                     </div>
@@ -77,7 +76,7 @@ function CollapsibleFile({topicHis}:{topicHis:TopicVersion[]}) {
                                         <Badge
                                             variant={"default"}
                                             className={`${topic.status == TopicVersionStatus.Pending ? "bg-amber-600" : topic.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"} px-2`}
-                                        >{TopicHistoryStatus[topic.status!]}</Badge>
+                                        >{TopicVersionStatus[topic.status!]}</Badge>
                                     </div>
                                     <Link className={""} href={topic.fileUpdate ? topic.fileUpdate : ""}><Download /></Link>
                                 </div>
