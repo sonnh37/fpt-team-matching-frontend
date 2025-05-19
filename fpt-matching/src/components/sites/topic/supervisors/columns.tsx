@@ -2,7 +2,6 @@
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
-import TimeStageTopic from "@/components/_common/time-stage-topic";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,11 +23,9 @@ import { useCurrentRole } from "@/hooks/use-current-role";
 import { mentortopicrequestService } from "@/services/mentor-topic-request-service";
 import { projectService } from "@/services/project-service";
 import { semesterService } from "@/services/semester-service";
-import { MentorTopicRequestStatus } from "@/types/enums/mentor-topic-request";
+import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
 import { Topic } from "@/types/topic";
-import { MentorTopicRequestCreateCommand } from "@/types/models/commands/mentor-topic-requests/mentor-topic-request-create-command";
 import { Semester } from "@/types/semester";
-import { Topic } from "@/types/topic";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { AlertTriangle, Eye, Loader2, Send } from "lucide-react";
@@ -37,6 +34,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 import { TopicDetailForm } from "../detail";
+import { MentorTopicRequestCreateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-create-command";
 
 export const useTopicColumns = () => {
   // Fetch all required data once
@@ -88,10 +86,10 @@ export const useTopicColumns = () => {
         <Button variant="link" className="p-0" asChild>
           <Link
             href={`/profile-detail/${
-              row.original.topicVersion?.topic?.mentorId || "#"
+              row.original?.mentorId || "#"
             }`}
           >
-            {row.original.topicVersion?.topic?.mentor?.email || "-"}
+            {row.original?.mentor?.email || "-"}
           </Link>
         </Button>
       ),
@@ -148,7 +146,7 @@ const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
   const queryClient = useQueryClient();
   const topic = row.original;
   const role = useCurrentRole();
-  const highestVersion = topic.topicVersion;
+  // const highestVersion = topic.topicVersion;
 
   const {
     data: projectData,
@@ -230,11 +228,11 @@ const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
             </DialogTrigger>
             <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
               <div className="flex justify-between p-4 gap-4">
-                <TimeStageTopic stageTopic={highestVersion?.stageTopic} />
+                {/* <TimeStageTopic stageTopic={highestVersion?.stageTopic} /> */}
                 {/* <HorizontalLinearStepper topic={topic} /> */}
               </div>
               <div className="p-4 gap-4">
-                <TopicDetailForm topicId={topic.topicVersion?.topicId} />
+                <TopicDetailForm topicId={topic?.id} />
               </div>
             </DialogContent>
           </Dialog>
@@ -246,14 +244,14 @@ const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
                 <DialogDescription>
                   Bạn sẽ gửi yêu cầu tới giảng viên{" "}
                   <span className="font-semibold">
-                    {topic.topicVersion?.topic?.mentor?.email || "-"}
+                    {topic.mentor?.email || "-"}
                   </span>{" "}
                   cho đề tài:
                 </DialogDescription>
               </DialogHeader>
 
               <div className="py-4">
-                <p className="font-medium">{highestVersion?.englishName}</p>
+                <p className="font-medium">{topic?.englishName}</p>
                 <div className="flex items-start gap-3 mt-3 text-sm text-muted-foreground">
                   <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0 text-yellow-500" />
                   <p>

@@ -24,6 +24,7 @@ export interface Topic extends BaseEntity {
   abbreviation?: string;
   isEnterpriseTopic: boolean;
   enterpriseName?: string;
+  semesterId?: string;
   fileUrl?: string;
   project?: Project;
   owner?: User;
