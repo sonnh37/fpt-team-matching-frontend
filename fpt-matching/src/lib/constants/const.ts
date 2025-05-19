@@ -37,8 +37,6 @@ export class Const {
   static readonly MENTOR_FEEDBACKS = "mentor-feedbacks";
   static readonly USER_X_ROLES = "user-x-roles";
   static readonly ROLES = "roles";
-  static readonly TOPICS = "topics";
-  static readonly TOPIC_VERSIONS = "topic-versions";
   static readonly TOPIC_VERSIONS_REQUEST = "topic-version-requests";
   static readonly HANGFIRE="hangfire"
 }

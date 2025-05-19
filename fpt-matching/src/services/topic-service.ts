@@ -11,6 +11,8 @@ import { TopicGetListByStatusAndRoleQuery } from "@/types/models/queries/topics/
 import { TopicGetListForMentorQuery } from "@/types/models/queries/topics/topic-get-list-for-mentor-query";
 import { Topic } from "@/types/topic";
 import { TopicGetListOfSupervisorsQuery } from "@/types/models/queries/topics/topic-get-list-of-supervisor-query";
+import { TopicUpdateCommand } from "@/types/models/commands/topic/topic-update-command";
+import { TopicStudentCreatePendingCommand } from "@/types/models/commands/topic/topic-student-create-pending-command";
 
 class TopicService extends BaseService<Topic> {
   constructor() {
@@ -80,6 +82,18 @@ class TopicService extends BaseService<Topic> {
     return axiosInstance
       .post<BusinessResult<Topic>>(
         `${this.endpoint}/create-pending-by-lecturer`,
+        command
+      )
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public submitTopicToMentorByStudent = (
+    command: TopicStudentCreatePendingCommand
+  ): Promise<BusinessResult<Topic>> => {
+    return axiosInstance
+      .post<BusinessResult<Topic>>(
+        `${this.endpoint}/submit-to-mentor-by-student`,
         command
       )
       .then((response) => response.data)

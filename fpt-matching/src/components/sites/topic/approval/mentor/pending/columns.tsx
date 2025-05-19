@@ -1,67 +1,49 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
 
-import { topicService } from "@/services/topic-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
-import { TopicVersionRequest } from "@/types/topic-version-request";
 
-import { useQuery } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 
+import { LoadingComponent } from "@/components/_common/loading-page";
 import { TopicDetailForm } from "@/components/sites/topic/detail";
 import { Button } from "@/components/ui/button";
-import { formatDate } from "@/lib/utils";
-import SamilaritiesProjectModels from "@/types/models/samilarities-project-models";
-import { Brain, Eye, FileText, ListChecks } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Topic } from "@/types/topic";
-import { useSelectorUser } from "@/hooks/use-auth";
-import { LoadingComponent } from "@/components/_common/loading-page";
-import ErrorSystem from "@/components/_common/errors/error-system";
 import {
   Card,
-  CardHeader,
   CardContent,
-  CardTitle,
   CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
+import { useSelectorUser } from "@/hooks/use-auth";
 import { apiHubsService } from "@/services/api-hubs-service";
-import { topicVersionRequestService } from "@/services/topic-version-request-service";
+import SamilaritiesProjectModels from "@/types/models/samilarities-project-models";
+import { Topic } from "@/types/topic";
 import { Label } from "@radix-ui/react-label";
-import { useParams } from "next/navigation";
-import { ProjectStatus } from "@/types/enums/project";
+import { Brain, Eye } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const columns: ColumnDef<Topic>[] = [
+  // {
+  //   accessorKey: "teamCode",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Mã nhóm" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const topic = row.original;
+  //     const projectOfLeader = topic?.owner?.projects.filter(
+  //       (m) => m.leaderId == topic.ownerId && m.status == ProjectStatus.Pending
+  //     )[0];
+  //     return projectOfLeader?.teamCode || "Chưa có mã nhóm";
+  //   },
+  // },
   {
-    accessorKey: "teamCode",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã nhóm" />
-    ),
-    cell: ({ row }) => {
-      const topic = row.original;
-      const projectOfLeader = topic?.owner?.projects.filter(
-        (m) => m.leaderId == topic.ownerId && m.status == ProjectStatus.Pending
-      )[0];
-      return projectOfLeader?.teamCode || "Chưa có mã nhóm";
-    },
-  },
-  {
-    accessorKey: "leaderId",
+    accessorKey: "ownerId",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Trưởng nhóm" />
     ),
@@ -71,20 +53,10 @@ export const columns: ColumnDef<Topic>[] = [
     },
   },
   {
-    accessorKey: "vietNamName",
+    accessorKey: "vietNameseName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
-    cell: ({ row }) => {
-      const topic = row.original;
-      const highestVersion =
-        topic.topicVersions.length > 0
-          ? topic.topicVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.englishName || "-";
-    },
   },
   {
     accessorKey: "actions",
@@ -106,51 +78,51 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const user = useSelectorUser();
   if (!user) return;
 
-  const highestVersion =
-    topic.topicVersions.length > 0
-      ? topic.topicVersions.reduce((prev, current) =>
-          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-        )
-      : undefined;
+  // const highestVersion =
+  //   topic.topicVersions.length > 0
+  //     ? topic.topicVersions.reduce((prev, current) =>
+  //         (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //       )
+  //     : undefined;
 
-  const mentorRequest = highestVersion?.topicVersionRequests.find(
-    (m) =>
-      (m.role === "Mentor" || m.role === "SubMentor") &&
-      m.status === TopicVersionRequestStatus.Pending &&
-      m.reviewerId === user.id
-  );
+  // const mentorRequest = highestVersion?.topicVersionRequests.find(
+  //   (m) =>
+  //     (m.role === "Mentor" || m.role === "SubMentor") &&
+  //     m.status === TopicVersionRequestStatus.Pending &&
+  //     m.reviewerId === user.id
+  // // );
 
-  const [loadingAI, setLoadingAI] = useState<boolean>(false);
-  const [samilaritiesProject, setSamilaritiesProject] = useState<
-    SamilaritiesProjectModels[]
-  >([]);
+  // const [loadingAI, setLoadingAI] = useState<boolean>(false);
+  // const [samilaritiesProject, setSamilaritiesProject] = useState<
+  //   SamilaritiesProjectModels[]
+  // >([]);
 
-  // Load similar projects khi tab active
-  useEffect(() => {
-    const loadSimilarProjects = async () => {
-      if (highestVersion?.description) {
-        setLoadingAI(true);
-        try {
-          const response = await apiHubsService.getSimilaritiesProject(
-            highestVersion.description
-          );
-          if (response) {
-            setSamilaritiesProject(
-              (response as { similar_capstone: SamilaritiesProjectModels[] })
-                .similar_capstone
-            );
-          }
-          setLoadingAI(false);
-        } catch (error) {
-          console.error("Failed to load similar projects", error);
-        } finally {
-          setLoadingAI(false);
-        }
-      }
-    };
+  // // Load similar projects khi tab active
+  // useEffect(() => {
+  //   const loadSimilarProjects = async () => {
+  //     if (highestVersion?.description) {
+  //       setLoadingAI(true);
+  //       try {
+  //         const response = await apiHubsService.getSimilaritiesProject(
+  //           highestVersion.description
+  //         );
+  //         if (response) {
+  //           setSamilaritiesProject(
+  //             (response as { similar_capstone: SamilaritiesProjectModels[] })
+  //               .similar_capstone
+  //           );
+  //         }
+  //         setLoadingAI(false);
+  //       } catch (error) {
+  //         console.error("Failed to load similar projects", error);
+  //       } finally {
+  //         setLoadingAI(false);
+  //       }
+  //     }
+  //   };
 
-    loadSimilarProjects();
-  }, [highestVersion]);
+  //   loadSimilarProjects();
+  // }, [highestVersion]);
 
   return (
     <div className="flex flex-row gap-2">
@@ -168,7 +140,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 <TopicDetailForm topicId={topic.id} />
               </div>
             )}
-            {loadingAI ? (
+            {/* {loadingAI ? (
               <LoadingComponent />
             ) : (
               <div className="flex flex-col gap-10 h-screen overflow-auto">
@@ -204,7 +176,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                   <p>No similar projects found</p>
                 )}
               </div>
-            )}
+            )} */}
           </div>
         </DialogContent>
       </Dialog>

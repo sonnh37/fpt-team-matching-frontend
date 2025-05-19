@@ -12,10 +12,10 @@ import TopicVersionRequestApprovedByCouncilTable from "@/components/sites/topic/
 import { TopicVersionRequestPendingByCouncilTable } from "@/components/sites/topic/approval/council/pending";
 import TopicVersionRequestRejectedByCouncilTable from "@/components/sites/topic/approval/council/rejected";
 import TopicVersionRequestApprovedByMentorTable from "@/components/sites/topic/approval/mentor/approved";
-import { TopicVersionRequestPendingByMentorTable } from "@/components/sites/topic/approval/mentor/pending";
+import { TopicPendingByMentorTable } from "@/components/sites/topic/approval/mentor/pending";
 import TopicVersionRequestRejectedByMentorTable from "@/components/sites/topic/approval/mentor/rejected";
 import { TopicVersionRequestConsiderByCouncilTable } from "@/components/sites/topic/requests/consider-by-council";
-import TopicVersionRequestConsiderByMentorTable from "@/components/sites/topic/approval/mentor/consider";
+import TopicConsiderByMentorTable from "@/components/sites/topic/approval/mentor/consider";
 
 export default function TopicApprovalPage() {
   const role = useCurrentRole();
@@ -73,8 +73,8 @@ function CouncilApprovalTabs() {
 
 function MentorApprovalTabs() {
   const tabs = [
-    { id: "pending", label: "Chờ duyệt", component: <TopicVersionRequestPendingByMentorTable /> },
-    { id: "consider", label: "Yêu cầu chỉnh sửa", component: <TopicVersionRequestConsiderByMentorTable /> },
+    { id: "pending", label: "Chờ duyệt", component: <TopicPendingByMentorTable /> },
+    { id: "consider", label: "Yêu cầu chỉnh sửa", component: <TopicConsiderByMentorTable /> },
     { id: "approved", label: "Đã duyệt", component: <TopicVersionRequestApprovedByMentorTable /> },
     { id: "rejected", label: "Từ chối", component: <TopicVersionRequestRejectedByMentorTable /> },
   ];

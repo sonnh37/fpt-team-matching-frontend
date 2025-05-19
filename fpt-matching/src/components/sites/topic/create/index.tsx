@@ -66,12 +66,12 @@ const formSchema = z.object({
     .string({ required_error: "Vui lòng nhập tên tiếng Anh" })
     .min(2, { message: "Tên tiếng Anh phải có ít nhất 2 ký tự" }),
 
-  teamSize: z
-    .number({
-      required_error: "Vui lòng chọn số lượng thành viên",
-      invalid_type_error: "Số lượng thành viên phải là số",
-    })
-    .gte(4, { message: "Số lượng thành viên tối thiểu là 4" }),
+  // teamSize: z
+  //   .number({
+  //     required_error: "Vui lòng chọn số lượng thành viên",
+  //     invalid_type_error: "Số lượng thành viên phải là số",
+  //   })
+  //   .gte(4, { message: "Số lượng thành viên tối thiểu là 4" }),
 
   abbreviation: z
     .string({ required_error: "Vui lòng nhập tên viết tắt" })
@@ -121,9 +121,7 @@ export const CreateProjectForm = () => {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      teamSize: 4,
-    },
+    
   });
 
   const isEnterpriseTopic = form.watch("isEnterpriseTopic");
@@ -794,7 +792,7 @@ export const CreateProjectForm = () => {
             <div className="space-y-4 rounded-lg border p-4">
               <h3 className="text-lg font-medium">Nhóm & Tài liệu</h3>
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="teamSize"
                 render={({ field }) => (
@@ -821,7 +819,7 @@ export const CreateProjectForm = () => {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
 
               {/* Mentor Selection - Only for Students */}
               {isStudent && (
