@@ -35,7 +35,9 @@ import {
     SelectValue
 } from "@/components/ui/select";
 import ConfirmSaveChange
-    from "@/app/(client)/(dashboard)/management/projects/detail/mentor-conclusion/confirm-save-change";
+    from "@/app/(client)/(dashboard)/management/mentor/projects/detail/mentor-conclusion/confirm-save-change";
+// import ConfirmSaveChange
+//     from "@/app/(client)/(dashboard)/management/projects/detail/mentor-conclusion/confirm-save-change";
 const TableOfSinhVien = ({sinhViens} : {sinhViens: TeamMember[]}) => {
     return (
         <Table>
@@ -165,14 +167,14 @@ const Page = () => {
                         <Label className={"text-sm mt-2 font-bold flex flex-row items-center gap-2"}>{<Plus className={"size-4"} />} Tiếng việt | Vietnamese: </Label>
                         <Input readOnly={true} className={"w-3/4"}
                                // value={project?.topic?.topicVersions.sort(x => x.version) ?? ""}
-                            value={project?.topic?.topicVersion?.vietNamName ?? undefined}
+                            value={project?.topic?.vietNameseName ?? undefined}
                         />
                     </div>
 
                     {/*1.1.2*/}
                     <div className={"mx-4 mt-2 flex flex-col gap-2"}>
                         <Label className={"text-sm mt-2 font-bold flex flex-row items-center gap-2"}>{<Plus className={"size-4"} />} Tiếng anh | English: </Label>
-                        <Input readOnly={true} className={"w-3/4"} value={project?.topic?.topicVersion?.englishName ?? undefined} />
+                        <Input readOnly={true} className={"w-3/4"} value={project?.topic?.englishName ?? undefined} />
                     </div>
                 </div>
 

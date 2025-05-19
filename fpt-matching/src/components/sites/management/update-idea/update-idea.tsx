@@ -1,12 +1,12 @@
 import React, {useEffect} from 'react';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import CollapsibleTopicHistory from "@/components/sites/management/update-topic/collapsile-topic-history";
+import CollapsibleTopicHistory from "@/components/sites/management/update-idea/collapsile-idea-history";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Badge} from "@/components/ui/badge";
 import {Textarea} from "@/components/ui/textarea";
-import {UpdateTopicDialog} from "@/components/sites/management/update-topic/update-topic-dialog";
+import {UpdateTopicDialog} from "@/components/sites/management/update-idea/update-idea-dialog";
 import DocxView from "@/components/sites/management/docx-view/docx-view";
 import {useCurrentRole} from '@/hooks/use-current-role';
 import {TopicVersion} from "@/types/topic-version";
