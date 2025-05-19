@@ -3,9 +3,8 @@ import { DataTablePagination } from "@/components/_common/data-table-api/data-ta
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
 import { topicService } from "@/services/topic-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
+
 import { FilterEnum } from "@/types/models/filter-enum";
-import { TopicVersionRequestGetAllCurrentByStatusQuery } from "@/types/models/queries/topic-version-requests/topic-version-request-get-all-current-by-status";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {

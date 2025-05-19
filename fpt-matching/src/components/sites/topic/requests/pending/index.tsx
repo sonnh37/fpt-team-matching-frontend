@@ -13,7 +13,7 @@ const defaultSchema = z.object({
 //#endregion
 export function TopicVersionRequestPendingTable() {
   const queryParams: TopicGetCurrentByStatusQuery = {
-    statusList: [TopicStatus.ManagerPending, TopicStatus.MentorPending],
+    statusList: [TopicStatus.ManagerPending, TopicStatus.MentorPending, TopicStatus.StudentEditing,TopicStatus.MentorSubmitted,],
     isPagination: false,
   };
 
