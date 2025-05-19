@@ -65,7 +65,7 @@ export const columns: ColumnDef<Topic>[] = [
       const topic = row.original;
       if (!topic.topicVersions) return;
      
-      return topic?.stageTopic?.semester?.semesterName || "-";
+      return topic.semester?.semesterName || "-";
     },
   },
   {

@@ -3,7 +3,7 @@ import { DataTablePagination } from "@/components/_common/data-table-api/data-ta
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
 import { topicVersionRequestService } from "@/services/topic-version-request-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
+import { TopicRequestStatus, TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -85,8 +85,8 @@ export default function TopicVersionRequestApprovedBySubMentorTable() {
       sorting
     );
 
-    params.status = TopicVersionRequestStatus.Approved;
-    params.topicStatus = TopicStatus.Pending;
+    params.status = TopicRequestStatus.Approved;
+    params.topicStatus = TopicStatus.MentorApproved;
     params.roles = ["SubMentor"];
 
     return { ...params };
