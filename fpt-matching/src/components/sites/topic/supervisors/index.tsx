@@ -40,8 +40,6 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { TopicGetListOfSupervisorsQuery } from "@/types/models/queries/topics/topic-get-list-of-supervisor-query";
-import { topicService } from "@/services/topic-service";
 import { useTopicColumns } from "./columns";
 
 const defaultSchema = z.object({

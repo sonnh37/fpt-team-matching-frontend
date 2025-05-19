@@ -3,7 +3,6 @@ import { DataTablePagination } from "@/components/_common/data-table-api/data-ta
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
 import { topicVersionRequestService } from "@/services/topic-version-request-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -24,7 +23,6 @@ import { z } from "zod";
 import { columns } from "./columns";
 import { Topic } from "@/types/topic";
 import { TopicGetCurrentByStatusQuery } from "@/types/models/queries/topics/topic-get-current-by-status";
-import { TopicVersionRequestGetAllCurrentByStatusQuery } from "@/types/models/queries/topic-version-requests/topic-version-request-get-all-current-by-status";
 import { TopicStatus } from "@/types/enums/topic";
 import { topicService } from "@/services/topic-service";
 import { DataOnlyTable } from "@/components/_common/data-table-client/data-table";
