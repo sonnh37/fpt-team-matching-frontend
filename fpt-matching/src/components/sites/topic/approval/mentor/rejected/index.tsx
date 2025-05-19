@@ -5,7 +5,7 @@ import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
 import { topicService } from "@/services/topic-service";
 import { TopicStatus } from "@/types/enums/topic";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
+import { TopicRequestStatus } from "@/types/enums/topic-request";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { TopicGetListByStatusAndRoleQuery } from "@/types/models/queries/topics/topic-get-list-by-status-and-roles-query";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -81,8 +81,8 @@ export default function TopicVersionRequestRejectedByMentorTable() {
       sorting
     );
 
-    params.status = TopicVersionRequestStatus.Rejected;
-    params.topicStatus = TopicStatus.Rejected;
+    params.status = TopicRequestStatus.Rejected;
+    params.topicStatus = TopicStatus.ManagerRejected;
     params.roles = ["Mentor"];
 
     return { ...params };

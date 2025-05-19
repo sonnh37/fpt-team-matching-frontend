@@ -51,7 +51,7 @@ export const columns: ColumnDef<Topic>[] = [
     ),
     cell: ({ row }) => {
       const topic = row.original;
-      return topic.semesterId ;
+      return topic.semester?.semesterName;
     },
   },
   {

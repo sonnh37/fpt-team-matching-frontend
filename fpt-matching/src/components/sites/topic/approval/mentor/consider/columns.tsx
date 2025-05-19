@@ -32,10 +32,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { RootState } from "@/lib/redux/store";
 import { topicVersionRequestService } from "@/services/topic-version-request-service";
 import { topicService } from "@/services/topic-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { Topic } from "@/types/topic";
 import { TopicVersionRequest } from "@/types/topic-version-request";
-import { TopicVersionRequestUpdateStatusCommand } from "@/types/models/commands/topic-version-requests/topic-version-request-update-status-command";
 import { User } from "@/types/user";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
@@ -82,13 +80,8 @@ export const columns: ColumnDef<Topic>[] = [
     ),
     cell: ({ row }) => {
       const topic = row.original;
-      const highestVersion =
-        topic.topicVersions.length > 0
-          ? topic.topicVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.englishName || "-";
+      
+      return topic?.englishName || "-";
     },
   },
   {

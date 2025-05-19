@@ -32,10 +32,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { RootState } from "@/lib/redux/store";
 import { topicVersionRequestService } from "@/services/topic-version-request-service";
 import { topicService } from "@/services/topic-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { Topic } from "@/types/topic";
 import { TopicVersionRequest } from "@/types/topic-version-request";
-import { TopicVersionRequestUpdateStatusCommand } from "@/types/models/commands/topic-version-requests/topic-version-request-update-status-command";
 import { User } from "@/types/user";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
@@ -52,21 +50,22 @@ import Link from "next/link";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useCurrentRole } from "@/hooks/use-current-role";
 import { ProjectStatus } from "@/types/enums/project";
+import { TopicRequestStatus } from "@/types/enums/topic-request";
 
 export const columns: ColumnDef<Topic>[] = [
-  {
-    accessorKey: "teamCode",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã nhóm" />
-    ),
-    cell: ({ row }) => {
-      const topic = row.original;
-      const projectOfLeader = topic?.owner?.projects.filter(
-        (m) => m.leaderId == topic.ownerId && m.status == ProjectStatus.Pending
-      )[0];
-      return projectOfLeader?.teamCode || "Chưa có mã nhóm";
-    },
-  },
+  // {
+  //   accessorKey: "Tên nhóm",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Mã nhóm" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const topic = row.original;
+  //     const projectOfLeader = topic?.owner?.projects.filter(
+  //       (m) => m.leaderId == topic.ownerId && m.status == ProjectStatus.Pending
+  //     )[0];
+  //     return projectOfLeader?.teamCode || "Chưa có nhóm";
+  //   },
+  // },
   {
     accessorKey: "leaderId",
     header: ({ column }) => (
@@ -84,13 +83,8 @@ export const columns: ColumnDef<Topic>[] = [
     ),
     cell: ({ row }) => {
       const topic = row.original;
-      const highestVersion =
-        topic.topicVersions.length > 0
-          ? topic.topicVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.englishName || "-";
+     
+      return topic?.vietNameseName || "-";
     },
   },
   {
@@ -114,44 +108,44 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const [open, setOpen] = useState(false);
 
   const role = useCurrentRole();
-  const highestVersion =
-    topic.topicVersions.length > 0
-      ? topic.topicVersions.reduce((prev, current) =>
-          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-        )
-      : undefined;
+  // const highestVersion =
+  //   topic.topicVersions.length > 0
+  //     ? topic.topicVersions.reduce((prev, current) =>
+  //         (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //       )
+  //     : undefined;
 
   const hasCouncilRequests =
-    highestVersion?.topicVersionRequests.some(
-      (request) => request.role == "Council"
+    topic?.topicRequests.some(
+      (request) => request.role == "Manager"
     ) && role == "Mentor";
 
   const isMentorOfTopic = topic.mentorId == user?.id;
 
-  const hasSubmentorPendingRequest = highestVersion?.topicVersionRequests.some(
+  const hasSubmentorPendingRequest = topic?.topicRequests?.some(
     (request) =>
       request.role == "SubMentor" &&
-      request.status == TopicVersionRequestStatus.Pending
+      request.status == TopicRequestStatus.Pending
   );
-  const handleSubmit = async () => {
-    try {
-      const res = await topicVersionRequestService.createCouncilRequestsForTopic(
-        highestVersion?.id
-      );
-      if (res.status != 1) return toast.error(res.message);
+  // const handleSubmit = async () => {
+  //   try {
+  //     const res = await topicVersionRequestService.createCouncilRequestsForTopic(
+  //       topic?.id
+  //     );
+  //     if (res.status != 1) return toast.error(res.message);
 
-      toast.success(res.message);
+  //     toast.success(res.message);
 
-      queryClient.refetchQueries({
-        queryKey: ["data"],
-      });
-      setOpen(false);
-    } catch (error: any) {
-      toast.error(error || "An unexpected error occurred");
-      setOpen(false);
-      return;
-    }
-  };
+  //     queryClient.refetchQueries({
+  //       queryKey: ["data"],
+  //     });
+  //     setOpen(false);
+  //   } catch (error: any) {
+  //     toast.error(error || "An unexpected error occurred");
+  //     setOpen(false);
+  //     return;
+  //   }
+  // };
 
   return (
     <div className="flex flex-col gap-2">
@@ -164,7 +158,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
           {topic && <TopicDetailForm topicId={topic.id} />}
           <DialogFooter>
-            {isMentorOfTopic && (
+            {/* {isMentorOfTopic && (
               <Button
                 variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 size="sm"
@@ -173,7 +167,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
               >
                 {hasCouncilRequests ? "Đã nộp" : "Nộp cho hội đồng"}
               </Button>
-            )}
+            )} */}
           </DialogFooter>
         </DialogContent>
       </Dialog>
