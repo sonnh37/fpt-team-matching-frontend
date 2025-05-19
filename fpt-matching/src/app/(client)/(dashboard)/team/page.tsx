@@ -3,11 +3,6 @@ import { AlertMessage } from "@/components/_common/alert-message";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { useConfirm } from "@/components/_common/formdelete/confirm-context";
 import { LoadingComponent } from "@/components/_common/loading-page";
-import { TypographyH3 } from "@/components/_common/typography/typography-h3";
-import { TypographyH4 } from "@/components/_common/typography/typography-h4";
-import { TypographyMuted } from "@/components/_common/typography/typography-muted";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import { TypographySmall } from "@/components/_common/typography/typography-small";
 import { NoTeam } from "@/components/sites/team/no-team";
 import InvitationsInComingToLeaderTable from "@/components/sites/team/request-join-team-incoming";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -43,7 +38,6 @@ import { topicService } from "@/services/topic-service";
 import { projectService } from "@/services/project-service";
 import { semesterService } from "@/services/semester-service";
 import { teammemberService } from "@/services/team-member-service";
-import { TopicStatus } from "@/types/enums/topic";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import { ProjectStatus } from "@/types/enums/project";
 import {
@@ -53,8 +47,7 @@ import {
 } from "@/types/enums/team-member";
 import { ProjectUpdateCommand } from "@/types/models/commands/projects/project-update-command";
 import { TeamMember } from "@/types/team-member";
-import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
@@ -71,9 +64,9 @@ import {
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import InviteUsersForm from "../topic/updatetopic/page";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import InviteUsersForm from "../topic/updateidea/page";
 
 export default function TeamInfo() {
   const user = useSelectorUser();
@@ -224,7 +217,7 @@ export default function TeamInfo() {
 
   const isHasTopic = !!project.topicId;
   const availableSlots = isHasTopic
-    ? (project.topic?.topicVersion?.teamSize ?? 0) -
+    ? (project?.teamSize ?? 0) -
       (project.teamMembers?.length ?? 0)
     : 5 - (project.teamMembers?.length ?? 0);
 
@@ -429,7 +422,7 @@ export default function TeamInfo() {
 
           <CardContent className="p-6 space-y-8">
             {/* Thông tin đề tài */}
-            {project.topic?.topicVersion != null ? (
+            {project.topic?.topicVersions != null ? (
               <>
                 <div className="space-y-6">
                   <h3 className="text-xl font-semibold text-foreground">
@@ -447,20 +440,20 @@ export default function TeamInfo() {
                         <div className="space-y-1">
                           <Label>Viết tắt:</Label>
                           <p>
-                            {project.topic.topicVersion.abbreviations ||
+                            {project.topic.abbreviation ||
                               "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <Label>Tên tiếng Việt:</Label>
                           <p>
-                            {project.topic.topicVersion.vietNamName || "Chưa có"}
+                            {project.topic.vietNameseName || "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <Label>Tên tiếng Anh:</Label>
                           <p>
-                            {project.topic.topicVersion.englishName || "Chưa có"}
+                            {project.topic.englishName || "Chưa có"}
                           </p>
                         </div>
                       </CardContent>
@@ -499,7 +492,7 @@ export default function TeamInfo() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-line">
-                          {project.topic.topicVersion.description ||
+                          {project.topic.description ||
                             "Chưa có mô tả"}
                         </p>
                       </CardContent>
@@ -516,17 +509,17 @@ export default function TeamInfo() {
                           <div className="space-y-1">
                             <Label>Đề tài doanh nghiệp:</Label>
                             <p>
-                              {project.topic.topicVersion.topic?.isEnterpriseTopic
+                              {project.topic.isEnterpriseTopic
                                 ? "Có"
                                 : "Không"}
                             </p>
                           </div>
-                          {project.topic.topicVersion.topic
+                          {project.topic
                             ?.isEnterpriseTopic && (
                             <div className="space-y-1">
                               <Label>Tên doanh nghiệp:</Label>
                               <p>
-                                {project.topic.topicVersion.enterpriseName ||
+                                {project.topic.enterpriseName ||
                                   "Chưa có"}
                               </p>
                             </div>
@@ -545,7 +538,7 @@ export default function TeamInfo() {
                         <div className="space-y-1">
                           <Label>Số lượng thành viên tối đa:</Label>
                           <p>
-                            {project.topic.topicVersion.teamSize || "Chưa có"}
+                            {project.teamSize || "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
