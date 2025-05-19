@@ -3,7 +3,6 @@ import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} f
 import {
     Table,
     TableBody,
-    TableCaption,
     TableCell,
     TableFooter,
     TableHead,
@@ -23,14 +22,53 @@ import {TeamMemberRole} from "@/types/enums/team-member";
 import {Badge} from "@/components/ui/badge";
 import SaveChangeProjectAddTeamDialog
     from "@/components/sites/management/student-do-not-have-team/project-add-student-card/save-change-project-add-team-dialog";
+import {Semester} from "@/types/semester";
 
-const ProjectAddStudentCard = ({setStudents,numberOfTeam, projects, setCountProjects, project, setProject}: {
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import {toast} from "sonner";
+import {Topic} from "@/types/topic";
+
+function SelectTopic({topics, setProject} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>}) {
+    return (
+        <Select onValueChange={(value) => {
+            setProject((prevState) => {
+                const updatedTopic = {...prevState ?? {} as Project};
+                updatedTopic.topicId = value;
+                return updatedTopic;
+            })
+        }}>
+            <SelectTrigger className="w-[20rem]">
+                <SelectValue placeholder="Chọn đề tài" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectGroup>
+                    <SelectLabel>Đề tài</SelectLabel>
+                    {topics.map((topic, index) => (
+                        <SelectItem key={index} value={topic.id ?? ""}>{topic.englishName}  - {topic.topicCode}</SelectItem>
+                    ))}
+                </SelectGroup>
+            </SelectContent>
+        </Select>
+    )
+}
+
+const ProjectAddStudentCard = ({setStudents,numberOfTeam, projects, setCountProjects, project, setProject, semester, topics}: {
     numberOfTeam: number,
     projects: Project[],
     setCountProjects: Dispatch<SetStateAction<number>>,
     project: Project | null,
     setProject: Dispatch<SetStateAction<Project | null>>,
     setStudents: Dispatch<SetStateAction<User[]>>
+    semester: Semester,
+    topics: Topic[],
 }) => {
     const [addTeam, setAddTeam] = React.useState(false);
     return (
@@ -49,17 +87,25 @@ const ProjectAddStudentCard = ({setStudents,numberOfTeam, projects, setCountProj
                     <div className="grid w-full items-center gap-4">
                         {
                             !addTeam && <Button onClick={(e) => {
-                                setAddTeam(true);
                                 e.preventDefault();
-                                setProject({} as Project);
-                                setCountProjects(numberOfTeam - 1);
+
+
+                                setCountProjects(() => {
+                                    if(numberOfTeam === 0) {
+                                        toast.error("Số lượng nhóm đã tới giới hạn")
+                                        return 0;
+                                    }
+                                    setAddTeam(true);
+                                    setProject({} as Project);
+                                    return numberOfTeam - 1
+                                });
                             }} size={"sm"} className={"w-1/3"} variant={"default"}><Plus/> Tạo nhóm</Button>
                         }
                         {
                             addTeam &&
                             <div>
-                                <Table>
-                                    <TableCaption>Danh sách thành viên trong nhóm</TableCaption>
+                                <Table className={`min-h-[${semester.maxTeamSize * 6}vh]`}>
+                                    {/*<TableCaption>Danh sách thành viên trong nhóm</TableCaption>*/}
                                     <TableHeader>
                                         <TableRow>
                                             <TableHead className="w-[100px]">Mã số</TableHead>
@@ -111,6 +157,16 @@ const ProjectAddStudentCard = ({setStudents,numberOfTeam, projects, setCountProj
 
                                     </TableFooter>
                                 </Table>
+                                <div className={"mt-6 flex flex-col gap-2"}>
+                                    {
+                                        project != null && (
+                                           <>
+                                               <h2 className={"font-bold text-sm"}>Chọn đề tài cho nhóm: </h2>
+                                               <SelectTopic setProject={setProject} topics={topics} />
+                                           </>
+                                        )
+                                    }
+                                </div>
                                 <div className={"mt-8 flex gap-4"}>
                                     <SaveChangeProjectAddTeamDialog project={project} />
                                     <CancelProjectAddTeamDialog />
@@ -120,6 +176,7 @@ const ProjectAddStudentCard = ({setStudents,numberOfTeam, projects, setCountProj
                         }
                     </div>
                 </form>
+
             </CardContent>
             <CardFooter className="flex justify-between">
 

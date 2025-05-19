@@ -27,26 +27,7 @@ import {TeamMember} from "@/types/team-member";
 import {Semester} from "@/types/semester";
 import {ProjectStatus} from "@/types/enums/project";
 
-function SelectTopic() {
-    return (
-        <Select>
-            <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a fruit" />
-            </SelectTrigger>
-            <SelectContent>
-                <SelectGroup>
-                    <SelectLabel>Fruits</SelectLabel>
-                    <SelectItem value="apple">Apple</SelectItem>
-                    <SelectItem value="banana">Banana</SelectItem>
-                    <SelectItem value="blueberry">Blueberry</SelectItem>
-                    <SelectItem value="grapes">Grapes</SelectItem>
-                    <SelectItem value="pineapple">Pineapple</SelectItem>
-                </SelectGroup>
-            </SelectContent>
-        </Select>
-    )
-}
-const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProject, updatedTeamMembers, semester}: {
+const InprogressProjectAddStudentCard = ({setStudents, projects, project, setProject, updatedTeamMembers, semester}: {
     projects: Project[],
     project: Project | null,
     setProject: Dispatch<SetStateAction<Project | null>>,
@@ -55,12 +36,11 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
     semester: Semester
 }) => {
     const [addTeam, setAddTeam] = React.useState(false);
-    console.log(projects)
     return (
         <Card className="w-[30vw]">
             <CardHeader>
-                <CardTitle>Nhóm chưa chốt</CardTitle>
-                <CardDescription>Thêm sinh viên vào nhóm chưa chốt tại đây</CardDescription>
+                <CardTitle>Nhóm đã chốt</CardTitle>
+                <CardDescription>Thêm sinh viên vào nhóm đã chốt tại đây</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="pb-4">
@@ -81,10 +61,11 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
                             <SelectGroup>
                                 <SelectLabel>Nhóm</SelectLabel>
                                 {projects.map((project) => (
-                                    (project.status == ProjectStatus.Pending || project.status == ProjectStatus.Forming) &&
-                                    <SelectItem key={project.teamCode} value={project.id!}>
-                                        {project.teamCode}
-                                    </SelectItem>
+                                    project.status == ProjectStatus.InProgress && project.topic && (
+                                        <SelectItem key={project.teamCode} value={project.id!}>
+                                            {project.teamCode}
+                                        </SelectItem>
+                                    )
                                 ))}
                             </SelectGroup>
                         </SelectContent>
@@ -151,8 +132,8 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
                                     </TableFooter>
                                 </Table>
                                 <div className={"mt-6"}>
-                                    <h2 className={"font-bold text-sm"}>Chọn đề tài cho nhóm: </h2>
-                                    <SelectTopic />
+                                    <h2 className={"font-bold text-sm"}>Đề tài của nhóm: </h2>
+                                    {/*<SelectTopic />*/}
                                 </div>
                                 <div className={"mt-8 flex gap-4"}>
                                     <SaveChangeExistingProjectAddTeamDialog updatedTeamMember={updatedTeamMembers} project={project} />
@@ -171,4 +152,4 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
     );
 };
 
-export default ExistingProjectAddStudentCard;
+export default InprogressProjectAddStudentCard;

@@ -86,7 +86,7 @@ export function StudentTable<TData, TValue>({
                 />
             </div>
             <div className="min-h-[60vh] rounded-md border">
-                <Table>
+                <Table >
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
