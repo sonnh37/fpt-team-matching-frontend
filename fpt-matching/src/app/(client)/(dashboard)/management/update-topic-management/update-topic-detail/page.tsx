@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import {useSearchParams} from "next/navigation";
-import UpdateTopic from "@/components/sites/management/update-topic/update-topic";
+import UpdateTopic from "@/components/sites/management/update-idea/update-idea";
 
 const Page = () => {
     const searchParams = useSearchParams();

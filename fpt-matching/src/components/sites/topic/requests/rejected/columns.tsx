@@ -11,6 +11,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useState } from "react";
 import { TopicDetailForm } from "../../detail";
+import TimeStageTopic from "@/components/_common/time-stage-idea";
 
 export const columns: ColumnDef<Topic>[] = [
   {
@@ -35,7 +36,7 @@ export const columns: ColumnDef<Topic>[] = [
       const topic = row.original;
       if (!topic.topicVersions) return;
 
-      return topic?.stageTopic?.semester?.semesterName || "-";
+      return topic.semester?.semesterName || "-";
     },
   },
   {
@@ -132,12 +133,12 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const [feedback, setFeedback] = useState(initialFeedback ?? "");
 
   const topic = row.original;
-  const highestVersion =
-    topic.topicVersions.length > 0
-      ? topic.topicVersions.reduce((prev, current) =>
-          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-        )
-      : undefined;
+  // const highestVersion =
+  //   topic.topicVersions.length > 0
+  //     ? topic.topicVersions.reduce((prev, current) =>
+  //         (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //       )
+  //     : undefined;
   return (
     <div className="flex flex-col gap-2">
       {/* Hiển thị trạng thái Mentor Approve */}
@@ -151,7 +152,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         </DialogTrigger>
         <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
           <div className="flex justify-between p-4 gap-4">
-            <TimeStageTopic stageTopic={highestVersion?.stageTopic} />
+            <TimeStageTopic stageTopic={topic?.stageTopic} />
             {/* <HorizontalLinearStepper topic={topic} /> */}
           </div>
           <div className="p-4 gap-4">

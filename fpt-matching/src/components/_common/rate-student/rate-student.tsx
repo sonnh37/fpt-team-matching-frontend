@@ -1,18 +1,13 @@
 import { Modal, ModalBody, ModalClose, ModalContent, ModalFooter, ModalTrigger } from '@/components/ui/animated-modal';
-import { DialogFooter, DialogHeader } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/moving-border';
 import { RootState } from '@/lib/redux/store';
 import { rateService } from '@/services/rate-service';
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@radix-ui/react-dialog';
 import { useQuery } from '@tanstack/react-query';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux';
-import { Rating } from "@mui/material";
-import { userService } from '@/services/user-service';
 import { teammemberService } from '@/services/team-member-service';
 import { RateCreateCommand } from '@/types/models/commands/rate/rate-create-command';
 import { toast } from 'sonner';
-import { topicHistoryService } from '@/services/topic-history-service';
+// import { topicHistoryService } from '@/services/idea-history-service';
 const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
     const [rated, setRated] = React.useState(20);
     const [rated1, setRated1] = React.useState(20);
@@ -45,7 +40,7 @@ const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
     }, [id]); // chạy lại khi giá trị thay đổi
 
     const [formData, setFormData] = useState({
-        rateById: user?.teamMembers.find(x => x.userId === user?.id)?.id ?? "", // hoặc x.id nếu đó là teamMemberId
+        rateById: user?.teamMembers?.find(x => x.userId === user?.id)?.id ?? "", // hoặc x.id nếu đó là teamMemberId
         rateForId: id,
         numbOfStar: 0,
         content: ""
@@ -74,7 +69,7 @@ const RateStudent = ({ id, projectId }: { id: string, projectId: string }) => {
         if (result1?.status == 1) {
             toast.success("Đã gửi form đánh giá đề tài thành công!")
             setFormData({
-                rateById: user?.teamMembers.find(x => x.userId === user?.id)?.id ?? "", // hoặc x.id nếu đó là teamMemberId
+                rateById: user?.teamMembers?.find(x => x.userId === user?.id)?.id ?? "", // hoặc x.id nếu đó là teamMemberId
                 rateForId: id,
                 numbOfStar: 1,
                 content: ""

@@ -5,7 +5,6 @@ import {ChevronsUpDown, Download} from "lucide-react";
 import Link from "next/link";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {Badge} from "@/components/ui/badge";
-import {TopicHistoryStatus} from "@/types/enums/topic-history";
 import {TopicVersion} from "@/types/topic-version";
 import {TopicVersionStatus} from "@/types/enums/topic-version";
 
@@ -59,7 +58,7 @@ export default function CollapsibleTopicHistory(
                                         <Badge
                                             variant={"default"}
                                             className={`p-1 ${topic.status == TopicVersionStatus.Pending ? "bg-amber-600" : topic.status == TopicVersionStatus.Approved ? "bg-green-500": "bg-red-500"}`}
-                                        >{TopicHistoryStatus[topic.status!]}</Badge>
+                                        >{TopicVersionStatus[topic.status!]}</Badge>
                                     </div>
                                     <Link className={""} href={topic.fileUpdate ? topic.fileUpdate : ""}><Download /></Link>
                                 </div>

@@ -2,8 +2,6 @@ import { DataTableComponent } from "@/components/_common/data-table-api/data-tab
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
-import { topicVersionRequestService } from "@/services/topic-version-request-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -23,12 +21,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
 import { Topic } from "@/types/topic";
-import { TopicVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/topic-version-requests/topic-version-request-get-all-current-by-status-and-roles";
+
 import { RootState } from "@/lib/redux/store";
 import { useSelector } from "react-redux";
 import { TopicGetListByStatusAndRoleQuery } from "@/types/models/queries/topics/topic-get-list-by-status-and-roles-query";
 import { topicService } from "@/services/topic-service";
 import { TopicStatus } from "@/types/enums/topic";
+import { TopicVersionRequestStatus } from "@/types/enums/topic-version-request";
+import { TopicRequestStatus } from "@/types/enums/topic-request";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -85,8 +85,8 @@ export default function TopicVersionRequestApprovedByMentorTable() {
       sorting
     );
 
-    params.status = TopicVersionRequestStatus.Approved;
-    params.topicStatus = TopicStatus.Pending;
+    params.status = TopicRequestStatus.Approved;
+    params.topicStatus = TopicStatus.MentorApproved;
     params.roles = ["Mentor"];
 
     return { ...params };

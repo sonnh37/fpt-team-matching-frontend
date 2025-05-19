@@ -51,15 +51,16 @@ export default function QuanLyYTuongPage() {
   // Định nghĩa các tab
   const TABS = {
     PENDING: "Chờ duyệt",
-    CONSIDER: "Đang xem xét",
+    // CONSIDER: "Đang xem xét",
     APPROVED: "Đã phê duyệt",
     REJECTED: "Đã từ chối",
   };
 
   // Đếm số lượng ý tưởng theo trạng thái
-  const countTopicsByStatus = (status: TopicStatus) => {
-    return res_topics?.data?.filter((m) => m.status === status).length ?? 0;
+  const countTopicsByStatus = (statuses: TopicStatus[]) => {
+    return res_topics?.data?.filter((m) => m.status && statuses.includes(m.status)).length ?? 0;
   };
+  
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -70,16 +71,16 @@ export default function QuanLyYTuongPage() {
           </CardTitle>
           <Separator />
         </CardHeader>
-        
+
         <CardContent>
           <Tabs defaultValue={TABS.PENDING} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+            <TabsList className="grid w-full grid-cols-3 bg-muted/50 h-full ">
               <TabsTrigger value={TABS.PENDING}>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 ">
                   {TABS.PENDING}
-                  {countTopicsByStatus(TopicStatus.ManagerPending) > 0 && (
+                  {countTopicsByStatus([TopicStatus.ManagerPending, TopicStatus.MentorPending,TopicStatus.StudentEditing,TopicStatus.MentorSubmitted]) > 0 && (
                     <Badge variant="secondary">
-                      {countTopicsByStatus(TopicStatus.ManagerPending)}
+                      {countTopicsByStatus([TopicStatus.ManagerPending, TopicStatus.MentorPending,TopicStatus.StudentEditing,TopicStatus.MentorSubmitted])}
                     </Badge>
                   )}
                 </div>
@@ -104,27 +105,27 @@ export default function QuanLyYTuongPage() {
                 </div>
               </TabsTrigger> */}
 
-              {/* <TabsTrigger value={TABS.APPROVED}>
+              <TabsTrigger value={TABS.APPROVED}>
                 <div className="flex items-center gap-2">
                   {TABS.APPROVED}
-                  {countTopicsByStatus(TopicStatus.Approved) > 0 && (
+                  {countTopicsByStatus([TopicStatus.ManagerApproved,TopicStatus.MentorApproved]) > 0 && (
                     <Badge variant="default">
-                      {countTopicsByStatus(TopicStatus.Approved)}
+                      {countTopicsByStatus([TopicStatus.ManagerApproved,TopicStatus.MentorApproved])}
                     </Badge>
                   )}
                 </div>
-              </TabsTrigger> */}
-
-              {/* <TabsTrigger value={TABS.REJECTED}>
+              </TabsTrigger>
+              { }
+              <TabsTrigger value={TABS.REJECTED}>
                 <div className="flex items-center gap-2">
                   {TABS.REJECTED}
-                  {countTopicsByStatus(TopicStatus.Rejected) > 0 && (
+                  {countTopicsByStatus([TopicStatus.MentorRejected,TopicStatus.ManagerRejected]) > 0 && (
                     <Badge variant="destructive">
-                      {countTopicsByStatus(TopicStatus.Rejected)}
+                      {countTopicsByStatus([TopicStatus.MentorRejected,TopicStatus.ManagerRejected])}
                     </Badge>
                   )}
                 </div>
-              </TabsTrigger> */}
+              </TabsTrigger>
             </TabsList>
 
             {/* Nội dung các tab */}
@@ -132,7 +133,7 @@ export default function QuanLyYTuongPage() {
               <TabsContent value={TABS.PENDING}>
                 <TopicVersionRequestPendingTable />
               </TabsContent>
-{/* 
+              {/* 
               <TabsContent value={TABS.CONSIDER}>
                 {role === "Student" ? (
                   <TopicVersionRequestConsiderByMentorTable />
@@ -140,14 +141,14 @@ export default function QuanLyYTuongPage() {
                   <TopicVersionRequestConsiderByCouncilTable />
                 )}
               </TabsContent>
-
+ */}
               <TabsContent value={TABS.APPROVED}>
                 <TopicVersionRequestApprovedTable />
               </TabsContent>
 
               <TabsContent value={TABS.REJECTED}>
                 <TopicVersionRequestRejectedTable />
-              </TabsContent> */}
+              </TabsContent>
             </div>
           </Tabs>
         </CardContent>

@@ -130,7 +130,7 @@ export const CreateProjectForm = () => {
   const isStudent = role == "Student";
   const isLecturer = role == "Mentor";
 
-  console.log(currentSemester, "Test")
+
   // Fetch all necessary data in parallel
   const {
     data: result_project,
@@ -262,16 +262,16 @@ export const CreateProjectForm = () => {
     isLoadingUsers ||
     isLoadingInvitations;
 
-  console.log(
-    "check_error",
-    // errorStage ||
-    errorProject ||
-    errorProfile ||
-    errorProfessions ||
-    errorTopics ||
-    errorUpComingSemester ||
-    errorInvitations
-  );
+  // console.log(
+  //   "check_error",
+  //   // errorStage ||
+  //   errorProject ||
+  //   errorProfile ||
+  //   errorProfessions ||
+  //   errorTopics ||
+  //   errorUpComingSemester ||
+  //   errorInvitations
+  // );
 
   const isError =
     // errorStage ||

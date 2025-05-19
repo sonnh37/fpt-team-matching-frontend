@@ -3,24 +3,13 @@
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { formatDate } from "@/lib/utils";
+
 import { mentortopicrequestService } from "@/services/mentor-topic-request-service";
-import { InvitationStatus } from "@/types/enums/invitation";
-import { MentorTopicRequestStatus } from "@/types/enums/mentor-topic-request";
-import { Invitation } from "@/types/invitation";
+import { MentorTopicRequestStatus } from "@/types/enums/mentor-idea-request";
 import { MentorTopicRequest } from "@/types/mentor-topic-request";
-import { MentorTopicRequestUpdateCommand } from "@/types/models/commands/mentor-topic-requests/mentor-topic-request-update-command";
+import { MentorTopicRequestUpdateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-update-command";
 import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
