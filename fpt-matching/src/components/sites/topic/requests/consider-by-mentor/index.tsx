@@ -11,7 +11,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function TopicVersionRequestConsiderByMentorTable() {
+export function TopicConsiderByMentorTable() {
   const queryParams: TopicGetCurrentByStatusQuery = {
     statusList: [TopicStatus.MentorConsider],
     isPagination: false,

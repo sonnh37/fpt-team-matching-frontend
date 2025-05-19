@@ -10,8 +10,7 @@ import { useDispatch } from "react-redux";
 // Components
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
-import { TopicVersionRequestConsiderByCouncilTable } from "@/components/sites/topic/requests/consider-by-council";
-import { TopicVersionRequestConsiderByMentorTable } from "@/components/sites/topic/requests/consider-by-mentor";
+import { TopicConsiderByMentorTable } from "@/components/sites/topic/requests/consider-by-mentor";
 import { TopicVersionRequestPendingTable } from "@/components/sites/topic/requests/pending";
 
 // UI Components
@@ -51,16 +50,18 @@ export default function QuanLyYTuongPage() {
   // Định nghĩa các tab
   const TABS = {
     PENDING: "Chờ duyệt",
-    // CONSIDER: "Đang xem xét",
+    CONSIDER: "Đang xem xét",
     APPROVED: "Đã phê duyệt",
     REJECTED: "Đã từ chối",
   };
 
   // Đếm số lượng ý tưởng theo trạng thái
   const countTopicsByStatus = (statuses: TopicStatus[]) => {
-    return res_topics?.data?.filter((m) => m.status && statuses.includes(m.status)).length ?? 0;
+    return (
+      res_topics?.data?.filter((m) => m.status && statuses.includes(m.status))
+        .length ?? 0
+    );
   };
-  
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -74,54 +75,70 @@ export default function QuanLyYTuongPage() {
 
         <CardContent>
           <Tabs defaultValue={TABS.PENDING} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 bg-muted/50 h-full ">
+            <TabsList className="grid w-full grid-cols-4 h-full">
               <TabsTrigger value={TABS.PENDING}>
                 <div className="flex items-center gap-2 ">
                   {TABS.PENDING}
-                  {countTopicsByStatus([TopicStatus.ManagerPending, TopicStatus.MentorPending,TopicStatus.StudentEditing,TopicStatus.MentorSubmitted]) > 0 && (
+                  {countTopicsByStatus([
+                    TopicStatus.ManagerPending,
+                    TopicStatus.MentorPending,
+                    TopicStatus.StudentEditing,
+                    TopicStatus.MentorSubmitted,
+                  ]) > 0 && (
                     <Badge variant="secondary">
-                      {countTopicsByStatus([TopicStatus.ManagerPending, TopicStatus.MentorPending,TopicStatus.StudentEditing,TopicStatus.MentorSubmitted])}
+                      {countTopicsByStatus([
+                        TopicStatus.ManagerPending,
+                        TopicStatus.MentorPending,
+                        TopicStatus.StudentEditing,
+                        TopicStatus.MentorSubmitted,
+                      ])}
                     </Badge>
                   )}
                 </div>
               </TabsTrigger>
 
-              {/* <TabsTrigger value={TABS.CONSIDER}>
-                <div className="flex items-center gap-2">
-                  {TABS.CONSIDER}
-                  {role === "Student" ? (
-                    countTopicsByStatus(TopicStatus.ConsiderByMentor) > 0 && (
+              {role === "Student" ? (
+                <TabsTrigger value={TABS.CONSIDER}>
+                  <div className="flex items-center gap-2">
+                    {TABS.CONSIDER}
+                    {countTopicsByStatus([TopicStatus.MentorConsider]) > 0 && (
                       <Badge variant="secondary">
-                        {countTopicsByStatus(TopicStatus.ConsiderByMentor)}
+                        {countTopicsByStatus([TopicStatus.MentorConsider])}
                       </Badge>
-                    )
-                  ) : (
-                    countTopicsByStatus(TopicStatus.ConsiderByCouncil) > 0 && (
-                      <Badge variant="secondary">
-                        {countTopicsByStatus(TopicStatus.ConsiderByCouncil)}
-                      </Badge>
-                    )
-                  )}
-                </div>
-              </TabsTrigger> */}
+                    )}
+                  </div>
+                </TabsTrigger>
+              ) : null}
 
               <TabsTrigger value={TABS.APPROVED}>
                 <div className="flex items-center gap-2">
                   {TABS.APPROVED}
-                  {countTopicsByStatus([TopicStatus.ManagerApproved,TopicStatus.MentorApproved]) > 0 && (
+                  {countTopicsByStatus([
+                    TopicStatus.ManagerApproved,
+                    TopicStatus.MentorApproved,
+                  ]) > 0 && (
                     <Badge variant="default">
-                      {countTopicsByStatus([TopicStatus.ManagerApproved,TopicStatus.MentorApproved])}
+                      {countTopicsByStatus([
+                        TopicStatus.ManagerApproved,
+                        TopicStatus.MentorApproved,
+                      ])}
                     </Badge>
                   )}
                 </div>
               </TabsTrigger>
-              { }
+              {}
               <TabsTrigger value={TABS.REJECTED}>
                 <div className="flex items-center gap-2">
                   {TABS.REJECTED}
-                  {countTopicsByStatus([TopicStatus.MentorRejected,TopicStatus.ManagerRejected]) > 0 && (
+                  {countTopicsByStatus([
+                    TopicStatus.MentorRejected,
+                    TopicStatus.ManagerRejected,
+                  ]) > 0 && (
                     <Badge variant="destructive">
-                      {countTopicsByStatus([TopicStatus.MentorRejected,TopicStatus.ManagerRejected])}
+                      {countTopicsByStatus([
+                        TopicStatus.MentorRejected,
+                        TopicStatus.ManagerRejected,
+                      ])}
                     </Badge>
                   )}
                 </div>
@@ -133,15 +150,13 @@ export default function QuanLyYTuongPage() {
               <TabsContent value={TABS.PENDING}>
                 <TopicVersionRequestPendingTable />
               </TabsContent>
-              {/* 
-              <TabsContent value={TABS.CONSIDER}>
-                {role === "Student" ? (
-                  <TopicVersionRequestConsiderByMentorTable />
-                ) : (
-                  <TopicVersionRequestConsiderByCouncilTable />
-                )}
-              </TabsContent>
- */}
+
+              {role === "Student" ? (
+                <TabsContent value={TABS.CONSIDER}>
+                  <TopicConsiderByMentorTable />
+                </TabsContent>
+              ) : null}
+
               <TabsContent value={TABS.APPROVED}>
                 <TopicVersionRequestApprovedTable />
               </TabsContent>

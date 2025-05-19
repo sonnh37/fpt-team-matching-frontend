@@ -76,9 +76,10 @@ const formSchema = z.object({
 
 interface TopicUpdateFormProps {
   topic: Topic;
+  onSuccess?: () => void;
 }
 
-export function TopicUpdateForm({ topic }: TopicUpdateFormProps) {
+export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
   const queryClient = useQueryClient();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -95,6 +96,8 @@ export function TopicUpdateForm({ topic }: TopicUpdateFormProps) {
     isPagination: false,
   };
 
+  const skipCheckAndSelectUI = isStudent ? topic.mentorId != undefined : topic.subMentorId != undefined;
+  console.log("check_skip", skipCheckAndSelectUI)
   const { data: usersData, isLoading: isLoadingUsers } = useQuery({
     queryKey: ["getUsersByRole", query],
     queryFn: () => userService.getAll(query),
@@ -124,18 +127,6 @@ export function TopicUpdateForm({ topic }: TopicUpdateFormProps) {
         duration: Infinity,
       });
 
-      // Check mentor availability
-      // const mentorCheck =
-      //   await userService.checkMentorAndSubMentorSlotAvailability({
-      //     mentorId: isStudent ? values.mentorId : user?.id,
-      //     subMentorId: values.subMentorId,
-      //   });
-
-      // if (!mentorCheck.data) {
-      //   toast.dismiss(loadingToastId);
-      //   return toast.error(mentorCheck.message);
-      // }
-
       let fileUrl = topic.fileUrl; // Giả sử nếu fileschema là string (URL cũ)
 
       // Chỉ upload file nếu fileschema là File object (file mới)
@@ -154,15 +145,6 @@ export function TopicUpdateForm({ topic }: TopicUpdateFormProps) {
       const command: TopicUpdateCommand = {
         ...topic,
         ...values,
-        subMentorId: undefined,
-        specialtyId: values.specialtyId ?? undefined, // Ensure no null
-        isEnterpriseTopic: isStudent
-          ? false
-          : values.isEnterpriseTopic ?? false,
-        enterpriseName: isStudent
-          ? undefined
-          : values.enterpriseName ?? undefined,
-        mentorId: isLecturer ? topic.mentorId : undefined,
         fileUrl: fileUrl,
         isExistedTeam: false,
       };
@@ -175,6 +157,7 @@ export function TopicUpdateForm({ topic }: TopicUpdateFormProps) {
 
       if (res.status == 1) {
         toast.success(res.message);
+        onSuccess?.();
         queryClient.refetchQueries({ queryKey: ["data"] });
 
         return;
@@ -191,29 +174,27 @@ export function TopicUpdateForm({ topic }: TopicUpdateFormProps) {
     setIsSubmitting(true);
     try {
       const values = form.getValues();
-      console.log(
-        "check_values",
-        isStudent ? values.mentorId ?? undefined : topic.mentorId
-      );
-      // Kiểm tra nếu là student và chưa chọn mentor
-      if (isStudent && !values.mentorId) {
-        setIsSubmitting(false);
-        setOpenMentorDialog(true);
-        return toast.error("Vui lòng chọn giảng viên hướng dẫn");
-      }
-
       const loadingToastId = toast.loading("Đang gửi ý tưởng cho mentor...");
 
-      // Check mentor availability
-      const mentorCheck =
-        await userService.checkMentorAndSubMentorSlotAvailability({
-          mentorId: isStudent ? values.mentorId ?? undefined : topic.mentorId,
-          subMentorId: values.subMentorId ?? undefined,
-        });
+      if (!skipCheckAndSelectUI) {
+        // Kiểm tra nếu là student và chưa chọn mentor
+        if (isStudent && !values.mentorId) {
+          setIsSubmitting(false);
+          setOpenMentorDialog(true);
+          return toast.error("Vui lòng chọn giảng viên hướng dẫn");
+        }
 
-      if (!mentorCheck.data) {
-        toast.dismiss(loadingToastId);
-        return toast.error(mentorCheck.message);
+        // Check mentor availability
+        const mentorCheck =
+          await userService.checkMentorAndSubMentorSlotAvailability({
+            mentorId: isStudent ? values.mentorId ?? undefined : topic.mentorId,
+            subMentorId: values.subMentorId ?? undefined,
+          });
+
+        if (!mentorCheck.data) {
+          toast.dismiss(loadingToastId);
+          return toast.error(mentorCheck.message);
+        }
       }
 
       // Gọi API để nộp cho mentor
@@ -230,6 +211,7 @@ export function TopicUpdateForm({ topic }: TopicUpdateFormProps) {
 
       if (res.status === 1) {
         toast.success(res.message);
+        onSuccess?.();
         queryClient.refetchQueries({ queryKey: ["data"] });
       } else {
         toast.error(res.message);
@@ -291,7 +273,7 @@ export function TopicUpdateForm({ topic }: TopicUpdateFormProps) {
             </DialogHeader>
 
             {/* Mentor Selection - Only for Students */}
-            {isStudent && (
+            {isStudent && !skipCheckAndSelectUI && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -373,7 +355,7 @@ export function TopicUpdateForm({ topic }: TopicUpdateFormProps) {
               </div>
             )}
 
-            {role == "Mentor" && (
+            {role == "Mentor" && !skipCheckAndSelectUI && (
               <FormField
                 control={form.control}
                 name="subMentorId"
@@ -582,7 +564,7 @@ export function TopicUpdateForm({ topic }: TopicUpdateFormProps) {
             <Button
               type="submit"
               variant={"outline"}
-              className="border-primary text-primary"
+              className="border-primary text-primary hover:text-primary"
               disabled={isSubmitting}
             >
               Cập nhật Ý tưởng
