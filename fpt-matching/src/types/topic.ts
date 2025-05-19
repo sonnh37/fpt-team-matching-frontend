@@ -2,6 +2,7 @@ import { BaseEntity } from "./_base/base";
 import { TopicStatus, TopicType } from "./enums/topic";
 import { MentorTopicRequest } from "./mentor-topic-request";
 import { Project } from "./project";
+import { Semester } from "./semester";
 import { Specialty } from "./specialty";
 import { StageTopic } from "./stage-topic";
 import { TopicRequest } from "./topic-request";
@@ -32,7 +33,8 @@ export interface Topic extends BaseEntity {
   subMentor?: User;
   specialty?: Specialty;
   stageTopic?: StageTopic;
-  topicRequests?: TopicRequest[];
-  topicVersions?: TopicVersion[];
-  mentorTopicRequests?: MentorTopicRequest[];
+  semester?: Semester;
+  topicRequests: TopicRequest[];
+  topicVersions: TopicVersion[];
+  mentorTopicRequests: MentorTopicRequest[];
 }

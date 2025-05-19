@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   ShieldHalf,
   SquareUserRound,
+  StickyNote,
   Telescope,
   UserCog,
   UserPlus,
@@ -73,6 +74,12 @@ export const NAV_CONFIG = {
           title: "Tạo ý tưởng",
           icon: PencilRuler,
           url: "/topic/create",
+          roles: ["Student", "Mentor"],
+        },
+        {
+          title: "Nháp đã tạo",
+          icon: StickyNote,
+          url: "/topic/draft",
           roles: ["Student", "Mentor"],
         },
         {
