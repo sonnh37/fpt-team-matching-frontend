@@ -42,6 +42,13 @@ class TeamMemberSerivce extends BaseService<TeamMember> {
      })
       return response.data
   }
+
+  public async addRangeByManager ({teamMembers} : {teamMembers: TeamMember[]}): Promise<BusinessResult<void>> {
+      const response = await axiosInstance.post<BusinessResult<void>>(`${this.endpoint}/add-range-by-manager`, {
+          teamMembers
+      })
+      return response.data
+  }
 }
 
 export const teammemberService = new TeamMemberSerivce();

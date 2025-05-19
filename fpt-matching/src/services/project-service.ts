@@ -141,6 +141,18 @@ class ProjectSerivce extends BaseService<Project> {
     );
     return response.data;
   }
+
+  public async getProjectNotCanceled() : Promise<BusinessResult<Project[]>> {
+    const response = await axiosInstance.get<BusinessResult<Project[]>>(`${this.endpoint}/get-project-not-canceled`);
+    return response.data
+  }
+
+  public async createProjectByManager({project} : {project: Project}) : Promise<BusinessResult<void>> {
+    const response = await axiosInstance.post<BusinessResult<void>>(`${this.endpoint}/create-project-by-manager`, {
+      ...project
+    });
+    return response.data;
+  }
 }
 
 export const projectService = new ProjectSerivce();
