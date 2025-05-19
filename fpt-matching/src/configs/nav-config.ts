@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   ShieldHalf,
   SquareUserRound,
+  StickyNote,
   Telescope,
   UserCog,
   UserPlus,
@@ -73,6 +74,12 @@ export const NAV_CONFIG = {
           title: "Tạo ý tưởng",
           icon: PencilRuler,
           url: "/topic/create",
+          roles: ["Student", "Mentor"],
+        },
+        {
+          title: "Nháp đã tạo",
+          icon: StickyNote,
+          url: "/topic/draft",
           roles: ["Student", "Mentor"],
         },
         {
@@ -167,9 +174,22 @@ export const NAV_CONFIG = {
 
     {
       title: "Quản lý nhóm",
-      url: "/management/projects",
       icon: Briefcase,
       roles: ["Manager"],
+      items: [
+        {
+          url: "/management/projects",
+          title: "Xem nhóm",
+          icon: Briefcase,
+          roles: ["Manager"],
+        },
+        {
+          url: "/management/projects/add-to-project",
+          title: "Thêm sinh viên vào nhóm",
+          icon: Briefcase,
+          roles: ["Manager"],
+        }
+      ]
     },
     // {
     //   title: "Quản lý đề tài",

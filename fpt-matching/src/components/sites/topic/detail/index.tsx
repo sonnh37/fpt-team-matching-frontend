@@ -28,7 +28,6 @@ import {
 import { useState } from "react";
 import { formatDate, getFileNameFromUrl, getPreviewUrl } from "@/lib/utils";
 import { format } from "date-fns";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { TopicVersion } from "@/types/topic-version";
 import { useQuery } from "@tanstack/react-query";
 import { topicService } from "@/services/topic-service";
@@ -37,6 +36,9 @@ import ErrorSystem from "@/components/_common/errors/error-system";
 import { useCurrentRole } from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { TypographyP } from "@/components/_common/typography/typography-p";
+import { TopicRequest } from "@/types/topic-request";
+import { TopicVersionRequestStatus } from "@/types/enums/topic-version-request";
+import { TopicRequestStatus } from "@/types/enums/topic-request";
 
 interface TopicDetailFormProps {
   topicId?: string;
@@ -56,40 +58,26 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
       await topicService.getById(topicId).then((res) => res.data),
   });
 
-  const [selectedVersion, setSelectedVersion] = useState<
-    TopicVersion | undefined
-  >();
-
   if (isLoading) return <LoadingComponent />;
   if (error) return <ErrorSystem />;
   if (!topic) return <div>Topic not found</div>;
 
-  const highestVersion =
-    topic.topicVersions.length > 0
-      ? topic.topicVersions.reduce((prev, current) =>
-          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-        )
-      : undefined;
+  // const highestVersion =
+  //   topic.topicVersions?.length > 0
+  //     ? topic.topicVersions.reduce((prev, current) =>
+  //         (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //       )
+  //     : undefined;
 
   // Initialize selectedVersion with highestVersion if not set
-  if (!selectedVersion && highestVersion) {
-    setSelectedVersion(highestVersion);
-  }
-  const resultDate = highestVersion?.stageTopic?.resultDate
-    ? new Date(highestVersion.stageTopic.resultDate)
+  // if (!selectedVersion && highestVersion) {
+  //   setSelectedVersion(highestVersion);
+  // }
+  const resultDate = topic.stageTopic?.resultDate
+    ? new Date(topic.stageTopic.resultDate)
     : null;
-  const topicVersionRequests = selectedVersion?.topicVersionRequests || [];
 
-  const isResultDay = resultDate ? resultDate.getTime() <= Date.now() : false;
-
-  const mentorApproval = topicVersionRequests.find(
-    (req) => req.role === "Mentor"
-  );
-  const councilApprovals = topicVersionRequests.filter(
-    (req) => req.role === "Council"
-  );
-
-  const renderVersionInfo = (version?: TopicVersion) => {
+  const renderVersionInfo = (version?: Topic) => {
     if (!version) {
       return (
         <div className="space-y-6">
@@ -102,14 +90,14 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
 
     const requests =
       roleCurrent === "Student"
-        ? version.topicVersionRequests.filter(
+        ? version.topicRequests.filter(
             (m) => m.role == "Mentor" || m.role == "SubMentor"
           )
         : roleCurrent == "Mentor"
-        ? version.topicVersionRequests.filter(
+        ? version.topicRequests.filter(
             (m) => m.role == "Mentor" || m.role == "SubMentor"
           )
-        : version.topicVersionRequests.filter((m) => m.reviewerId == user.id);
+        : version.topicRequests.filter((m) => m.reviewerId == user.id);
 
     return (
       <div className="space-y-6">
@@ -125,7 +113,7 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
             <div className="space-y-1">
               <Label className="italic">Tên tiếng việt</Label>
               <p className="text-sm font-medium">
-                {version.vietNamName || "-"}
+                {version.vietNameseName || "-"}
               </p>
             </div>
 
@@ -139,13 +127,8 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
             <div className="space-y-1">
               <Label className="italic">Viết tắt</Label>
               <p className="text-sm font-medium">
-                {version.abbreviations || "-"}
+                {version.abbreviation || "-"}
               </p>
-            </div>
-
-            <div className="space-y-1">
-              <Label className="italic">Số lượng người tối đa</Label>
-              <p className="text-sm font-medium">{version.teamSize || "-"}</p>
             </div>
           </div>
 
@@ -176,14 +159,14 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
 
             <div className="space-y-2">
               <Label className="italic">Tệp</Label>
-              {version.file ? (
+              {version.fileUrl ? (
                 <div className="flex items-center gap-3">
                   <p className="text-sm font-medium flex-1 truncate">
-                    {getFileNameFromUrl(version.file)}
+                    {getFileNameFromUrl(version.fileUrl)}
                   </p>
 
                   <Link
-                    href={getPreviewUrl(version.file)}
+                    href={getPreviewUrl(version.fileUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -198,7 +181,7 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
                   </Link>
 
                   <Link
-                    href={version.file}
+                    href={version.fileUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -220,24 +203,20 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
         </div>
 
         {/* Topic Information (if exists) */}
-        {version.topic && (
-          <div className="space-y-3">
-            <div className="flex items-center gap-2 text-lg font-semibold">
-              <Building2 className="h-5 w-5" />
-              <h3>Thông tin đề tài</h3>
-            </div>
-            <Separator />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <Label className="italic">Mã đề tài</Label>
-                <p className="text-sm font-medium">
-                  {version.topic.topicCode || "-"}
-                </p>
-              </div>
-              {/* Add more topic fields as needed */}
-            </div>
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-lg font-semibold">
+            <Building2 className="h-5 w-5" />
+            <h3>Thông tin đề tài</h3>
           </div>
-        )}
+          <Separator />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <Label className="italic">Mã đề tài</Label>
+              <p className="text-sm font-medium">{version.topicCode || "-"}</p>
+            </div>
+            {/* Add more topic fields as needed */}
+          </div>
+        </div>
 
         {/* Version Requests Section */}
         {requests?.length > 0 && (
@@ -255,8 +234,6 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
             <div className="space-y-4">
               {requests.map((request) => {
                 const isRequestForCurrentUser = request.reviewerId == user.id;
-                const isRequestForCurrentUserHasAnswer =
-                  request?.answerCriterias?.length > 0 || false;
 
                 const note = request?.note;
 
@@ -286,26 +263,24 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
                         </p>
                       </div>
 
-                      {isRequestForCurrentUser &&
-                        topic.ownerId != user.id && (
-                          <div className="space-y-1">
-                            <Link href={`/topic/reviews/${request.id}`} passHref>
-                              <Button
-                                variant={
-                                  isRequestForCurrentUserHasAnswer ||
-                                  (request.role == "SubMentor" &&
-                                    request.status !=
-                                      TopicVersionRequestStatus.Pending)
-                                    ? "default"
-                                    : "outline"
-                                }
-                              >
-                                Đánh giá
-                                <ListChecks className="h-4 w-4" />
-                              </Button>
-                            </Link>
-                          </div>
-                        )}
+                      {isRequestForCurrentUser && topic.ownerId != user.id && (
+                        <div className="space-y-1">
+                          <Link href={`/topic/reviews/${request.id}`} passHref>
+                            <Button
+                              variant={
+                                request.role == "SubMentor" &&
+                                request.status !=
+                                  TopicRequestStatus.Pending
+                                  ? "default"
+                                  : "outline"
+                              }
+                            >
+                              Đánh giá
+                              <ListChecks className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
 
                       {!(note == undefined || note == "" || note == null) && (
                         <div className="space-y-1">
@@ -323,7 +298,7 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
 
         <div>
           <Button variant={"outline"} asChild>
-            <Link href={`/topic/detail/${topic.id ?? ""}`}>Chi tiết</Link>
+            <Link href={`/topic/detail/${topic.id}`}>Chi tiết</Link>
           </Button>
         </div>
       </div>
@@ -413,76 +388,64 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
 
       <Separator />
 
-      {/* Version Selector */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <GitCompare className="h-5 w-5 text-muted-foreground" />
-          <Label className="italic">Phiên bản</Label>
-        </div>
-
-        <Select
-          value={selectedVersion?.version?.toString()}
-          onValueChange={(value) => {
-            const version = topic.topicVersions.find(
-              (v) => v.version?.toString() === value
-            );
-            setSelectedVersion(version);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select version" />
-          </SelectTrigger>
-          <SelectContent>
-            {topic.topicVersions
-              .sort((a, b) => (b.version || 0) - (a.version || 0))
-              .map((version) => (
-                <SelectItem
-                  key={version.id}
-                  value={version.version?.toString() || ""}
-                >
-                  Phiên bản {version.version}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
-      </div>
+      
 
       {/* Version-specific content */}
-      {renderVersionInfo(selectedVersion)}
+      {renderVersionInfo(topic)}
     </div>
   );
 };
 
 // Status Badge Component
 const StatusBadge = ({ status }: { status?: TopicStatus }) => {
-  if (status === undefined) return <Badge variant="outline">Không xác định</Badge>;
+  if (status === undefined)
+    return <Badge variant="outline">Không xác định</Badge>;
 
   // Ánh xạ status sang tiếng Việt
-  const statusText = {
-    [TopicStatus.Pending]: "Đang chờ",
-    [TopicStatus.Approved]: "Đã duyệt",
-    [TopicStatus.Rejected]: "Đã từ chối",
-    [TopicStatus.ConsiderByMentor]: "Được xem xét bởi giáo viên hướng dẫn",
-    [TopicStatus.ConsiderByCouncil]: "Được xem xét bởi Hội đồng",
-    // Thêm các trạng thái khác nếu cần
-  }[status] || "Khác";
+  const statusText =
+    {
+      [TopicStatus.Draft]: "Bản nháp",
+      [TopicStatus.StudentEditing]: "Sinh viên chỉnh sửa",
+      [TopicStatus.MentorPending]: "Chờ giáo viên phản hồi",
+      [TopicStatus.MentorConsider]: "Giáo viên đang xem xét",
+      [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
+      [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
+      [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
+      [TopicStatus.ManagerPending]: "Hội đồng đang xem xét",
+      [TopicStatus.ManagerApproved]: "Hội đồng đã duyệt",
+      [TopicStatus.ManagerRejected]: "Hội đồng đã từ chối",
+      // Thêm các trạng thái khác nếu cần
+    }[status] || "Khác";
 
   let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
     "default";
 
   switch (status) {
-    case TopicStatus.Pending:
-      badgeVariant = "secondary";
-      break;
-    case TopicStatus.Approved:
-      badgeVariant = "default";
-      break;
-    case TopicStatus.Rejected:
-      badgeVariant = "destructive";
-      break;
-    default:
-      badgeVariant = "outline";
-  }
+        case TopicStatus.Draft:
+        case TopicStatus.StudentEditing:
+        case TopicStatus.MentorPending:
+        case TopicStatus.ManagerPending:
+          badgeVariant = "secondary"; // màu trung tính, chờ xử lý
+          break;
+      
+        case TopicStatus.MentorApproved:
+        case TopicStatus.ManagerApproved:
+          badgeVariant = "default"; // màu xanh (duyệt)
+          break;
+      
+        case TopicStatus.MentorRejected:
+        case TopicStatus.ManagerRejected:
+          badgeVariant = "destructive"; // màu đỏ (từ chối)
+          break;
+      
+        case TopicStatus.MentorConsider:
+        case TopicStatus.MentorSubmitted:
+          badgeVariant = "outline"; // màu nhẹ (đang xem xét, trung gian)
+          break;
+      
+        default:
+          badgeVariant = "outline";
+      }
 
   return <Badge variant={badgeVariant}>{statusText}</Badge>;
 };
@@ -491,30 +454,32 @@ const StatusBadge = ({ status }: { status?: TopicStatus }) => {
 const RequestStatusBadge = ({
   status,
 }: {
-  status?: TopicVersionRequestStatus;
+  status?: TopicRequestStatus;
 }) => {
-  if (status === undefined) return <Badge variant="outline">Không xác định</Badge>;
+  if (status === undefined)
+    return <Badge variant="outline">Không xác định</Badge>;
 
   // Ánh xạ status sang tiếng Việt
-  const statusText = {
-    [TopicVersionRequestStatus.Pending]: "Đang chờ xử lý",
-    [TopicVersionRequestStatus.Approved]: "Đã phê duyệt",
-    [TopicVersionRequestStatus.Rejected]: "Đã từ chối",
-    [TopicVersionRequestStatus.Consider]: "Được xem xét",
-    // Thêm các trạng thái khác nếu cần
-  }[status] || "Trạng thái khác";
+  const statusText =
+    {
+      [TopicRequestStatus.Pending]: "Đang chờ xử lý",
+      [TopicRequestStatus.Approved]: "Đã phê duyệt",
+      [TopicRequestStatus.Rejected]: "Đã từ chối",
+      [TopicRequestStatus.Consider]: "Được xem xét",
+      // Thêm các trạng thái khác nếu cần
+    }[status] || "Trạng thái khác";
 
   let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
     "default";
 
   switch (status) {
-    case TopicVersionRequestStatus.Pending:
+    case TopicRequestStatus.Pending:
       badgeVariant = "secondary";
       break;
-    case TopicVersionRequestStatus.Approved:
+    case TopicRequestStatus.Approved:
       badgeVariant = "default";
       break;
-    case TopicVersionRequestStatus.Rejected:
+    case TopicRequestStatus.Rejected:
       badgeVariant = "destructive";
       break;
     default:

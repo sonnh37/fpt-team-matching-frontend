@@ -117,7 +117,7 @@ const formSchema = z.object({
 export const CreateProjectForm = () => {
   const role = useCurrentRole();
   const user = useSelectorUser();
-  const { currentSemester } = useCurrentSemester();
+  const { currentSemester, isLoading: isLoadingSemester } = useCurrentSemester();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -255,7 +255,7 @@ export const CreateProjectForm = () => {
   });
   // Loading and error states
   const isLoading =
-    // isLoadingStage ||
+    isLoadingSemester ||
     isLoadingProject ||
     isLoadingProfile ||
     isLoadingProfessions ||
