@@ -406,10 +406,10 @@ const StatusBadge = ({ status }: { status?: TopicStatus }) => {
       [TopicStatus.MentorConsider]: "Giáo viên đang xem xét",
       [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
       [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
-      [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
-      [TopicStatus.ManagerPending]: "Hội đồng đang xem xét",
-      [TopicStatus.ManagerApproved]: "Hội đồng đã duyệt",
-      [TopicStatus.ManagerRejected]: "Hội đồng đã từ chối",
+      [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên quản lí",
+      [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
+      [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
+      [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
       // Thêm các trạng thái khác nếu cần
     }[status] || "Khác";
 

@@ -12,7 +12,11 @@ import { TopicGetListForMentorQuery } from "@/types/models/queries/topics/topic-
 import { Topic } from "@/types/topic";
 import { TopicGetListOfSupervisorsQuery } from "@/types/models/queries/topics/topic-get-list-of-supervisor-query";
 import { TopicUpdateCommand } from "@/types/models/commands/topic/topic-update-command";
-import { TopicStudentCreatePendingCommand } from "@/types/models/commands/topic/topic-student-create-pending-command";
+import {
+  TopicLecturerCreatePendingCommand,
+  TopicResubmitForMentorByStudentCommand,
+  TopicSubmitForMentorByStudentCommand,
+} from "@/types/models/commands/topic/topic-student-create-pending-command";
 
 class TopicService extends BaseService<Topic> {
   constructor() {
@@ -89,11 +93,46 @@ class TopicService extends BaseService<Topic> {
   };
 
   public submitTopicToMentorByStudent = (
-    command: TopicStudentCreatePendingCommand
+    command: TopicSubmitForMentorByStudentCommand
   ): Promise<BusinessResult<Topic>> => {
     return axiosInstance
       .post<BusinessResult<Topic>>(
         `${this.endpoint}/submit-to-mentor-by-student`,
+        command
+      )
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public submitTopicOfLecturerByLecturer = (
+    command: TopicLecturerCreatePendingCommand
+  ): Promise<BusinessResult<Topic>> => {
+    return axiosInstance
+      .post<BusinessResult<Topic>>(
+        `${this.endpoint}/submit-topic-of-lecturer-by-lecturer`,
+        command
+      )
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public submitTopicOfStudentByLecturer = (
+    topicId: string
+  ): Promise<BusinessResult<Topic>> => {
+    return axiosInstance
+      .put<BusinessResult<Topic>>(
+        `${this.endpoint}/submit-topic-of-student-by-lecturer/${topicId}`
+      )
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public resubmitTopicToMentorByStudent = (
+    command: TopicResubmitForMentorByStudentCommand
+  ): Promise<BusinessResult<Topic>> => {
+    return axiosInstance
+      .post<BusinessResult<Topic>>(
+        `${this.endpoint}/resubmit-to-mentor-by-student`,
         command
       )
       .then((response) => response.data)
@@ -146,8 +185,12 @@ class TopicService extends BaseService<Topic> {
   //     });
   // };
 
-  public async getApprovedTopicsDoNotHaveTeam() : Promise<BusinessResult<Topic[]>> {
-      const response = await axiosInstance.get<BusinessResult<Topic[]>>(`${this.endpoint}/get-approved-topics-do-not-have-team`);
+  public async getApprovedTopicsDoNotHaveTeam(): Promise<
+    BusinessResult<Topic[]>
+  > {
+    const response = await axiosInstance.get<BusinessResult<Topic[]>>(
+      `${this.endpoint}/get-approved-topics-do-not-have-team`
+    );
     return response.data;
   }
 }

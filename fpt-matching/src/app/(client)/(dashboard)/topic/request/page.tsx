@@ -84,6 +84,7 @@ export default function QuanLyYTuongPage() {
                     TopicStatus.MentorPending,
                     TopicStatus.StudentEditing,
                     TopicStatus.MentorSubmitted,
+                    TopicStatus.MentorApproved,
                   ]) > 0 && (
                     <Badge variant="secondary">
                       {countTopicsByStatus([
@@ -91,6 +92,7 @@ export default function QuanLyYTuongPage() {
                         TopicStatus.MentorPending,
                         TopicStatus.StudentEditing,
                         TopicStatus.MentorSubmitted,
+                        TopicStatus.MentorApproved,
                       ])}
                     </Badge>
                   )}
@@ -115,12 +117,11 @@ export default function QuanLyYTuongPage() {
                   {TABS.APPROVED}
                   {countTopicsByStatus([
                     TopicStatus.ManagerApproved,
-                    TopicStatus.MentorApproved,
+                    
                   ]) > 0 && (
                     <Badge variant="default">
                       {countTopicsByStatus([
                         TopicStatus.ManagerApproved,
-                        TopicStatus.MentorApproved,
                       ])}
                     </Badge>
                   )}

@@ -59,6 +59,7 @@ import { TypographyMuted } from "@/components/_common/typography/typography-mute
 import { useCurrentRole } from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { TopicUpdateForm } from "../../update";
+import { TopicResubmitUpdateForm } from "../../update/resubmit-form";
 
 interface TopicUpdateFormProps {
   topicId?: string;
@@ -420,7 +421,7 @@ export const TopicDetailForm = ({ topicId }: TopicUpdateFormProps) => {
       {/* Create Version Dialog */}
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
         <DialogContent className="sm:max-h-[80%] max-w-[90%] sm:max-w-[60%] max-h-screen overflow-y-auto">
-          <TopicUpdateForm
+          <TopicResubmitUpdateForm
             topic={topic}
             onSuccess={async () => {
               window.location.reload();
@@ -447,9 +448,9 @@ const StatusBadge = ({ status }: { status?: TopicStatus }) => {
       [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
       [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
       [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
-      [TopicStatus.ManagerPending]: "Hội đồng đang xem xét",
-      [TopicStatus.ManagerApproved]: "Hội đồng đã duyệt",
-      [TopicStatus.ManagerRejected]: "Hội đồng đã từ chối",
+      [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
+      [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
+      [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
       // Thêm các trạng thái khác nếu cần
     }[status] || "Khác";
 

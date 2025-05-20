@@ -45,10 +45,7 @@ import { useSelectorUser } from "@/hooks/use-auth";
 import { TopicCreateCommand } from "@/types/models/commands/topic/topic-create-command";
 import { topicService } from "@/services/topic-service";
 import { TopicUpdateCommand } from "@/types/models/commands/topic/topic-update-command";
-import {
-  TopicLecturerCreatePendingCommand,
-  TopicSubmitForMentorByStudentCommand,
-} from "@/types/models/commands/topic/topic-student-create-pending-command";
+import { TopicResubmitForMentorByStudentCommand, TopicSubmitForMentorByStudentCommand } from "@/types/models/commands/topic/topic-student-create-pending-command";
 import { useState } from "react";
 import {
   Dialog,
@@ -71,9 +68,7 @@ const formSchema = z.object({
   description: z.string().min(10, "Tối thiểu 10 ký tự").nullable(),
   isEnterpriseTopic: z.boolean().optional(),
   enterpriseName: z.string().optional().nullable(),
-  mentorId: z.string().optional().nullable(),
   specialtyId: z.string().optional().nullable(),
-  subMentorId: z.string().optional().nullable(),
   fileschema: z.any().optional().nullable(),
 });
 
@@ -82,7 +77,7 @@ interface TopicUpdateFormProps {
   onSuccess?: () => void;
 }
 
-export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
+export function TopicResubmitUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
   const queryClient = useQueryClient();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,10 +94,8 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
     isPagination: false,
   };
 
-  const skipCheckAndSelectUI = isStudent
-    ? topic.mentorId != undefined
-    : topic.subMentorId != undefined;
-  console.log("check_skip", skipCheckAndSelectUI);
+  const skipCheckAndSelectUI = isStudent ? topic.mentorId != undefined : topic.subMentorId != undefined;
+  console.log("check_skip", skipCheckAndSelectUI)
   const { data: usersData, isLoading: isLoadingUsers } = useQuery({
     queryKey: ["getUsersByRole", query],
     queryFn: () => userService.getAll(query),
@@ -118,9 +111,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
       description: topic.description,
       isEnterpriseTopic: topic.isEnterpriseTopic || false,
       enterpriseName: topic.enterpriseName,
-      mentorId: topic.mentorId,
       specialtyId: topic.specialtyId,
-      subMentorId: topic.subMentorId,
     },
   });
 
@@ -181,58 +172,21 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
       const values = form.getValues();
       const loadingToastId = toast.loading("Đang gửi ý tưởng cho mentor...");
 
-      if (!skipCheckAndSelectUI) {
-        // Kiểm tra nếu là student và chưa chọn mentor
-        if (isStudent && !values.mentorId) {
-          setIsSubmitting(false);
-          setOpenMentorDialog(true);
-          return toast.error("Vui lòng chọn giảng viên hướng dẫn");
-        }
+      const command: TopicResubmitForMentorByStudentCommand = {
+        ...topic,
+      };
 
-        // Check mentor availability
-        const mentorCheck =
-          await userService.checkMentorAndSubMentorSlotAvailability({
-            mentorId: isStudent ? (values.mentorId ?? undefined) : topic.ownerId,
-            subMentorId: values.subMentorId ?? undefined,
-          });
-
-        if (!mentorCheck.data) {
-          toast.dismiss(loadingToastId);
-          return toast.error(mentorCheck.message);
-        }
-      }
-
-      // Gọi API để nộp cho mentor
-      let res;
-      if (isStudent) {
-        const command: TopicSubmitForMentorByStudentCommand = {
-          ...topic,
-          mentorId: values.mentorId ?? undefined,
-          subMentorId: values.subMentorId ?? undefined,
-        };
-
-        // Create topic based on user role
-        res = await topicService.submitTopicToMentorByStudent(command);
-      }
-
-      if (isLecturer) {
-        const command: TopicLecturerCreatePendingCommand = {
-          ...topic,
-          subMentorId: values.subMentorId ?? undefined,
-        };
-
-        // Create topic based on user role
-        res = await topicService.submitTopicOfLecturerByLecturer(command);
-      }
+      // Create topic based on user role
+      const res = await topicService.resubmitTopicToMentorByStudent(command);
 
       toast.dismiss(loadingToastId);
 
-      if (res?.status === 1) {
+      if (res.status === 1) {
         toast.success(res.message);
         onSuccess?.();
         queryClient.refetchQueries({ queryKey: ["data"] });
       } else {
-        toast.error(res?.message);
+        toast.error(res.message);
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi");
@@ -290,136 +244,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
               </DialogDescription>
             </DialogHeader>
 
-            {/* Mentor Selection - Only for Students */}
-            {isStudent && !skipCheckAndSelectUI && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="mentorId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Giảng viên hướng dẫn</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value ?? undefined}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Chọn giảng viên" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {usersData?.data?.results?.map((user) => (
-                            <SelectItem key={user.id} value={user.id!}>
-                              <div className="flex items-center gap-2">
-                                <span>
-                                  {user.lastName} {user.firstName}
-                                </span>
-                                <span className="text-muted-foreground text-xs">
-                                  {user.email}
-                                </span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Chọn giảng viên sẽ hướng dẫn dự án của bạn
-                      </FormDescription>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="subMentorId"
-                  render={({ field }) => {
-                    const mentorId = form.watch("mentorId");
-                    const filteredUsers = usersData?.data?.results?.filter(
-                      (user) => user.id !== mentorId
-                    );
-
-                    return (
-                      <FormItem>
-                        <FormLabel>Giảng viên hướng dẫn 2 (Tùy chọn)</FormLabel>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value ?? undefined}
-                          disabled={!mentorId}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Chọn giảng viên 2" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {filteredUsers?.map((user) => (
-                              <SelectItem key={user.id} value={user.id!}>
-                                <div className="flex items-center gap-2">
-                                  <span>
-                                    {user.lastName} {user.firstName}
-                                  </span>
-                                  <span className="text-muted-foreground text-xs">
-                                    {user.email}
-                                  </span>
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Chọn giảng viên sẽ hướng dẫn dự án của bạn
-                        </FormDescription>
-                      </FormItem>
-                    );
-                  }}
-                />
-              </div>
-            )}
-
-            {isLecturer && !skipCheckAndSelectUI && (
-              <FormField
-                control={form.control}
-                name="subMentorId"
-                render={({ field }) => {
-                  const filteredUsers = usersData?.data?.results?.filter(
-                    (user_) => user_.id !== user.id
-                  );
-
-                  return (
-                    <FormItem>
-                      <FormLabel>Giảng viên 2 (Tùy chọn)</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value ?? undefined}
-                        disabled={!user.id}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Chọn giảng viên 2" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {filteredUsers?.map((userFiltered) => (
-                            <SelectItem
-                              key={userFiltered?.id}
-                              value={userFiltered.id ?? ""}
-                            >
-                              <div className="flex items-center gap-2">
-                                <span>
-                                  {userFiltered.lastName}{" "}
-                                  {userFiltered.firstName}
-                                </span>
-                                <span className="text-muted-foreground text-xs">
-                                  {userFiltered.email}
-                                </span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormDescription>
-                        Chọn giảng viên sẽ hướng dẫn dự án của bạn
-                      </FormDescription>
-                    </FormItem>
-                  );
-                }}
-              />
-            )}
+           
             <DialogFooter className="flex justify-between">
               <Button
                 variant="outline"
@@ -576,18 +401,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
                 onClick={() => setOpenMentorDialog(true)}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Đang xử lý..." : "Nộp cho Mentor"}
-              </Button>
-            )}
-
-            {isLecturer && (
-              <Button
-                type="button"
-                variant={"outline"}
-                onClick={() => setOpenMentorDialog(true)}
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? "Đang xử lý..." : "Nộp cho quản lí"}
+                {isSubmitting ? "Đang xử lý..." : "Nộp lại cho Mentor"}
               </Button>
             )}
             <Button

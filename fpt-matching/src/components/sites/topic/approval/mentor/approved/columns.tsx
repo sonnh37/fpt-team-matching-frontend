@@ -32,14 +32,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { RootState } from "@/lib/redux/store";
 import { topicVersionRequestService } from "@/services/topic-version-request-service";
 import { topicService } from "@/services/topic-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { Topic } from "@/types/topic";
 import { TopicVersionRequest } from "@/types/topic-version-request";
-import { TopicVersionRequestUpdateStatusCommand } from "@/types/models/commands/topic-version-requests/topic-version-request-update-status-command";
 import { User } from "@/types/user";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { Eye, ListChecks, Loader2, MoreHorizontal } from "lucide-react";
+import { Eye, ListChecks, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -52,21 +50,22 @@ import Link from "next/link";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useCurrentRole } from "@/hooks/use-current-role";
 import { ProjectStatus } from "@/types/enums/project";
+import { TopicRequestStatus } from "@/types/enums/topic-request";
 
 export const columns: ColumnDef<Topic>[] = [
-  {
-    accessorKey: "teamCode",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã nhóm" />
-    ),
-    cell: ({ row }) => {
-      const topic = row.original;
-      const projectOfLeader = topic?.owner?.projects.filter(
-        (m) => m.leaderId == topic.ownerId && m.status == ProjectStatus.Pending
-      )[0];
-      return projectOfLeader?.teamCode || "Chưa có mã nhóm";
-    },
-  },
+  // {
+  //   accessorKey: "Tên nhóm",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Mã nhóm" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const topic = row.original;
+  //     const projectOfLeader = topic?.owner?.projects.filter(
+  //       (m) => m.leaderId == topic.ownerId && m.status == ProjectStatus.Pending
+  //     )[0];
+  //     return projectOfLeader?.teamCode || "Chưa có nhóm";
+  //   },
+  // },
   {
     accessorKey: "leaderId",
     header: ({ column }) => (
@@ -84,13 +83,8 @@ export const columns: ColumnDef<Topic>[] = [
     ),
     cell: ({ row }) => {
       const topic = row.original;
-      const highestVersion =
-        topic.topicVersions.length > 0
-          ? topic.topicVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.englishName || "-";
+
+      return topic?.vietNameseName || "-";
     },
   },
   {
@@ -112,49 +106,47 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const user = useSelectorUser();
   const topicId = topic.id;
   const [open, setOpen] = useState(false);
-  const role = useCurrentRole();
-  const [isSubmitting, setIsSubmitting] = useState(false); // Thêm state cho loading
 
-  const highestVersion =
-    topic.topicVersions.length > 0
-      ? topic.topicVersions.reduce((prev, current) =>
-          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-        )
-      : undefined;
+  const role = useCurrentRole();
+  // const highestVersion =
+  //   topic.topicVersions.length > 0
+  //     ? topic.topicVersions.reduce((prev, current) =>
+  //         (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //       )
+  //     : undefined;
 
   const hasCouncilRequests =
-    highestVersion?.topicVersionRequests.some(
-      (request) => request.role == "Council"
-    ) && role == "Mentor";
+    topic?.topicRequests.some((request) => request.role == "Manager") &&
+    role == "Mentor";
 
   const isMentorOfTopic = topic.mentorId == user?.id;
 
-  const hasSubmentorPendingRequest = highestVersion?.topicVersionRequests.some(
+  const hasSubmentorPendingRequest = topic?.topicRequests?.some(
     (request) =>
       request.role == "SubMentor" &&
-      request.status == TopicVersionRequestStatus.Pending
+      request.status == TopicRequestStatus.Pending
   );
 
   const handleSubmit = async () => {
-    setIsSubmitting(true); // Bắt đầu loading
     try {
-      const res = await topicVersionRequestService.createCouncilRequestsForTopic(
-        highestVersion?.id
-      );
-      if (res.status != 1) {
-        toast.error(res.message);
+      if (!topic?.id) {
+        toast.error("Topic ID is missing");
+        setOpen(false);
         return;
       }
+      const res = await topicService.submitTopicOfStudentByLecturer(topic.id);
+      if (res.status != 1) return toast.error(res.message);
 
       toast.success(res.message);
+
       queryClient.refetchQueries({
         queryKey: ["data"],
       });
+      setOpen(false);
     } catch (error: any) {
       toast.error(error || "An unexpected error occurred");
-    } finally {
-      setIsSubmitting(false); // Kết thúc loading dù có lỗi hay không
       setOpen(false);
+      return;
     }
   };
 
@@ -173,19 +165,10 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
               <Button
                 variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 size="sm"
-                onClick={handleSubmit}
-                disabled={hasCouncilRequests || hasSubmentorPendingRequest || isSubmitting} // Thêm isSubmitting vào điều kiện disabled
+                onClick={() => handleSubmit()}
+                disabled={hasCouncilRequests || hasSubmentorPendingRequest}
               >
-                {isSubmitting ? ( // Hiển thị loading khi đang submit
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Đang xử lý...
-                  </div>
-                ) : hasCouncilRequests ? (
-                  "Đã nộp"
-                ) : (
-                  "Nộp cho hội đồng"
-                )}
+                {hasCouncilRequests ? "Đã nộp" : "Nộp cho quản lí"}
               </Button>
             )}
           </DialogFooter>
