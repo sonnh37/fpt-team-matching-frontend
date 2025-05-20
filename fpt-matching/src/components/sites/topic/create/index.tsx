@@ -117,11 +117,11 @@ const formSchema = z.object({
 export const CreateProjectForm = () => {
   const role = useCurrentRole();
   const user = useSelectorUser();
-  const { currentSemester, isLoading: isLoadingSemester } = useCurrentSemester();
+  const { currentSemester, isLoading: isLoadingSemester } =
+    useCurrentSemester();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    
   });
 
   const isEnterpriseTopic = form.watch("isEnterpriseTopic");
@@ -129,7 +129,6 @@ export const CreateProjectForm = () => {
   // Check user role
   const isStudent = role == "Student";
   const isLecturer = role == "Mentor";
-
 
   // Fetch all necessary data in parallel
   const {
@@ -360,7 +359,6 @@ export const CreateProjectForm = () => {
 
   if (hasActiveTopics && isStudent) return <PageIsTopic />;
 
-  
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Hiển thị confirm dialog trước khi submit
     const confirmSubmit = await new Promise((resolve) => {
@@ -471,7 +469,7 @@ export const CreateProjectForm = () => {
   }
 
   async function handleCreateDraft() {
-   const values = form.getValues()
+    const values = form.getValues();
     // Hiển thị confirm dialog trước khi submit
     const confirmSubmit = await new Promise((resolve) => {
       toast.custom(
@@ -523,7 +521,6 @@ export const CreateProjectForm = () => {
         duration: Infinity,
       });
 
-
       // Upload file
       const fileUpload = await fileUploadService.uploadFile(
         values.fileschema,
@@ -545,8 +542,7 @@ export const CreateProjectForm = () => {
         type: TopicType.Student,
         semesterId: currentSemester?.id,
         ownerId: user?.id,
-        isExistedTeam: false
-
+        isExistedTeam: false,
       };
 
       const commandLecture: TopicCreateCommand = {
@@ -559,7 +555,7 @@ export const CreateProjectForm = () => {
         type: TopicType.Lecturer,
         semesterId: currentSemester?.id,
         ownerId: user?.id,
-        isExistedTeam: false
+        isExistedTeam: false,
       };
       const res = isStudent
         ? await topicService.create(commandStudent)
@@ -584,7 +580,6 @@ export const CreateProjectForm = () => {
       toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi");
     }
   }
-
 
   return (
     <Form {...form}>
@@ -1032,13 +1027,16 @@ export const CreateProjectForm = () => {
           </CardContent>
 
           <CardFooter className="flex justify-end">
-          <Button variant={"secondary"} type="button" onClick={() => handleCreateDraft()}>
+            <Button
+              variant={"secondary"}
+              type="button"
+              onClick={() => handleCreateDraft()}
+            >
               Tạo bảng nháp
             </Button>
             <Button type="submit" className="w-full ml-2 md:w-auto">
-              Gửi Ý tưởng
+              Nộp ý tưởng
             </Button>
-          
           </CardFooter>
         </Card>
       </form>

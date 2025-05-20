@@ -45,7 +45,10 @@ import { useSelectorUser } from "@/hooks/use-auth";
 import { TopicCreateCommand } from "@/types/models/commands/topic/topic-create-command";
 import { topicService } from "@/services/topic-service";
 import { TopicUpdateCommand } from "@/types/models/commands/topic/topic-update-command";
-import { TopicSubmitForMentorByStudentCommand } from "@/types/models/commands/topic/topic-student-create-pending-command";
+import {
+  TopicLecturerCreatePendingCommand,
+  TopicSubmitForMentorByStudentCommand,
+} from "@/types/models/commands/topic/topic-student-create-pending-command";
 import { useState } from "react";
 import {
   Dialog,
@@ -96,8 +99,10 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
     isPagination: false,
   };
 
-  const skipCheckAndSelectUI = isStudent ? topic.mentorId != undefined : topic.subMentorId != undefined;
-  console.log("check_skip", skipCheckAndSelectUI)
+  const skipCheckAndSelectUI = isStudent
+    ? topic.mentorId != undefined
+    : topic.subMentorId != undefined;
+  console.log("check_skip", skipCheckAndSelectUI);
   const { data: usersData, isLoading: isLoadingUsers } = useQuery({
     queryKey: ["getUsersByRole", query],
     queryFn: () => userService.getAll(query),
@@ -187,7 +192,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
         // Check mentor availability
         const mentorCheck =
           await userService.checkMentorAndSubMentorSlotAvailability({
-            mentorId: isStudent ? values.mentorId ?? undefined : topic.mentorId,
+            mentorId: isStudent ? (values.mentorId ?? undefined) : topic.ownerId,
             subMentorId: values.subMentorId ?? undefined,
           });
 
@@ -198,23 +203,36 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
       }
 
       // Gọi API để nộp cho mentor
-      const command: TopicSubmitForMentorByStudentCommand = {
-        ...topic,
-        mentorId: values.mentorId ?? undefined,
-        subMentorId: values.subMentorId ?? undefined,
-      };
+      let res;
+      if (isStudent) {
+        const command: TopicSubmitForMentorByStudentCommand = {
+          ...topic,
+          mentorId: values.mentorId ?? undefined,
+          subMentorId: values.subMentorId ?? undefined,
+        };
 
-      // Create topic based on user role
-      const res = await topicService.submitTopicToMentorByStudent(command);
+        // Create topic based on user role
+        res = await topicService.submitTopicToMentorByStudent(command);
+      }
+
+      if (isLecturer) {
+        const command: TopicLecturerCreatePendingCommand = {
+          ...topic,
+          subMentorId: values.subMentorId ?? undefined,
+        };
+
+        // Create topic based on user role
+        res = await topicService.submitTopicOfLecturerByLecturer(command);
+      }
 
       toast.dismiss(loadingToastId);
 
-      if (res.status === 1) {
+      if (res?.status === 1) {
         toast.success(res.message);
         onSuccess?.();
         queryClient.refetchQueries({ queryKey: ["data"] });
       } else {
-        toast.error(res.message);
+        toast.error(res?.message);
       }
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi");
@@ -355,7 +373,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
               </div>
             )}
 
-            {role == "Mentor" && !skipCheckAndSelectUI && (
+            {isLecturer && !skipCheckAndSelectUI && (
               <FormField
                 control={form.control}
                 name="subMentorId"
@@ -559,6 +577,17 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Đang xử lý..." : "Nộp cho Mentor"}
+              </Button>
+            )}
+
+            {isLecturer && (
+              <Button
+                type="button"
+                variant={"outline"}
+                onClick={() => setOpenMentorDialog(true)}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? "Đang xử lý..." : "Nộp cho quản lí"}
               </Button>
             )}
             <Button

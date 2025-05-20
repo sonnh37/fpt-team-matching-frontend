@@ -82,9 +82,9 @@ export const columns: ColumnDef<Topic>[] = [
             [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
             [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
             [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
-            [TopicStatus.ManagerPending]: "Hội đồng đang xem xét",
-            [TopicStatus.ManagerApproved]: "Hội đồng đã duyệt",
-            [TopicStatus.ManagerRejected]: "Hội đồng đã từ chối",
+            [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
+            [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
+            [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
            
           }[status] || "Khác"
         : "-";
