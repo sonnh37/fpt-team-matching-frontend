@@ -28,6 +28,9 @@ import {Semester} from "@/types/semester";
 import {ProjectStatus} from "@/types/enums/project";
 import { ViewTopicDetail } from '../view-detail/view-topic-detail';
 import {Topic} from "@/types/topic";
+import {
+    CancelExistingProjectDialog
+} from "@/components/sites/management/student-do-not-have-team/project-add-student-card/cancel-existing-project-dialog";
 function SelectTopic({topics, setProject, project} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>, project: Project}) {
     return (
         <Select defaultValue={project.topicId ?? undefined} onValueChange={(value) => {
@@ -171,7 +174,8 @@ const InprogressProjectAddStudentCard = ({setStudents, projects, project, setPro
                                 </div>
                                 <div className={"mt-8 flex gap-4"}>
                                     <SaveChangeExistingProjectAddTeamDialog updatedTeamMember={updatedTeamMembers} project={project} />
-                                    <CancelProjectAddTeamDialog />
+                                    {/*<CancelProjectAddTeamDialog />*/}
+                                    {project && <CancelExistingProjectDialog projectId={project.id!} />}
                                 </div>
                             </div>
 

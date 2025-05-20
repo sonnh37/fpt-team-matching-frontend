@@ -18,7 +18,7 @@ export function CancelProjectAddTeamDialog() {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Huỷ nhóm</DialogTitle>
+                    <DialogTitle>Huỷ tạo nhóm</DialogTitle>
                     <DialogDescription>
                         Bạn có chắc chắn muốn huỷ nhóm này ?
                     </DialogDescription>
