@@ -447,8 +447,8 @@ export const CreateProjectForm = () => {
       };
 
       const res = isStudent
-        ? await topicService.createTopicByStudent(command)
-        : await topicService.createTopicByLecturer(command);
+        ? await topicService.submitTopicToMentorByStudent(command)
+        : await topicService.submitTopicOfLecturerByLecturer(command);
 
       // Cập nhật trạng thái loading
       toast.dismiss(loadingToastId);
@@ -572,10 +572,10 @@ export const CreateProjectForm = () => {
         toast.success(res.message, {
           action: {
             label: "Xem danh sách",
-            onClick: () => router.push("/topic/request"),
+            onClick: () => router.push("/topic/draft"),
           },
         });
-        setTimeout(() => router.push("/topic/request"), 2000);
+        setTimeout(() => router.push("/topic/draft"), 2000);
         return;
       }
 

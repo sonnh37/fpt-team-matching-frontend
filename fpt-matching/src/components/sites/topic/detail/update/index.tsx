@@ -59,6 +59,7 @@ import { TypographyMuted } from "@/components/_common/typography/typography-mute
 import { useCurrentRole } from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { TopicUpdateForm } from "../../update";
+import { TopicResubmitUpdateForm } from "../../update/resubmit-form";
 
 interface TopicUpdateFormProps {
   topicId?: string;
@@ -420,7 +421,7 @@ export const TopicDetailForm = ({ topicId }: TopicUpdateFormProps) => {
       {/* Create Version Dialog */}
       <Dialog open={openCreate} onOpenChange={setOpenCreate}>
         <DialogContent className="sm:max-h-[80%] max-w-[90%] sm:max-w-[60%] max-h-screen overflow-y-auto">
-          <TopicUpdateForm
+          <TopicResubmitUpdateForm
             topic={topic}
             onSuccess={async () => {
               window.location.reload();
