@@ -34,7 +34,7 @@ const SaveChangeExistingProjectAddTeamDialog = ({project, updatedTeamMember}:{pr
                 teamMember.projectId = project.id;
                 teamMember.isDeleted = false;
             })
-            const response = await teammemberService.addRangeByManager({teamMembers: updatedTeamMember});
+            const response = await teammemberService.addRangeByManager({teamMembers: updatedTeamMember, topicId: project.topicId ?? "", projectId: project.id ?? ""});
             if (response.status != 1)
             {
                 toast.error(response.message)
@@ -45,7 +45,7 @@ const SaveChangeExistingProjectAddTeamDialog = ({project, updatedTeamMember}:{pr
                 window.location.reload();
             }
             console.log(updatedTeamMember)
-        } catch (e) {
+        } catch (e: any) {
             toast.error(e.message);
         }
         finally {

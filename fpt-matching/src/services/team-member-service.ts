@@ -1,5 +1,4 @@
 import { Const } from "@/lib/constants/const";
-import React from "react";
 import { BaseService } from "./_base/base-service";
 import { BusinessResult } from "@/types/models/responses/business-result";
 import axiosInstance from "@/lib/interceptors/axios-instance";
@@ -43,9 +42,11 @@ class TeamMemberSerivce extends BaseService<TeamMember> {
       return response.data
   }
 
-  public async addRangeByManager ({teamMembers} : {teamMembers: TeamMember[]}): Promise<BusinessResult<void>> {
+  public async addRangeByManager ({teamMembers, topicId, projectId} : {teamMembers: TeamMember[], topicId: string, projectId: string}): Promise<BusinessResult<void>> {
       const response = await axiosInstance.post<BusinessResult<void>>(`${this.endpoint}/add-range-by-manager`, {
-          teamMembers
+          teamMembers,
+          topicId,
+          projectId
       })
       return response.data
   }
