@@ -6,9 +6,7 @@ import {Button} from "@/components/ui/button";
 import {Project} from "@/types/project";
 
 import {User} from '@/types/user';
-import {
-    CancelProjectAddTeamDialog
-} from "@/components/sites/management/student-do-not-have-team/project-add-student-card/cancel-project-add-team-dialog";
+
 import {TeamMemberRole} from "@/types/enums/team-member";
 import {Badge} from "@/components/ui/badge";
 import {
@@ -28,6 +26,9 @@ import {Semester} from "@/types/semester";
 import {ProjectStatus} from "@/types/enums/project";
 import { Topic } from '@/types/topic';
 import {ViewTopicDetail} from "@/components/sites/management/student-do-not-have-team/view-detail/view-topic-detail";
+import {
+    CancelExistingProjectDialog
+} from "@/components/sites/management/student-do-not-have-team/project-add-student-card/cancel-existing-project-dialog";
 
 function SelectTopic({topics, setProject, project, setTopics} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>, project: Project, setTopics: Dispatch<SetStateAction<Topic[]>>}) {
     return (
@@ -174,7 +175,8 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
                                 </div>
                                 <div className={"mt-8 flex gap-4"}>
                                     <SaveChangeExistingProjectAddTeamDialog updatedTeamMember={updatedTeamMembers} project={project} />
-                                    <CancelProjectAddTeamDialog />
+                                    {/*<CancelProjectAddTeamDialog />*/}
+                                    {project && <CancelExistingProjectDialog projectId={project.id!} />}
                                 </div>
                             </div>
 

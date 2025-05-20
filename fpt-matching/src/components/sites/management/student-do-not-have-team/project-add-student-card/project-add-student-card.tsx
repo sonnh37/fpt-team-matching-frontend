@@ -36,13 +36,19 @@ import {
 import {toast} from "sonner";
 import {Topic} from "@/types/topic";
 
-function SelectTopic({topics, setProject} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>}) {
+function SelectTopic({topics, setProject, project} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>, project: Project}) {
     return (
-        <Select onValueChange={(value) => {
+        <Select defaultValue={project.topicId ?? undefined} onValueChange={(value) => {
             setProject((prevState) => {
-                const updatedTopic = {...prevState ?? {} as Project};
-                updatedTopic.topicId = value;
-                return updatedTopic;
+                const updatedProject = {...prevState ?? {} as Project};
+                updatedProject.topicId = value;
+
+                const foundTopic = topics.find(x => x.id === value)
+                if (foundTopic) {
+                    updatedProject.topic = foundTopic;
+                }
+
+                return updatedProject;
             })
         }}>
             <SelectTrigger className="w-[20rem]">
@@ -52,7 +58,7 @@ function SelectTopic({topics, setProject} : {topics: Topic[], setProject: Dispat
                 <SelectGroup>
                     <SelectLabel>Đề tài</SelectLabel>
                     {topics.map((topic, index) => (
-                        <SelectItem key={index} value={topic.id ?? ""}>{topic.englishName}  - {topic.topicCode}</SelectItem>
+                        <SelectItem disabled={topic.isExistedTeam} key={index} value={topic.id ?? ""}>{topic.englishName}  - {topic.topicCode}</SelectItem>
                     ))}
                 </SelectGroup>
             </SelectContent>
@@ -162,7 +168,7 @@ const ProjectAddStudentCard = ({setStudents,numberOfTeam, projects, setCountProj
                                         project != null && (
                                            <>
                                                <h2 className={"font-bold text-sm"}>Chọn đề tài cho nhóm: </h2>
-                                               <SelectTopic setProject={setProject} topics={topics} />
+                                               <SelectTopic project={project} setProject={setProject} topics={topics} />
                                            </>
                                         )
                                     }
