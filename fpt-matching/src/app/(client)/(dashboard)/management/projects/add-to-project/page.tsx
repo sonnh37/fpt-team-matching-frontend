@@ -93,7 +93,8 @@ const Page = () => {
     if (!semester.currentSemester?.id) {
         return null
     }
-    return (
+    console.log(project)
+    return semester && (
             <div className={"flex gap-8 w-full"}>
                 <div className={"w-[70%]"}>
                     <div className={"my-6"}>
@@ -105,7 +106,11 @@ const Page = () => {
                 </div>
                 <div className={"mt-[4.6rem]"}>
                     { (
-                        <Tabs defaultValue="create-team" className="w-full">
+                        <Tabs onValueChange={() => {
+                            semester.currentSemester?.numberOfTeam && setCountProject(semester.currentSemester?.numberOfTeam - projects.length)
+                            setProject(null)
+                            setTeamMembersUpdated([])
+                        }} defaultValue="create-team" className="w-full">
                             <TabsList className="grid w-full grid-cols-3">
                                 <TabsTrigger value="create-team">Tạo nhóm mới</TabsTrigger>
                                 <TabsTrigger value="create-existing-team">Thêm vào nhóm chưa chốt</TabsTrigger>
@@ -115,10 +120,10 @@ const Page = () => {
                                 <ProjectAddStudentCard topics={topics} semester={semester.currentSemester} setStudents={setStudents} projects={projects} numberOfTeam={countProject} setCountProjects={setCountProject} project={project} setProject={setProject}  />
                             </TabsContent>
                             <TabsContent value="create-existing-team">
-                                <ExistingProjectAddStudentCard semester={semester.currentSemester} updatedTeamMembers={teamMembersUpdated}  project={project} setProject={setProject} setStudents={setStudents} projects={projects}  />
+                                <ExistingProjectAddStudentCard setTopics={setTopics} topics={topics} semester={semester.currentSemester} updatedTeamMembers={teamMembersUpdated}  project={project} setProject={setProject} setStudents={setStudents} projects={projects}  />
                             </TabsContent>
                             <TabsContent value="create-inprogress-team">
-                                <InprogressProjectAddStudentCard semester={semester.currentSemester} updatedTeamMembers={teamMembersUpdated}  project={project} setProject={setProject} setStudents={setStudents} projects={projects}  />
+                                <InprogressProjectAddStudentCard topics={topics} semester={semester.currentSemester} updatedTeamMembers={teamMembersUpdated}  project={project} setProject={setProject} setStudents={setStudents} projects={projects}  />
                             </TabsContent>
                         </Tabs>
                         )}

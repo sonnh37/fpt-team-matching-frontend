@@ -26,36 +26,49 @@ import SaveChangeExistingProjectAddTeamDialog
 import {TeamMember} from "@/types/team-member";
 import {Semester} from "@/types/semester";
 import {ProjectStatus} from "@/types/enums/project";
+import { Topic } from '@/types/topic';
+import {ViewTopicDetail} from "@/components/sites/management/student-do-not-have-team/view-detail/view-topic-detail";
 
-function SelectTopic() {
+function SelectTopic({topics, setProject, project, setTopics} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>, project: Project, setTopics: Dispatch<SetStateAction<Topic[]>>}) {
     return (
-        <Select>
-            <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select a fruit" />
+        <Select defaultValue={project.topicId ?? undefined} onValueChange={(value) => {
+            setProject((prevState) => {
+                const updatedProject = {...prevState ?? {} as Project};
+                updatedProject.topicId = value;
+
+                const foundTopic = topics.find(x => x.id === value)
+                if (foundTopic) {
+                    updatedProject.topic = foundTopic;
+                }
+
+                return updatedProject;
+            })
+        }}>
+            <SelectTrigger className="w-[20rem]">
+                <SelectValue placeholder="Chọn đề tài" />
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>
-                    <SelectLabel>Fruits</SelectLabel>
-                    <SelectItem value="apple">Apple</SelectItem>
-                    <SelectItem value="banana">Banana</SelectItem>
-                    <SelectItem value="blueberry">Blueberry</SelectItem>
-                    <SelectItem value="grapes">Grapes</SelectItem>
-                    <SelectItem value="pineapple">Pineapple</SelectItem>
+                    <SelectLabel>Đề tài</SelectLabel>
+                    {topics.map((topic, index) => (
+                        <SelectItem disabled={topic.isExistedTeam} key={index} value={topic.id ?? ""}>{topic.englishName}  - {topic.topicCode}</SelectItem>
+                    ))}
                 </SelectGroup>
             </SelectContent>
         </Select>
     )
 }
-const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProject, updatedTeamMembers, semester}: {
+const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProject, updatedTeamMembers, semester, topics, setTopics}: {
     projects: Project[],
     project: Project | null,
     setProject: Dispatch<SetStateAction<Project | null>>,
     setStudents: Dispatch<SetStateAction<User[]>>,
     updatedTeamMembers: TeamMember[]
-    semester: Semester
+    semester: Semester,
+    topics: Topic[],
+    setTopics: Dispatch<SetStateAction<Topic[]>>
 }) => {
     const [addTeam, setAddTeam] = React.useState(false);
-    console.log(projects)
     return (
         <Card className="w-[30vw]">
             <CardHeader>
@@ -151,8 +164,13 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
                                     </TableFooter>
                                 </Table>
                                 <div className={"mt-6"}>
-                                    <h2 className={"font-bold text-sm"}>Chọn đề tài cho nhóm: </h2>
-                                    <SelectTopic />
+                                    <h2 className={"font-bold text-sm mb-2"}>Chọn đề tài cho nhóm: </h2>
+                                    <div className={"flex gap-3"}>
+                                        {
+                                            project && <SelectTopic setTopics={setTopics} project={project} topics={topics} setProject={setProject} />
+                                        }
+                                        {project?.topic &&  <ViewTopicDetail topic={project.topic}  />}
+                                    </div>
                                 </div>
                                 <div className={"mt-8 flex gap-4"}>
                                     <SaveChangeExistingProjectAddTeamDialog updatedTeamMember={updatedTeamMembers} project={project} />

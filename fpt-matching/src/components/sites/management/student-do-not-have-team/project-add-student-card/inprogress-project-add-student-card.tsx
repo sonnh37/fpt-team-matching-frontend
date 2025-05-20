@@ -26,14 +26,45 @@ import SaveChangeExistingProjectAddTeamDialog
 import {TeamMember} from "@/types/team-member";
 import {Semester} from "@/types/semester";
 import {ProjectStatus} from "@/types/enums/project";
+import { ViewTopicDetail } from '../view-detail/view-topic-detail';
+import {Topic} from "@/types/topic";
+function SelectTopic({topics, setProject, project} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>, project: Project}) {
+    return (
+        <Select defaultValue={project.topicId ?? undefined} onValueChange={(value) => {
+            setProject((prevState) => {
+                const updatedProject = {...prevState ?? {} as Project};
+                updatedProject.topicId = value;
 
-const InprogressProjectAddStudentCard = ({setStudents, projects, project, setProject, updatedTeamMembers, semester}: {
+                const foundTopic = topics.find(x => x.id === value)
+                if (foundTopic) {
+                    updatedProject.topic = foundTopic;
+                }
+
+                return updatedProject;
+            })
+        }}>
+            <SelectTrigger className="w-[20rem]">
+                <SelectValue placeholder="Chọn đề tài" />
+            </SelectTrigger>
+            <SelectContent>
+                <SelectGroup>
+                    <SelectLabel>Đề tài</SelectLabel>
+                    {topics.map((topic, index) => (
+                        <SelectItem disabled={topic.isExistedTeam} key={index} value={topic.id ?? ""}>{topic.englishName}  - {topic.topicCode}</SelectItem>
+                    ))}
+                </SelectGroup>
+            </SelectContent>
+        </Select>
+    )
+}
+const InprogressProjectAddStudentCard = ({setStudents, projects, project, setProject, updatedTeamMembers, semester, topics}: {
     projects: Project[],
     project: Project | null,
     setProject: Dispatch<SetStateAction<Project | null>>,
     setStudents: Dispatch<SetStateAction<User[]>>,
     updatedTeamMembers: TeamMember[]
-    semester: Semester
+    semester: Semester,
+    topics: Topic[]
 }) => {
     const [addTeam, setAddTeam] = React.useState(false);
     return (
@@ -61,7 +92,7 @@ const InprogressProjectAddStudentCard = ({setStudents, projects, project, setPro
                             <SelectGroup>
                                 <SelectLabel>Nhóm</SelectLabel>
                                 {projects.map((project) => (
-                                    project.status == ProjectStatus.InProgress && project.topic && (
+                                    project.status == ProjectStatus.InProgress && project.topicId && (
                                         <SelectItem key={project.teamCode} value={project.id!}>
                                             {project.teamCode}
                                         </SelectItem>
@@ -132,8 +163,11 @@ const InprogressProjectAddStudentCard = ({setStudents, projects, project, setPro
                                     </TableFooter>
                                 </Table>
                                 <div className={"mt-6"}>
-                                    <h2 className={"font-bold text-sm"}>Đề tài của nhóm: </h2>
-                                    {/*<SelectTopic />*/}
+                                    <h2 className={"font-bold text-sm"}>Đề tài của nhóm</h2>
+                                    <div className={"flex gap-3"}>
+                                        {project != null && <SelectTopic setProject={setProject} topics={topics} project={project} />}
+                                        {project?.topic &&  <ViewTopicDetail topic={project.topic}  />}
+                                    </div>
                                 </div>
                                 <div className={"mt-8 flex gap-4"}>
                                     <SaveChangeExistingProjectAddTeamDialog updatedTeamMember={updatedTeamMembers} project={project} />
