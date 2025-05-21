@@ -153,6 +153,31 @@ class ProjectSerivce extends BaseService<Project> {
     });
     return response.data;
   }
+
+
+  public submitBlockProjectByStudent = async (
+    projectId?: string
+  ): Promise<BusinessResult<Project>> => {
+    try {
+
+      const response = await axiosInstance.get<BusinessResult<Project> >(`${this.endpoint}/submit-block-project-by-student/?${projectId}`);
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  };
+  public BlockProjectByManager = async (
+    projectId?: string
+  ): Promise<BusinessResult<Project>> => {
+    try {
+
+      const response = await axiosInstance.get<BusinessResult<Project> >(`${this.endpoint}/block-project-by-manager/?${projectId}`);
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  };
 }
+
 
 export const projectService = new ProjectSerivce();
