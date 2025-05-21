@@ -83,7 +83,7 @@ export const columnsStudentTable = ({ setProject, currentSemester, setTeamMember
                                     updatedTeamMembers.push({
                                         user: user,
                                         userId: user.id,
-                                        status: TeamMemberStatus.Pending,
+                                        status: TeamMemberStatus.InProgress,
                                         role: updatedTeamMembers.length == 0 ? TeamMemberRole.Leader : TeamMemberRole.Member
                                     } as TeamMember);
 
@@ -103,7 +103,7 @@ export const columnsStudentTable = ({ setProject, currentSemester, setTeamMember
                                     const updatedTeamMembers = [...(prevState || [])];
                                     updatedTeamMembers.push({
                                         userId: user.id,
-                                        status: TeamMemberStatus.Pending,
+                                        status: TeamMemberStatus.InProgress,
                                         role: TeamMemberRole.Member,
                                         isDeleted: false,
                                     } as TeamMember)

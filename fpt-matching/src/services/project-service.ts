@@ -154,6 +154,12 @@ class ProjectSerivce extends BaseService<Project> {
     return response.data;
   }
 
+  public async cancelProjectByManager({projectId} : {projectId: string}): Promise<BusinessResult<void>> {
+    const response = await axiosInstance.put<BusinessResult<void>>(`${this.endpoint}/cancel-project-by-manager/${projectId}`);
+    return response.data
+  }
+}
+
 
   public submitBlockProjectByStudent = async (
     projectId?: string

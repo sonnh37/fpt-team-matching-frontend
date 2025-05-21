@@ -38,7 +38,7 @@ const SaveChangeProjectAddTeamDialog = ({project}:{project:Project | null}) => {
                 toast.success(response.message)
                 window.location.reload();
             }
-        } catch (e) {
+        } catch (e: Error) {
             toast.error(e.message);
         }
         finally {

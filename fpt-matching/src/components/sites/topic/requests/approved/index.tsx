@@ -34,7 +34,7 @@ const defaultSchema = z.object({
 //#endregion
 export default function TopicVersionRequestApprovedTable() {
   const queryParams: TopicGetCurrentByStatusQuery = {
-    statusList: [TopicStatus.ManagerApproved, TopicStatus.MentorApproved],
+    statusList: [TopicStatus.ManagerApproved],
     isPagination: false,
   };
 

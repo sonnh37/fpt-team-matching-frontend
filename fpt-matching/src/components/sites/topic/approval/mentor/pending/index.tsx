@@ -58,7 +58,7 @@ const defaultSchema = z.object({
   stageNumber: z.number().default(1).optional(),
 });
 
-export function TopicVersionRequestPendingByMentorTable() {
+export function TopicPendingByMentorTable() {
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "createdDate", desc: true },
   ]);

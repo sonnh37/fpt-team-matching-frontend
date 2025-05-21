@@ -165,7 +165,7 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
                     {getFileNameFromUrl(version.fileUrl)}
                   </p>
 
-                  <Link
+                  {/* <Link
                     href={getPreviewUrl(version.fileUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -178,7 +178,7 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
                       <Eye className="h-4 w-4" />
                       Xem nhanh
                     </Button>
-                  </Link>
+                  </Link> */}
 
                   <Link
                     href={version.fileUrl}
@@ -266,18 +266,16 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
                       {isRequestForCurrentUser && topic.ownerId != user.id && (
                         <div className="space-y-1">
                           <Link href={`/topic/reviews/${request.id}`} passHref>
-                            <Button
-                              variant={
-                                request.role == "SubMentor" &&
-                                request.status !=
-                                  TopicRequestStatus.Pending
-                                  ? "default"
-                                  : "outline"
-                              }
-                            >
-                              Đánh giá
-                              <ListChecks className="h-4 w-4" />
-                            </Button>
+                            {request.status == TopicRequestStatus.Pending ? (
+                              <Button variant={"outline"}>Đánh giá</Button>
+                            ) : (
+                              <Button
+                                variant={"outline"}
+                                className="border-primary text-primary hover:text-primary"
+                              >
+                                Đã đánh giá
+                              </Button>
+                            )}
                           </Link>
                         </div>
                       )}
@@ -296,9 +294,9 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
           </div>
         )}
 
-        <div>
+        <div className="flex w-full justify-end">
           <Button variant={"outline"} asChild>
-            <Link href={`/topic/detail/${topic.id}`}>Chi tiết</Link>
+            <Link href={`/topic/detail/${topic.id}`}>Xem chi tiết</Link>
           </Button>
         </div>
       </div>
@@ -388,8 +386,6 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
 
       <Separator />
 
-      
-
       {/* Version-specific content */}
       {renderVersionInfo(topic)}
     </div>
@@ -410,10 +406,10 @@ const StatusBadge = ({ status }: { status?: TopicStatus }) => {
       [TopicStatus.MentorConsider]: "Giáo viên đang xem xét",
       [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
       [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
-      [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
-      [TopicStatus.ManagerPending]: "Hội đồng đang xem xét",
-      [TopicStatus.ManagerApproved]: "Hội đồng đã duyệt",
-      [TopicStatus.ManagerRejected]: "Hội đồng đã từ chối",
+      [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên quản lí",
+      [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
+      [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
+      [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
       // Thêm các trạng thái khác nếu cần
     }[status] || "Khác";
 
@@ -421,41 +417,37 @@ const StatusBadge = ({ status }: { status?: TopicStatus }) => {
     "default";
 
   switch (status) {
-        case TopicStatus.Draft:
-        case TopicStatus.StudentEditing:
-        case TopicStatus.MentorPending:
-        case TopicStatus.ManagerPending:
-          badgeVariant = "secondary"; // màu trung tính, chờ xử lý
-          break;
-      
-        case TopicStatus.MentorApproved:
-        case TopicStatus.ManagerApproved:
-          badgeVariant = "default"; // màu xanh (duyệt)
-          break;
-      
-        case TopicStatus.MentorRejected:
-        case TopicStatus.ManagerRejected:
-          badgeVariant = "destructive"; // màu đỏ (từ chối)
-          break;
-      
-        case TopicStatus.MentorConsider:
-        case TopicStatus.MentorSubmitted:
-          badgeVariant = "outline"; // màu nhẹ (đang xem xét, trung gian)
-          break;
-      
-        default:
-          badgeVariant = "outline";
-      }
+    case TopicStatus.Draft:
+    case TopicStatus.StudentEditing:
+    case TopicStatus.MentorPending:
+    case TopicStatus.ManagerPending:
+      badgeVariant = "secondary"; // màu trung tính, chờ xử lý
+      break;
+
+    case TopicStatus.MentorApproved:
+    case TopicStatus.ManagerApproved:
+      badgeVariant = "default"; // màu xanh (duyệt)
+      break;
+
+    case TopicStatus.MentorRejected:
+    case TopicStatus.ManagerRejected:
+      badgeVariant = "destructive"; // màu đỏ (từ chối)
+      break;
+
+    case TopicStatus.MentorConsider:
+    case TopicStatus.MentorSubmitted:
+      badgeVariant = "outline"; // màu nhẹ (đang xem xét, trung gian)
+      break;
+
+    default:
+      badgeVariant = "outline";
+  }
 
   return <Badge variant={badgeVariant}>{statusText}</Badge>;
 };
 
 // Request Status Badge Component
-const RequestStatusBadge = ({
-  status,
-}: {
-  status?: TopicRequestStatus;
-}) => {
+const RequestStatusBadge = ({ status }: { status?: TopicRequestStatus }) => {
   if (status === undefined)
     return <Badge variant="outline">Không xác định</Badge>;
 

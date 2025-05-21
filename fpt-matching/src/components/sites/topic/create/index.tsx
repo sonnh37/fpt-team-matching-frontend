@@ -66,12 +66,12 @@ const formSchema = z.object({
     .string({ required_error: "Vui lòng nhập tên tiếng Anh" })
     .min(2, { message: "Tên tiếng Anh phải có ít nhất 2 ký tự" }),
 
-  teamSize: z
-    .number({
-      required_error: "Vui lòng chọn số lượng thành viên",
-      invalid_type_error: "Số lượng thành viên phải là số",
-    })
-    .gte(4, { message: "Số lượng thành viên tối thiểu là 4" }),
+  // teamSize: z
+  //   .number({
+  //     required_error: "Vui lòng chọn số lượng thành viên",
+  //     invalid_type_error: "Số lượng thành viên phải là số",
+  //   })
+  //   .gte(4, { message: "Số lượng thành viên tối thiểu là 4" }),
 
   abbreviation: z
     .string({ required_error: "Vui lòng nhập tên viết tắt" })
@@ -117,13 +117,11 @@ const formSchema = z.object({
 export const CreateProjectForm = () => {
   const role = useCurrentRole();
   const user = useSelectorUser();
-  const { currentSemester, isLoading: isLoadingSemester } = useCurrentSemester();
+  const { currentSemester, isLoading: isLoadingSemester } =
+    useCurrentSemester();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      teamSize: 4,
-    },
   });
 
   const isEnterpriseTopic = form.watch("isEnterpriseTopic");
@@ -131,7 +129,6 @@ export const CreateProjectForm = () => {
   // Check user role
   const isStudent = role == "Student";
   const isLecturer = role == "Mentor";
-
 
   // Fetch all necessary data in parallel
   const {
@@ -362,7 +359,6 @@ export const CreateProjectForm = () => {
 
   if (hasActiveTopics && isStudent) return <PageIsTopic />;
 
-  
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Hiển thị confirm dialog trước khi submit
     const confirmSubmit = await new Promise((resolve) => {
@@ -449,8 +445,8 @@ export const CreateProjectForm = () => {
       };
 
       const res = isStudent
-        ? await topicService.createTopicByStudent(command)
-        : await topicService.createTopicByLecturer(command);
+        ? await topicService.submitTopicToMentorByStudent(command)
+        : await topicService.submitTopicOfLecturerByLecturer(command);
 
       // Cập nhật trạng thái loading
       toast.dismiss(loadingToastId);
@@ -473,7 +469,7 @@ export const CreateProjectForm = () => {
   }
 
   async function handleCreateDraft() {
-   const values = form.getValues()
+    const values = form.getValues();
     // Hiển thị confirm dialog trước khi submit
     const confirmSubmit = await new Promise((resolve) => {
       toast.custom(
@@ -525,7 +521,6 @@ export const CreateProjectForm = () => {
         duration: Infinity,
       });
 
-
       // Upload file
       const fileUpload = await fileUploadService.uploadFile(
         values.fileschema,
@@ -547,8 +542,7 @@ export const CreateProjectForm = () => {
         type: TopicType.Student,
         semesterId: currentSemester?.id,
         ownerId: user?.id,
-        isExistedTeam: false
-
+        isExistedTeam: false,
       };
 
       const commandLecture: TopicCreateCommand = {
@@ -561,7 +555,7 @@ export const CreateProjectForm = () => {
         type: TopicType.Lecturer,
         semesterId: currentSemester?.id,
         ownerId: user?.id,
-        isExistedTeam: false
+        isExistedTeam: false,
       };
       const res = isStudent
         ? await topicService.create(commandStudent)
@@ -574,10 +568,10 @@ export const CreateProjectForm = () => {
         toast.success(res.message, {
           action: {
             label: "Xem danh sách",
-            onClick: () => router.push("/topic/request"),
+            onClick: () => router.push("/topic/draft"),
           },
         });
-        setTimeout(() => router.push("/topic/request"), 2000);
+        setTimeout(() => router.push("/topic/draft"), 2000);
         return;
       }
 
@@ -586,7 +580,6 @@ export const CreateProjectForm = () => {
       toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi");
     }
   }
-
 
   return (
     <Form {...form}>
@@ -794,7 +787,7 @@ export const CreateProjectForm = () => {
             <div className="space-y-4 rounded-lg border p-4">
               <h3 className="text-lg font-medium">Nhóm & Tài liệu</h3>
 
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="teamSize"
                 render={({ field }) => (
@@ -821,7 +814,7 @@ export const CreateProjectForm = () => {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
 
               {/* Mentor Selection - Only for Students */}
               {isStudent && (
@@ -1034,13 +1027,16 @@ export const CreateProjectForm = () => {
           </CardContent>
 
           <CardFooter className="flex justify-end">
-          <Button variant={"secondary"} type="button" onClick={() => handleCreateDraft()}>
+            <Button
+              variant={"secondary"}
+              type="button"
+              onClick={() => handleCreateDraft()}
+            >
               Tạo bảng nháp
             </Button>
             <Button type="submit" className="w-full ml-2 md:w-auto">
-              Gửi Ý tưởng
+              Nộp ý tưởng
             </Button>
-          
           </CardFooter>
         </Card>
       </form>

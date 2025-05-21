@@ -82,9 +82,9 @@ export const columns: ColumnDef<Topic>[] = [
             [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
             [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
             [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
-            [TopicStatus.ManagerPending]: "Hội đồng đang xem xét",
-            [TopicStatus.ManagerApproved]: "Hội đồng đã duyệt",
-            [TopicStatus.ManagerRejected]: "Hội đồng đã từ chối",
+            [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
+            [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
+            [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
            
           }[status] || "Khác"
         : "-";
@@ -190,47 +190,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           <div className="p-4 gap-4">
             <TopicDetailForm topicId={topic.id} />
           </div>
-          <DialogFooter>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div>
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button size="sm" variant="destructive" disabled={isLock}>
-                        Xóa ý tưởng
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Xác nhận xóa</DialogTitle>
-                      </DialogHeader>
-                      <TypographyP>
-                        Bạn có chắc chắn muốn xóa ý tưởng này không? Hành động
-                        này không thể hoàn tác.
-                      </TypographyP>
-                      <DialogFooter>
-                        <DialogClose asChild>
-                          <Button variant="outline">Hủy</Button>
-                        </DialogClose>
-                        <Button
-                          variant="destructive"
-                          onClick={handleDelete}
-                          disabled={isDeleting}
-                        >
-                          {isDeleting ? "Đang xử lí..." : "Xác nhận xóa"}
-                        </Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
-                </div>
-              </TooltipTrigger>
-              {isLock && (
-                <TooltipContent>
-                  <p>Ý tưởng này đã được người cố vấn chấp thuận.</p>
-                </TooltipContent>
-              )}
-            </Tooltip>
-          </DialogFooter>
+         
         </DialogContent>
       </Dialog>
     </div>

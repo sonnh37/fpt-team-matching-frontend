@@ -6,7 +6,9 @@ import {Button} from "@/components/ui/button";
 import {Project} from "@/types/project";
 
 import {User} from '@/types/user';
-
+import {
+    CancelProjectAddTeamDialog
+} from "@/components/sites/management/student-do-not-have-team/project-add-student-card/cancel-project-add-team-dialog";
 import {TeamMemberRole} from "@/types/enums/team-member";
 import {Badge} from "@/components/ui/badge";
 import {
@@ -24,13 +26,12 @@ import SaveChangeExistingProjectAddTeamDialog
 import {TeamMember} from "@/types/team-member";
 import {Semester} from "@/types/semester";
 import {ProjectStatus} from "@/types/enums/project";
-import { Topic } from '@/types/topic';
-import {ViewTopicDetail} from "@/components/sites/management/student-do-not-have-team/view-detail/view-topic-detail";
+import { ViewTopicDetail } from '../view-detail/view-topic-detail';
+import {Topic} from "@/types/topic";
 import {
     CancelExistingProjectDialog
 } from "@/components/sites/management/student-do-not-have-team/project-add-student-card/cancel-existing-project-dialog";
-
-function SelectTopic({topics, setProject, project, setTopics} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>, project: Project, setTopics: Dispatch<SetStateAction<Topic[]>>}) {
+function SelectTopic({topics, setProject, project} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>, project: Project}) {
     return (
         <Select defaultValue={project.topicId ?? undefined} onValueChange={(value) => {
             setProject((prevState) => {
@@ -59,22 +60,21 @@ function SelectTopic({topics, setProject, project, setTopics} : {topics: Topic[]
         </Select>
     )
 }
-const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProject, updatedTeamMembers, semester, topics, setTopics}: {
+const InprogressProjectAddStudentCard = ({setStudents, projects, project, setProject, updatedTeamMembers, semester, topics}: {
     projects: Project[],
     project: Project | null,
     setProject: Dispatch<SetStateAction<Project | null>>,
     setStudents: Dispatch<SetStateAction<User[]>>,
     updatedTeamMembers: TeamMember[]
     semester: Semester,
-    topics: Topic[],
-    setTopics: Dispatch<SetStateAction<Topic[]>>
+    topics: Topic[]
 }) => {
     const [addTeam, setAddTeam] = React.useState(false);
     return (
         <Card className="w-[30vw]">
             <CardHeader>
-                <CardTitle>Nhóm chưa chốt</CardTitle>
-                <CardDescription>Thêm sinh viên vào nhóm chưa chốt tại đây</CardDescription>
+                <CardTitle>Nhóm đã chốt</CardTitle>
+                <CardDescription>Thêm sinh viên vào nhóm đã chốt tại đây</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="pb-4">
@@ -95,10 +95,11 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
                             <SelectGroup>
                                 <SelectLabel>Nhóm</SelectLabel>
                                 {projects.map((project) => (
-                                    (project.status == ProjectStatus.Pending || project.status == ProjectStatus.Forming) &&
-                                    <SelectItem key={project.teamCode} value={project.id!}>
-                                        {project.teamCode}
-                                    </SelectItem>
+                                    project.status == ProjectStatus.InProgress && project.topicId && (
+                                        <SelectItem key={project.teamCode} value={project.id!}>
+                                            {project.teamCode}
+                                        </SelectItem>
+                                    )
                                 ))}
                             </SelectGroup>
                         </SelectContent>
@@ -165,11 +166,9 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
                                     </TableFooter>
                                 </Table>
                                 <div className={"mt-6"}>
-                                    <h2 className={"font-bold text-sm mb-2"}>Chọn đề tài cho nhóm: </h2>
+                                    <h2 className={"font-bold text-sm"}>Đề tài của nhóm</h2>
                                     <div className={"flex gap-3"}>
-                                        {
-                                            project && <SelectTopic setTopics={setTopics} project={project} topics={topics} setProject={setProject} />
-                                        }
+                                        {project != null && <SelectTopic setProject={setProject} topics={topics} project={project} />}
                                         {project?.topic &&  <ViewTopicDetail topic={project.topic}  />}
                                     </div>
                                 </div>
@@ -191,4 +190,4 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
     );
 };
 
-export default ExistingProjectAddStudentCard;
+export default InprogressProjectAddStudentCard;

@@ -1,41 +1,29 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import TimeStageTopic from "@/components/_common/time-stage-topic";
+
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import HorizontalLinearStepper from "@/components/_common/material-ui/stepper";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useCurrentRole } from "@/hooks/use-current-role";
 import { RootState } from "@/lib/redux/store";
-import { topicService } from "@/services/topic-service";
-import { stagetopicService } from "@/services/stage-topic-service";
+import { formatDate } from "@/lib/utils";
 import { TopicStatus } from "@/types/enums/topic";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { Topic } from "@/types/topic";
 import { TopicVersionRequest } from "@/types/topic-version-request";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { ColumnDef, Row } from "@tanstack/react-table";
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { toast } from "sonner";
-import { TopicDetailForm } from "@/components/sites/topic/detail";
-import { formatDate } from "@/lib/utils";
-import { useRouter } from "next/navigation";
+import { TopicDetailForm } from "../../detail";
+import TimeStageTopic from "@/components/_common/time-stage-idea";
 
 export const columns: ColumnDef<Topic>[] = [
   {
@@ -46,32 +34,27 @@ export const columns: ColumnDef<Topic>[] = [
     cell: ({ row }) => {
       const topic = row.original;
       if (!topic.topicVersions) return;
-      const highestVersion =
-        topic.topicVersions.length > 0
-          ? topic.topicVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.englishName || "-";
+      
+      return topic?.englishName || "-";
     },
   },
-  {
-    accessorKey: "latestVersion",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phiên bản mới nhất" />
-    ),
-    cell: ({ row }) => {
-      const topic = row.original;
-      if (!topic.topicVersions) return;
-      const highestVersion =
-        topic.topicVersions.length > 0
-          ? topic.topicVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion ? `v${highestVersion.version}` : "-";
-    },
-  },
+  // {
+  //   accessorKey: "latestVersion",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Phiên bản mới nhất" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const topic = row.original;
+  //     if (!topic.topicVersions) return;
+  //     const highestVersion =
+  //       topic.topicVersions.length > 0
+  //         ? topic.topicVersions.reduce((prev, current) =>
+  //             (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //           )
+  //         : undefined;
+  //     return highestVersion ? `v${highestVersion.version}` : "-";
+  //   },
+  // },
 
   {
     accessorKey: "semester",
@@ -81,14 +64,8 @@ export const columns: ColumnDef<Topic>[] = [
     cell: ({ row }) => {
       const topic = row.original;
       if (!topic.topicVersions) return;
-      const highestVersion =
-        topic.topicVersions.length > 0
-          ? topic.topicVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-
-      return highestVersion?.stageTopic?.semester?.semesterName || "-";
+     
+      return topic.semester?.semesterName || "-";
     },
   },
   {
@@ -99,14 +76,9 @@ export const columns: ColumnDef<Topic>[] = [
     cell: ({ row }) => {
       const topic = row.original;
       if (!topic.topicVersions) return;
-      const highestVersion =
-        topic.topicVersions.length > 0
-          ? topic.topicVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
+    
 
-      return highestVersion?.stageTopic?.stageNumber || "-";
+      return topic?.stageTopic?.stageNumber || "-";
     },
   },
   {
@@ -118,32 +90,50 @@ export const columns: ColumnDef<Topic>[] = [
       const status = row.getValue("status") as TopicStatus | undefined;
       
       // Ánh xạ status sang tiếng Việt
-      const statusText = status !== undefined 
-        ? {
-            [TopicStatus.Pending]: "Đang chờ",
-            [TopicStatus.Approved]: "Đã duyệt",
-            [TopicStatus.Rejected]: "Đã từ chối",
-            [TopicStatus.ConsiderByMentor]: "Được xem xét bởi giáo viên hướng dẫn",
-            [TopicStatus.ConsiderByCouncil]: "Được xem xét bởi Hội đồng",
-          }[status] || "Khác"
-        : "-";
+     // Ánh xạ status sang tiếng Việt
+     const statusText = status !== undefined 
+     ? { [TopicStatus.Draft]: "Bản nháp",
+         [TopicStatus.StudentEditing]: "Sinh viên chỉnh sửa",
+         [TopicStatus.MentorPending]: "Chờ giáo viên phản hồi",
+         [TopicStatus.MentorConsider]: "Giáo viên đang xem xét",
+         [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
+         [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
+         [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
+         [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
+         [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
+         [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
+        
+       }[status] || "Khác"
+     : "-";
   
       let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
         "default";
-  
-      switch (status) {
-        case TopicStatus.Pending:
-          badgeVariant = "secondary";
-          break;
-        case TopicStatus.Approved:
-          badgeVariant = "default";
-          break;
-        case TopicStatus.Rejected:
-          badgeVariant = "destructive";
-          break;
-        default:
-          badgeVariant = "outline";
-      }
+        switch (status) {
+          case TopicStatus.Draft:
+          case TopicStatus.StudentEditing:
+          case TopicStatus.MentorPending:
+          case TopicStatus.ManagerPending:
+            badgeVariant = "secondary"; // màu trung tính, chờ xử lý
+            break;
+        
+          case TopicStatus.MentorApproved:
+          case TopicStatus.ManagerApproved:
+            badgeVariant = "default"; // màu xanh (duyệt)
+            break;
+        
+          case TopicStatus.MentorRejected:
+          case TopicStatus.ManagerRejected:
+            badgeVariant = "destructive"; // màu đỏ (từ chối)
+            break;
+        
+          case TopicStatus.MentorConsider:
+          case TopicStatus.MentorSubmitted:
+            badgeVariant = "outline"; // màu nhẹ (đang xem xét, trung gian)
+            break;
+        
+          default:
+            badgeVariant = "outline";
+        }
   
       return <Badge variant={badgeVariant}>{statusText}</Badge>;
     },
@@ -159,6 +149,7 @@ export const columns: ColumnDef<Topic>[] = [
     },
   },
 ];
+
 interface ActionsProps {
   row: Row<Topic>;
 }
@@ -166,55 +157,16 @@ interface ActionsProps {
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const isEditing = row.getIsSelected();
-  const router = useRouter();
   const initialFeedback = row.getValue("content") as string;
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const role = useCurrentRole();
+
   const topic = row.original;
-  const highestVersion =
-    topic.topicVersions.length > 0
-      ? topic.topicVersions.reduce((prev, current) =>
-          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-        )
-      : undefined;
-  const hasMentorApproval = highestVersion?.topicVersionRequests.some(
-    (request) =>
-      (request.status === TopicVersionRequestStatus.Approved ||
-        request.status === TopicVersionRequestStatus.Rejected) &&
-      request.role === "Mentor"
-  );
-
-  const isLock = role != "Lecturer" ? hasMentorApproval : false;
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      if (!topic.id) {
-        toast.error("Topic ID is missing. Cannot delete the topic.");
-        return;
-      }
-      const res = await topicService.deletePermanent(topic.id);
-      if (res.status != 1) {
-        toast.error(res.message);
-        return;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      toast.success(res.message);
-      await queryClient.refetchQueries({ queryKey: ["data"] });
-      await queryClient.refetchQueries({ queryKey: ["data_topics"] });
-      setIsDeleteDialogOpen(false);
-    } catch (error) {
-      console.error("Error deleting topic:", error);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+ 
 
   return (
-    <div className="flex flex-row gap-2">
+    <div className="flex flex-col gap-2">
+      {/* Hiển thị trạng thái Mentor Approve */}
+
+      {/* Nút View */}
       <Dialog>
         <DialogTrigger asChild>
           <Button size="sm" variant="default">
@@ -223,22 +175,14 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         </DialogTrigger>
         <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
           <div className="flex justify-between p-4 gap-4">
-            <TimeStageTopic stageTopic={highestVersion?.stageTopic} />
+            <TimeStageTopic stageTopic={topic?.stageTopic} />
             {/* <HorizontalLinearStepper topic={topic} /> */}
           </div>
           <div className="p-4 gap-4">
             <TopicDetailForm topicId={topic.id} />
           </div>
-          
         </DialogContent>
       </Dialog>
-      <Button
-        size="sm"
-        onClick={() => router.push(`/topic/detail/${topic.id}`)}
-        variant="default"
-      >
-        Chi tiết
-      </Button>
     </div>
   );
 };

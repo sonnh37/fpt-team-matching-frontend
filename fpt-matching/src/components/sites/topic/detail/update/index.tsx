@@ -15,6 +15,7 @@ import {
   ClipboardList,
   Building2,
   Plus,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -57,6 +58,8 @@ import ErrorSystem from "@/components/_common/errors/error-system";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
 import { useCurrentRole } from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
+import { TopicUpdateForm } from "../../update";
+import { TopicResubmitUpdateForm } from "../../update/resubmit-form";
 
 interface TopicUpdateFormProps {
   topicId?: string;
@@ -70,7 +73,7 @@ const createVersionSchema = z.object({
 
 type CreateVersionFormValues = z.infer<typeof createVersionSchema>;
 
-export const TopicUpdateForm = ({ topicId }: TopicUpdateFormProps) => {
+export const TopicDetailForm = ({ topicId }: TopicUpdateFormProps) => {
   const roleCurrent = useCurrentRole();
   const user = useSelectorUser();
   const queryClient = useQueryClient();
@@ -109,12 +112,6 @@ export const TopicUpdateForm = ({ topicId }: TopicUpdateFormProps) => {
   ) {
     canCreate = true;
   }
-
- 
-
-
-
-  
 
   const renderVersionInfo = (version?: Topic) => {
     if (!version) {
@@ -170,7 +167,6 @@ export const TopicUpdateForm = ({ topicId }: TopicUpdateFormProps) => {
               </p>
             </div>
 
-          
             <div className="space-y-1">
               <Label className="italic">Đợt</Label>
               <p className="text-sm font-medium">
@@ -180,12 +176,8 @@ export const TopicUpdateForm = ({ topicId }: TopicUpdateFormProps) => {
 
             <div className="space-y-1">
               <Label className="italic">Kì:</Label>
-              <p className="text-sm">
-                {version.semester?.semesterName || "-"}
-              </p>
+              <p className="text-sm">{version.semester?.semesterName || "-"}</p>
             </div>
-
-           
           </div>
 
           <div className="space-y-1">
@@ -258,7 +250,7 @@ export const TopicUpdateForm = ({ topicId }: TopicUpdateFormProps) => {
           </div>
         </div>
 
-       {/* Topic Information (if exists) */}
+        {/* Topic Information (if exists) */}
         <div className="space-y-3">
           <div className="flex items-center gap-2 text-lg font-semibold">
             <Building2 className="h-5 w-5" />
@@ -341,8 +333,8 @@ export const TopicUpdateForm = ({ topicId }: TopicUpdateFormProps) => {
                       onClick={() => setOpenCreate(true)}
                       className="h-7"
                     >
-                      <Plus className="h-3.5 w-3.5" />
-                      Nộp lại
+                      <Pencil className="h-3.5 w-3.5" />
+                      Chỉnh sửa
                     </Button>
                   )}
                 </div>
@@ -423,34 +415,20 @@ export const TopicUpdateForm = ({ topicId }: TopicUpdateFormProps) => {
 
         <Separator />
 
-        
-
         {/* Version-specific content */}
         {renderVersionInfo(topic)}
       </div>
       {/* Create Version Dialog */}
-      {/* <Dialog open={openCreate} onOpenChange={setOpenCreate}>
-        <DialogContent className="sm:max-h-[80%] sm:max-w-[600px] max-h-screen overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Tạo phiên bản mới</DialogTitle>
-            <DialogDescription>
-              Điền thông tin phiên bản để gửi duyệt.
-            </DialogDescription>
-          </DialogHeader>
-          <CreateVersionForm
+      <Dialog open={openCreate} onOpenChange={setOpenCreate}>
+        <DialogContent className="sm:max-h-[80%] max-w-[90%] sm:max-w-[60%] max-h-screen overflow-y-auto">
+          <TopicResubmitUpdateForm
             topic={topic}
             onSuccess={async () => {
-              setOpenCreate(false);
-              setSelectedVersion(undefined);
-              await queryClient.refetchQueries({
-                queryKey: ["topicUpdate", topicId],
-              });
+              window.location.reload();
             }}
-            initialData={highestVersion}
-            onCancel={() => setOpenCreate(false)}
           />
         </DialogContent>
-      </Dialog> */}
+      </Dialog>
     </>
   );
 };
@@ -470,9 +448,9 @@ const StatusBadge = ({ status }: { status?: TopicStatus }) => {
       [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
       [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
       [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
-      [TopicStatus.ManagerPending]: "Hội đồng đang xem xét",
-      [TopicStatus.ManagerApproved]: "Hội đồng đã duyệt",
-      [TopicStatus.ManagerRejected]: "Hội đồng đã từ chối",
+      [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
+      [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
+      [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
       // Thêm các trạng thái khác nếu cần
     }[status] || "Khác";
 
@@ -480,41 +458,37 @@ const StatusBadge = ({ status }: { status?: TopicStatus }) => {
     "default";
 
   switch (status) {
-        case TopicStatus.Draft:
-        case TopicStatus.StudentEditing:
-        case TopicStatus.MentorPending:
-        case TopicStatus.ManagerPending:
-          badgeVariant = "secondary"; // màu trung tính, chờ xử lý
-          break;
-      
-        case TopicStatus.MentorApproved:
-        case TopicStatus.ManagerApproved:
-          badgeVariant = "default"; // màu xanh (duyệt)
-          break;
-      
-        case TopicStatus.MentorRejected:
-        case TopicStatus.ManagerRejected:
-          badgeVariant = "destructive"; // màu đỏ (từ chối)
-          break;
-      
-        case TopicStatus.MentorConsider:
-        case TopicStatus.MentorSubmitted:
-          badgeVariant = "outline"; // màu nhẹ (đang xem xét, trung gian)
-          break;
-      
-        default:
-          badgeVariant = "outline";
-      }
+    case TopicStatus.Draft:
+    case TopicStatus.StudentEditing:
+    case TopicStatus.MentorPending:
+    case TopicStatus.ManagerPending:
+      badgeVariant = "secondary"; // màu trung tính, chờ xử lý
+      break;
+
+    case TopicStatus.MentorApproved:
+    case TopicStatus.ManagerApproved:
+      badgeVariant = "default"; // màu xanh (duyệt)
+      break;
+
+    case TopicStatus.MentorRejected:
+    case TopicStatus.ManagerRejected:
+      badgeVariant = "destructive"; // màu đỏ (từ chối)
+      break;
+
+    case TopicStatus.MentorConsider:
+    case TopicStatus.MentorSubmitted:
+      badgeVariant = "outline"; // màu nhẹ (đang xem xét, trung gian)
+      break;
+
+    default:
+      badgeVariant = "outline";
+  }
 
   return <Badge variant={badgeVariant}>{statusText}</Badge>;
 };
 
 // Request Status Badge Component
-const RequestStatusBadge = ({
-  status,
-}: {
-  status?: TopicRequestStatus;
-}) => {
+const RequestStatusBadge = ({ status }: { status?: TopicRequestStatus }) => {
   if (status === undefined)
     return <Badge variant="outline">Không xác định</Badge>;
 
