@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@/components/ui/button"
@@ -15,167 +15,528 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import Link from "next/link";
+import { FormInput, FormSwitch } from "@/lib/form-custom-shadcn";
+import { projectService } from "@/services/project-service";
+import { professionService } from "@/services/profession-service";
+import { useQuery } from "@tanstack/react-query";
+import { useCurrentRole } from "@/hooks/use-current-role";
+import { useSelectorUser } from "@/hooks/use-auth";
+import { useParams } from "next/navigation";
+import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
+import { userService } from "@/services/user-service";
+import { TeamMemberRole } from "@/types/enums/team-member";
+
+
+// Các đuôi file cho phép
+const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
 
 const formSchema = z.object({
-  englishTitle: z.string().min(2, { message: "Tên đề tài bằng Tiếng Anh ít nhất 2 ký tự." }),
-  abbreviation: z.string().max(20, { message: "Tên viết tắt đề tài ít nhất 20 ký tự " }),
-  vietnameseTitle: z.string().min(2, { message: "Tên đề bài bằng Tiếng Việt ít nhất 2 ký tự." }),
-  description: z.string().min(10, { message: "Nội dung có ít nhất 10 ký tự." }),
-  inviteEmail: z.string().email({ message: "Sai đinh dạng email." }),
-})
+  englishName: z
+    .string({ required_error: "Vui lòng nhập tên tiếng Anh" })
+    .min(2, { message: "Tên tiếng Anh phải có ít nhất 2 ký tự" }),
+
+  // teamSize: z
+  //   .number({
+  //     required_error: "Vui lòng chọn số lượng thành viên",
+  //     invalid_type_error: "Số lượng thành viên phải là số",
+  //   })
+  //   .gte(4, { message: "Số lượng thành viên tối thiểu là 4" }),
+
+  abbreviation: z
+    .string({ required_error: "Vui lòng nhập tên viết tắt" })
+    .max(20, { message: "Tên viết tắt không được quá 20 ký tự" }),
+
+  vietNameseName: z
+    .string({ required_error: "Vui lòng nhập tên tiếng Việt" })
+    .min(2, { message: "Tên tiếng Việt phải có ít nhất 2 ký tự" }),
+
+  description: z
+    .string({ required_error: "Vui lòng nhập mô tả" })
+    .min(10, { message: "Mô tả phải có ít nhất 10 ký tự" }),
+
+  fileschema: z
+    .custom<File>((val) => val instanceof File, {
+      message: "Vui lòng chọn tệp đính kèm",
+    })
+    .refine(
+      (file) => {
+        const fileName = file.name.toLowerCase();
+        return ALLOWED_EXTENSIONS.some((ext) => fileName.endsWith(ext));
+      },
+      {
+        message: "Chỉ chấp nhận tệp .doc, .docx hoặc .pdf",
+      }
+    ),
+
+  specialtyId: z.string().optional(),
+
+  mentorId: z
+    .string({ required_error: "Vui lòng chọn giảng viên hướng dẫn" })
+    .optional(),
+
+  subMentorId: z.string().optional(),
+
+  enterpriseName: z
+    .string()
+    .min(2, { message: "Tên doanh nghiệp phải có ít nhất 2 ký tự" })
+    .optional(),
+
+  isEnterpriseTopic: z.boolean().default(false),
+});
+
+
 
 
 const SubmitTopic = () => {
-
+  const { projectId } = useParams();
+  const role = useCurrentRole();
+  const user = useSelectorUser();
+  // Check user role
+  const isStudent = role == "Student";
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      englishTitle: "",
-      abbreviation: "",
-      vietnameseTitle: "",
-      description: "",
-      inviteEmail: "",
-    },
-  })
+  });
+  const query: UserGetAllQuery = {
+    role: "Mentor,Submentor",
+    isPagination: false,
+  };
 
-  const [teamMembers, setTeamMembers] = useState([
-    { email: "thainhthe150042@fpt.edu.vn", role: "Owner" },
-  ]);
+  const { data: usersData, isLoading: isLoadingUsers } = useQuery({
+    queryKey: ["getUsersByRole", query],
+    queryFn: () => userService.getAll(query),
+    refetchOnWindowFocus: false,
+  });
+  const {
+    data: result_project,
+    isLoading: isLoadingProject,
+    error: errorProject,
+  } = useQuery({
+    queryKey: ["getProjectInfo"],
+    queryFn: () => projectService.getById(projectId.toString()),
+    enabled: !!isStudent, // Only fetch if student
+    refetchOnWindowFocus: false,
+  });
+
+  useEffect(() => {
+    if (result_project?.data && result_project?.data.topic) {
+      const topic = result_project.data.topic;
+
+      form.reset({
+        englishName: topic.englishName ?? "",
+        abbreviation: topic.abbreviation ?? "",
+        vietNameseName: topic.vietNameseName ?? "",
+        description: topic.description ?? "",
+        specialtyId: topic.specialty?.id ?? "", // ID chuyên ngành
+        fileshcema: topic.fileUrl ?? "", // file không gán vì không có kiểu file trả về từ API
+      });
+    }
+  }, [result_project?.data]);
+
+  const project = result_project?.data;
+  const teamMembers = project?.teamMembers;
+
+  const {
+    data: professionsData,
+    isLoading: isLoadingProfessions,
+    error: errorProfessions,
+  } = useQuery({
+    queryKey: ["getAllProfessions"],
+    queryFn: () => professionService.getAll(),
+    refetchOnWindowFocus: false,
+  });
+
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log("Form submitted:", values)
   }
 
 
-  const handleInvite = () => {
 
-  };
 
   return (
-    <Form  {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 p-4 bg-white shadow-md rounded-lg">
-        <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-xl">
-          <h2 className="text-2xl font-semibold text-center mb-6">Submit Registration</h2>
-          <h3 className="text-sm text-center mb-6">Please verify the detail list beloew</h3>
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div>
-              <p className="text-sm font-medium">Profession *</p>
-              <p className="text-gray-700">Information Technology (K15 trở đi)</p>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 p-1 md:p-6 flex justify-center"
+      >
+        <Card className="w-full max-w-4xl">
+          <CardHeader className="text-center space-y-2">
+            <CardTitle className="text-3xl font-bold tracking-tight">
+              Đơn nộp xác thực lại đề tài và nhóm
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Điền đầy đủ thông tin bên dưới để đăng ký ý tưởng dự án. Tất cả
+              các trường đều bắt buộc trừ khi có ghi chú khác.
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+
+
+            {/* Profession & Specialty Section */}
+            <div className="space-y-4 rounded-lg border p-4">
+              <h3 className="text-lg font-medium">Thông tin Học thuật</h3>
+
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormItem>
+                  <FormLabel>Ngành học</FormLabel>
+                  <Select
+                    value={result_project?.data?.topic?.specialty?.professionId}
+                    disabled
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Chọn ngành học" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {professionsData?.data?.results?.map((pro) => (
+                        <SelectItem key={pro.id} value={pro.id!}>
+                          {pro.professionName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormItem>
+
+                <FormField
+                  control={form.control}
+                  name="specialtyId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Chuyên ngành</FormLabel>
+                      <Select value={field.value} disabled >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Chọn chuyên ngành" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {professionsData?.data?.results
+                            ?.find(
+                              (p) =>
+                                p.id ===
+                                result_project?.data?.topic?.specialty?.professionId
+                            )
+                            ?.specialties?.map((spec) => (
+                              <SelectItem key={spec.id} value={spec.id!}>
+                                {spec.specialtyName}
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
             </div>
-            <div>
-              <p className="text-sm font-medium">Specialty *</p>
-              <p className="text-gray-700">Software Engineering (JS)</p>
+
+            {/* Enterprise Name (conditionally shown) */}
+            {/* {isEnterpriseTopic && (
+            <div className="space-y-4 rounded-lg border p-4">
+              <FormInput
+                form={form}
+                name="enterpriseName"
+                label="Tên Doanh nghiệp"
+                placeholder="Nhập tên doanh nghiệp tài trợ"
+                description="Tên công ty tài trợ cho dự án này"
+              />
             </div>
-          </div>
+          )} */}
 
-          {/* English Title */}
-          <FormField
-            control={form.control}
-            name="englishTitle"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>English Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="What's your topic?" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Topic Details Section */}
+            <div className="space-y-4 rounded-lg border p-4">
+              <h3 className="text-lg font-medium">Chi tiết Ý tưởng</h3>
 
-          {/* Abbreviation */}
-          <FormField
-            control={form.control}
-            name="abbreviation"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Abbreviation</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter the abbreviations for your title" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="englishName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tên tiếng Anh</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Tên dự án bằng tiếng Anh"
+                          {...field}
+                          className="dark:bg-muted/50"
+                          readOnly
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Tên chính thức của dự án
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          {/* Vietnamese Title */}
-          <FormField
-            control={form.control}
-            name="vietnameseTitle"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Vietnamese Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="What's your topic in Vietnamese" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                <FormField
+                  control={form.control}
+                  name="vietNameseName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tên tiếng Việt</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Tên dự án bằng tiếng Việt"
+                          {...field}
+                          className="dark:bg-muted/50"
+                          readOnly
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
+              <FormField
+                control={form.control}
+                name="abbreviation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Viết tắt</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Tên viết tắt của dự án"
+                        {...field}
+                        className="dark:bg-muted/50"
+                        readOnly
+                      />
+                    </FormControl>
+                    <FormDescription>Tối đa 20 ký tự</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-          {/* Team Members */}
-          <div className="mb-4">
-            <p className="text-sm font-medium">Team Members</p>
-            <p className="text-sm font-medium text-gray-400">Member:4</p>
-          </div>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mô tả</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Mô tả chi tiết về dự án của bạn..."
+                        {...field}
+                        className="min-h-[120px] dark:bg-muted/50"
+                        readOnly
+                      />
+                    </FormControl>
+                    <FormDescription>Tối thiểu 10 ký tự</FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
+            {/* Team & File Section */}
+            <div className="space-y-4 rounded-lg border p-4">
+              <h3 className="text-lg font-medium">Nhóm & Tài liệu</h3>
 
+              {/* <FormField
+              control={form.control}
+              name="teamSize"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Số lượng thành viên</FormLabel>
+                  <Select
+                    onValueChange={(value) => field.onChange(Number(value))}
+                    value={field.value?.toString()}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Chọn số lượng thành viên" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[4, 5].map((option) => (
+                        <SelectItem key={option} value={option.toString()}>
+                          {option} thành viên
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormDescription>
+                    Bao gồm cả bạn với vai trò trưởng nhóm
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            /> */}
 
-          <FormField
-            control={form.control}
-            name="inviteEmail"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>You can choose 2 supervisor and one of their topics for you Capstone Project(Optional)</FormLabel>
-                <p className="text-black text-xs mb-2 font-bold">
-                  You have to fill fullname in the following form: fullname(FPT Mail) <p className="text-red-600">ex: Nguyen Van Anh(anhntv@fpt.edu.vn)</p>
+              {/* Mentor Selection - Only for Students */}
+              {isStudent && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="mentorId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Giảng viên hướng dẫn</FormLabel>
+                        <Select
+                          value={field.value}
+                        >
+                          <SelectContent>
+                            {usersData?.data?.results?.map((user) => (
+                              <SelectItem key={user.id} value={user.id!}>
+                                <div className="flex items-center gap-2">
+                                  <span>
+                                    {user.lastName} {user.firstName}
+                                  </span>
+                                  <span className="text-muted-foreground text-xs">
+                                    {user.email}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormDescription>
+                          Chọn giảng viên sẽ hướng dẫn dự án của bạn
+                        </FormDescription>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="subMentorId"
+                    render={({ field }) => {
+                      const mentorId = form.watch("mentorId");
+                      const filteredUsers = usersData?.data?.results?.filter(
+                        (user) => user.id !== mentorId
+                      );
+
+                      return (
+                        <FormItem>
+                          <FormLabel>
+                            Giảng viên hướng dẫn 2 (Tùy chọn)
+                          </FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            disabled={!mentorId}
+                          >
+                            <SelectContent>
+                              {filteredUsers?.map((user) => (
+                                <SelectItem key={user.id} value={user.id!}>
+                                  <div className="flex items-center gap-2">
+                                    <span>
+                                      {user.lastName} {user.firstName}
+                                    </span>
+                                    <span className="text-muted-foreground text-xs">
+                                      {user.email}
+                                    </span>
+                                  </div>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormDescription>
+                            Chọn giảng viên sẽ hướng dẫn dự án của bạn
+                          </FormDescription>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                </div>
+              )}
+
+              {/* File Upload */}
+              <FormField
+                control={form.control}
+                name="fileschema"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tài liệu Dự án</FormLabel>
+                    <FormControl>
+                      <div className="flex items-center gap-2">
+                        {project?.topic?.fileUrl ? (
+                          <a href={project?.topic?.fileUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 border-b-2 border-blue-400">
+                            Link file
+                          </a>
+
+                        ) : (
+                          <div>Không có file</div>
+                        )}
+
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Định dạng chấp nhận: {ALLOWED_EXTENSIONS.join(", ")} (tối
+                      đa 10MB)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Current User Info - Only for Students */}
+            {isStudent && (
+              <div className="rounded-lg border p-4 space-y-2">
+                <h3 className="text-lg font-medium">Thành viên Nhóm</h3>
+                <p className="text-sm text-muted-foreground">
+                  Bạn sẽ là trưởng nhóm của dự án này
                 </p>
-                <FormLabel className="text-base text-purple-500">Supervisor 1</FormLabel>
-                <div className="text-xs text-gray-500">FullName</div>
-                <FormControl>
-                  <div className="flex space-x-2">
-                    <Input placeholder="ex: Nguyen Van Anh(anhntv@fpt.edu.vn)" {...field} />
-                    <select name="" id="">
-                      <option value="">Nguyen Van A</option>
-                      <option value="">Nguyen Van B</option>
-                      <option value="">Nguyen Van C</option>
-                    </select>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+                <>
+                  {teamMembers?.map((member) => {
+                    const userInTeam = member.user;
+                    if (!userInTeam) return null;
+                    return (
+                      <div className="flex items-center justify-between p-3 rounded-md bg-muted/50">
+                        <div className="flex items-center gap-3">
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {userInTeam.email}
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              {userInTeam.lastName} {userInTeam.firstName}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
+                          {TeamMemberRole[member.role ?? 0]}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </>
+              </div>
             )}
-          />
-          <FormField
-            control={form.control}
-            name="inviteEmail"
-            render={({ field }) => (
-              <FormItem>
+          </CardContent>
 
-                <FormLabel className="text-base text-purple-500">Supervisor 2</FormLabel>
-                <div className="text-xs text-gray-500">FullName</div>
-                <FormControl>
-                  <div className="flex space-x-2">
-                    <Input placeholder="ex: Nguyen Van Anh(anhntv@fpt.edu.vn)" {...field} />
-                    <select name="" id="">
-                      <option value="">Nguyen Van A</option>
-                      <option value="">Nguyen Van B</option>
-                      <option value="">Nguyen Van C</option>
-                    </select>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {/* Submit Button */}
-          <button className="w-full bg-purple-400 text-white mt-6 p-3 rounded-lg hover:bg-purple-500 transition">
-            Create
-          </button>
-        </div>
+          <CardFooter className="flex justify-end">
+            <Button
+              variant={"secondary"}
+              type="button"
+            >
+              Hủy bỏ
+            </Button>
+            <Button type="submit" className="w-full ml-2 md:w-auto">
+              Nộp ý tưởng
+            </Button>
+          </CardFooter>
+        </Card>
       </form>
     </Form>
   );
