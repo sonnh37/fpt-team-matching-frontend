@@ -42,6 +42,8 @@ import { useParams } from "next/navigation";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { userService } from "@/services/user-service";
 import { TeamMemberRole } from "@/types/enums/team-member";
+import { toast } from "sonner";
+import { useConfirm } from "@/components/_common/formdelete/confirm-context";
 
 
 // Các đuôi file cho phép
@@ -116,7 +118,7 @@ const SubmitTopic = () => {
     resolver: zodResolver(formSchema),
   });
   const query: UserGetAllQuery = {
-    role: "Mentor,Submentor",
+    role: "Mentor",
     isPagination: false,
   };
 
@@ -141,16 +143,24 @@ const SubmitTopic = () => {
       const topic = result_project.data.topic;
 
       form.reset({
+        mentorId: topic.mentorId ?? "",
+        subMentorId: topic.subMentorId ?? "",
         englishName: topic.englishName ?? "",
         abbreviation: topic.abbreviation ?? "",
         vietNameseName: topic.vietNameseName ?? "",
         description: topic.description ?? "",
         specialtyId: topic.specialty?.id ?? "", // ID chuyên ngành
-        fileshcema: topic.fileUrl ?? "", // file không gán vì không có kiểu file trả về từ API
+        // fileshcema: topic.fileUrl ?? "", // file không gán vì không có kiểu file trả về từ API
       });
     }
   }, [result_project?.data]);
 
+
+  const mentor = usersData?.data?.results?.find((u) => u.id === result_project?.data?.topic?.mentorId);
+  const subMentor = usersData?.data?.results?.find((u) => u.id === result_project?.data?.topic?.subMentorId);
+
+  console.log(mentor, "test1")
+  console.log(subMentor, "test2")
   const project = result_project?.data;
   const teamMembers = project?.teamMembers;
 
@@ -164,18 +174,42 @@ const SubmitTopic = () => {
     refetchOnWindowFocus: false,
   });
 
+  const confirm = useConfirm()
+  const handleSubmit = async (projectId: string) => {
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Form submitted:", values)
-  }
-
+    const confirmed = await confirm({
+      title: "Bạn có muốn nộp đơn này lên hệ thống",
+      description: "Khi nộp nhóm bạn sẽ khóa lại",
+      confirmText: "Có,đồng ý",
+      cancelText: "Không,cảm ơn",
+    });
+    if ((teamMembers?.length ?? 0) >= 4) {
+      toast.error("Nhóm chưa đủ số lượng thành viên");
+      return
+    }
+    if (result_project?.data?.topicId) {
+      toast.error("Nhóm chưa có đề tài");
+      return
+    }
+    if (confirmed) {
+      if (projectId) {
+        const result = await projectService.submitBlockProjectByStudent(projectId);
+        if (result?.status === 1) {
+          toast.success("Nộp đề tài thành công");
+          // TODO: Gọi lại data / chuyển trang nếu cần
+        } else {
+          toast.error(result?.message || "Có lỗi xảy ra khi nộp đề tài");
+        }
+      }
+    }
+  };
 
 
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        // onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 p-1 md:p-6 flex justify-center"
       >
         <Card className="w-full max-w-4xl">
@@ -354,35 +388,6 @@ const SubmitTopic = () => {
             <div className="space-y-4 rounded-lg border p-4">
               <h3 className="text-lg font-medium">Nhóm & Tài liệu</h3>
 
-              {/* <FormField
-              control={form.control}
-              name="teamSize"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Số lượng thành viên</FormLabel>
-                  <Select
-                    onValueChange={(value) => field.onChange(Number(value))}
-                    value={field.value?.toString()}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Chọn số lượng thành viên" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[4, 5].map((option) => (
-                        <SelectItem key={option} value={option.toString()}>
-                          {option} thành viên
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Bao gồm cả bạn với vai trò trưởng nhóm
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-
               {/* Mentor Selection - Only for Students */}
               {isStudent && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -392,27 +397,7 @@ const SubmitTopic = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Giảng viên hướng dẫn</FormLabel>
-                        <Select
-                          value={field.value}
-                        >
-                          <SelectContent>
-                            {usersData?.data?.results?.map((user) => (
-                              <SelectItem key={user.id} value={user.id!}>
-                                <div className="flex items-center gap-2">
-                                  <span>
-                                    {user.lastName} {user.firstName}
-                                  </span>
-                                  <span className="text-muted-foreground text-xs">
-                                    {user.email}
-                                  </span>
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormDescription>
-                          Chọn giảng viên sẽ hướng dẫn dự án của bạn
-                        </FormDescription>
+                        <p>{mentor ? `${mentor.lastName} ${mentor.firstName}` : "Chưa chọn"}</p>
                       </FormItem>
                     )}
                   />
@@ -431,29 +416,7 @@ const SubmitTopic = () => {
                           <FormLabel>
                             Giảng viên hướng dẫn 2 (Tùy chọn)
                           </FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            value={field.value}
-                            disabled={!mentorId}
-                          >
-                            <SelectContent>
-                              {filteredUsers?.map((user) => (
-                                <SelectItem key={user.id} value={user.id!}>
-                                  <div className="flex items-center gap-2">
-                                    <span>
-                                      {user.lastName} {user.firstName}
-                                    </span>
-                                    <span className="text-muted-foreground text-xs">
-                                      {user.email}
-                                    </span>
-                                  </div>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormDescription>
-                            Chọn giảng viên sẽ hướng dẫn dự án của bạn
-                          </FormDescription>
+                          <p>{subMentor ? `${subMentor.lastName} ${subMentor.firstName}` : "Không có"}</p>
                         </FormItem>
                       );
                     }}
@@ -532,7 +495,7 @@ const SubmitTopic = () => {
             >
               Hủy bỏ
             </Button>
-            <Button type="submit" className="w-full ml-2 md:w-auto">
+            <Button type="button" onClick={() => handleSubmit(result_project?.data?.id ?? "")} className="w-full ml-2 md:w-auto">
               Nộp ý tưởng
             </Button>
           </CardFooter>
