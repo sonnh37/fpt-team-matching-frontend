@@ -211,14 +211,14 @@ export default function TeamInfo() {
     a.role === TeamMemberRole.Leader
       ? -1
       : b.role === TeamMemberRole.Leader
-      ? 1
-      : 0
+        ? 1
+        : 0
   );
 
   const isHasTopic = !!project.topicId;
   const availableSlots = isHasTopic
     ? (project?.teamSize ?? 0) -
-      (project.teamMembers?.length ?? 0)
+    (project.teamMembers?.length ?? 0)
     : 5 - (project.teamMembers?.length ?? 0);
 
   const isLockTeamMember = availableSlots === 0;
@@ -229,7 +229,7 @@ export default function TeamInfo() {
   ) => {
     const confirmed = await confirm({
       title: "Xác nhận",
-      description: "Bạn có chắc chắn muốn thực hiện hành động này?",
+      description: "Bạn có chắc chắn muốn xác nhận form này này?",
       confirmText: "Xác nhận",
       cancelText: "Hủy",
     });
@@ -516,14 +516,14 @@ export default function TeamInfo() {
                           </div>
                           {project.topic
                             ?.isEnterpriseTopic && (
-                            <div className="space-y-1">
-                              <Label>Tên doanh nghiệp:</Label>
-                              <p>
-                                {project.topic.enterpriseName ||
-                                  "Chưa có"}
-                              </p>
-                            </div>
-                          )}
+                              <div className="space-y-1">
+                                <Label>Tên doanh nghiệp:</Label>
+                                <p>
+                                  {project.topic.enterpriseName ||
+                                    "Chưa có"}
+                                </p>
+                              </div>
+                            )}
                         </div>
                         <div className="space-y-4">
                           <div className="space-y-1">
@@ -544,7 +544,7 @@ export default function TeamInfo() {
                         <div className="space-y-1">
                           <Label>Tệp đính kèm:</Label>
                           {project.topic?.topicVersions?.length > 0 &&
-                          latestTopicVersion?.fileUpdate ? (
+                            latestTopicVersion?.fileUpdate ? (
                             <Button variant="link" className="px-0" asChild>
                               <a
                                 target="_blank"
@@ -598,9 +598,8 @@ export default function TeamInfo() {
 
               <div className="grid gap-4">
                 {sortedMembers.map((member: TeamMember) => {
-                  const initials = `${
-                    member.user?.lastName?.charAt(0).toUpperCase() || ""
-                  }`;
+                  const initials = `${member.user?.lastName?.charAt(0).toUpperCase() || ""
+                    }`;
                   const joinDate = formatDate(member.joinDate);
                   const leaveDate = formatDate(member.leaveDate);
                   // Role mapping
@@ -719,7 +718,7 @@ export default function TeamInfo() {
                               </Badge>
                               {member.status !== TeamMemberStatus.Pending &&
                                 member.status !==
-                                  TeamMemberStatus.InProgress && (
+                                TeamMemberStatus.InProgress && (
                                   <Badge
                                     variant={statusInfo.variant as any}
                                     className={cn(
@@ -795,9 +794,8 @@ export default function TeamInfo() {
 
       <div className="lg:col-span-1 space-y-6">
         {/* Card đăng ký nhóm */}
-        {project.status == ProjectStatus.Pending &&
-          project.topicId &&
-          availableSlots == 0 && (
+        {project.status !== ProjectStatus.Pending &&
+          (
             <Card className="rounded-lg">
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg">Đăng ký nhóm</CardTitle>
@@ -808,24 +806,27 @@ export default function TeamInfo() {
                   Lưu ý: Đề tài cần được thống nhất bởi tất cả thành viên trước
                   khi nộp và sẽ không được thay đổi tên nhóm
                 </p>
+                {
+                  project.topicId &&
+                   ( availableSlots == 0 || availableSlots == 1 )
+                   ? (
+                    <Link
+                    href={`/submit/${project.id}`}
+                    >
+                      <Button className="w-full">  Nộp đề tài</Button>
+                    
+                    </Link>
+                  ) :
+                    (
+                      <Button className="w-full" disabled> Chưa đủ điều kiện</Button>
+                    )
+                }
 
-                <Button
-                  className="w-full"
-                  onClick={() =>
-                    handleAction(async () => {
-                      const command: ProjectUpdateCommand = {
-                        ...project,
-                        status: ProjectStatus.InProgress,
-                      };
-                      return projectService.update(command);
-                    }, "Đã nộp đề tài")
-                  }
-                >
-                  Nộp đề tài
-                </Button>
               </CardContent>
             </Card>
           )}
+
+
         {/* Card xin đề tài từ GV (nếu có) */}
         {!teamInfo?.data?.topicId && (
           <Card className="rounded-lg">
@@ -869,7 +870,7 @@ export default function TeamInfo() {
               const reviewDate = new Date(review3.reviewDate);
               const adjustedReviewDate = new Date(
                 reviewDate.getTime() +
-                  reviewDate.getTimezoneOffset() * 60 * 1000
+                reviewDate.getTimezoneOffset() * 60 * 1000
               );
               const currentDate = new Date();
 
