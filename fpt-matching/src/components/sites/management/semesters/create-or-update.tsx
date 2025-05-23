@@ -45,7 +45,7 @@ interface SemesterFormProps {
 const formSchema = z.object({
   id: z.string().optional(),
   semesterCode: z.string().nullable(),
-  criteriaFormId: z.string().nullable(),
+  // criteriaFormId: z.string().nullable(),
   semesterName: z.string().nullable(),
   semesterPrefixName: z.string().nullable(),
   limitTopicSubMentor: z.number(),
@@ -241,21 +241,28 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                 </CardHeader>
                 <CardContent className="pt-6 grid gap-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FormSelectObject
-                      form={form}
-                      name="criteriaFormId"
-                      label="Mẫu tiêu chí đánh giá"
-                      options={criteriaforms}
-                      selectValue="id"
-                      selectLabel="title"
-                      placeholder="Chọn mẫu tiêu chí"
-                    />
+                    {/*<FormSelectObject*/}
+                    {/*  form={form}*/}
+                    {/*  name="criteriaFormId"*/}
+                    {/*  label="Mẫu tiêu chí đánh giá"*/}
+                    {/*  options={criteriaforms}*/}
+                    {/*  selectValue="id"*/}
+                    {/*  selectLabel="title"*/}
+                    {/*  placeholder="Chọn mẫu tiêu chí"*/}
+                    {/*/>*/}
 
                     <FormInput
                       form={form}
                       name="semesterCode"
                       label="Mã học kỳ"
                       placeholder="VD: HK2024"
+                    />
+                    <FormSelectEnum
+                        form={form}
+                        name="status"
+                        label="Trạng thái"
+                        enumOptions={getEnumOptions(SemesterStatus)}
+                        default
                     />
                   </div>
 
@@ -275,13 +282,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                       placeholder="VD: Năm học 2023-2024"
                     />
 
-                    <FormSelectEnum
-                      form={form}
-                      name="status"
-                      label="Trạng thái"
-                      enumOptions={getEnumOptions(SemesterStatus)}
-                      default
-                    />
+
                   </div>
                 </CardContent>
               </Card>
@@ -344,7 +345,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                   <FormInputNumber
                     form={form}
                     name="minTeamSize"
-                    label="Số lượng tối thiểu của Team"
+                    label="Số lượng thành viên tối thiểu"
                     placeholder="Nhập số lượng"
                     min={2}
                   />
@@ -352,7 +353,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                   <FormInputNumber
                     form={form}
                     name="maxTeamSize"
-                    label="Số lượng tối đa của Team"
+                    label="Số lượng thành viên tối đa"
                     placeholder="Nhập số lượng"
                     min={0}
                   />

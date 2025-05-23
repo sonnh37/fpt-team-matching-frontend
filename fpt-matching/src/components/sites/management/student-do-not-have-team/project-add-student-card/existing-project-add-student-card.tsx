@@ -29,6 +29,8 @@ import {ViewTopicDetail} from "@/components/sites/management/student-do-not-have
 import {
     CancelExistingProjectDialog
 } from "@/components/sites/management/student-do-not-have-team/project-add-student-card/cancel-existing-project-dialog";
+import {toast} from "sonner";
+import {teammemberService} from "@/services/team-member-service";
 
 function SelectTopic({topics, setProject, project, setTopics} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>, project: Project, setTopics: Dispatch<SetStateAction<Topic[]>>}) {
     return (
@@ -70,6 +72,46 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
     setTopics: Dispatch<SetStateAction<Topic[]>>
 }) => {
     const [addTeam, setAddTeam] = React.useState(false);
+
+    const handleRemoveTeamMember = async (member: TeamMember) => {
+        if (!project)
+            return;
+        const foundExistingStudent=  updatedTeamMembers.some(x => x.userId == member.userId);
+        if (foundExistingStudent) {
+            setProject((prevState) => {
+                if (!prevState) {
+                    return prevState;
+                }
+                const memberRemove = project.teamMembers.find(member => member.userId == member.userId);
+                if (!memberRemove) {
+                    return prevState;
+                }
+                setStudents((prevState) => {
+                    const updatedTeamMembers = [...(prevState || [])];
+                    if (memberRemove.user)
+                        updatedTeamMembers.push(memberRemove.user)
+                    return updatedTeamMembers;
+                })
+                const remaining = project?.teamMembers.filter(student => student.userId != member.userId);
+
+                return {
+                    ...prevState,
+                    teamMembers: remaining,
+                };
+            })
+            toast.success("Xoá thành viên thành công")
+            return;
+        } else {
+            member.leaveDate = new Date(Date.now())
+            const response = await teammemberService.update(member);
+            if (response.status != 1){
+                toast.error(response.message)
+                return;
+            }
+            toast.success(response.message);
+            return;
+        }
+    }
     return (
         <Card className="w-[30vw]">
             <CardHeader>
@@ -130,30 +172,10 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
                                                     <TableCell><Badge variant={member.role == TeamMemberRole.Leader ? "default" : "outline"}>{TeamMemberRole[member.role!]}</Badge></TableCell>
                                                     <TableCell>
                                                         {
-                                                            updatedTeamMembers.some(x => x.userId == member.userId) ? <Button onClick={(e) => {
+                                                            <Button onClick={(e) => {
                                                                 e.preventDefault();
-                                                                setProject((prevState) => {
-                                                                    if (!prevState) {
-                                                                        return prevState;
-                                                                    }
-                                                                    const memberRemove = project.teamMembers.find(member => member.userId == member.userId);
-                                                                    if (!memberRemove) {
-                                                                        return prevState;
-                                                                    }
-                                                                    setStudents((prevState) => {
-                                                                        const updatedTeamMembers = [...(prevState || [])];
-                                                                        if (memberRemove.user)
-                                                                            updatedTeamMembers.push(memberRemove.user)
-                                                                        return updatedTeamMembers;
-                                                                    })
-                                                                    const remaining = project?.teamMembers.filter(student => student.userId != member.userId);
-
-                                                                    return {
-                                                                        ...prevState,
-                                                                        teamMembers: remaining,
-                                                                    };
-                                                                })
-                                                            }} variant={"destructive" }>Huỷ</Button> : null
+                                                                handleRemoveTeamMember(member)
+                                                            }} variant={"destructive" }>Huỷ</Button>
                                                         }
                                                     </TableCell>
                                                 </TableRow>

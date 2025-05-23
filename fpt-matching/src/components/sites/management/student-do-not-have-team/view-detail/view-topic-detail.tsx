@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import {Topic} from "@/types/topic";
+import {TopicStatus} from "@/types/enums/topic";
 
 interface ViewTopicDetailProps {
     topic: Topic
@@ -37,7 +38,7 @@ export function ViewTopicDetail({ topic }: ViewTopicDetailProps) {
                         { label: "Abbreviation", value: topic.abbreviation },
                         { label: "Topic Code", value: topic.topicCode },
                         { label: "Enterprise Name", value: topic.enterpriseName },
-                        { label: "Status", value: topic.status },
+                        { label: "Status", value: TopicStatus[topic.status!] },
                     ].map(({ label, value }) => (
                         <div className="grid grid-cols-4 items-center gap-4" key={label}>
                             <Label className="text-right">{label}</Label>
