@@ -1,3 +1,4 @@
+"use client"
 import { TopicRequestPendingManagerTable } from '@/components/sites/topic/requests/manager-approved'
 import React from 'react'
 

@@ -230,7 +230,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         </DialogTrigger>
         <DialogContent className="sm:min-w-[60%] sm:max-w-fit max-h-screen overflow-y-auto">
           <div className="p-4 gap-4">
-            
+          <TopicDetailForm topicId={project?.topic?.id} />
           </div>
         </DialogContent>
       </Dialog>
