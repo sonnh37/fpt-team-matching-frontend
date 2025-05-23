@@ -5,26 +5,29 @@ import { TopicGetCurrentByStatusQuery } from "@/types/models/queries/topics/topi
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { columns } from "./columns";
+import { projectService } from "@/services/project-service";
+import { ProjectGetAllQuery } from "@/types/models/queries/projects/project-get-all-query";
+import { ProjectStatus } from "@/types/enums/project";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function TopicRequestPendingManagerTable() {
-  const queryParams: TopicGetCurrentByStatusQuery = {
-    statusList: [
-      TopicStatus.ManagerPending,
-    ],
+export function ManageProjectSubmit() {
+  const queryParams: ProjectGetAllQuery = {
+    status: ProjectStatus.Pending,
     isPagination: false,
   };
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () => topicService.getCurrentTopicOfMeByStatus(queryParams),
+    queryFn: () => projectService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
+
+  console.log(data?.data?.results,"test")
 
   if (error) return <div>Error loading data</div>;
 
@@ -32,7 +35,7 @@ export function TopicRequestPendingManagerTable() {
     <>
       <div className="space-y-8">
         <div className="">
-          <DataOnlyTable data={data?.data ?? []} columns={columns} />
+          <DataOnlyTable data={data?.data?.results ?? []} columns={columns} />
         </div>
       </div>
     </>

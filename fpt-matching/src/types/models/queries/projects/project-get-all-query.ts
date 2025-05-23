@@ -6,19 +6,17 @@ import { Topic } from "@/types/topic";
 export interface ProjectGetAllQuery extends BaseQueryableQuery {
   leaderId?: string;
   topicId?: string;
+  semesterId?: string;
   teamName?: string;
   teamCode?: string;
   description?: string;
   status?: ProjectStatus;
   teamSize?: number;
-
-  topicId?: string;
   defenseStage?: number;
-
-  isHasTeam: boolean;
+  isHasTeam?: boolean;
   englishName?: string;
   specialtyId?: string;
-  leaderEmail?: string;
-  // leaderEmail?: string;
+  leaderEmail?:string;
   professionId?: string;
+  
 }
