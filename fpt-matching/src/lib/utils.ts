@@ -6,6 +6,7 @@ import { vi } from "date-fns/locale";
 import * as XLSX from "xlsx";
 import { TopicStatus } from "@/types/enums/topic";
 import { Topic } from "@/types/topic";
+import { Semester } from "@/types/semester";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -109,6 +110,12 @@ export function getEnumOptions(enumObject: any) {
       value: enumObject[key], // Sử dụng giá trị thực của enum làm value
     }));
 }
+
+export const getLatestStageTopic = (semester: Semester) => {
+  return semester.stageTopics?.reduce((prev, current) => 
+    (prev?.stageNumber > current?.stageNumber) ? prev : current
+  );
+};
 
 export const isActiveTopic = (topic: Topic) => {
   const excludedStatuses = [

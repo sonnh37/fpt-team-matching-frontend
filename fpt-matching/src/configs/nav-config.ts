@@ -6,6 +6,7 @@ import {
   CalendarDays,
   CircleHelp,
   CircleUser,
+  Command,
   Edit,
   FileCheck,
   FileUser,
@@ -141,6 +142,12 @@ export const NAV_CONFIG = {
   ],
 
   management: [
+    {
+      title: "Quản lý đề tài",
+      url: "/management/topics",
+      icon: Command,
+      roles: ["Manager"],
+    },
     {
       title: "Quản lý đánh giá",
       url: "/manage-review",
