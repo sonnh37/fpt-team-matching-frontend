@@ -37,4 +37,5 @@ export interface Topic extends BaseEntity {
   topicRequests: TopicRequest[];
   topicVersions: TopicVersion[];
   mentorTopicRequests: MentorTopicRequest[];
+  
 }
