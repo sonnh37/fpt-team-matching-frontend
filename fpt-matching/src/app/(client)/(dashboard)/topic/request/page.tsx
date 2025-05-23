@@ -1,174 +1,144 @@
 "use client";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs-shadcn";
-import { useDispatch } from "react-redux";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Components
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { LoadingComponent } from "@/components/_common/loading-page";
-import { TopicConsiderByMentorTable } from "@/components/sites/topic/requests/consider-by-mentor";
-import { TopicVersionRequestPendingTable } from "@/components/sites/topic/requests/pending";
-
-// UI Components
 import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-
-// Hooks
 import { useSelectorUser } from "@/hooks/use-auth";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import { useCurrentRole, useCurrentSemester } from "@/hooks/use-current-role";
 import { topicService } from "@/services/topic-service";
 import { TopicStatus } from "@/types/enums/topic";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import TopicVersionRequestApprovedTable from "@/components/sites/topic/requests/approved";
-import TopicVersionRequestRejectedTable from "@/components/sites/topic/requests/rejected";
 
-export default function QuanLyYTuongPage() {
+// Components
+import TopicVersionRequestApprovedTable from "@/components/sites/topic/requests/approved";
+import { TopicConsiderByMentorTable } from "@/components/sites/topic/requests/consider-by-mentor";
+import { TopicVersionRequestPendingTable } from "@/components/sites/topic/requests/pending";
+import TopicVersionRequestRejectedTable from "@/components/sites/topic/requests/rejected";
+import { getLatestStageTopic } from "@/lib/utils";
+const TAB_CONFIG = [
+  {
+    value: "pending",
+    label: "Chờ duyệt",
+    statuses: [
+      TopicStatus.ManagerPending,
+      TopicStatus.MentorPending,
+      TopicStatus.StudentEditing,
+      TopicStatus.MentorSubmitted,
+      TopicStatus.MentorApproved,
+    ],
+    component: TopicVersionRequestPendingTable,
+    show: true,
+  },
+  {
+    value: "consider",
+    label: "Đang xem xét",
+    statuses: [TopicStatus.MentorConsider],
+    component: TopicConsiderByMentorTable,
+    show: (role: string) => role === "Student",
+  },
+  {
+    value: "approved",
+    label: "Đã phê duyệt",
+    statuses: [TopicStatus.ManagerApproved],
+    component: TopicVersionRequestApprovedTable,
+    show: true,
+  },
+  {
+    value: "rejected",
+    label: "Đã từ chối",
+    statuses: [TopicStatus.MentorRejected, TopicStatus.ManagerRejected],
+    component: TopicVersionRequestRejectedTable,
+    show: true,
+  },
+];
+
+export default function Page() {
   const user = useSelectorUser();
   const role = useCurrentRole();
+  const { currentSemester } = useCurrentSemester();
 
-  const {
-    data: res_topics,
-    isLoading,
-    error,
-    isError,
-  } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ["data_topics"],
-    queryFn: async () => await topicService.getTopicByUser(),
+    queryFn: () => topicService.getTopicByUser(),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
   if (!role || !user) return null;
   if (isLoading) return <LoadingComponent />;
-  if (isError) return <ErrorSystem />;
+  if (error) return <ErrorSystem />;
+  if (!currentSemester) return <>Chưa tới kì</>;
 
-  // Định nghĩa các tab
-  const TABS = {
-    PENDING: "Chờ duyệt",
-    CONSIDER: "Đang xem xét",
-    APPROVED: "Đã phê duyệt",
-    REJECTED: "Đã từ chối",
-  };
+  const visibleTabs = TAB_CONFIG.filter((tab) =>
+    typeof tab.show === "function" ? tab.show(role) : tab.show
+  );
 
-  // Đếm số lượng ý tưởng theo trạng thái
+  const stageTopic = getLatestStageTopic(currentSemester)
+  const resultDate = stageTopic?.resultDate;
+
+  const topics = data?.data?.map((topic) => {
+    const dateNow = new Date();
+    const publicDate = new Date(resultDate ?? 0);
+    // Nếu chưa tới ngày public và đang ở trạng thái Approved/Rejected
+    if (
+      dateNow <= publicDate &&
+      (topic.status === TopicStatus.ManagerApproved ||
+        topic.status === TopicStatus.ManagerRejected)
+    ) {
+      return {
+        ...topic,
+        status: TopicStatus.ManagerPending,
+      };
+    }
+    return topic;
+  });
+
   const countTopicsByStatus = (statuses: TopicStatus[]) => {
     return (
-      res_topics?.data?.filter((m) => m.status && statuses.includes(m.status))
-        .length ?? 0
+      topics?.filter(
+        (t) =>
+          t.status !== undefined && statuses.includes(t.status as TopicStatus)
+      ).length || 0
     );
   };
-
   return (
-    <div className="container mx-auto px-4 py-8">
-      <Card className="border-none shadow-none">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-primary">
-            Quản lý ý tưởng
-          </CardTitle>
-          <Separator />
-        </CardHeader>
+    <div className="space-y-6">
+      <h1 className="text-2xl font-bold text-primary">Quản lý ý tưởng</h1>
 
-        <CardContent>
-          <Tabs defaultValue={TABS.PENDING} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 h-full">
-              <TabsTrigger value={TABS.PENDING}>
-                <div className="flex items-center gap-2 ">
-                  {TABS.PENDING}
-                  {countTopicsByStatus([
-                    TopicStatus.ManagerPending,
-                    TopicStatus.MentorPending,
-                    TopicStatus.StudentEditing,
-                    TopicStatus.MentorSubmitted,
-                    TopicStatus.MentorApproved,
-                  ]) > 0 && (
-                    <Badge variant="secondary">
-                      {countTopicsByStatus([
-                        TopicStatus.ManagerPending,
-                        TopicStatus.MentorPending,
-                        TopicStatus.StudentEditing,
-                        TopicStatus.MentorSubmitted,
-                        TopicStatus.MentorApproved,
-                      ])}
-                    </Badge>
-                  )}
-                </div>
-              </TabsTrigger>
-
-              {role === "Student" ? (
-                <TabsTrigger value={TABS.CONSIDER}>
-                  <div className="flex items-center gap-2">
-                    {TABS.CONSIDER}
-                    {countTopicsByStatus([TopicStatus.MentorConsider]) > 0 && (
-                      <Badge variant="secondary">
-                        {countTopicsByStatus([TopicStatus.MentorConsider])}
-                      </Badge>
-                    )}
-                  </div>
-                </TabsTrigger>
-              ) : null}
-
-              <TabsTrigger value={TABS.APPROVED}>
+      <Tabs defaultValue="pending" className="w-full">
+        <TabsList>
+          {visibleTabs.map((tab) => {
+            const count = countTopicsByStatus(tab.statuses);
+            return (
+              <TabsTrigger key={tab.value} value={tab.value}>
                 <div className="flex items-center gap-2">
-                  {TABS.APPROVED}
-                  {countTopicsByStatus([
-                    TopicStatus.ManagerApproved,
-                    
-                  ]) > 0 && (
-                    <Badge variant="default">
-                      {countTopicsByStatus([
-                        TopicStatus.ManagerApproved,
-                      ])}
+                  {tab.label}
+                  {count > 0 && (
+                    <Badge
+                      variant={
+                        tab.value === "rejected"
+                          ? "destructive"
+                          : tab.value === "approved"
+                          ? "default"
+                          : "secondary"
+                      }
+                    >
+                      {count}
                     </Badge>
                   )}
                 </div>
               </TabsTrigger>
-              {}
-              <TabsTrigger value={TABS.REJECTED}>
-                <div className="flex items-center gap-2">
-                  {TABS.REJECTED}
-                  {countTopicsByStatus([
-                    TopicStatus.MentorRejected,
-                    TopicStatus.ManagerRejected,
-                  ]) > 0 && (
-                    <Badge variant="destructive">
-                      {countTopicsByStatus([
-                        TopicStatus.MentorRejected,
-                        TopicStatus.ManagerRejected,
-                      ])}
-                    </Badge>
-                  )}
-                </div>
-              </TabsTrigger>
-            </TabsList>
+            );
+          })}
+        </TabsList>
 
-            {/* Nội dung các tab */}
-            <div className="mt-6">
-              <TabsContent value={TABS.PENDING}>
-                <TopicVersionRequestPendingTable />
-              </TabsContent>
-
-              {role === "Student" ? (
-                <TabsContent value={TABS.CONSIDER}>
-                  <TopicConsiderByMentorTable />
-                </TabsContent>
-              ) : null}
-
-              <TabsContent value={TABS.APPROVED}>
-                <TopicVersionRequestApprovedTable />
-              </TabsContent>
-
-              <TabsContent value={TABS.REJECTED}>
-                <TopicVersionRequestRejectedTable />
-              </TabsContent>
-            </div>
-          </Tabs>
-        </CardContent>
-      </Card>
+        {visibleTabs.map((tab) => (
+          <TabsContent key={tab.value} value={tab.value}>
+            <tab.component />
+          </TabsContent>
+        ))}
+      </Tabs>
     </div>
   );
 }
