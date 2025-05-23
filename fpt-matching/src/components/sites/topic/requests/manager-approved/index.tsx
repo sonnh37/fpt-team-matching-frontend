@@ -11,7 +11,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function TopicVersionRequestPendingManagerTable() {
+export function TopicRequestPendingManagerTable() {
   const queryParams: TopicGetCurrentByStatusQuery = {
     statusList: [
       TopicStatus.ManagerPending,
