@@ -100,12 +100,6 @@ export default function TopicsOfSupervisorsTable() {
     refetchOnWindowFocus: false,
   });
 
-  const { data: res_semester, isLoading: isLoadingSemester } = useQuery({
-    queryKey: ["current-semester"],
-    queryFn: () => semesterService.getCurrentSemester(),
-    refetchOnWindowFocus: false,
-  });
-
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
@@ -133,11 +127,6 @@ export default function TopicsOfSupervisorsTable() {
           Danh Sách đề tài Từ Giảng Viên
         </TypographyH2>
 
-        <div className="flex justify-center">
-          <Badge variant="outline" className="text-sm font-normal">
-            Học kỳ hiện tại: {res_semester?.data?.semesterName || "-"}
-          </Badge>
-        </div>
       </div>
 
       {/* Search Card */}

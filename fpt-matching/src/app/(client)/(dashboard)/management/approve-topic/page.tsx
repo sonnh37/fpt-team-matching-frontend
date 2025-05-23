@@ -1,5 +1,5 @@
 "use client"
-import { TopicRequestPendingManagerTable } from '@/components/sites/topic/requests/manager-approved'
+import { TopicRequestPendingManagerTable } from '@/components/sites/management/topic-requests'
 import React from 'react'
 
 const page = () => {

@@ -15,12 +15,11 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function TopicRequestPendingManagerTable() {
+export function TopicRequestApprovedManagerTable() {
   const { currentSemester, isLoading } = useCurrentSemester();
 
   const queryParams: TopicGetAllQuery = {
-    types: [TopicType.Enterprise,TopicType.Lecturer,TopicType.Lecturer],
-    status:   TopicStatus.ManagerPending,
+    status:   TopicStatus.ManagerApproved,
     semesterId: currentSemester?.id,
     isPagination: false,
   };
@@ -31,7 +30,6 @@ export function TopicRequestPendingManagerTable() {
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
-  console.log(data, "TestTopic")
 
   if (error) return <div>Error loading data</div>;
 

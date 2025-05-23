@@ -1,5 +1,4 @@
 "use client";
-import { AlertMessage } from "@/components/_common/alert-message";
 import ErrorSystem from "@/components/_common/errors/error-system";
 import { useConfirm } from "@/components/_common/formdelete/confirm-context";
 import { LoadingComponent } from "@/components/_common/loading-page";
@@ -34,10 +33,9 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { cn, formatDate } from "@/lib/utils";
-import { topicService } from "@/services/topic-service";
 import { projectService } from "@/services/project-service";
-import { semesterService } from "@/services/semester-service";
 import { teammemberService } from "@/services/team-member-service";
+import { topicService } from "@/services/topic-service";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import { ProjectStatus } from "@/types/enums/project";
 import {
@@ -48,6 +46,8 @@ import {
 import { ProjectUpdateCommand } from "@/types/models/commands/projects/project-update-command";
 import { TeamMember } from "@/types/team-member";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Label } from "@/components/ui/label";
 import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircle,
@@ -62,10 +62,8 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import InviteUsersForm from "../topic/updateidea/page";
 
 export default function TeamInfo() {
@@ -74,28 +72,6 @@ export default function TeamInfo() {
   const [teamName, setTeamName] = useState("");
   const confirm = useConfirm();
 
-  const {
-    data: res_current_semester,
-    isLoading: isLoadingStage,
-    isError: isErrorStage,
-    error: errorStage,
-    refetch: refetchCurrentSemester,
-  } = useQuery({
-    queryKey: ["getCurrentSemester"],
-    queryFn: () => semesterService.getCurrentSemester(),
-    refetchOnWindowFocus: false,
-  });
-
-  const hasCurrentSemester = useMemo(() => {
-    if (
-      res_current_semester?.data == undefined ||
-      res_current_semester.data == null
-    ) {
-      // Đang chưa vô kì nhưng vô đợt hoặc chưa vô đợt
-      return false;
-    }
-    return true;
-  }, [res_current_semester?.data]);
   const {
     data: teamInfo,
     isLoading: isLoadingTeam,
@@ -119,7 +95,8 @@ export default function TeamInfo() {
     refetchOnWindowFocus: false,
   });
 
-  const topicId = teamInfo?.data?.topic?.topicVersion?.topicId;
+  const topicId = teamInfo?.data?.topic?.id;
+
   const {
     data: topic,
     isLoading: isLoadingTopic,
@@ -132,13 +109,8 @@ export default function TeamInfo() {
   });
 
   // Combine loading and error states
-  const isLoading =
-    isLoadingStage ||
-    isLoadingTeam ||
-    isLoadingTopic ||
-    isLoadingCurrentSemester;
-  const isError =
-    isErrorStage || isErrorTeam || isErrorTopic || isErrorCurrentSemester;
+  const isLoading = isLoadingTeam || isLoadingTopic || isLoadingCurrentSemester;
+  const isError = isErrorTeam || isErrorTopic || isErrorCurrentSemester;
 
   useEffect(() => {
     if (teamInfo?.data?.teamName) {
@@ -148,16 +120,11 @@ export default function TeamInfo() {
 
   if (isLoading) return <LoadingComponent />;
   if (isError) {
-    console.error("Error fetching:", errorTeam || errorStage);
+    console.error("Error fetching:", errorTeam);
     return <ErrorSystem />;
   }
 
   if (teamInfo?.status === -1) {
-    if (
-      res_current_semester?.data != undefined ||
-      res_current_semester?.data != null
-    )
-      return <AlertMessage message="Chưa kết thúc kì hiện tại!" />;
     return <NoTeam />;
   }
 
@@ -188,7 +155,6 @@ export default function TeamInfo() {
       setIsEditing(false);
       refetchTeam();
       refetchTeamInCurrentSemester();
-      refetchCurrentSemester();
     } catch (error) {
       toast.error(error as string);
     } finally {
@@ -211,14 +177,13 @@ export default function TeamInfo() {
     a.role === TeamMemberRole.Leader
       ? -1
       : b.role === TeamMemberRole.Leader
-        ? 1
-        : 0
+      ? 1
+      : 0
   );
 
   const isHasTopic = !!project.topicId;
   const availableSlots = isHasTopic
-    ? (project?.teamSize ?? 0) -
-    (project.teamMembers?.length ?? 0)
+    ? (project?.teamSize ?? 0) - (project.teamMembers?.length ?? 0)
     : 5 - (project.teamMembers?.length ?? 0);
 
   const isLockTeamMember = availableSlots === 0;
@@ -241,7 +206,6 @@ export default function TeamInfo() {
           toast.success(successMessage);
           refetchTeam();
           refetchTeamInCurrentSemester();
-          refetchCurrentSemester();
         } else {
           toast.error(res.message || "Thao tác thất bại");
         }
@@ -439,22 +403,15 @@ export default function TeamInfo() {
                       <CardContent className="space-y-4">
                         <div className="space-y-1">
                           <Label>Viết tắt:</Label>
-                          <p>
-                            {project.topic.abbreviation ||
-                              "Chưa có"}
-                          </p>
+                          <p>{project.topic.abbreviation || "Chưa có"}</p>
                         </div>
                         <div className="space-y-1">
                           <Label>Tên tiếng Việt:</Label>
-                          <p>
-                            {project.topic.vietNameseName || "Chưa có"}
-                          </p>
+                          <p>{project.topic.vietNameseName || "Chưa có"}</p>
                         </div>
                         <div className="space-y-1">
                           <Label>Tên tiếng Anh:</Label>
-                          <p>
-                            {project.topic.englishName || "Chưa có"}
-                          </p>
+                          <p>{project.topic.englishName || "Chưa có"}</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -492,8 +449,7 @@ export default function TeamInfo() {
                       </CardHeader>
                       <CardContent>
                         <p className="whitespace-pre-line">
-                          {project.topic.description ||
-                            "Chưa có mô tả"}
+                          {project.topic.description || "Chưa có mô tả"}
                         </p>
                       </CardContent>
                     </Card>
@@ -509,21 +465,15 @@ export default function TeamInfo() {
                           <div className="space-y-1">
                             <Label>Đề tài doanh nghiệp:</Label>
                             <p>
-                              {project.topic.isEnterpriseTopic
-                                ? "Có"
-                                : "Không"}
+                              {project.topic.isEnterpriseTopic ? "Có" : "Không"}
                             </p>
                           </div>
-                          {project.topic
-                            ?.isEnterpriseTopic && (
-                              <div className="space-y-1">
-                                <Label>Tên doanh nghiệp:</Label>
-                                <p>
-                                  {project.topic.enterpriseName ||
-                                    "Chưa có"}
-                                </p>
-                              </div>
-                            )}
+                          {project.topic?.isEnterpriseTopic && (
+                            <div className="space-y-1">
+                              <Label>Tên doanh nghiệp:</Label>
+                              <p>{project.topic.enterpriseName || "Chưa có"}</p>
+                            </div>
+                          )}
                         </div>
                         <div className="space-y-4">
                           <div className="space-y-1">
@@ -537,14 +487,12 @@ export default function TeamInfo() {
                         </div>
                         <div className="space-y-1">
                           <Label>Số lượng thành viên tối đa:</Label>
-                          <p>
-                            {project.teamSize || "Chưa có"}
-                          </p>
+                          <p>{project.teamSize || "Chưa có"}</p>
                         </div>
                         <div className="space-y-1">
                           <Label>Tệp đính kèm:</Label>
                           {project.topic?.topicVersions?.length > 0 &&
-                            latestTopicVersion?.fileUpdate ? (
+                          latestTopicVersion?.fileUpdate ? (
                             <Button variant="link" className="px-0" asChild>
                               <a
                                 target="_blank"
@@ -598,8 +546,9 @@ export default function TeamInfo() {
 
               <div className="grid gap-4">
                 {sortedMembers.map((member: TeamMember) => {
-                  const initials = `${member.user?.lastName?.charAt(0).toUpperCase() || ""
-                    }`;
+                  const initials = `${
+                    member.user?.lastName?.charAt(0).toUpperCase() || ""
+                  }`;
                   const joinDate = formatDate(member.joinDate);
                   const leaveDate = formatDate(member.leaveDate);
                   // Role mapping
@@ -718,7 +667,7 @@ export default function TeamInfo() {
                               </Badge>
                               {member.status !== TeamMemberStatus.Pending &&
                                 member.status !==
-                                TeamMemberStatus.InProgress && (
+                                  TeamMemberStatus.InProgress && (
                                   <Badge
                                     variant={statusInfo.variant as any}
                                     className={cn(
@@ -794,38 +743,31 @@ export default function TeamInfo() {
 
       <div className="lg:col-span-1 space-y-6">
         {/* Card đăng ký nhóm */}
-        {project.status !== ProjectStatus.Pending &&
-          (
-            <Card className="rounded-lg">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-lg">Đăng ký nhóm</CardTitle>
-                <CardDescription>Nộp đăng ký đề tài chính thức</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm">
-                  Lưu ý: Đề tài cần được thống nhất bởi tất cả thành viên trước
-                  khi nộp và sẽ không được thay đổi tên nhóm
-                </p>
-                {
-                  project.topicId &&
-                   ( availableSlots == 0 || availableSlots == 1 )
-                   ? (
-                    <Link
-                    href={`/submit/${project.id}`}
-                    >
-                      <Button className="w-full">  Nộp đề tài</Button>
-                    
-                    </Link>
-                  ) :
-                    (
-                      <Button className="w-full" disabled> Chưa đủ điều kiện</Button>
-                    )
-                }
-
-              </CardContent>
-            </Card>
-          )}
-
+        {project.status !== ProjectStatus.Pending && (
+          <Card className="rounded-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Đăng ký nhóm</CardTitle>
+              <CardDescription>Nộp đăng ký đề tài chính thức</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm">
+                Lưu ý: Đề tài cần được thống nhất bởi tất cả thành viên trước
+                khi nộp và sẽ không được thay đổi tên nhóm
+              </p>
+              {project.topicId &&
+              (availableSlots == 0 || availableSlots == 1) ? (
+                <Link href={`/submit/${project.id}`}>
+                  <Button className="w-full"> Nộp đề tài</Button>
+                </Link>
+              ) : (
+                <Button className="w-full" disabled>
+                  {" "}
+                  Chưa đủ điều kiện
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Card xin đề tài từ GV (nếu có) */}
         {!teamInfo?.data?.topicId && (
@@ -870,7 +812,7 @@ export default function TeamInfo() {
               const reviewDate = new Date(review3.reviewDate);
               const adjustedReviewDate = new Date(
                 reviewDate.getTime() +
-                reviewDate.getTimezoneOffset() * 60 * 1000
+                  reviewDate.getTimezoneOffset() * 60 * 1000
               );
               const currentDate = new Date();
 
