@@ -18,7 +18,6 @@ export function TopicVersionRequestPendingTable() {
       TopicStatus.MentorPending,
       TopicStatus.MentorApproved,
       TopicStatus.ManagerPending,
-      TopicStatus.MentorPending,
       TopicStatus.StudentEditing,
       TopicStatus.MentorSubmitted,
     ],
