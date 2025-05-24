@@ -77,15 +77,10 @@ export const NAV_CONFIG = {
           url: "/topic/create",
           roles: ["Student", "Mentor"],
         },
+       
         {
-          title: "Nháp đã tạo",
+          title: "Đề tài của tôi",
           icon: StickyNote,
-          url: "/topic/draft",
-          roles: ["Student", "Mentor"],
-        },
-        {
-          title: "Lịch sử duyệt ý tưởng",
-          icon: History,
           url: "/topic/request",
           roles: ["Student", "Mentor"],
         },

@@ -1,3 +1,4 @@
+"use client";
 import { DataOnlyTable } from "@/components/_common/data-table-client/data-table";
 import { topicService } from "@/services/topic-service";
 import { TopicStatus } from "@/types/enums/topic";
