@@ -11,7 +11,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export function TopicVersionRequestPendingTable() {
+export function TopicPendingTable() {
   const queryParams: TopicGetCurrentByStatusQuery = {
     statusList: [
       TopicStatus.StudentEditing,

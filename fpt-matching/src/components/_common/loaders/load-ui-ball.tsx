@@ -19,7 +19,7 @@ const LoadUIBall = () => {
 
   return (
     <>
-      <Ring size={35} bgOpacity={0.05} color={color} />
+      <Ring size={35} bgOpacity={0.05} stroke={2} color={color} />
     </>
   );
 };
