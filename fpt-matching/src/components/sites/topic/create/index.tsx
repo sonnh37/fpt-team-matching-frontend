@@ -335,6 +335,8 @@ export const CreateProjectForm = () => {
           <AlertMessage message={messages.join(". ")} messageType="error" />
         );
       }
+
+      return <AlertMessage message="Bạn chưa tạo team." messageType="error" />;
     }
   }
 
@@ -342,7 +344,7 @@ export const CreateProjectForm = () => {
     topicsData?.data?.find(
       (t) =>
         t.status === TopicStatus.ManagerApproved &&
-        t.project?.id && 
+        t.project?.id &&
         t.isExistedTeam
     ) ??
     topicsData?.data?.find(
@@ -354,8 +356,6 @@ export const CreateProjectForm = () => {
           TopicStatus.MentorRejected,
         ].includes(t.status)
     );
-
-  console.log("check_active topic", activeTopic);
 
   if (activeTopic && isStudent) {
     return <TopicApprovalStatus topic={activeTopic} isStudent={isStudent} />;

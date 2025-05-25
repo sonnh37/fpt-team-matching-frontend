@@ -17,6 +17,7 @@ import {
   TopicResubmitForMentorByStudentCommand,
   TopicSubmitForMentorByStudentCommand,
 } from "@/types/models/commands/topic/topic-student-create-pending-command";
+import { TopicUpdateAsProjectCommand } from "@/types/models/commands/topic/topic-update-as-project-command";
 
 class TopicService extends BaseService<Topic> {
   constructor() {
@@ -164,6 +165,15 @@ class TopicService extends BaseService<Topic> {
   ): Promise<BusinessResult<Topic>> => {
     return axiosInstance
       .put<BusinessResult<Topic>>(`${this.endpoint}/status`, command)
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+   public updateTopicAsProject = (
+    command: TopicUpdateAsProjectCommand
+  ): Promise<BusinessResult<Topic>> => {
+    return axiosInstance
+      .put<BusinessResult<Topic>>(`${this.endpoint}/select-as-project`, command)
       .then((response) => response.data)
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };

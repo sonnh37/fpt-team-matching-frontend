@@ -32,7 +32,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function TopicVersionRequestApprovedTable() {
+export default function TopicApprovedTable() {
   const queryParams: TopicGetCurrentByStatusQuery = {
     statusList: [TopicStatus.ManagerApproved],
     isPagination: false,

@@ -35,7 +35,6 @@ import { useSelectorUser } from "@/hooks/use-auth";
 import { cn, formatDate } from "@/lib/utils";
 import { projectService } from "@/services/project-service";
 import { teammemberService } from "@/services/team-member-service";
-import { topicService } from "@/services/topic-service";
 import { InvitationStatus, InvitationType } from "@/types/enums/invitation";
 import { ProjectStatus } from "@/types/enums/project";
 import {
@@ -95,22 +94,9 @@ export default function TeamInfo() {
     refetchOnWindowFocus: false,
   });
 
-  const topicId = teamInfo?.data?.topic?.id;
-
-  const {
-    data: topic,
-    isLoading: isLoadingTopic,
-    isError: isErrorTopic,
-  } = useQuery({
-    queryKey: ["getTopicInTeam", topicId],
-    queryFn: () => topicService.getById(topicId).then((res) => res.data),
-    refetchOnWindowFocus: false,
-    enabled: !!topicId,
-  });
-
   // Combine loading and error states
-  const isLoading = isLoadingTeam || isLoadingTopic || isLoadingCurrentSemester;
-  const isError = isErrorTeam || isErrorTopic || isErrorCurrentSemester;
+  const isLoading = isLoadingTeam || isLoadingCurrentSemester;
+  const isError = isErrorTeam || isErrorCurrentSemester;
 
   useEffect(() => {
     if (teamInfo?.data?.teamName) {
@@ -124,7 +110,7 @@ export default function TeamInfo() {
     return <ErrorSystem />;
   }
 
-  if (teamInfo?.status === -1) {
+  if (teamInfo?.status == -1) {
     return <NoTeam />;
   }
 
@@ -430,13 +416,16 @@ export default function TeamInfo() {
                         <div className="space-y-1">
                           <Label>Ngành:</Label>
                           <p>
-                            {topic?.specialty?.profession?.professionName ||
-                              "Chưa có"}
+                            {project.topic?.specialty?.profession
+                              ?.professionName || "Chưa có"}
                           </p>
                         </div>
                         <div className="space-y-1">
                           <Label>Chuyên ngành:</Label>
-                          <p>{topic?.specialty?.specialtyName || "Chưa có"}</p>
+                          <p>
+                            {project.topic?.specialty?.specialtyName ||
+                              "Chưa có"}
+                          </p>
                         </div>
                       </CardContent>
                     </Card>
@@ -478,11 +467,13 @@ export default function TeamInfo() {
                         <div className="space-y-4">
                           <div className="space-y-1">
                             <Label>Người hướng dẫn:</Label>
-                            <p>{topic?.mentor?.email || "Chưa có"}</p>
+                            <p>{project.topic.mentor?.email || "Chưa có"}</p>
                           </div>
                           <div className="space-y-1">
                             <Label>Người hướng dẫn 2:</Label>
-                            <p>{topic?.subMentor?.email || "Chưa có"}</p>
+                            <p>
+                              {project.topic?.subMentor?.email || "Chưa có"}
+                            </p>
                           </div>
                         </div>
                         <div className="space-y-1">

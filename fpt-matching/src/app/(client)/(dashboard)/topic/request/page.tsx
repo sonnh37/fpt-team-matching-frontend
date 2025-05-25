@@ -11,10 +11,10 @@ import { TopicStatus } from "@/types/enums/topic";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 // Components
-import TopicVersionRequestApprovedTable from "@/components/sites/topic/requests/approved";
+import TopicApprovedTable from "@/components/sites/topic/requests/approved";
 import { TopicConsiderByMentorTable } from "@/components/sites/topic/requests/consider-by-mentor";
-import { TopicVersionRequestPendingTable } from "@/components/sites/topic/requests/pending";
-import TopicVersionRequestRejectedTable from "@/components/sites/topic/requests/rejected";
+import { TopicPendingTable } from "@/components/sites/topic/requests/pending";
+import TopicRejectedTable from "@/components/sites/topic/requests/rejected";
 import { getLatestStageTopic } from "@/lib/utils";
 const TAB_CONFIG = [
   {
@@ -27,7 +27,7 @@ const TAB_CONFIG = [
       TopicStatus.MentorSubmitted,
       TopicStatus.MentorApproved,
     ],
-    component: TopicVersionRequestPendingTable,
+    component: TopicPendingTable,
     show: true,
   },
   {
@@ -41,14 +41,14 @@ const TAB_CONFIG = [
     value: "approved",
     label: "Đã phê duyệt",
     statuses: [TopicStatus.ManagerApproved],
-    component: TopicVersionRequestApprovedTable,
+    component: TopicApprovedTable,
     show: true,
   },
   {
     value: "rejected",
     label: "Đã từ chối",
     statuses: [TopicStatus.MentorRejected, TopicStatus.ManagerRejected],
-    component: TopicVersionRequestRejectedTable,
+    component: TopicRejectedTable,
     show: true,
   },
 ];
