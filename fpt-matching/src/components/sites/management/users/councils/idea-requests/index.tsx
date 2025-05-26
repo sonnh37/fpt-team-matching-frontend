@@ -23,21 +23,18 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ColumnFiltersState,
   getCoreRowModel,
-  getFilteredRowModel,
   PaginationState,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
 import { Search } from "lucide-react";
-import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { columns } from "./columns";
 import { semesterService } from "@/services/semester-service";
 import { Badge } from "@/components/ui/badge";
-import { UserGetAllInSemesterQuery } from "@/types/models/queries/users/user-get-all-in-semester-query";
 import { getEnumOptions } from "@/lib/utils";
 import { Department } from "@/types/enums/user";
 import { FilterEnum } from "@/types/models/filter-enum";
@@ -49,7 +46,7 @@ const formSchema = z.object({
 });
 
 export default function CouncilTopicVersionRequestPendingTable() {
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
       columnId: "department",
