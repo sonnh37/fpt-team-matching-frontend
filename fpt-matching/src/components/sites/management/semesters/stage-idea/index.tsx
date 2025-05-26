@@ -67,6 +67,7 @@ import { StageTopic } from "@/types/stage-topic";
 import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
 import { StageTopicFormDialog } from "./create-or-update-dialog";
 import { LoadingComponent } from "@/components/_common/loading-page";
+import {useCurrentSemester} from "@/hooks/use-current-role";
 //#region INPUT
 const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
@@ -91,17 +92,17 @@ const Actions: React.FC<ActionsProps> = ({ row, onEdit }) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => onEdit(model)}>
             {" "}
             {/* Mở form Edit */}
-            Edit
+            Chỉnh sửa
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>
-            Delete
-            <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-          </DropdownMenuItem>
+          {/*<DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>*/}
+          {/*  Delete*/}
+          {/*  <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>*/}
+          {/*</DropdownMenuItem>*/}
         </DropdownMenuContent>
       </DropdownMenu>
       <DeleteBaseEntitysDialog
@@ -118,6 +119,10 @@ const Actions: React.FC<ActionsProps> = ({ row, onEdit }) => {
 //#endregion
 export default function StageTopicTable() {
   const params_ = useParams();
+  const searchParams = useSearchParams();
+  const semesterId = searchParams.get("semesterId");
+  const currentSemester = useCurrentSemester().currentSemester
+
   const filterEnums: FilterEnum[] = [
     { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
   ];
@@ -217,9 +222,9 @@ export default function StageTopicTable() {
 
   //#endregion
 
-  const onSubmit = (values: z.infer<typeof defaultSchema>) => {
-    setInputFields(values);
-  };
+  // const onSubmit = (values: z.infer<typeof defaultSchema>) => {
+  //   setInputFields(values);
+  // };
 
   // Thêm nút "Create" vào Toolbar
   const handleCreateClick = () => {
@@ -233,13 +238,15 @@ export default function StageTopicTable() {
   const handleSuccess = () => {
     refetch(); // Gọi lại API để cập nhật dữ liệu
   };
-
+  if (!currentSemester){
+    return null;
+  }
   return (
     <>
       <div className="">
         <div className="">
           <div className="space-y-4 mx-auto">
-            <Button type="button" onClick={handleCreateClick} variant="default">
+            <Button disabled={ semesterId != currentSemester.id} type="button" onClick={handleCreateClick} variant="default">
               Tạo mới đợt
             </Button>
 

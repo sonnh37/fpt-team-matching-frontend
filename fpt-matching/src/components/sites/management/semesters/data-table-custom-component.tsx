@@ -33,6 +33,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import {useCurrentSemester} from "@/hooks/use-current-role";
 
 // Status mapping to Vietnamese
 const statusMap = {
@@ -107,6 +108,10 @@ export function DataTableSemesterComponent<TData>({
     }
   };
 
+  const currentSemesterInWorkSpace = useCurrentSemester().currentSemester
+  if (!currentSemesterInWorkSpace) {
+    return null
+  }
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {table.getRowModel().rows.length > 0 ? (
@@ -134,13 +139,16 @@ export function DataTableSemesterComponent<TData>({
                         >
                           {model.semesterName}
                         </Link>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col gap-2">
                           <Badge
                             variant={statusMap[model.status].variant}
                             className="px-2 py-0.5 text-xs font-medium"
                           >
                             {statusMap[model.status].label}
                           </Badge>
+                          {/*<Badge>*/}
+                          {/*  Workspace hiện tại*/}
+                          {/*</Badge>*/}
                         </div>
                       </CardTitle>
 
@@ -225,6 +233,13 @@ export function DataTableSemesterComponent<TData>({
                         </p>
                       </div>
                     </div>
+                    {
+                      currentSemesterInWorkSpace.id == model.id &&
+                        <div className={"w-full"}>
+                          <Badge className={"bg-green-500 hover:bg-green-300 w-full text-center items-center flex justify-center"}>Workspace hiện tại</Badge>
+                        </div>
+                    }
+
                   </div>
                 </CardContent>
 

@@ -37,6 +37,9 @@ import {hangfireService} from "@/services/hangfire-service";
 import StageTopicTable from "./stage-idea";
 import { SemesterStatus } from "@/types/enums/semester";
 import { getEnumOptions } from "@/lib/utils";
+import SemesterStatusTimeline from "@/components/ui/timeline";
+import {UpdateStatusDialog} from "@/components/sites/management/semesters/update-status-dialog";
+import { useCurrentSemester } from "@/hooks/use-current-role";
 
 interface SemesterFormProps {
   initialData?: Semester | null;
@@ -76,7 +79,10 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
   const previousPath = usePreviousPath();
   const [file, setFile] = useState<File | null>(null);
   const queryClient = useQueryClient();
-
+  const currentSemester = useCurrentSemester().currentSemester;
+  if (!currentSemester) {
+    return null;
+  }
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData
@@ -166,13 +172,10 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
   if (isLoading1) return <LoadingComponent />;
   if (isError1) return <ErrorSystem />;
 
-  const criteriaforms = res_criteriaforms?.data?.results ?? [];
+  // const criteriaforms = res_criteriaforms?.data?.results ?? [];
 
-  const handleTriggerNow = async (jobId: string) => {
-    const response = await hangfireService.TriggerNow({jobId: jobId})
-    toast.info(response.data)
-  }
-  return (
+
+    return (
     <>
       <ConfirmationDialog
         isLoading={isLoading}
@@ -201,174 +204,185 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
               <p className="text-sm text-muted-foreground">
                 {initialData ? "Cập nhật thông tin học kỳ" : "Tạo học kỳ mới"}
               </p>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => router.push(previousPath)}
-                disabled={loading}
-              >
-                Hủy
-              </Button>
-              <Button type="submit" disabled={loading}>
-                {loading && (
-                  <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-                )}
-                {action}
-              </Button>
+              {initialData &&
+                  <p className={"text-sm text-muted-foreground text-red-500"}>Chỉ được cập nhật trong kì của workspace</p>
+              }
             </div>
           </div>
+          {initialData && (
+              <Card>
+                <CardHeader className="border-b flex flex-row justify-between">
+                  <CardTitle className="text-lg">Giai đoạn của kì</CardTitle>
+                  <div className="flex gap-2">
+                    {initialData.status != SemesterStatus.Closed &&
+                        (<UpdateStatusDialog semester={initialData} />)}
+                  </div>
 
+                </CardHeader>
+                <>
+                  <SemesterStatusTimeline semester={initialData} />
+                </>
+              </Card>
+          )}
           {/* Main form content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left column - Main form */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-3 space-y-6">
               <Card>
-                <CardHeader className="border-b flex flex-row justify-between">
-                  <CardTitle className="text-lg">Thông tin chung</CardTitle>
-                  <div className={"flex flex-row gap-2"}>
-                    <Button onClick={(e) =>{
-                      e.preventDefault();
-                      handleTriggerNow(`auto-update-result-${form.getValues("semesterCode")}`)
-                    }}>Công khai kết quả duyệt ngay !</Button>
-                    <Button onClick={(e) => {
-                      e.preventDefault();
-                      handleTriggerNow(`auto-update-project-inprogress-${form.getValues("semesterCode")}`)
-                      handleTriggerNow(`auto-create-review-${form.getValues("semesterCode")}`)
-                    }}>Bắt đầu kì ngay !</Button>
+                <div className={"grid grid-cols-3 gap-6 px-4"}>
+                  <div className={"col-span-2 border-gray-200 border-r-[1px] pr-6"}>
+                    <div className={""}>
+                      <CardHeader className="border-b flex flex-row justify-between">
+                        <CardTitle className="text-lg">Thông tin chung</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-6 grid gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                          <FormInput
+                              form={form}
+                              name="semesterCode"
+                              label="Mã học kỳ"
+                              placeholder="VD: HK2024"
+                          />
+                          <FormSelectEnum
+                              form={form}
+                              name="status"
+                              label="Trạng thái"
+                              enumOptions={getEnumOptions(SemesterStatus)}
+                              default
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                          <FormInput
+                              form={form}
+                              name="semesterName"
+                              label="Tên học kỳ"
+                              placeholder="VD: Học kỳ 1 2024"
+                          />
+
+                          <FormInput
+                              form={form}
+                              name="semesterPrefixName"
+                              label="Tên tiền tố"
+                              placeholder="VD: Năm học 2023-2024"
+                          />
+
+
+                        </div>
+                      </CardContent>
+                    </div>
+                    <div>
+                      <CardHeader className="border-b">
+                        <CardTitle className="text-lg">Thời gian</CardTitle>
+                      </CardHeader>
+                      <CardContent className="pt-6 grid gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <FormInputDateTimePicker
+                              form={form}
+                              name="startDate"
+                              label="Ngày bắt đầu"
+                          />
+
+                          <FormInputDateTimePicker
+                              form={form}
+                              name="endDate"
+                              label="Ngày kết thúc"
+                          />
+                          <FormInputDateTimePicker
+                              form={form}
+                              name="publicTopicDate"
+                              label="Công bố đề tài"
+                          />
+                          <FormInputDateTimePicker
+                              form={form}
+                              name="onGoingDate"
+                              label="Ngày diễn ra"
+                          />
+                        </div>
+                      </CardContent>
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent className="pt-6 grid gap-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/*<FormSelectObject*/}
-                    {/*  form={form}*/}
-                    {/*  name="criteriaFormId"*/}
-                    {/*  label="Mẫu tiêu chí đánh giá"*/}
-                    {/*  options={criteriaforms}*/}
-                    {/*  selectValue="id"*/}
-                    {/*  selectLabel="title"*/}
-                    {/*  placeholder="Chọn mẫu tiêu chí"*/}
-                    {/*/>*/}
+                  {/* Right column - Limits and actions */}
+                  <div className="space-y-6 col-span-1">
+                      <CardHeader className="border-b">
+                        <CardTitle className="font-semibold tracking-tight text-lg">Giới hạn đề tài</CardTitle>
+                      </CardHeader>
+                      <CardContent className="grid gap-6">
+                        <FormInputNumber
+                            form={form}
+                            name="limitTopicMentorOnly"
+                            label="Mentor 1"
+                            placeholder="Nhập số lượng"
+                            min={0}
+                        />
 
-                    <FormInput
-                      form={form}
-                      name="semesterCode"
-                      label="Mã học kỳ"
-                      placeholder="VD: HK2024"
-                    />
-                    <FormSelectEnum
-                        form={form}
-                        name="status"
-                        label="Trạng thái"
-                        enumOptions={getEnumOptions(SemesterStatus)}
-                        default
-                    />
+                        <FormInputNumber
+                            form={form}
+                            name="limitTopicSubMentor"
+                            label="Mentor 2"
+                            placeholder="Nhập số lượng"
+                            min={0}
+                        />
+
+                        <FormInputNumber
+                            form={form}
+                            name="minTeamSize"
+                            label="Số lượng thành viên tối thiểu"
+                            placeholder="Nhập số lượng"
+                            min={2}
+                        />
+
+                        <FormInputNumber
+                            form={form}
+                            name="maxTeamSize"
+                            label="Số lượng thành viên tối đa"
+                            placeholder="Nhập số lượng"
+                            min={0}
+                        />
+
+                        <FormInputNumber
+                            form={form}
+                            name="numberOfTeam"
+                            label="Số lượng Team trong kì này"
+                            placeholder="Nhập số lượng"
+                            min={0}
+                        />
+                      </CardContent>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                    <FormInput
-                      form={form}
-                      name="semesterName"
-                      label="Tên học kỳ"
-                      placeholder="VD: Học kỳ 1 2024"
-                    />
-
-                    <FormInput
-                      form={form}
-                      name="semesterPrefixName"
-                      label="Tên tiền tố"
-                      placeholder="VD: Năm học 2023-2024"
-                    />
-
-
-                  </div>
-                </CardContent>
+                </div>
+                <div className="p-6 flex gap-2 justify-end">
+                  <Button
+                      variant="outline"
+                      type="button"
+                      onClick={() => router.push(previousPath)}
+                      disabled={loading}
+                  >
+                    Hủy
+                  </Button>
+                  {
+                    initialData == null ? (
+                        <Button type="submit" disabled={loading}>
+                          {loading && (
+                              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                          )}
+                          {action}
+                        </Button>
+                    ) : (
+                        <Button type="submit" disabled={loading || initialData.id != currentSemester.id}>
+                          {loading && (
+                              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+                          )}
+                          {action}
+                        </Button>
+                    )
+                  }
+                </div>
               </Card>
 
-              <Card>
-                <CardHeader className="border-b">
-                  <CardTitle className="text-lg">Thời gian</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-6 grid gap-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <FormInputDateTimePicker
-                      form={form}
-                      name="startDate"
-                      label="Ngày bắt đầu"
-                    />
-                    
-                    <FormInputDateTimePicker
-                      form={form}
-                      name="endDate"
-                      label="Ngày kết thúc"
-                    />
-                    <FormInputDateTimePicker
-                      form={form}
-                      name="publicTopicDate"
-                      label="Công bố đề tài"
-                    />
-                    <FormInputDateTimePicker
-                      form={form}
-                      name="onGoingDate"
-                      label="Ngày diễn ra"
-                    />
-                  </div>
-                </CardContent>
-              </Card>
             </div>
 
-            {/* Right column - Limits and actions */}
-            <div className="space-y-6">
-              <Card>
-                <CardHeader className="border-b">
-                  <CardTitle className="text-lg">Giới hạn đề tài</CardTitle>
-                </CardHeader>
-                <CardContent className="pt-6 grid gap-6">
-                  <FormInputNumber
-                    form={form}
-                    name="limitTopicMentorOnly"
-                    label="Mentor 1"
-                    placeholder="Nhập số lượng"
-                    min={0}
-                  />
-
-                  <FormInputNumber
-                    form={form}
-                    name="limitTopicSubMentor"
-                    label="Mentor 2"
-                    placeholder="Nhập số lượng"
-                    min={0}
-                  />
-
-                  <FormInputNumber
-                    form={form}
-                    name="minTeamSize"
-                    label="Số lượng thành viên tối thiểu"
-                    placeholder="Nhập số lượng"
-                    min={2}
-                  />
-
-                  <FormInputNumber
-                    form={form}
-                    name="maxTeamSize"
-                    label="Số lượng thành viên tối đa"
-                    placeholder="Nhập số lượng"
-                    min={0}
-                  />
-
-                  <FormInputNumber
-                    form={form}
-                    name="numberOfTeam"
-                    label="Số lượng Team trong kì này"
-                    placeholder="Nhập số lượng"
-                    min={0}
-                  />
-                </CardContent>
-              </Card>
-
-            </div>
           </div>
 
           {initialData && (
