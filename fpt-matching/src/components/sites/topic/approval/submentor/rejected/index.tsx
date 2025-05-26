@@ -1,59 +1,36 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import { TypographyH2 } from "@/components/_common/typography/typography-h2";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { useSelectorUser } from "@/hooks/use-auth";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
 import { topicService } from "@/services/topic-service";
-import { TopicStatus, TopicType } from "@/types/enums/topic";
+import { TopicStatus } from "@/types/enums/topic";
+import { TopicRequestStatus } from "@/types/enums/topic-request";
 import { FilterEnum } from "@/types/models/filter-enum";
-import { TopicGetAllQuery } from "@/types/models/queries/topics/topic-get-all-query";
+import { TopicGetListByStatusAndRoleQuery } from "@/types/models/queries/topics/topic-get-list-by-status-and-roles-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ColumnFiltersState,
   getCoreRowModel,
-  getFilteredRowModel,
   PaginationState,
   SortingState,
   useReactTable,
-  VisibilityState,
+  VisibilityState
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
-import { TopicVersionRequestGetAllQuery } from "@/types/models/queries/topic-version-requests/topic-version-request-get-all-query";
-import { topicVersionRequestService } from "@/services/topic-version-request-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
-import { Topic } from "@/types/topic";
-import { TopicVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/topic-version-requests/topic-version-request-get-all-current-by-status-and-roles";
-import { useSelector } from "react-redux";
-import { RootState } from "@/lib/redux/store";
-import { useSelectorUser } from "@/hooks/use-auth";
-import { TopicGetListByStatusAndRoleQuery } from "@/types/models/queries/topics/topic-get-list-by-status-and-roles-query";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function TopicVersionRequestRejectedBySubMentorTable() {
+export default function TopicRejectedBySubMentorTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -104,8 +81,8 @@ export default function TopicVersionRequestRejectedBySubMentorTable() {
       sorting
     );
 
-    params.status = TopicVersionRequestStatus.Rejected;
-    params.topicStatus = TopicStatus.Rejected;
+    params.status = TopicRequestStatus.Rejected;
+    params.topicStatus = TopicStatus.MentorRejected;
     params.roles = ["SubMentor"];
 
     return { ...params };

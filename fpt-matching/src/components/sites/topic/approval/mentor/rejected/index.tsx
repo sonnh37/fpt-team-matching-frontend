@@ -30,7 +30,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function TopicVersionRequestRejectedByMentorTable() {
+export default function TopicRejectedByMentorTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -82,7 +82,7 @@ export default function TopicVersionRequestRejectedByMentorTable() {
     );
 
     params.status = TopicRequestStatus.Rejected;
-    params.topicStatus = TopicStatus.ManagerRejected;
+    params.topicStatus = TopicStatus.MentorRejected;
     params.roles = ["Mentor"];
 
     return { ...params };

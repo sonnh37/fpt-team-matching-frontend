@@ -1,9 +1,9 @@
 "use client";
 import ErrorHttp from "@/components/_common/errors/error-http";
-import TopicVersionRequestApprovedByMentorTable from "@/components/sites/topic/approval/mentor/approved";
+import TopicApprovedByMentorTable from "@/components/sites/topic/approval/mentor/approved";
 import TopicConsiderByMentorTable from "@/components/sites/topic/approval/mentor/consider";
 import { TopicPendingByMentorTable } from "@/components/sites/topic/approval/mentor/pending";
-import TopicVersionRequestRejectedByMentorTable from "@/components/sites/topic/approval/mentor/rejected";
+import TopicRejectedByMentorTable from "@/components/sites/topic/approval/mentor/rejected";
 import { Card } from "@/components/ui/card";
 import {
   Tabs,
@@ -44,12 +44,12 @@ function MentorApprovalTabs() {
     {
       id: "approved",
       label: "Đã duyệt",
-      component: <TopicVersionRequestApprovedByMentorTable />,
+      component: <TopicApprovedByMentorTable />,
     },
     {
       id: "rejected",
       label: "Từ chối",
-      component: <TopicVersionRequestRejectedByMentorTable />,
+      component: <TopicRejectedByMentorTable />,
     },
   ];
 

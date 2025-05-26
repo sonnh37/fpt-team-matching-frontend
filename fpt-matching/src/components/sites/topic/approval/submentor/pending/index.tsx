@@ -27,10 +27,6 @@ import { useQueryParams } from "@/hooks/use-query-params";
 import { RootState } from "@/lib/redux/store";
 import { cn, formatDate } from "@/lib/utils";
 import { topicVersionRequestService } from "@/services/topic-version-request-service";
-import { stagetopicService } from "@/services/stage-topic-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
-import { TopicVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/topic-version-requests/topic-version-request-get-all-current-by-status-and-roles";
-import { StageTopic } from "@/types/stage-topic";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData } from "@tanstack/react-query";
 import {
@@ -55,12 +51,14 @@ import { useSelectorUser } from "@/hooks/use-auth";
 import { topicService } from "@/services/topic-service";
 import { TopicGetListByStatusAndRoleQuery } from "@/types/models/queries/topics/topic-get-list-by-status-and-roles-query";
 import { TopicStatus } from "@/types/enums/topic";
+import { TopicVersionRequestStatus } from "@/types/enums/topic-version-request";
+import { TopicRequestStatus } from "@/types/enums/topic-request";
 
 const defaultSchema = z.object({
   stageNumber: z.number().default(1).optional(),
 });
 
-export function TopicVersionRequestPendingBySubMentorTable() {
+export function TopicPendingBySubMentorTable() {
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: "createdDate", desc: true },
   ]);
@@ -95,8 +93,8 @@ export function TopicVersionRequestPendingBySubMentorTable() {
       pagination,
       sorting
     );
-    params.status = TopicVersionRequestStatus.Pending;
-    params.topicStatus = TopicStatus.Pending;
+    params.status = TopicRequestStatus.Pending;
+    params.topicStatus = TopicStatus.MentorPending;
     params.roles = ["SubMentor"];
     return { ...params };
   }, [formValues, columnFilters, pagination, sorting]);

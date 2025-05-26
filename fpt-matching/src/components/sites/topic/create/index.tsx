@@ -484,6 +484,15 @@ export const CreateProjectForm = () => {
             </DialogTitle>
             <DialogDescription className="pt-2">
               Bạn có chắc chắn muốn gửi ý tưởng này không?
+              {dialogAction === "submit" && (
+                <>
+                  <br />
+                  ⚠️ Lưu ý quan trọng: Khi nộp chính thức, đề tài sẽ thuộc quyền
+                  quản lý của giảng viên hướng dẫn.
+                  <br />
+                  Sau khi gửi, bạn không thể chỉnh sửa thông tin đề tài.
+                </>
+              )}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex justify-between">

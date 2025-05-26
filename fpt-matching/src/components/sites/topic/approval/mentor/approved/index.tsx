@@ -35,7 +35,7 @@ const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function TopicVersionRequestApprovedByMentorTable() {
+export default function TopicApprovedByMentorTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -86,7 +86,7 @@ export default function TopicVersionRequestApprovedByMentorTable() {
     );
 
     params.status = TopicRequestStatus.Approved;
-    params.topicStatus = TopicStatus.MentorApproved;
+    // params.topicStatus = TopicStatus.MentorApproved;
     params.roles = ["Mentor"];
 
     return { ...params };

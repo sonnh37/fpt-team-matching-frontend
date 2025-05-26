@@ -2,19 +2,19 @@ import { DataTableComponent } from "@/components/_common/data-table-api/data-tab
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { isExistedTeam_options } from "@/lib/filter-options";
-import { topicVersionRequestService } from "@/services/topic-version-request-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
+import { topicService } from "@/services/topic-service";
+import { TopicStatus } from "@/types/enums/topic";
 import { FilterEnum } from "@/types/models/filter-enum";
+import { TopicGetListByStatusAndRoleQuery } from "@/types/models/queries/topics/topic-get-list-by-status-and-roles-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ColumnFiltersState,
   getCoreRowModel,
-  getFilteredRowModel,
   PaginationState,
   SortingState,
   useReactTable,
-  VisibilityState,
+  VisibilityState
 } from "@tanstack/react-table";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
@@ -22,21 +22,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { columns } from "./columns";
-import { Topic } from "@/types/topic";
-import { TopicVersionRequestGetAllCurrentByStatusAndRolesQuery } from "@/types/models/queries/topic-version-requests/topic-version-request-get-all-current-by-status-and-roles";
-import { RootState } from "@/lib/redux/store";
-import { useSelector } from "react-redux";
-import { useSelectorUser } from "@/hooks/use-auth";
-import { TopicGetListByStatusAndRoleQuery } from "@/types/models/queries/topics/topic-get-list-by-status-and-roles-query";
-import { topicService } from "@/services/topic-service";
-import { TopicStatus } from "@/types/enums/topic";
+import { TopicRequestStatus } from "@/types/enums/topic-request";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function TopicVersionRequestConsiderBySubMentorTable() {
+export default function TopicConsiderBySubMentorTable() {
   const searchParams = useSearchParams();
   const filterEnums: FilterEnum[] = [
     {
@@ -81,8 +74,8 @@ export default function TopicVersionRequestConsiderBySubMentorTable() {
       sorting
     );
 
-    params.status = TopicVersionRequestStatus.Consider;
-    params.topicStatus = TopicStatus.ConsiderByMentor;
+    params.status = TopicRequestStatus.Consider;
+    params.topicStatus = TopicStatus.MentorConsider;
     params.roles = ["SubMentor"];
 
     return { ...params };

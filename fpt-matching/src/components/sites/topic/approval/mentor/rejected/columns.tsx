@@ -1,67 +1,49 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogTrigger
 } from "@/components/ui/dialog";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { RootState } from "@/lib/redux/store";
-import { formatDate } from "@/lib/utils";
-import { topicVersionRequestService } from "@/services/topic-version-request-service";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
-import { TopicVersionRequest } from "@/types/topic-version-request";
-import { User } from "@/types/user";
+
 import { ColumnDef, Row } from "@tanstack/react-table";
-import { Eye, ListChecks, MoreHorizontal } from "lucide-react";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import { CiFolderOn, CiFolderOff } from "react-icons/ci";
-import { useSelector } from "react-redux";
-import { Topic } from "@/types/topic";
-import { TopicDetailForm } from "../../../detail";
-import Link from "next/link";
+
+import { LoadingComponent } from "@/components/_common/loading-page";
+import { TopicDetailForm } from "@/components/sites/topic/detail";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { useSelectorUser } from "@/hooks/use-auth";
-import { ProjectStatus } from "@/types/enums/project";
+import { apiHubsService } from "@/services/api-hubs-service";
+import SamilaritiesProjectModels from "@/types/models/samilarities-project-models";
+import { Topic } from "@/types/topic";
+import { Label } from "@radix-ui/react-label";
+import { Brain, Eye } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export const columns: ColumnDef<Topic>[] = [
+  // {
+  //   accessorKey: "teamCode",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Mã nhóm" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const topic = row.original;
+  //     const projectOfLeader = topic?.owner?.projects.filter(
+  //       (m) => m.leaderId == topic.ownerId && m.status == ProjectStatus.Pending
+  //     )[0];
+  //     return projectOfLeader?.teamCode || "Chưa có mã nhóm";
+  //   },
+  // },
   {
-    accessorKey: "teamCode",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Mã nhóm" />
-    ),
-    cell: ({ row }) => {
-      const topic = row.original;
-      const projectOfLeader = topic?.owner?.projects.filter(
-        (m) => m.leaderId == topic.ownerId && m.status == ProjectStatus.Pending
-      )[0];
-      return projectOfLeader?.teamCode || "Chưa có mã nhóm";
-    },
-  },
-  {
-    accessorKey: "leaderId",
+    accessorKey: "ownerId",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Trưởng nhóm" />
     ),
@@ -71,20 +53,10 @@ export const columns: ColumnDef<Topic>[] = [
     },
   },
   {
-    accessorKey: "vietNamName",
+    accessorKey: "vietNameseName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
-    cell: ({ row }) => {
-      const topic = row.original;
-      const highestVersion =
-        topic.topicVersions.length > 0
-          ? topic.topicVersions.reduce((prev, current) =>
-              (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-            )
-          : undefined;
-      return highestVersion?.englishName || "-";
-    },
   },
   {
     accessorKey: "actions",
@@ -98,19 +70,59 @@ export const columns: ColumnDef<Topic>[] = [
 interface ActionsProps {
   row: Row<Topic>;
 }
-
 const Actions: React.FC<ActionsProps> = ({ row }) => {
+  const [dialogOpen, setDialogOpen] = useState(false);
+
   const topic = row.original;
 
   const user = useSelectorUser();
   if (!user) return;
 
-  const highestVersion =
-    topic.topicVersions.length > 0
-      ? topic.topicVersions.reduce((prev, current) =>
-          (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-        )
-      : undefined;
+  // const highestVersion =
+  //   topic.topicVersions.length > 0
+  //     ? topic.topicVersions.reduce((prev, current) =>
+  //         (prev.version ?? 0) > (current.version ?? 0) ? prev : current
+  //       )
+  //     : undefined;
+
+  // const mentorRequest = highestVersion?.topicVersionRequests.find(
+  //   (m) =>
+  //     (m.role === "Mentor" || m.role === "SubMentor") &&
+  //     m.status === TopicVersionRequestStatus.Pending &&
+  //     m.reviewerId === user.id
+  // // );
+
+  // const [loadingAI, setLoadingAI] = useState<boolean>(false);
+  // const [samilaritiesProject, setSamilaritiesProject] = useState<
+  //   SamilaritiesProjectModels[]
+  // >([]);
+
+  // // Load similar projects khi tab active
+  // useEffect(() => {
+  //   const loadSimilarProjects = async () => {
+  //     if (highestVersion?.description) {
+  //       setLoadingAI(true);
+  //       try {
+  //         const response = await apiHubsService.getSimilaritiesProject(
+  //           highestVersion.description
+  //         );
+  //         if (response) {
+  //           setSamilaritiesProject(
+  //             (response as { similar_capstone: SamilaritiesProjectModels[] })
+  //               .similar_capstone
+  //           );
+  //         }
+  //         setLoadingAI(false);
+  //       } catch (error) {
+  //         console.error("Failed to load similar projects", error);
+  //       } finally {
+  //         setLoadingAI(false);
+  //       }
+  //     }
+  //   };
+
+  //   loadSimilarProjects();
+  // }, [highestVersion]);
 
   return (
     <div className="flex flex-row gap-2">
@@ -121,10 +133,65 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
             <Eye className="h-4 w-4" />
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-          {topic && <TopicDetailForm topicId={topic.id} />}
+        <DialogContent className="sm:max-w-[90vw] max-h-[90vh] overflow-y-auto">
+          <div className="grid gap-4 grid-cols-3">
+            {topic && (
+              <div className="col-span-2">
+                <TopicDetailForm topicId={topic.id} />
+              </div>
+            )}
+            {/* {loadingAI ? (
+              <LoadingComponent />
+            ) : (
+              <div className="flex flex-col gap-10 h-screen overflow-auto">
+                <div className="text-lg font-semibold flex gap-2">
+                  <Brain className="h-5 w-5" />
+                  <h3>Các đề tài tương đồng đã tồn tại</h3>
+                </div>
+                {samilaritiesProject && samilaritiesProject.length > 0 ? (
+                  samilaritiesProject.map((project, index) => (
+                    <Card key={index}>
+                      <CardHeader>
+                        <CardTitle>{project.name}</CardTitle>
+                        <CardDescription>
+                          Độ tương đồng:{" "}
+                          {(Number(project.similarity.toFixed(2)) ?? 0) * 100}%
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-2">
+                          <div className={"flex gap-4"}>
+                            <Label className="font-bold">Mã đề tài:</Label>
+                            <p>{project.project_code}</p>
+                          </div>
+                          <div>
+                            <Label className={"font-bold"}>Mô tả:</Label>
+                            <p>{project.context}</p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : (
+                  <p>No similar projects found</p>
+                )}
+              </div>
+            )} */}
+          </div>
         </DialogContent>
       </Dialog>
+      {/* <Tooltip>
+        <TooltipTrigger asChild>
+          <Link href={`/topic/reviews/${mentorRequest?.id}`} passHref>
+            <Button size="icon" variant="default">
+              <ListChecks className="h-4 w-4" />
+            </Button>
+          </Link>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Đánh giá</p>
+        </TooltipContent>
+      </Tooltip> */}
     </div>
   );
 };

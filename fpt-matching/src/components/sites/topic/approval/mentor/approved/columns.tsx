@@ -106,14 +106,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const user = useSelectorUser();
   const topicId = topic.id;
   const [open, setOpen] = useState(false);
+  const [iSubmitting, setSetSubmitting] = useState(false);
 
   const role = useCurrentRole();
-  // const highestVersion =
-  //   topic.topicVersions.length > 0
-  //     ? topic.topicVersions.reduce((prev, current) =>
-  //         (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //       )
-  //     : undefined;
 
   const hasCouncilRequests =
     topic?.topicRequests.some((request) => request.role == "Manager") &&
@@ -124,10 +119,11 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const hasSubmentorPendingRequest = topic?.topicRequests?.some(
     (request) =>
       request.role == "SubMentor" &&
-      request.status == TopicRequestStatus.Pending
+      request.status != TopicRequestStatus.Approved
   );
 
   const handleSubmit = async () => {
+    setSetSubmitting(true);
     try {
       if (!topic?.id) {
         toast.error("Topic ID is missing");
@@ -147,6 +143,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       toast.error(error || "An unexpected error occurred");
       setOpen(false);
       return;
+    } finally {
+      setSetSubmitting(false);
     }
   };
 
@@ -166,9 +164,17 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 size="sm"
                 onClick={() => handleSubmit()}
-                disabled={hasCouncilRequests || hasSubmentorPendingRequest}
+                disabled={
+                  hasCouncilRequests ||
+                  hasSubmentorPendingRequest ||
+                  iSubmitting
+                }
               >
-                {hasCouncilRequests ? "Đã nộp" : "Nộp cho quản lí"}
+                {iSubmitting
+                  ? "Đang nộp..."
+                  : hasCouncilRequests
+                  ? "Đã nộp"
+                  : "Nộp"}
               </Button>
             )}
           </DialogFooter>
