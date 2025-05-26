@@ -66,7 +66,7 @@ export const NAV_CONFIG = {
     },
 
     {
-      title: "Ý tưởng",
+      title: "Quản lí đề tài",
       url: "/topic",
       icon: Telescope,
       roles: ["*"],

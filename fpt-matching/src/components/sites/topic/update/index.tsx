@@ -93,7 +93,6 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
   if (!user) return;
   const isLecturer = role === "Mentor";
   const isStudent = role === "Student";
-  const isEnterpriseTopic = topic.isEnterpriseTopic;
   const query: UserGetAllQuery = {
     role: "Mentor",
     isPagination: false,
@@ -123,6 +122,8 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
       subMentorId: topic.subMentorId,
     },
   });
+
+  const isEnterpriseTopic = form.watch("isEnterpriseTopic");
 
   async function handleSubmitConfirm(values: z.infer<typeof formSchema>) {
     setOpenSubmitDialog(false);
@@ -192,7 +193,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
         // Check mentor availability
         const mentorCheck =
           await userService.checkMentorAndSubMentorSlotAvailability({
-            mentorId: isStudent ? (values.mentorId ?? undefined) : topic.ownerId,
+            mentorId: isStudent ? values.mentorId ?? undefined : topic.ownerId,
             subMentorId: values.subMentorId ?? undefined,
           });
 
