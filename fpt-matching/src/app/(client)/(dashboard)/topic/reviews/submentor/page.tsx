@@ -10,7 +10,7 @@ import {
   TabsContent,
   TabsList,
   TabsTrigger,
-} from "@/components/ui/tabs-shadcn";
+} from "@/components/ui/tabs";
 import { useCurrentRole } from "@/hooks/use-current-role";
 
 export default function Page() {
@@ -37,11 +37,6 @@ function SubMentorApprovalTabs() {
       component: <TopicPendingBySubMentorTable />,
     },
     {
-      id: "consider",
-      label: "Yêu cầu chỉnh sửa",
-      component: <TopicConsiderBySubMentorTable />,
-    },
-    {
       id: "approved",
       label: "Đã duyệt",
       component: <TopicApprovedBySubMentorTable />,
@@ -55,12 +50,11 @@ function SubMentorApprovalTabs() {
 
   return (
     <Tabs defaultValue="pending" className="w-full">
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="">
         {tabs.map((tab) => (
           <TabsTrigger
             key={tab.id}
             value={tab.id}
-            className="data-[state=active]:bg-primary data-[state=active]:text-white"
           >
             {tab.label}
             {/* Uncomment when you have counts */}

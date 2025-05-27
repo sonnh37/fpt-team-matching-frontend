@@ -353,14 +353,14 @@ export const TopicDetailForm = ({ topicId }: TopicUpdateFormProps) => {
             </div>
 
             <div className="space-y-1">
-              <Label className="italic">Người hướng dẫn</Label>
+              <Label className="italic">Giảng viên hướng dẫn</Label>
               <p className="text-sm font-medium">
                 {topic.mentor?.email || "Not assigned"}
               </p>
             </div>
 
             <div className="space-y-1">
-              <Label className="italic">Người hướng dẫn 2</Label>
+              <Label className="italic">Giảng viên hướng dẫn 2</Label>
               <p className="text-sm font-medium">
                 {topic.subMentor?.email || "Not assigned"}
               </p>
@@ -443,14 +443,14 @@ const StatusBadge = ({ status }: { status?: TopicStatus }) => {
     {
       [TopicStatus.Draft]: "Bản nháp",
       [TopicStatus.StudentEditing]: "Sinh viên chỉnh sửa",
-      [TopicStatus.MentorPending]: "Chờ giáo viên phản hồi",
-      [TopicStatus.MentorConsider]: "Giáo viên đang yêu cầu chỉnh sửa",
-      [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
-      [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
-      [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
-      [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
-      [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
-      [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
+      [TopicStatus.MentorPending]: "Chờ giảng viên phản hồi",
+      [TopicStatus.MentorConsider]: "Giảng viên đang yêu cầu chỉnh sửa",
+      [TopicStatus.MentorApproved]: "Giảng viên đã duyệt",
+      [TopicStatus.MentorRejected]: "Giảng viên đã từ chối",
+      [TopicStatus.MentorSubmitted]: "Giảng viên đã nộp lên hội đồng",
+      [TopicStatus.ManagerPending]: "Đang xem xét",
+      [TopicStatus.ManagerApproved]: "Đã duyệt",
+      [TopicStatus.ManagerRejected]: "Đã từ chối",
       // Thêm các trạng thái khác nếu cần
     }[status] || "Khác";
 

@@ -99,6 +99,18 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
           )
         : version.topicRequests.filter((m) => m.reviewerId == user.id);
 
+    const requestInvitations =
+      roleCurrent == "Mentor"
+        ? version.status == TopicStatus.ManagerApproved
+          ? version.topicRequests.filter(
+              (m) =>
+                m.role == "SubMentor" &&
+                m.status == TopicRequestStatus.Pending &&
+                m.reviewerId == user.id
+            )
+          : []
+        : [];
+
     return (
       <div className="space-y-6">
         {/* Version Information Section */}
@@ -225,8 +237,8 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
               <ClipboardList className="h-5 w-5" />
               <h3>
                 {roleCurrent == "Student"
-                  ? "Lịch sử đánh giá của các mentor"
-                  : "Lịch sử đánh giá"}
+                  ? "Đánh giá của các mentor"
+                  : "Đánh giá"}
               </h3>
             </div>
             <Separator />
@@ -234,14 +246,27 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
             <div className="space-y-4">
               {requests.map((request) => {
                 const isRequestForCurrentUser = request.reviewerId == user.id;
-
+                const isMentorRequest = request.role == "Mentor";
+                const isSubMentorRequest = request.role == "SubMentor";
                 const note = request?.note;
-
+                if (
+                  version.status == TopicStatus.ManagerApproved &&
+                  request.status == TopicRequestStatus.Pending
+                ) {
+                  return;
+                }
+                // const
                 return (
                   <div key={request.id} className="border rounded-lg p-4">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                       <div className="space-y-1">
-                        <Label className="italic">Người đánh giá</Label>
+                        <Label className="italic">
+                          {isMentorRequest
+                            ? "Giảng viên hướng dẫn"
+                            : isSubMentorRequest
+                            ? "Giảng viên hướng dẫn 2"
+                            : "Quản lí đánh giá"}
+                        </Label>
                         <p className="text-sm font-medium">
                           {request.reviewer?.email || "Unknown"}
                         </p>
@@ -294,6 +319,57 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
           </div>
         )}
 
+        {requestInvitations?.length > 0 && roleCurrent == "Mentor" && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 text-lg font-semibold">
+              <ClipboardList className="h-5 w-5" />
+              <h3>Lời mời tham gia làm giảng viên 2</h3>
+            </div>
+            <Separator />
+
+            <div className="space-y-4">
+              {requestInvitations.map((request) => {
+                // const
+                return (
+                  <div key={request.id} className="border rounded-lg p-4">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="space-y-1">
+                        <Label className="italic">Giảng viên hướng dẫn</Label>
+                        <p className="text-sm font-medium">
+                          {request.reviewer?.email || "Unknown"}
+                        </p>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="italic">Trạng thái</Label>
+                        <div>
+                          <RequestStatusBadge status={request.status} />
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="italic">Ngày xử lí</Label>
+                        <p className="text-sm font-medium">
+                          {formatDate(request.processDate) == "Không có ngày"
+                            ? "Đang đợi duyệt"
+                            : formatDate(request.processDate)}
+                        </p>
+                      </div>
+
+                      {topic.ownerId != user.id && (
+                        <div className="space-y-1">
+                          <Button variant={"outline"}>Từ chối</Button>
+                          <Button variant={"outline"}>Đồng ý</Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="flex w-full justify-end">
           <Button variant={"outline"} asChild>
             <Link href={`/topic/detail/${topic.id}`}>Xem chi tiết</Link>
@@ -324,14 +400,14 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
           </div>
 
           <div className="space-y-1">
-            <Label className="italic">Người hướng dẫn</Label>
+            <Label className="italic">Giảng viên hướng dẫn</Label>
             <p className="text-sm font-medium">
               {topic.mentor?.email || "Not assigned"}
             </p>
           </div>
 
           <div className="space-y-1">
-            <Label className="italic">Người hướng dẫn 2</Label>
+            <Label className="italic">Giảng viên hướng dẫn 2</Label>
             <p className="text-sm font-medium">
               {topic.subMentor?.email || "Not assigned"}
             </p>
@@ -402,14 +478,14 @@ const StatusBadge = ({ status }: { status?: TopicStatus }) => {
     {
       [TopicStatus.Draft]: "Bản nháp",
       [TopicStatus.StudentEditing]: "Sinh viên chỉnh sửa",
-      [TopicStatus.MentorPending]: "Chờ giáo viên phản hồi",
-      [TopicStatus.MentorConsider]: "Giáo viên đang yêu cầu chỉnh sửa",
-      [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
-      [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
-      [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên quản lí",
-      [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
-      [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
-      [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
+      [TopicStatus.MentorPending]: "Chờ giảng viên phản hồi",
+      [TopicStatus.MentorConsider]: "Giảng viên đang yêu cầu chỉnh sửa",
+      [TopicStatus.MentorApproved]: "Giảng viên đã duyệt",
+      [TopicStatus.MentorRejected]: "Giảng viên đã từ chối",
+      [TopicStatus.MentorSubmitted]: "Giảng viên đã nộp lên quản lí",
+      [TopicStatus.ManagerPending]: "Đang xem xét",
+      [TopicStatus.ManagerApproved]: "Đã duyệt",
+      [TopicStatus.ManagerRejected]: "Đã từ chối",
       // Thêm các trạng thái khác nếu cần
     }[status] || "Khác";
 

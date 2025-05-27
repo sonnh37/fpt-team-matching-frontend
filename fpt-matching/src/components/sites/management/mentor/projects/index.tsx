@@ -29,8 +29,8 @@ const defaultSchema = z.object({
 });
 
 const roles_options = [
-  { label: "Người hướng dẫn", value: "Mentor" },
-  { label: "Người hướng dẫn 2", value: "SubMentor" },
+  { label: "Giảng viên hướng dẫn", value: "Mentor" },
+  { label: "Giảng viên hướng dẫn 2", value: "SubMentor" },
 ];
 //#endregion
 export default function ProjectTable() {

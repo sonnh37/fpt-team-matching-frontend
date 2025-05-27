@@ -18,6 +18,7 @@ import {
   TopicSubmitForMentorByStudentCommand,
 } from "@/types/models/commands/topic/topic-student-create-pending-command";
 import { TopicUpdateAsProjectCommand } from "@/types/models/commands/topic/topic-update-as-project-command";
+import { TopicCreateOrUpdateDraftCommand } from "@/types/models/commands/topic/topic-create-or-update-draft";
 
 class TopicService extends BaseService<Topic> {
   constructor() {
@@ -169,7 +170,7 @@ class TopicService extends BaseService<Topic> {
       .catch((error) => this.handleError(error)); // Xử lý lỗi
   };
 
-   public updateTopicAsProject = (
+  public updateTopicAsProject = (
     command: TopicUpdateAsProjectCommand
   ): Promise<BusinessResult<Topic>> => {
     return axiosInstance
@@ -203,6 +204,34 @@ class TopicService extends BaseService<Topic> {
     );
     return response.data;
   }
+
+  public createDraft = async (
+    command: TopicCreateOrUpdateDraftCommand
+  ): Promise<BusinessResult<Topic>> => {
+    try {
+      const response = await axiosInstance.post<BusinessResult<Topic>>(
+        `${this.endpoint}/create-draft`,
+        command
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  };
+
+  public updateDraft = async (
+    command: TopicCreateOrUpdateDraftCommand
+  ): Promise<BusinessResult<Topic>> => {
+    try {
+      const response = await axiosInstance.put<BusinessResult<Topic>>(
+        `${this.endpoint}/update-draft`,
+        command
+      );
+      return response.data;
+    } catch (error) {
+      return this.handleError(error);
+    }
+  };
 }
 
 export const topicService = new TopicService();

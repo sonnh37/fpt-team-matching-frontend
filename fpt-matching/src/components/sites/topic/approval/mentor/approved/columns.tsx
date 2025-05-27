@@ -159,7 +159,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
           {topic && <TopicDetailForm topicId={topic.id} />}
           <DialogFooter>
-            {isMentorOfTopic && (
+            {/* {isMentorOfTopic && (
               <Button
                 variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 size="sm"
@@ -176,7 +176,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                   ? "Đã nộp"
                   : "Nộp"}
               </Button>
-            )}
+            )} */}
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -63,7 +63,7 @@ export default function Page() {
                         <TableHead className="w-[100px]">Số thứ tự</TableHead>
                         <TableHead className="">Tên nhóm</TableHead>
                         <TableHead className="">Chuyên ngành</TableHead>
-                        {/* <TableHead className="">Người hướng dẫn</TableHead> */}
+                        {/* <TableHead className="">Giảng viên hướng dẫn</TableHead> */}
                         <TableHead>Tên thành viên</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Đánh giá</TableHead>

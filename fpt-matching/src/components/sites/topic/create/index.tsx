@@ -449,8 +449,8 @@ export const CreateProjectForm = () => {
         isExistedTeam: false,
       };
       const res = isStudent
-        ? await topicService.create(commandStudent)
-        : await topicService.create(commandLecture);
+        ? await topicService.createDraft(commandStudent)
+        : await topicService.createDraft(commandLecture);
 
       // Cập nhật trạng thái loading
 

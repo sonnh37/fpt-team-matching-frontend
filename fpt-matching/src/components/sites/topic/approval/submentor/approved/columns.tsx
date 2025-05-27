@@ -127,8 +127,6 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       request.status != TopicRequestStatus.Approved
   );
 
-  console.log("check_hasSubmentorPendingRequest", hasSubmentorPendingRequest)
-
   const handleSubmit = async () => {
     try {
       if (!topic?.id) {
@@ -162,7 +160,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         </DialogTrigger>
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
           {topic && <TopicDetailForm topicId={topic.id} />}
-          <DialogFooter>
+          {/* <DialogFooter>
             {isMentorOfTopic && (
               <Button
                 variant={`${hasCouncilRequests ? "secondary" : "default"}`}
@@ -173,7 +171,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 {hasCouncilRequests ? "Đã nộp" : "Nộp"}
               </Button>
             )}
-          </DialogFooter>
+          </DialogFooter> */}
         </DialogContent>
       </Dialog>
     </div>

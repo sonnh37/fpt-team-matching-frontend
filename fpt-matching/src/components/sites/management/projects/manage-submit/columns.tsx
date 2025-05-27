@@ -71,7 +71,7 @@ export const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "mentor",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tên người hướng dẫn 1" />
+      <DataTableColumnHeader column={column} title="Tên giảng viên hướng dẫn 1" />
     ),
     cell: ({ row }) => {
       const project = row.original;
@@ -82,7 +82,7 @@ export const columns: ColumnDef<Project>[] = [
   {
     accessorKey: "subMentor",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tên người hướng dẫn 2" />
+      <DataTableColumnHeader column={column} title="Tên giảng viên hướng dẫn 2" />
     ),
     cell: ({ row }) => {
       const project = row.original;
