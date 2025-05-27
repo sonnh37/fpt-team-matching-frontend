@@ -47,6 +47,7 @@ import { TopicRequestForSubMentorCommand } from "@/types/models/commands/topic-r
 import { topicRequestService } from "@/services/topic-request-service";
 import { toast } from "sonner";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
+import { TopicRequestForRespondCommand } from "@/types/models/commands/topic-requests/topic-request-for-respond-command";
 
 interface TopicDetailFormProps {
   topicId?: string;
@@ -59,6 +60,8 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
   const [selectedSubMentor, setSelectedSubMentor] = useState<string | null>(
     null
   );
+
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const queryClient = useQueryClient();
 
@@ -116,7 +119,7 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
         return;
       }
 
-    //  queryClient.refetchQueries({ queryKey: ["data"] });
+      //  queryClient.refetchQueries({ queryKey: ["data"] });
       queryClient.refetchQueries({ queryKey: ["users", topicId] });
       queryClient.refetchQueries({ queryKey: ["topicDetail", topicId] });
 
@@ -413,9 +416,34 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
                       </div>
 
                       {topic.ownerId != user.id && (
-                        <div className="space-y-1">
-                          <Button variant={"outline"}>Từ chối</Button>
-                          <Button variant={"outline"}>Đồng ý</Button>
+                        <div className="flex gap-2 justify-center">
+                          <Button
+                            type="button"
+                            onClick={() =>
+                              handleConfirmSubMentorBySubMentor(
+                                TopicRequestStatus.Rejected,
+                                request.id
+                              )
+                            }
+                            disabled={isSubmitting}
+                            variant={"outline"}
+                          >
+                            Từ chối
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={"outline"}
+                            onClick={() =>
+                              handleConfirmSubMentorBySubMentor(
+                                TopicRequestStatus.Approved,
+                                request.id
+                              )
+                            }
+                            disabled={isSubmitting}
+                            className="border-primary text-primary hover:text-primary"
+                          >
+                            Đồng ý
+                          </Button>
                         </div>
                       )}
                     </div>
@@ -433,6 +461,38 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
         </div>
       </div>
     );
+  };
+
+  const handleConfirmSubMentorBySubMentor = async (
+    status: TopicRequestStatus,
+    topicRequestId?: string
+  ) => {
+    setIsSubmitting(true);
+    try {
+      // Call your API to request the sub-mentor
+      const command: TopicRequestForRespondCommand = {
+        id: topicRequestId,
+        status: status,
+      };
+      const res = await topicRequestService.subMentorResponseRequestOfMentor(
+        command
+      );
+
+      if (res.status !== 1) {
+        toast.error(res.message);
+        return;
+      }
+
+      //  queryClient.refetchQueries({ queryKey: ["data"] });
+      queryClient.refetchQueries({ queryKey: ["users", topicId] });
+      queryClient.refetchQueries({ queryKey: ["topicDetail", topicId] });
+
+      toast.success("Đã gửi phản hồi thành công");
+    } catch (error) {
+      console.error("Error requesting sub-mentor:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

@@ -1,7 +1,7 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { mentortopicrequestService } from "@/services/mentor-topic-request-service";
-import { MentorTopicRequestGetAllQuery } from "@/types/models/queries/mentor-idea-requests/mentor-idea-request-get-all-query";
+import { topicService } from "@/services/topic-service";
+import { TopicGetListInviteForSubmentorQuery } from "@/types/models/queries/topics/topic-get-list-invite-for-submentor-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
@@ -10,7 +10,7 @@ import {
   PaginationState,
   SortingState,
   useReactTable,
-  VisibilityState
+  VisibilityState,
 } from "@tanstack/react-table";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
@@ -22,7 +22,7 @@ import { columns } from "./columns";
 //#region INPUT
 const defaultSchema = z.object({});
 //#endregion
-export default function InvitationReceiveToGetTopicByStudentTable() {
+export default function TopicInvitationForSubMentorTable() {
   const searchParams = useSearchParams();
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -54,7 +54,7 @@ export default function InvitationReceiveToGetTopicByStudentTable() {
 
   // default field in table
   const queryParams = useMemo(() => {
-    const params: MentorTopicRequestGetAllQuery = useQueryParams(
+    const params: TopicGetListInviteForSubmentorQuery = useQueryParams(
       inputFields,
       columnFilters,
       pagination,
@@ -75,8 +75,7 @@ export default function InvitationReceiveToGetTopicByStudentTable() {
 
   const { data, isFetching, error, refetch } = useQuery({
     queryKey: ["data", queryParams],
-    queryFn: () =>
-      mentortopicrequestService.getMentorMentorTopicRequests(queryParams),
+    queryFn: () => topicService.getTopicInvitesForSubMentor(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

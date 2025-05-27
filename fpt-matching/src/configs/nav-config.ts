@@ -123,6 +123,12 @@ export const NAV_CONFIG = {
       roles: ["Mentor"],
     },
     {
+      title: "Lời mời làm GVHD 2",
+      url: "/mentor-invitations",
+      icon: UserPlus,
+      roles: ["Mentor"],
+    },
+    {
       title: "Danh sách giảng viên",
       url: "/supervisors",
       icon: UsersRound,

@@ -56,6 +56,24 @@ class TopicService extends BaseService<Topic> {
       });
   };
 
+
+  public getTopicInvitesForSubMentor = (
+    query?: TopicGetListForMentorQuery
+  ): Promise<BusinessResult<QueryResult<Topic>>> => {
+    const cleanedQuery = cleanQueryParams(query);
+
+    return axiosInstance
+      .get<BusinessResult<QueryResult<Topic>>>(
+        `${this.endpoint}/me/submentor-topic-invites?${cleanedQuery}`
+      )
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        return this.handleError(error);
+      });
+  };
+
   public createTopicByStudent = (
     command: TopicCreateCommand
   ): Promise<BusinessResult<Topic>> => {
