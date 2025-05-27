@@ -212,7 +212,7 @@ const InviteUsersForm = () => {
           <Label className="text-base font-medium">Thành viên hiện tại</Label>
           <Badge variant="outline" className="px-2 py-0.5">
             {sortedMembers?.length}
-            {res_current_semester?.data?.maxTeamSize}
+            {/*{res_current_semester?.data?.maxTeamSize}*/}
           </Badge>
         </div>
 

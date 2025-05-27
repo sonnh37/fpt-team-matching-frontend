@@ -91,6 +91,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
           startDate: new Date(initialData.startDate ?? new Date()),
           endDate: new Date(initialData.endDate ?? new Date()),
           publicTopicDate: new Date(initialData.publicTopicDate ?? new Date()),
+          onGoingDate: new Date(initialData.onGoingDate ?? new Date()),
         }
       : {},
   });

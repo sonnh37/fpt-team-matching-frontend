@@ -245,7 +245,7 @@ export default function StageTopicTable() {
         <div className="">
           <div className="space-y-4 mx-auto">
             <Button disabled={ semesterId != currentSemester.id} type="button" onClick={handleCreateClick} variant="default">
-              Tạo mới đợt
+              Tạo đợt duyệt
             </Button>
 
             <DataTableComponent
