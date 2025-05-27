@@ -29,7 +29,7 @@ import { useState } from "react";
 import { formatDate, getFileNameFromUrl, getPreviewUrl } from "@/lib/utils";
 import { format } from "date-fns";
 import { TopicVersion } from "@/types/topic-version";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { topicService } from "@/services/topic-service";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
@@ -39,6 +39,14 @@ import { TypographyP } from "@/components/_common/typography/typography-p";
 import { TopicRequest } from "@/types/topic-request";
 import { TopicVersionRequestStatus } from "@/types/enums/topic-version-request";
 import { TopicRequestStatus } from "@/types/enums/topic-request";
+import { User } from "@/types/user";
+import { userService } from "@/services/user-service";
+import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
+import { UserGetAllInSemesterQuery } from "@/types/models/queries/users/user-get-all-in-semester-query";
+import { TopicRequestForSubMentorCommand } from "@/types/models/commands/topic-requests/topic-request-for-submentor-command";
+import { topicRequestService } from "@/services/topic-request-service";
+import { toast } from "sonner";
+import { TypographyMuted } from "@/components/_common/typography/typography-muted";
 
 interface TopicDetailFormProps {
   topicId?: string;
@@ -47,6 +55,17 @@ interface TopicDetailFormProps {
 export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
   const roleCurrent = useCurrentRole();
   const user = useSelectorUser();
+  const [availableSubMentors, setAvailableSubMentors] = useState<User[]>([]);
+  const [selectedSubMentor, setSelectedSubMentor] = useState<string | null>(
+    null
+  );
+
+  const queryClient = useQueryClient();
+
+  const queryUsers: UserGetAllInSemesterQuery = {
+    isPagination: false,
+    role: "Mentor",
+  };
   if (!user) return;
   const {
     data: topic,
@@ -58,25 +77,62 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
       await topicService.getById(topicId).then((res) => res.data),
   });
 
-  if (isLoading) return <LoadingComponent />;
-  if (error) return <ErrorSystem />;
+  const {
+    data: res_users,
+    isLoading: isUsersLoading,
+    error: usersError,
+  } = useQuery({
+    queryKey: ["users", topicId],
+    queryFn: async () => await userService.getUsersInSemester(queryUsers),
+  });
+
+  if (isLoading || isUsersLoading) return <LoadingComponent />;
+  if (error || usersError) return <ErrorSystem />;
   if (!topic) return <div>Topic not found</div>;
+  const users = res_users?.data?.results?.filter((m) => m.id != user.id) || [];
+  const handleSelectSubMentor = (mentorId: string) => {
+    setSelectedSubMentor(mentorId);
+  };
 
-  // const highestVersion =
-  //   topic.topicVersions?.length > 0
-  //     ? topic.topicVersions.reduce((prev, current) =>
-  //         (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //       )
-  //     : undefined;
+  const isPendingInviteTopicRequestForMentor = topic.topicRequests.some(
+    (m) => m.role === "SubMentor" && m.status === TopicRequestStatus.Pending
+  );
 
-  // Initialize selectedVersion with highestVersion if not set
-  // if (!selectedVersion && highestVersion) {
-  //   setSelectedVersion(highestVersion);
-  // }
-  const resultDate = topic.stageTopic?.resultDate
-    ? new Date(topic.stageTopic.resultDate)
-    : null;
+  const handleConfirmSubMentor = async () => {
+    if (!selectedSubMentor) return;
 
+    try {
+      // Call your API to request the sub-mentor
+      const command: TopicRequestForSubMentorCommand = {
+        topicId: topicId,
+        reviewerId: selectedSubMentor,
+      };
+      const res = await topicRequestService.sendRequestToSubMentorByMentor(
+        command
+      );
+
+      if (res.status !== 1) {
+        toast.error(res.message);
+        return;
+      }
+
+    //  queryClient.refetchQueries({ queryKey: ["data"] });
+      queryClient.refetchQueries({ queryKey: ["users", topicId] });
+      queryClient.refetchQueries({ queryKey: ["topicDetail", topicId] });
+
+      toast.success("Đã gửi lời mời giảng viên 2 thành công");
+    } catch (error) {
+      console.error("Error requesting sub-mentor:", error);
+    }
+  };
+
+  const handleRemoveSubMentor = async () => {
+    try {
+      setSelectedSubMentor(null);
+    } catch (error) {
+      console.error("Error requesting sub-mentor:", error);
+    }
+  };
   const renderVersionInfo = (version?: Topic) => {
     if (!version) {
       return (
@@ -408,9 +464,73 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
 
           <div className="space-y-1">
             <Label className="italic">Giảng viên hướng dẫn 2</Label>
-            <p className="text-sm font-medium">
-              {topic.subMentor?.email || "Not assigned"}
-            </p>
+            {topic.status === TopicStatus.ManagerApproved ? (
+              isPendingInviteTopicRequestForMentor ? (
+                <div className="">
+                  <p className="text-sm font-medium">
+                    {topic.topicRequests?.find((r) => r.role === "SubMentor")
+                      ?.reviewer?.email || "Không xác định"}
+                  </p>
+                  <TypographyMuted>(Đang chờ phản hồi)</TypographyMuted>
+                </div>
+              ) : topic.subMentor ? (
+                <div className="">
+                  <p className="text-sm font-medium">{topic.subMentor.email}</p>
+                  {isPendingInviteTopicRequestForMentor && (
+                    <TypographyMuted>(Đang chờ phản hồi)</TypographyMuted>
+                  )}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Select
+                    onValueChange={(value) => handleSelectSubMentor(value)}
+                    value={selectedSubMentor ?? undefined} // Sử dụng nullish coalescing
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Thêm giảng viên" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {users.map((mentor) => (
+                        <SelectItem key={mentor.id} value={mentor.id}>
+                          {mentor.email}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {selectedSubMentor && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-red-500 hover:bg-red-50"
+                        onClick={() => handleRemoveSubMentor()}
+                      >
+                        ×
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-6 w-6 text-green-500 hover:bg-green-50"
+                        onClick={() => handleConfirmSubMentor()}
+                      >
+                        ✓
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )
+            ) : // Trường hợp status khác ManagerApproved
+            isPendingInviteTopicRequestForMentor ? (
+              <div className="">
+                <p className="text-sm font-medium">
+                  {topic.topicRequests?.find((r) => r.role === "SubMentor")
+                    ?.reviewer?.email || "Không xác định"}
+                </p>
+                <TypographyMuted>(Đang chờ phản hồi)</TypographyMuted>
+              </div>
+            ) : (
+              <p className="text-sm font-medium">Không có</p>
+            )}
           </div>
 
           <div className="space-y-1">
@@ -420,12 +540,12 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
             </p>
           </div>
 
-          {/* <div className="space-y-1">
-            <Label className="italic">Existing Team</Label>
+          <div className="space-y-1">
+            <Label className="italic">Nhóm</Label>
             <p className="text-sm font-medium">
-              {topic.isExistedTeam ? "Yes" : "No"}
+              {topic.isExistedTeam ? "Đã có nhóm" : "Chưa có nhóm"}
             </p>
-          </div> */}
+          </div>
 
           <div className="space-y-1">
             <Label className="italic">Chủ đề doanh nghiệp</Label>

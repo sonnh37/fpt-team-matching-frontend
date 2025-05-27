@@ -67,6 +67,7 @@ import {
 import { z } from "zod";
 import { useState } from "react";
 import { TopicApprovalStatus } from "@/app/(client)/(dashboard)/topic/idea-is-exist/page";
+import { UserGetAllInSemesterQuery } from "@/types/models/queries/users/user-get-all-in-semester-query";
 // Các đuôi file cho phép
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
@@ -187,14 +188,14 @@ export const CreateProjectForm = () => {
     refetchOnWindowFocus: false,
   });
 
-  const query: UserGetAllQuery = {
+  const query: UserGetAllInSemesterQuery = {
     role: "Mentor",
     isPagination: false,
   };
 
   const { data: usersData, isLoading: isLoadingUsers } = useQuery({
     queryKey: ["getUsersByRole", query],
-    queryFn: () => userService.getAll(query),
+    queryFn: () => userService.getUsersInSemester(query),
     refetchOnWindowFocus: false,
   });
 
