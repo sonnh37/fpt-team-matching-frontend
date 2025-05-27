@@ -44,7 +44,7 @@ import {
   useSearchParams,
 } from "next/navigation";
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
+import {Dispatch, SetStateAction, useEffect, useMemo, useState} from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -68,6 +68,7 @@ import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-gene
 import { StageTopicFormDialog } from "./create-or-update-dialog";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import {useCurrentSemester} from "@/hooks/use-current-role";
+import {PublicResultDialog} from "@/components/sites/management/semesters/stage-idea/public-result-dialog";
 //#region INPUT
 const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
@@ -76,11 +77,13 @@ const defaultSchema = z.object({
 interface ActionsProps {
   row: Row<StageTopic>;
   onEdit: (stageTopic: StageTopic) => void; // Thêm callback để mở dialog
+  setOpenPublicStage: Dispatch<SetStateAction<boolean>>
+  openPublicStage: boolean,
+  setSelectedStageTopic: Dispatch<SetStateAction<StageTopic | null>>
 }
 
-const Actions: React.FC<ActionsProps> = ({ row, onEdit }) => {
+const Actions: React.FC<ActionsProps> = ({ row, onEdit, setOpenPublicStage, setSelectedStageTopic }) => {
   const model = row.original;
-  const [showDeleteTaskDialog, setShowDeleteTaskDialog] = useState(false);
 
   return (
     <>
@@ -99,20 +102,14 @@ const Actions: React.FC<ActionsProps> = ({ row, onEdit }) => {
             {/* Mở form Edit */}
             Chỉnh sửa
           </DropdownMenuItem>
-          {/*<DropdownMenuItem onSelect={() => setShowDeleteTaskDialog(true)}>*/}
-          {/*  Delete*/}
-          {/*  <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>*/}
-          {/*</DropdownMenuItem>*/}
+          <DropdownMenuItem onSelect={() => {
+            setOpenPublicStage(true)
+            setSelectedStageTopic(model);
+          }}>
+            Công khai đợt duyệt
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <DeleteBaseEntitysDialog
-        deleteById={stagetopicService.delete}
-        open={showDeleteTaskDialog}
-        onOpenChange={setShowDeleteTaskDialog}
-        list={[model]}
-        showTrigger={false}
-        onSuccess={() => row.toggleSelected(false)}
-      />
     </>
   );
 };
@@ -122,7 +119,8 @@ export default function StageTopicTable() {
   const searchParams = useSearchParams();
   const semesterId = searchParams.get("semesterId");
   const currentSemester = useCurrentSemester().currentSemester
-
+  const [openPublicStage, setOpenPublicStage] = React.useState<boolean>(false)
+  const [selectedStageTopic, setSelectedStageTopic] = React.useState<StageTopic | null>(null)
   const filterEnums: FilterEnum[] = [
     { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
   ];
@@ -202,7 +200,7 @@ export default function StageTopicTable() {
       accessorKey: "actions",
       header: "Thao tác",
       cell: ({ row }) => {
-        return <Actions row={row} onEdit={handleEdit} />;
+        return currentSemester?.id == semesterId && <Actions setSelectedStageTopic={setSelectedStageTopic} setOpenPublicStage={setOpenPublicStage} openPublicStage={openPublicStage} row={row} onEdit={handleEdit} />;
       },
     },
   ];
@@ -266,6 +264,8 @@ export default function StageTopicTable() {
           stageTopic={currentStageTopic}
           onSuccess={handleSuccess}
         />
+        <PublicResultDialog openPublicStage={openPublicStage} setOpenPublicStage={setOpenPublicStage} stageTopicId={selectedStageTopic?.id ?? ""}/>
+
       </div>
     </>
   );
