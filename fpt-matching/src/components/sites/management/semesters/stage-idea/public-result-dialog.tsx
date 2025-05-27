@@ -35,7 +35,7 @@ export function PublicResultDialog({stageTopicId, openPublicStage, setOpenPublic
     return (
         <Dialog open={openPublicStage} onOpenChange={setOpenPublicStage}>
             <DialogTrigger asChild>
-                <Button variant="outline">Edit Profile</Button>
+                {/*<Button variant="outline">Edit Profile</Button>*/}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
