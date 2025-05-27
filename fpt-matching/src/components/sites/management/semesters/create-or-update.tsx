@@ -282,23 +282,23 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                           <FormInputDateTimePicker
                               form={form}
                               name="startDate"
-                              label="Ngày bắt đầu"
+                              label="Ngày bắt đầu dự kiến"
                           />
 
                           <FormInputDateTimePicker
                               form={form}
                               name="endDate"
-                              label="Ngày kết thúc"
+                              label="Ngày kết thúc dự kiến"
                           />
                           <FormInputDateTimePicker
                               form={form}
                               name="publicTopicDate"
-                              label="Công bố đề tài"
+                              label="Ngày công bố đề tài dự kiến"
                           />
                           <FormInputDateTimePicker
                               form={form}
                               name="onGoingDate"
-                              label="Ngày diễn ra"
+                              label="Ngày khoá nhóm dự kiến"
                           />
                         </div>
                       </CardContent>
