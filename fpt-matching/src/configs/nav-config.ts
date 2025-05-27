@@ -180,17 +180,18 @@ export const NAV_CONFIG = {
       roles: ["Manager"],
       items: [
         {
+          url: "/management/projects",
+          title: "Danh sách nhóm",
+          icon: Briefcase,
+          roles: ["Manager"],
+        },
+        {
           url: "/management/projects/manage-submit",
           title: "Các nhóm đã submit",
           icon: Briefcase,
           roles: ["Manager"],
         },
-        {
-          url: "/management/projects",
-          title: "Xem nhóm",
-          icon: Briefcase,
-          roles: ["Manager"],
-        },
+        
         {
           url: "/management/projects/add-to-project",
           title: "Thêm sinh viên vào nhóm",

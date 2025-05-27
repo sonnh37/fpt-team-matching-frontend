@@ -1,6 +1,7 @@
 "use client";
 
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
+import { TypographyP } from "@/components/_common/typography/typography-p";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,10 +38,15 @@ export const columns: ColumnDef<Project>[] = [
     ),
   },
   {
-    accessorKey: "topic.topicVersion.englishName",
+    accessorKey: "topic.vietNameseName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tên đề tài" />
     ),
+    cell: ({ row }) => {
+      const topicName =
+        row.original.topic?.vietNameseName || "Chưa có tên đề tài";
+      return <TypographyP>{topicName}</TypographyP>;
+    },
   },
 
   {
@@ -56,18 +62,25 @@ export const columns: ColumnDef<Project>[] = [
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as ProjectStatus;
-      
+
       // Map status to Vietnamese text
-      const statusText = {
-        [ProjectStatus.Pending]: "Đang chờ",
-        [ProjectStatus.InProgress]: "Đang thực hiện",
-        [ProjectStatus.Completed]: "Hoàn thành",
-        [ProjectStatus.Canceled]: "Đã hủy",
-        // Add other statuses if needed
-      }[status] || "Khác";
-  
-      let badgeVariant: "secondary" | "destructive" | "default" | "outline" | null = "default";
-  
+      const statusText =
+        {
+          [ProjectStatus.Forming]: "Đang hình thành",
+          [ProjectStatus.Pending]: "Đang chờ",
+          [ProjectStatus.InProgress]: "Đang thực hiện",
+          [ProjectStatus.Completed]: "Hoàn thành",
+          [ProjectStatus.Canceled]: "Đã hủy",
+          // Add other statuses if needed
+        }[status] || "Khác";
+
+      let badgeVariant:
+        | "secondary"
+        | "destructive"
+        | "default"
+        | "outline"
+        | null = "default";
+
       switch (status) {
         case ProjectStatus.Pending:
           badgeVariant = "secondary";
@@ -84,7 +97,7 @@ export const columns: ColumnDef<Project>[] = [
         default:
           badgeVariant = "outline";
       }
-  
+
       return <Badge variant={badgeVariant}>{statusText}</Badge>;
     },
     filterFn: (row, id, value) => {
@@ -138,7 +151,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Các thao tác</DropdownMenuLabel>
-          
+
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleViewClick}>
             Xem chi tiết
