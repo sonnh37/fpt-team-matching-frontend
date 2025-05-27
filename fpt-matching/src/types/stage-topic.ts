@@ -8,7 +8,7 @@ export interface StageTopic extends BaseEntity {
   endDate: Date | string;
   resultDate: Date | string;
   stageNumber: number;
-  numberReviewer?: number;
+  // numberReviewer?: number;
   semester?: Semester;
   topics: Topic[];
 }

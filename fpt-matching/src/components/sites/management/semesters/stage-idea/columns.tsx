@@ -33,7 +33,7 @@ export const columns: ColumnDef<StageTopic>[] = [
   {
     accessorKey: "startDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Ngày bắt đầu" />
+      <DataTableColumnHeader column={column} title="Ngày bắt đầu dự kiến" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("startDate"));
@@ -43,7 +43,7 @@ export const columns: ColumnDef<StageTopic>[] = [
   {
     accessorKey: "endDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Ngày kết thúc" />
+      <DataTableColumnHeader column={column} title="Ngày kết thúc dự kiến" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("endDate"));
@@ -53,7 +53,7 @@ export const columns: ColumnDef<StageTopic>[] = [
   {
     accessorKey: "resultDate",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Ngày kết quả" />
+      <DataTableColumnHeader column={column} title="Ngày kết quả dự kiến" />
     ),
     cell: ({ row }) => {
       const date = new Date(row.getValue("resultDate"));

@@ -28,7 +28,7 @@ import {
   FormInputDateTimePicker,
   FormInputNumber,
 } from "@/lib/form-custom-shadcn";
-import { useParams } from "next/navigation";
+import {useParams, useSearchParams} from "next/navigation";
 import { StageTopicUpdateCommand } from "@/types/models/commands/stage-topics/stage-topic-update-command";
 import { StageTopicCreateCommand } from "@/types/models/commands/stage-topics/stage-topic-create-command";
 import { useQueryClient } from "@tanstack/react-query";
@@ -38,7 +38,6 @@ import { useEffect } from "react";
 const formSchema = z.object({
   id: z.string().optional(),
   stageNumber: z.number().min(1, "Stage number is required"),
-  numberReviewer: z.number().min(2, "Number review is required"),
   semesterId: z.string(),
   startDate: z.date(),
   endDate: z.date(),
@@ -59,25 +58,21 @@ export function StageTopicFormDialog({
   onSuccess,
 }: StageTopicFormDialogProps) {
   const queryClient = useQueryClient();
-  const params = useParams();
+  const params = useSearchParams();
 
   const getDefaultValues = () => {
     if (stageTopic) {
       return {
         ...stageTopic,
-        startDate: stageTopic.startDate
-          ? new Date(stageTopic.startDate)
-          : new Date(),
-        endDate: stageTopic.endDate ? new Date(stageTopic.endDate) : new Date(),
-        resultDate: stageTopic.resultDate
-          ? new Date(stageTopic.resultDate)
-          : new Date(),
-          numberReviewer: stageTopic.numberReviewer ?? 2,
+        startDate: stageTopic?.startDate ? new Date(stageTopic.startDate) : new Date(),
+        endDate: stageTopic?.endDate ? new Date(stageTopic.endDate) : new Date(),
+        resultDate: stageTopic?.resultDate ? new Date(stageTopic.resultDate) : new Date(),
+        semesterId: params.get("semesterId") as string,
       };
     }
     return {
-      semesterId: params.semesterId as string,
-      numberReviewer: 2,
+      semesterId: params.get("semesterId") as string,
+      // numberReviewer: 2,
     };
   };
 
@@ -109,7 +104,7 @@ export function StageTopicFormDialog({
       onOpenChange(false);
       onSuccess?.();
     } catch (error) {
-      toast.error(error as string);
+      toast.error((error as Error).message);
     }
   };
 
@@ -136,13 +131,13 @@ export function StageTopicFormDialog({
               decimalScale={0}
               min={1}
             />
-            <FormInputNumber
-              form={form}
-              name="numberReviewer"
-              label="Số lượng người đánh giá"
-              decimalScale={0}
-              min={2}
-            />
+            {/*<FormInputNumber*/}
+            {/*  form={form}*/}
+            {/*  name="numberReviewer"*/}
+            {/*  label="Số lượng người đánh giá"*/}
+            {/*  decimalScale={0}*/}
+            {/*  min={2}*/}
+            {/*/>*/}
             <FormInputDateTimePicker form={form} name="startDate" label="Ngày bắt đầu" />
             <FormInputDateTimePicker form={form} name="endDate" label="Ngày kết thúc" />
             <FormInputDateTimePicker form={form} name="resultDate" label="Ngày có kết quả" />
