@@ -1,55 +1,13 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import {
   Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
 } from "@/components/ui/card";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import { useCurrentRole } from "@/hooks/use-current-role";
-import { Topic } from "@/types/topic";
-import Link from "next/link";
-import {
-  FormInput,
-  FormInputTextArea,
-  FormSwitch,
-} from "@/lib/form-custom-shadcn";
-import { toast } from "sonner";
-import { userService } from "@/services/user-service";
-import { fileUploadService } from "@/services/file-upload-service";
-import { AlertCircle, FileText, Send } from "lucide-react";
-import { useSelectorUser } from "@/hooks/use-auth";
-import { TopicCreateCommand } from "@/types/models/commands/topic/topic-create-command";
-import { topicService } from "@/services/topic-service";
-import { TopicUpdateCommand } from "@/types/models/commands/topic/topic-update-command";
-import {
-  TopicLecturerCreatePendingCommand,
-  TopicSubmitForMentorByStudentCommand,
-} from "@/types/models/commands/topic/topic-student-create-pending-command";
-import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -57,10 +15,49 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useSelectorUser } from "@/hooks/use-auth";
+import { useCurrentRole } from "@/hooks/use-current-role";
+import {
+  FormInput,
+  FormInputTextArea,
+  FormSwitch,
+} from "@/lib/form-custom-shadcn";
+import { fileUploadService } from "@/services/file-upload-service";
+import { topicService } from "@/services/topic-service";
+import { userService } from "@/services/user-service";
+import {
+  TopicLecturerCreatePendingCommand,
+  TopicSubmitForMentorByStudentCommand,
+} from "@/types/models/commands/topic/topic-student-create-pending-command";
+import { TopicUpdateCommand } from "@/types/models/commands/topic/topic-update-command";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
+import { Topic } from "@/types/topic";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { AlertCircle, FileText, Send } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
 
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
@@ -85,15 +82,16 @@ interface TopicUpdateFormProps {
 export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
   const queryClient = useQueryClient();
 
+  const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [openSubmitDialog, setOpenSubmitDialog] = useState(false);
-  const [openMentorDialog, setOpenMentorDialog] = useState(false);
+  const [dialogAction, setDialogAction] = useState<"submit" | "update">(
+    "submit"
+  );
   const role = useCurrentRole();
   const user = useSelectorUser();
   if (!user) return;
   const isLecturer = role === "Mentor";
   const isStudent = role === "Student";
-  const isEnterpriseTopic = topic.isEnterpriseTopic;
   const query: UserGetAllQuery = {
     role: "Mentor",
     isPagination: false,
@@ -124,13 +122,13 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
     },
   });
 
-  async function handleSubmitConfirm(values: z.infer<typeof formSchema>) {
-    setOpenSubmitDialog(false);
+  const isEnterpriseTopic = form.watch("isEnterpriseTopic");
+
+  async function handleUpdate(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
     try {
       // Hiển thị loading khi bắt đầu xử lý
-      const loadingToastId = toast.loading("Đang xử lý yêu cầu...", {
-        duration: Infinity,
-      });
+
 
       let fileUrl = topic.fileUrl; // Giả sử nếu fileschema là string (URL cũ)
 
@@ -141,7 +139,6 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
           "Topic"
         );
         if (fileUpload.status != 1) {
-          toast.dismiss(loadingToastId);
           return toast.error(fileUpload.message);
         }
         fileUrl = fileUpload.data;
@@ -157,8 +154,6 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
       // Create topic based on user role
       const res = await topicService.update(command);
 
-      // Cập nhật trạng thái loading
-      toast.dismiss(loadingToastId);
 
       if (res.status == 1) {
         toast.success(res.message);
@@ -171,33 +166,30 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
       toast.error(res.message);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi");
+    } finally {
+      setIsSubmitting(false); 
     }
   }
 
   async function handleSubmitToMentorConfirm() {
-    setOpenMentorDialog(false);
     setIsSubmitting(true);
     try {
       const values = form.getValues();
-      const loadingToastId = toast.loading("Đang gửi ý tưởng cho mentor...");
 
       if (!skipCheckAndSelectUI) {
         // Kiểm tra nếu là student và chưa chọn mentor
         if (isStudent && !values.mentorId) {
-          setIsSubmitting(false);
-          setOpenMentorDialog(true);
           return toast.error("Vui lòng chọn giảng viên hướng dẫn");
         }
 
         // Check mentor availability
         const mentorCheck =
           await userService.checkMentorAndSubMentorSlotAvailability({
-            mentorId: isStudent ? (values.mentorId ?? undefined) : topic.ownerId,
+            mentorId: isStudent ? values.mentorId ?? undefined : topic.ownerId,
             subMentorId: values.subMentorId ?? undefined,
           });
 
         if (!mentorCheck.data) {
-          toast.dismiss(loadingToastId);
           return toast.error(mentorCheck.message);
         }
       }
@@ -225,8 +217,6 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
         res = await topicService.submitTopicOfLecturerByLecturer(command);
       }
 
-      toast.dismiss(loadingToastId);
-
       if (res?.status === 1) {
         toast.success(res.message);
         onSuccess?.();
@@ -242,31 +232,49 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
   }
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit((values) => setOpenSubmitDialog(true))}
-        className="space-y-8 p-1 md:p-6 flex justify-center"
-      >
+      <form className="space-y-8 p-1 md:p-6 flex justify-center">
         {/* Dialog xác nhận cập nhật ý tưởng */}
-        <Dialog open={openSubmitDialog} onOpenChange={setOpenSubmitDialog}>
+        <Dialog
+          open={isConfirmDialogOpen}
+          onOpenChange={setIsConfirmDialogOpen}
+        >
           <DialogContent>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <AlertCircle className="h-5 w-5 text-yellow-500" />
-                <span>Xác nhận cập nhật ý tưởng</span>
+                <span>Xác nhận gửi ý tưởng</span>
               </DialogTitle>
               <DialogDescription className="pt-2">
-                Bạn có chắc chắn muốn cập nhật ý tưởng này không?
+                Bạn có chắc chắn muốn gửi ý tưởng này không?
+                {dialogAction === "submit" && (
+                  <>
+                    <br />
+                    ⚠️ Lưu ý quan trọng: Khi nộp chính thức, đề tài sẽ thuộc
+                    quyền quản lý của giảng viên hướng dẫn.
+                    <br />
+                    Sau khi gửi, bạn không thể chỉnh sửa thông tin đề tài.
+                  </>
+                )}
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex justify-between">
               <Button
                 variant="outline"
-                onClick={() => setOpenSubmitDialog(false)}
+                onClick={() => {
+                  setIsConfirmDialogOpen(false);
+                }}
               >
                 Hủy
               </Button>
               <Button
-                onClick={() => handleSubmitConfirm(form.getValues())}
+                onClick={async () => {
+                  setIsConfirmDialogOpen(false);
+                  if (dialogAction === "submit") {
+                    await handleSubmitToMentorConfirm();
+                  } else {
+                    await handleUpdate(form.getValues());
+                  }
+                }}
                 className="gap-2"
               >
                 <Send className="h-4 w-4" />
@@ -276,22 +284,80 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
           </DialogContent>
         </Dialog>
 
-        {/* Dialog xác nhận nộp cho mentor */}
-        <Dialog open={openMentorDialog} onOpenChange={setOpenMentorDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5 text-yellow-500" />
-                <span>Xác nhận nộp ý tưởng</span>
-              </DialogTitle>
+        <Card className="w-full max-w-4xl">
+          <CardHeader className="text-center space-y-2">
+            <CardTitle className="text-3xl font-bold tracking-tight">
+              Chỉnh sửa ý tưởng
+            </CardTitle>
+            <CardDescription className="text-muted-foreground">
+              Cập nhật thông tin bên dưới để chỉnh sửa ý tưởng dự án.
+            </CardDescription>
+          </CardHeader>
 
-              <DialogDescription className="pt-2">
-                Bạn có chắc chắn muốn nộp ý tưởng này cho mentor không?
-              </DialogDescription>
-            </DialogHeader>
+          <CardContent className="space-y-6">
+            {/* Enterprise Toggle - Only for Lecturers */}
+            {isLecturer && (
+              <div className="space-y-4 rounded-lg border p-4">
+                <FormSwitch
+                  form={form}
+                  name="isEnterpriseTopic"
+                  label="Dự án do Doanh nghiệp tài trợ"
+                  description="Chọn nếu dự án của bạn được tài trợ bởi doanh nghiệp"
+                />
+              </div>
+            )}
 
-            {/* Mentor Selection - Only for Students */}
-            {isStudent && !skipCheckAndSelectUI && (
+            {/* Enterprise Name (conditionally shown) */}
+            {isEnterpriseTopic && (
+              <div className="space-y-4 rounded-lg border p-4">
+                <FormInput
+                  form={form}
+                  name="enterpriseName"
+                  label="Tên Doanh nghiệp"
+                  description="Tên công ty tài trợ cho dự án này"
+                />
+              </div>
+            )}
+
+            {/* Topic Details Section */}
+            <div className="space-y-4 rounded-lg border p-4">
+              <h3 className="text-lg font-medium">Chi tiết Ý tưởng</h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormInput
+                  form={form}
+                  name="englishName"
+                  label="Tên tiếng Anh"
+                  placeholder="Tên dự án bằng tiếng Anh"
+                  description="Tên chính thức của dự án"
+                />
+
+                <FormInput
+                  form={form}
+                  name="vietNameseName"
+                  label="Tên tiếng Việt"
+                  placeholder="Tên dự án bằng tiếng Việt"
+                />
+              </div>
+
+              <FormInput
+                form={form}
+                name="abbreviation"
+                label="Viết tắt"
+                placeholder="Tên viết tắt của dự án"
+                description="Tối đa 20 ký tự"
+              />
+
+              <FormInputTextArea
+                form={form}
+                name="description"
+                label="Mô tả"
+                placeholder="Tối thiểu 10 ký tự"
+                description="Mô tả chi tiết về dự án của bạn..."
+              />
+            </div>
+
+            {isStudent && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
@@ -373,7 +439,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
               </div>
             )}
 
-            {isLecturer && !skipCheckAndSelectUI && (
+            {isLecturer && (
               <FormField
                 control={form.control}
                 name="subMentorId"
@@ -420,97 +486,6 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
                 }}
               />
             )}
-            <DialogFooter className="flex justify-between">
-              <Button
-                variant="outline"
-                onClick={() => setOpenMentorDialog(false)}
-              >
-                Hủy
-              </Button>
-              <Button
-                onClick={handleSubmitToMentorConfirm}
-                className="gap-2"
-                disabled={isSubmitting}
-              >
-                <Send className="h-4 w-4" />
-                {isSubmitting ? "Đang xử lý..." : "Chắc chắn"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        <Card className="w-full max-w-4xl">
-          <CardHeader className="text-center space-y-2">
-            <CardTitle className="text-3xl font-bold tracking-tight">
-              Chỉnh sửa ý tưởng
-            </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Cập nhật thông tin bên dưới để chỉnh sửa ý tưởng dự án.
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="space-y-6">
-            {/* Enterprise Toggle - Only for Lecturers */}
-            {isLecturer && (
-              <div className="space-y-4 rounded-lg border p-4">
-                <FormSwitch
-                  form={form}
-                  name="isEnterpriseTopic"
-                  label="Dự án do Doanh nghiệp tài trợ"
-                  description="Chọn nếu dự án của bạn được tài trợ bởi doanh nghiệp"
-                />
-              </div>
-            )}
-
-            {/* Enterprise Name (conditionally shown) */}
-            {isEnterpriseTopic && (
-              <div className="space-y-4 rounded-lg border p-4">
-                <FormInput
-                  form={form}
-                  name="enterpriseName"
-                  label="Tên Doanh nghiệp"
-                  description="Tên công ty tài trợ cho dự án này"
-                />
-              </div>
-            )}
-
-            {/* Topic Details Section */}
-            <div className="space-y-4 rounded-lg border p-4">
-              <h3 className="text-lg font-medium">Chi tiết Ý tưởng</h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <FormInput
-                  form={form}
-                  name="englishName"
-                  label="Tên tiếng Anh"
-                  placeholder="Tên dự án bằng tiếng Anh"
-                  description="Tên chính thức của dự án"
-                />
-
-                <FormInput
-                  form={form}
-                  name="vietNameseName"
-                  label="Tên tiếng Việt"
-                  placeholder="Tên dự án bằng tiếng Việt"
-                />
-              </div>
-
-              <FormInput
-                form={form}
-                name="abbreviation"
-                label="Viết tắt"
-                placeholder="Tên viết tắt của dự án"
-                description="Tối đa 20 ký tự"
-              />
-
-              <FormInputTextArea
-                form={form}
-                name="description"
-                label="Mô tả"
-                placeholder="Tối thiểu 10 ký tự"
-                description="Mô tả chi tiết về dự án của bạn..."
-              />
-            </div>
 
             {/* File Upload */}
             <FormField
@@ -573,10 +548,13 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
               <Button
                 type="button"
                 variant={"outline"}
-                onClick={() => setOpenMentorDialog(true)}
+                onClick={() => {
+                  setDialogAction("submit");
+                  setIsConfirmDialogOpen(true);
+                }}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Đang xử lý..." : "Nộp cho Mentor"}
+                {isSubmitting ? "Đang xử lý..." : "Nộp"}
               </Button>
             )}
 
@@ -584,19 +562,26 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
               <Button
                 type="button"
                 variant={"outline"}
-                onClick={() => setOpenMentorDialog(true)}
+                onClick={() => {
+                  setDialogAction("submit");
+                  setIsConfirmDialogOpen(true);
+                }}
                 disabled={isSubmitting}
               >
-                {isSubmitting ? "Đang xử lý..." : "Nộp cho quản lí"}
+                {isSubmitting ? "Đang xử lý..." : "Nộp"}
               </Button>
             )}
             <Button
-              type="submit"
+              type="button"
               variant={"outline"}
               className="border-primary text-primary hover:text-primary"
               disabled={isSubmitting}
+              onClick={() => {
+                setDialogAction("update");
+                setIsConfirmDialogOpen(true);
+              }}
             >
-              Cập nhật Ý tưởng
+              Cập nhật bản nháp
             </Button>
           </CardFooter>
         </Card>

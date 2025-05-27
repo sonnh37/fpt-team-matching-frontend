@@ -26,6 +26,7 @@ import { Profession } from "@/types/profession";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
+  ColumnDef,
   ColumnFiltersState,
   getCoreRowModel,
   getFilteredRowModel,
@@ -34,7 +35,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
+import { Badge, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -48,6 +49,12 @@ import { isDeleted_options } from "@/lib/filter-options";
 import { TopicGetListForMentorQuery } from "@/types/models/queries/topics/topic-get-list-for-mentor-query";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import { topicService } from "@/services/topic-service";
+import { TopicStatus } from "@/types/enums/topic";
+import { Topic } from "@/types/topic";
+import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
+import { TypographyP } from "@/components/_common/typography/typography-p";
+import { TypographyMuted } from "@/components/_common/typography/typography-muted";
+import { useCurrentSemester, useCurrentSemesterId } from "@/hooks/use-current-role";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -58,9 +65,45 @@ const roles_options = [
   { label: "Người hướng dẫn", value: "Mentor" },
   { label: "Người hướng dẫn 2", value: "SubMentor" },
 ];
+
 //#endregion
-export default function TopicTable() {
+interface TopicTableProps {
+  statuses?: TopicStatus[];
+}
+export default function TopicTable({ statuses }: TopicTableProps) {
   const searchParams = useSearchParams();
+  
+  const getColumns = (statuses?: TopicStatus[]): ColumnDef<Topic>[] => {
+    const updatedColumns = [...columns];
+
+    const actionsIndex = updatedColumns.findIndex(
+      (col) => col.id === "actions"
+    );
+
+    if (
+      actionsIndex !== -1 &&
+      statuses?.includes(TopicStatus.ManagerApproved)
+    ) {
+      updatedColumns.splice(actionsIndex, 0, {
+        accessorKey: "groupStatus",
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Trạng thái nhóm" />
+        ),
+        cell: ({ row }) => {
+          const model = row.original;
+          return model.project?.teamCode ? (
+            <TypographyP>{model.project.teamCode}</TypographyP>
+          ) : (
+            <TypographyMuted className="text-red-500">
+              Chưa có nhóm
+            </TypographyMuted>
+          );
+        },
+      });
+    }
+
+    return updatedColumns;
+  };
   const filterEnums: FilterEnum[] = [
     { columnId: "roles", title: "Phân loại vị trí", options: roles_options },
   ];
@@ -101,6 +144,8 @@ export default function TopicTable() {
       sorting
     );
 
+    params.statuses = statuses;
+
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
 
@@ -124,7 +169,7 @@ export default function TopicTable() {
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns,
+    columns: getColumns(statuses),
     pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,
@@ -144,8 +189,7 @@ export default function TopicTable() {
 
   return (
     <>
-      <div className="container mx-auto space-y-8">
-        <TypographyH2>Đề tài</TypographyH2>
+      <div>
         <Card className="space-y-4 p-4">
           <DataTableToolbar
             form={form}

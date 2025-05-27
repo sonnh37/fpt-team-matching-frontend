@@ -30,7 +30,7 @@ export default function Page() {
 
   return (
     <div className="container mx-auto py-8">
-      <Tabs value={activeTab} onValueChange={handleTabChange}>
+      {/* <Tabs value={activeTab} onValueChange={handleTabChange}>
         <TabsList>
           <TabsTrigger value="create">Tạo đề tài</TabsTrigger>
           <TabsTrigger value="drafts">Bản nháp</TabsTrigger>
@@ -48,6 +48,9 @@ export default function Page() {
           </div>
         </TabsContent>
       </Tabs>
+       */}
+
+       <CreateProjectForm />
     </div>
   );
 }

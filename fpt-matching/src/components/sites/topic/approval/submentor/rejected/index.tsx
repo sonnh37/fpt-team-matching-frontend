@@ -1,40 +1,44 @@
-import {DataTableComponent} from "@/components/_common/data-table-api/data-table-component";
-import {DataTablePagination} from "@/components/_common/data-table-api/data-table-pagination";
-import {useQueryParams} from "@/hooks/use-query-params";
-import {topicService} from "@/services/topic-service";
-import {TopicStatus} from "@/types/enums/topic";
-import {keepPreviousData, useQuery} from "@tanstack/react-query";
+import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
+import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
+import { useSelectorUser } from "@/hooks/use-auth";
+import { useQueryParams } from "@/hooks/use-query-params";
+import { isExistedTeam_options } from "@/lib/filter-options";
+import { topicService } from "@/services/topic-service";
+import { TopicStatus } from "@/types/enums/topic";
+import { TopicRequestStatus } from "@/types/enums/topic-request";
+import { FilterEnum } from "@/types/models/filter-enum";
+import { TopicGetListByStatusAndRoleQuery } from "@/types/models/queries/topics/topic-get-list-by-status-and-roles-query";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ColumnFiltersState,
   getCoreRowModel,
   PaginationState,
   SortingState,
   useReactTable,
-  VisibilityState,
+  VisibilityState
 } from "@tanstack/react-table";
+import { useSearchParams } from "next/navigation";
 import * as React from "react";
-import {useEffect, useMemo, useState} from "react";
-import {z} from "zod";
-import {columns} from "./columns";
-// import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
-import {useSelectorUser} from "@/hooks/use-auth";
-import {TopicGetListByStatusAndRoleQuery} from "@/types/models/queries/topics/topic-get-list-by-status-and-roles-query";
-import {TopicRequestStatus} from "@/types/enums/topic-request";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { columns } from "./columns";
 
 //#region INPUT
 const defaultSchema = z.object({
   // englishName: z.string().optional(),
 });
 //#endregion
-export default function TopicVersionRequestRejectedBySubMentorTable() {
-  // const searchParams = useSearchParams();
-  // const filterEnums: FilterEnum[] = [
-  //   {
-  //     columnId: "isExistedTeam",
-  //     title: "Slot register",
-  //     options: isExistedTeam_options,
-  //   },
-  // ];
+export default function TopicRejectedBySubMentorTable() {
+  const searchParams = useSearchParams();
+  const filterEnums: FilterEnum[] = [
+    {
+      columnId: "isExistedTeam",
+      title: "Slot register",
+      options: isExistedTeam_options,
+    },
+  ];
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
     {
@@ -78,7 +82,7 @@ export default function TopicVersionRequestRejectedBySubMentorTable() {
     );
 
     params.status = TopicRequestStatus.Rejected;
-    params.topicStatus = TopicStatus.MentorRejected || TopicStatus.ManagerRejected;
+    params.topicStatus = TopicStatus.MentorRejected;
     params.roles = ["SubMentor"];
 
     return { ...params };

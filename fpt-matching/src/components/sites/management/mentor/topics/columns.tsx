@@ -54,76 +54,6 @@ export const columns: ColumnDef<Topic>[] = [
     },
   },
   {
-    accessorKey: "status",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Trạng thái" />
-    ),
-    cell: ({ row }) => {
-      const model = row.original;
-      const topic = model;
-
-      // Hàm chuyển đổi status sang tiếng Việt
-      const StatusBadge = ({ status }: { status?: TopicStatus }) => {
-        if (status === undefined)
-          return <Badge variant="outline">Không xác định</Badge>;
-
-        // Ánh xạ status sang tiếng Việt
-        const statusText =
-          {
-            [TopicStatus.Draft]: "Bản nháp",
-            [TopicStatus.StudentEditing]: "Sinh viên chỉnh sửa",
-            [TopicStatus.MentorPending]: "Chờ giáo viên phản hồi",
-            [TopicStatus.MentorConsider]: "Giáo viên đang xem xét",
-            [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
-            [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
-            [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên quản lí",
-            [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
-            [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
-            [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
-            // Thêm các trạng thái khác nếu cần
-          }[status] || "Khác";
-
-        let badgeVariant: "secondary" | "destructive" | "default" | "outline" =
-          "default";
-
-        switch (status) {
-          case TopicStatus.Draft:
-          case TopicStatus.StudentEditing:
-          case TopicStatus.MentorPending:
-          case TopicStatus.ManagerPending:
-            badgeVariant = "secondary"; // màu trung tính, chờ xử lý
-            break;
-
-          case TopicStatus.MentorApproved:
-          case TopicStatus.ManagerApproved:
-            badgeVariant = "default"; // màu xanh (duyệt)
-            break;
-
-          case TopicStatus.MentorRejected:
-          case TopicStatus.ManagerRejected:
-            badgeVariant = "destructive"; // màu đỏ (từ chối)
-            break;
-
-          case TopicStatus.MentorConsider:
-          case TopicStatus.MentorSubmitted:
-            badgeVariant = "outline"; // màu nhẹ (đang xem xét, trung gian)
-            break;
-
-          default:
-            badgeVariant = "outline";
-        }
-
-        return <Badge variant={badgeVariant}>{statusText}</Badge>;
-      };
-
-      return (
-        <div className="flex items-center gap-2">
-          <StatusBadge status={topic.status} />
-        </div>
-      );
-    },
-  },
-  {
     accessorKey: "roles",
     header: () => null,
     cell: () => null,
@@ -131,6 +61,7 @@ export const columns: ColumnDef<Topic>[] = [
   },
   {
     accessorKey: "actions",
+    id: "actions",
     header: "Thao tác",
     cell: ({ row }) => {
       return <Actions row={row} />;

@@ -444,7 +444,7 @@ const StatusBadge = ({ status }: { status?: TopicStatus }) => {
       [TopicStatus.Draft]: "Bản nháp",
       [TopicStatus.StudentEditing]: "Sinh viên chỉnh sửa",
       [TopicStatus.MentorPending]: "Chờ giáo viên phản hồi",
-      [TopicStatus.MentorConsider]: "Giáo viên đang xem xét",
+      [TopicStatus.MentorConsider]: "Giáo viên đang yêu cầu chỉnh sửa",
       [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
       [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
       [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",

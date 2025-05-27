@@ -22,6 +22,10 @@ import { z } from "zod";
 import { columns } from "./columns";
 import { AdvancedSearchToolbar } from "./advanced-search-toolbar";
 import { ProjectStatus } from "@/types/enums/project";
+import {
+  useCurrentSemester,
+  useCurrentSemesterId,
+} from "@/hooks/use-current-role";
 
 const advancedSearchSchema = z.object({
   quickSearch: z.string().optional(),
@@ -38,6 +42,11 @@ const roles_options = [
 ];
 
 export default function ProjectTable() {
+  const { currentSemester, isLoading, isError } = useCurrentSemester();
+
+  if (isLoading) return;
+  if (isError) return;
+  const semesterId = currentSemester?.id;
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -45,6 +54,20 @@ export default function ProjectTable() {
   const filterEnums: FilterEnum[] = [
     { columnId: "roles", title: "Phân loại vị trí", options: roles_options },
   ];
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
+  const [isTyping, setIsTyping] = useState(false);
+  const [sorting, setSorting] = useState<SortingState>([
+    {
+      id: searchParams.get("sortBy") || "createdDate",
+      desc: searchParams.get("sortDirection") === "desc",
+    },
+  ]);
+
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: parseInt(searchParams.get("page") || "0"),
+    pageSize: parseInt(searchParams.get("pageSize") || "10"),
+  });
 
   // Khởi tạo form từ URL params
   const form = useForm<z.infer<typeof advancedSearchSchema>>({
@@ -60,19 +83,8 @@ export default function ProjectTable() {
         undefined,
     },
   });
-
   const formValues = useWatch({ control: form.control });
-  const [sorting, setSorting] = useState<SortingState>([
-    {
-      id: searchParams.get("sortBy") || "createdDate",
-      desc: searchParams.get("sortDirection") === "desc",
-    },
-  ]);
 
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: parseInt(searchParams.get("page") || "0"),
-    pageSize: parseInt(searchParams.get("pageSize") || "10"),
-  });
   // Cập nhật URL khi form thay đổi
   useEffect(() => {
     const params = new URLSearchParams();
@@ -95,31 +107,24 @@ export default function ProjectTable() {
 
   // Khởi tạo state từ URL params
 
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [isTyping, setIsTyping] = useState(false);
-
   // Query params cho API
-  const queryParams = useMemo(() => {
-    const params: ProjectGetAllQuery = {
-      ...useQueryParams(formValues, columnFilters, pagination, sorting),
-      isHasTeam: true,
-      teamCode: formValues.teamCode,
-      teamName: formValues.teamName,
-      leaderEmail: formValues.leaderEmail,
-      // topicName: formValues.topicName,
-      status: formValues.status as ProjectStatus | undefined,
-      // searchTerm: formValues.quickSearch,
-    };
-
-    return params;
-  }, [formValues, columnFilters, pagination, sorting]);
+  const queryParams: ProjectGetAllQuery = {
+    ...useQueryParams(formValues, columnFilters, pagination, sorting),
+    isHasTeam: true,
+    semesterId: semesterId,
+    teamCode: formValues.teamCode,
+    teamName: formValues.teamName,
+    leaderEmail: formValues.leaderEmail,
+    // topicName: formValues.topicName,
+    status: formValues.status as ProjectStatus | undefined,
+    // searchTerm: formValues.quickSearch,
+  };
 
   const { data, isFetching, error } = useQuery({
     queryKey: ["projects", queryParams],
     queryFn: () => projectService.getAll(queryParams),
-    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
+    enabled: !!semesterId, // Chỉ gọi API khi semesterId có giá trị
   });
 
   if (error) return <div>Error loading data</div>;

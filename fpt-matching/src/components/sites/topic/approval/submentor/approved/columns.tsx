@@ -83,7 +83,7 @@ export const columns: ColumnDef<Topic>[] = [
     ),
     cell: ({ row }) => {
       const topic = row.original;
-     
+
       return topic?.vietNameseName || "-";
     },
   },
@@ -116,36 +116,41 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   //     : undefined;
 
   const hasCouncilRequests =
-    topic?.topicRequests.some(
-      (request) => request.role == "Manager"
-    ) && role == "Mentor";
+    topic?.topicRequests.some((request) => request.role == "Manager") &&
+    role == "Mentor";
 
   const isMentorOfTopic = topic.mentorId == user?.id;
 
   const hasSubmentorPendingRequest = topic?.topicRequests?.some(
     (request) =>
       request.role == "SubMentor" &&
-      request.status == TopicRequestStatus.Pending
+      request.status != TopicRequestStatus.Approved
   );
-  // const handleSubmit = async () => {
-  //   try {
-  //     const res = await topicVersionRequestService.createCouncilRequestsForTopic(
-  //       topic?.id
-  //     );
-  //     if (res.status != 1) return toast.error(res.message);
 
-  //     toast.success(res.message);
+  console.log("check_hasSubmentorPendingRequest", hasSubmentorPendingRequest)
 
-  //     queryClient.refetchQueries({
-  //       queryKey: ["data"],
-  //     });
-  //     setOpen(false);
-  //   } catch (error: any) {
-  //     toast.error(error || "An unexpected error occurred");
-  //     setOpen(false);
-  //     return;
-  //   }
-  // };
+  const handleSubmit = async () => {
+    try {
+      if (!topic?.id) {
+        toast.error("Topic ID is missing");
+        setOpen(false);
+        return;
+      }
+      const res = await topicService.submitTopicOfStudentByLecturer(topic.id);
+      if (res.status != 1) return toast.error(res.message);
+
+      toast.success(res.message);
+
+      queryClient.refetchQueries({
+        queryKey: ["data"],
+      });
+      setOpen(false);
+    } catch (error: any) {
+      toast.error(error || "An unexpected error occurred");
+      setOpen(false);
+      return;
+    }
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -158,16 +163,16 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
         <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
           {topic && <TopicDetailForm topicId={topic.id} />}
           <DialogFooter>
-            {/* {isMentorOfTopic && (
+            {isMentorOfTopic && (
               <Button
                 variant={`${hasCouncilRequests ? "secondary" : "default"}`}
                 size="sm"
                 onClick={() => handleSubmit()}
                 disabled={hasCouncilRequests || hasSubmentorPendingRequest}
               >
-                {hasCouncilRequests ? "Đã nộp" : "Nộp cho hội đồng"}
+                {hasCouncilRequests ? "Đã nộp" : "Nộp"}
               </Button>
-            )} */}
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,9 +1,9 @@
 "use client";
 import ErrorHttp from "@/components/_common/errors/error-http";
-import TopicVersionRequestApprovedBySubMentorTable from "@/components/sites/topic/approval/submentor/approved";
-import TopicVersionRequestConsiderBySubMentorTable from "@/components/sites/topic/approval/submentor/consider";
-import { TopicVersionRequestPendingBySubMentorTable } from "@/components/sites/topic/approval/submentor/pending";
-import TopicVersionRequestRejectedBySubMentorTable from "@/components/sites/topic/approval/submentor/rejected";
+import TopicApprovedBySubMentorTable from "@/components/sites/topic/approval/submentor/approved";
+import TopicConsiderBySubMentorTable from "@/components/sites/topic/approval/submentor/consider";
+import { TopicPendingBySubMentorTable } from "@/components/sites/topic/approval/submentor/pending";
+import TopicRejectedBySubMentorTable from "@/components/sites/topic/approval/submentor/rejected";
 import { Card } from "@/components/ui/card";
 import {
   Tabs,
@@ -34,22 +34,22 @@ function SubMentorApprovalTabs() {
     {
       id: "pending",
       label: "Chờ duyệt",
-      component: <TopicVersionRequestPendingBySubMentorTable />,
+      component: <TopicPendingBySubMentorTable />,
     },
     {
       id: "consider",
       label: "Yêu cầu chỉnh sửa",
-      component: <TopicVersionRequestConsiderBySubMentorTable />,
+      component: <TopicConsiderBySubMentorTable />,
     },
     {
       id: "approved",
       label: "Đã duyệt",
-      component: <TopicVersionRequestApprovedBySubMentorTable />,
+      component: <TopicApprovedBySubMentorTable />,
     },
     {
       id: "rejected",
       label: "Từ chối",
-      component: <TopicVersionRequestRejectedBySubMentorTable />,
+      component: <TopicRejectedBySubMentorTable />,
     },
   ];
 

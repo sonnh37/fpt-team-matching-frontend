@@ -112,7 +112,7 @@ export const columns: ColumnDef<Topic>[] = [
               [TopicStatus.Draft]: "Bản nháp",
               [TopicStatus.StudentEditing]: "Sinh viên chỉnh sửa",
               [TopicStatus.MentorPending]: "Chờ giáo viên phản hồi",
-              [TopicStatus.MentorConsider]: "Giáo viên đang xem xét",
+              [TopicStatus.MentorConsider]: "Giáo viên đang yêu cầu chỉnh sửa",
               [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
               [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
               [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
@@ -172,10 +172,10 @@ export const columns: ColumnDef<Topic>[] = [
           {isSelected ? (
             <Badge variant="default" className="flex items-center gap-1">
               <CheckIcon className="h-3 w-3" />
-              <span>Đã chọn làm project</span>
+              <span>Đã chọn làm đề tài</span>
             </Badge>
           ) : (
-            <Badge variant="outline">Chưa chọn</Badge>
+            <Badge variant="outline">Không chọn</Badge>
           )}
         </div>
       );
@@ -244,13 +244,13 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
           {canConvert ? (
             <DropdownMenuItem onClick={() => setIsConfirmOpen(true)}>
               <FilePlusIcon className="h-4 w-4" />
-              Chọn làm project
+              Chọn làm đề tài
             </DropdownMenuItem>
           ) : (
             isSelectedAsProject && (
               <DropdownMenuItem onClick={() => setIsProjectDetailOpen(true)}>
                 <FolderOpenIcon className="-4 w-4" />
-                Xem project
+                Xem đề tài
               </DropdownMenuItem>
             )
           )}
