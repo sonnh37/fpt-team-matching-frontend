@@ -36,7 +36,7 @@ export function TopicApprovalStatus({ topic, isStudent }: TopicApprovalStatusPro
               Đang chờ phê duyệt
             </h2>
             <p className="text-muted-foreground">
-              Topic <span className="font-semibold text-foreground">"{topicName}"</span> đã được gửi đi. 
+              Topic <span className="font-semibold text-foreground">${topicName}</span> đã được gửi đi.
               Vui lòng chờ trong khi chúng tôi xem xét yêu cầu của bạn.
             </p>
           </div>
@@ -64,7 +64,7 @@ export function TopicApprovalStatus({ topic, isStudent }: TopicApprovalStatusPro
               Topic đã được duyệt
             </h2>
             <p className="text-muted-foreground">
-              Topic <span className="font-semibold text-foreground">"{topicName}"</span> đã được phê duyệt.
+              Topic <span className="font-semibold text-foreground">${topicName}</span> đã được phê duyệt.
               {topic.project ? (
                 " Bạn có thể bắt đầu làm việc trên topic này."
               ) : (
@@ -104,7 +104,7 @@ export function TopicApprovalStatus({ topic, isStudent }: TopicApprovalStatusPro
               Topic đã bị từ chối
             </h2>
             <p className="text-muted-foreground">
-              Topic <span className="font-semibold text-foreground">"{topicName}"</span> không được phê duyệt.
+              Topic <span className="font-semibold text-foreground">${topicName}</span> không được phê duyệt.
             </p>
             
           </div>

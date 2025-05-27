@@ -58,9 +58,9 @@ export default function TopicRejectedBySubMentorTable() {
   //#endregion
 
   //#region CREATE TABLE
-  const form = useForm<z.infer<typeof defaultSchema>>({
-    resolver: zodResolver(defaultSchema),
-  });
+  // const form = useForm<z.infer<typeof defaultSchema>>({
+  //   resolver: zodResolver(defaultSchema),
+  // });
 
   // input field
   const [inputFields, setInputFields] =

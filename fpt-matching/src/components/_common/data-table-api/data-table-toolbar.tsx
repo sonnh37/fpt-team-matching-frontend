@@ -424,7 +424,7 @@ export function DataTableToolbar<TData>({
                   className="gap-1 transition duration-300 ease-linear"
                 >
                   <PlusCircle className="fill-primary-background h-5 w-5" />
-                  New
+                  Tạo mới
                 </Button>
               </motion.div>
             </Link>

@@ -26,6 +26,7 @@ import { Progress } from "@/components/ui/progress"
 import { Label } from "@/components/ui/label";
 import {semesterService} from "@/services/semester-service";
 import {Semester} from "@/types/semester";
+import {useCurrentSemester} from "@/hooks/use-current-role";
 
 // Custom components
 
@@ -88,6 +89,9 @@ export default function Page ()  {
     const [reviewNumber, setReviewNumber] = useState<string>("1")
     const [loading, setLoading] = useState<boolean>(true)
     const [currentSemester, setCurrentSemester] = useState<Semester | null>(null)
+
+    const getCurrentSemesterWS = useCurrentSemester().currentSemester
+
     useEffect(() => {
         const fetchDataReview = async () => {
             if (currentSemester) {
@@ -104,23 +108,27 @@ export default function Page ()  {
 
     useEffect(() => {
         const fetchCurrentSemester = async () => {
-            const result = await semesterService.getCurrentSemester();
-            if (result.data) {
-                setCurrentSemester(result.data)
+            // const result = await semesterService.getCurrentSemester();
+            // if (result.data) {
+            //     setCurrentSemester(result.data)
+            // }
+            if (getCurrentSemesterWS) {
+                setCurrentSemester(getCurrentSemesterWS)
+                console.log(getCurrentSemesterWS)
             }
         }
 
         fetchCurrentSemester()
-    }, [])
+    }, [getCurrentSemesterWS])
 
     const router = useRouter()
     return (
         <div className={"px-4"}>
-            <div className={"mb-4 flex "}>
-                <div className={"w-1/6"}>
+            <div className={"mb-4 "}>
+                <div className={"w-full"}>
                     <ButtonWithIcon router={router} />
                 </div>
-                {<div className={"w-2/3 flex justify-center items-center"}>
+                {<div className={"w-full flex justify-center items-center"}>
                     <div className={"font-bold text-2xl"}>
                         Kì hiện tại: {currentSemester?.semesterName} - {currentSemester?.semesterCode}
                     </div>

@@ -20,13 +20,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { TopicVersionRequestStatus } from "@/types/enums/topic-request";
 import { Department } from "@/types/enums/user";
 import { TopicVersionRequest } from "@/types/topic-version-request";
 import { User } from "@/types/user";
 import { ColumnDef } from "@tanstack/react-table";
 import Link from "next/link";
 import { useState } from "react";
+import {TopicVersionRequestStatus} from "@/types/enums/topic-version-request";
 export const columns: ColumnDef<User>[] = [
   {
     accessorKey: "avatar",
@@ -131,7 +131,7 @@ export const columns: ColumnDef<User>[] = [
                     <TableRow>
                       <TableHead>Mã đề tài</TableHead>
                       <TableHead>Tên ý tưởng</TableHead>
-                      <TableHead>Phiên bản</TableHead>
+                      {/*<TableHead>Phiên bản</TableHead>*/}
                       <TableHead>Kì</TableHead>
                       <TableHead>Giai đoạn</TableHead>
                     </TableRow>
@@ -143,16 +143,16 @@ export const columns: ColumnDef<User>[] = [
                           {request.topicVersion?.topic?.topicCode || "-"}
                         </TableCell>
                         <TableCell>
-                          {request.topicVersion?.englishName || "-"}
+                          {request.topicVersion?.topic?.englishName || "-"}
                         </TableCell>
-                        <TableCell>V{request.topicVersion?.version}</TableCell>
+                        {/*<TableCell>V{request.topicVersion?.version}</TableCell>*/}
 
                         <TableCell>
-                          {request.topicVersion?.stageTopic?.semester
+                          {request.topicVersion?.topic?.semester
                             ?.semesterName || "-"}
                         </TableCell>
                         <TableCell>
-                          {request.topicVersion?.stageTopic?.stageNumber || "-"}
+                          {request.topicVersion?.topic?.stageTopic?.stageNumber || "-"}
                         </TableCell>
                       </TableRow>
                     ))}
