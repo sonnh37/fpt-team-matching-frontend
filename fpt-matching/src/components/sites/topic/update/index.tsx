@@ -152,7 +152,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
       };
 
       // Create topic based on user role
-      const res = await topicService.update(command);
+      const res = await topicService.updateDraft(command);
 
 
       if (res.status == 1) {

@@ -466,11 +466,11 @@ export default function TeamInfo() {
                         </div>
                         <div className="space-y-4">
                           <div className="space-y-1">
-                            <Label>Người hướng dẫn:</Label>
+                            <Label>Giảng viên hướng dẫn:</Label>
                             <p>{project.topic.mentor?.email || "Chưa có"}</p>
                           </div>
                           <div className="space-y-1">
-                            <Label>Người hướng dẫn 2:</Label>
+                            <Label>Giảng viên hướng dẫn 2:</Label>
                             <p>
                               {project.topic?.subMentor?.email || "Chưa có"}
                             </p>

@@ -57,7 +57,7 @@ export const columns: ColumnDef<Topic>[] = [
   {
     accessorKey: "stage",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Tên giáo viên" />
+      <DataTableColumnHeader column={column} title="Tên giảng viên" />
     ),
     cell: ({ row }) => {
       const topic = row.original;
@@ -76,15 +76,15 @@ export const columns: ColumnDef<Topic>[] = [
         // Ánh xạ status sang tiếng Việt
         const statusText = status !== undefined 
         ? { [TopicStatus.Draft]: "Bản nháp",
-            [TopicStatus.StudentEditing]: "Sinh viên chỉnh sửa",
-            [TopicStatus.MentorPending]: "Chờ giáo viên phản hồi",
-            [TopicStatus.MentorConsider]: "Giáo viên đang yêu cầu chỉnh sửa",
-            [TopicStatus.MentorApproved]: "Giáo viên đã duyệt",
-            [TopicStatus.MentorRejected]: "Giáo viên đã từ chối",
-            [TopicStatus.MentorSubmitted]: "Giáo viên đã nộp lên hội đồng",
-            [TopicStatus.ManagerPending]: "Quản lí đang xem xét",
-            [TopicStatus.ManagerApproved]: "Quản lí đã duyệt",
-            [TopicStatus.ManagerRejected]: "Quản lí đã từ chối",
+            [TopicStatus.StudentEditing]: "Sinh viên chỉnh sửa", //
+            [TopicStatus.MentorPending]: "Chờ giảng viên phản hồi",
+            [TopicStatus.MentorConsider]: "Giảng viên đang yêu cầu chỉnh sửa",
+            [TopicStatus.MentorApproved]: "Giảng viên đã duyệt",
+            [TopicStatus.MentorRejected]: "Giảng viên đã từ chối",
+            [TopicStatus.MentorSubmitted]: "Giảng viên đã nộp lên hội đồng", //
+            [TopicStatus.ManagerPending]: "Đang xem xét",
+            [TopicStatus.ManagerApproved]: "Đã duyệt",
+            [TopicStatus.ManagerRejected]: "Đã từ chối",
            
           }[status] || "Khác"
         : "-";

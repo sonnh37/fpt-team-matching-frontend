@@ -6,6 +6,8 @@ import { BusinessResult } from "@/types/models/responses/business-result";
 import { BaseService } from "./_base/base-service";
 import { TopicRequest } from "@/types/topic-request";
 import { TopicRequestMentorOrManagerResponseCommand } from "@/types/models/commands/topic-requests/topic-request-mentor-or-manager-response-command";
+import { TopicRequestForRespondCommand } from "@/types/models/commands/topic-requests/topic-request-for-respond-command";
+import { TopicRequestForSubMentorCommand } from "@/types/models/commands/topic-requests/topic-request-for-submentor-command";
 
 class TopicRequestService extends BaseService<TopicRequest> {
   constructor() {
@@ -121,6 +123,30 @@ class TopicRequestService extends BaseService<TopicRequest> {
     return axiosInstance
       .put<BusinessResult<TopicRequest>>(
         `${this.endpoint}/respond-by-mentor-or-manager`,
+        command
+      )
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public sendRequestToSubMentorByMentor = (
+    command?: TopicRequestForSubMentorCommand
+  ): Promise<BusinessResult<TopicRequest>> => {
+    return axiosInstance
+      .post<BusinessResult<TopicRequest>>(
+        `${this.endpoint}/send-request-to-submentor-by-mentor`,
+        command
+      )
+      .then((response) => response.data)
+      .catch((error) => this.handleError(error)); // Xử lý lỗi
+  };
+
+  public subMentorResponseRequestOfMentor = (
+    command?: TopicRequestForRespondCommand
+  ): Promise<BusinessResult<TopicRequest>> => {
+    return axiosInstance
+      .put<BusinessResult<TopicRequest>>(
+        `${this.endpoint}/submentor-response-request-of-mentor`,
         command
       )
       .then((response) => response.data)

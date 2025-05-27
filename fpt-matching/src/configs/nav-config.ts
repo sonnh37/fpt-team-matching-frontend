@@ -66,7 +66,7 @@ export const NAV_CONFIG = {
     },
 
     {
-      title: "Quản lí đề tài",
+      title: "Đề tài",
       url: "/topic",
       icon: Telescope,
       roles: ["*"],
@@ -91,13 +91,13 @@ export const NAV_CONFIG = {
           roles: ["*"],
         },
         {
-          title: "Duyệt ý tưởng (Mentor)",
+          title: "Duyệt đề tài (Mentor)",
           icon: MdOutlineRateReview,
           url: "/topic/reviews/mentor",
           roles: ["Mentor"],
         },
         {
-          title: "Duyệt ý tưởng (SubMentor)",
+          title: "Duyệt đề tài (SubMentor)",
           icon: MdOutlineRateReview,
           url: "/topic/reviews/submentor",
           roles: ["Mentor"],
@@ -119,6 +119,12 @@ export const NAV_CONFIG = {
     {
       title: "Đề nghị sử dụng đề tài",
       url: "/student-requests",
+      icon: UserPlus,
+      roles: ["Mentor"],
+    },
+    {
+      title: "Lời mời làm GVHD 2",
+      url: "/mentor-invitations",
       icon: UserPlus,
       roles: ["Mentor"],
     },

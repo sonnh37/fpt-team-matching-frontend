@@ -87,7 +87,7 @@ export const columns: ColumnDef<Topic>[] = [
   {
     accessorKey: "mentorId",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Người hướng dẫn" />
+      <DataTableColumnHeader column={column} title="Giảng viên hướng dẫn" />
     ),
     cell: ({ row }) => {
       const topic = row.original;

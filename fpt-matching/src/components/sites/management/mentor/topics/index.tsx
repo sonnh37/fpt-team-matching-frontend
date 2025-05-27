@@ -24,7 +24,11 @@ import { useQueryParams } from "@/hooks/use-query-params";
 import { professionService } from "@/services/profession-service";
 import { Profession } from "@/types/profession";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import {
+  keepPreviousData,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -35,7 +39,7 @@ import {
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Badge, Search } from "lucide-react";
+import { Badge, CheckCircle, Loader2, Search, Upload } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -54,7 +58,13 @@ import { Topic } from "@/types/topic";
 import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { TypographyMuted } from "@/components/_common/typography/typography-muted";
-import { useCurrentSemester, useCurrentSemesterId } from "@/hooks/use-current-role";
+import {
+  useCurrentRole,
+  useCurrentSemester,
+  useCurrentSemesterId,
+} from "@/hooks/use-current-role";
+import { useSelectorUser } from "@/hooks/use-auth";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -62,8 +72,8 @@ const defaultSchema = z.object({
 });
 
 const roles_options = [
-  { label: "Người hướng dẫn", value: "Mentor" },
-  { label: "Người hướng dẫn 2", value: "SubMentor" },
+  { label: "Giảng viên hướng dẫn", value: "Mentor" },
+  { label: "Giảng viên hướng dẫn 2", value: "SubMentor" },
 ];
 
 //#endregion
@@ -72,14 +82,16 @@ interface TopicTableProps {
 }
 export default function TopicTable({ statuses }: TopicTableProps) {
   const searchParams = useSearchParams();
-  
+  const role = useCurrentRole();
+  const user = useSelectorUser();
+
   const getColumns = (statuses?: TopicStatus[]): ColumnDef<Topic>[] => {
     const updatedColumns = [...columns];
-
     const actionsIndex = updatedColumns.findIndex(
       (col) => col.id === "actions"
     );
 
+    // Thêm cột trạng thái nhóm nếu cần
     if (
       actionsIndex !== -1 &&
       statuses?.includes(TopicStatus.ManagerApproved)
@@ -97,6 +109,105 @@ export default function TopicTable({ statuses }: TopicTableProps) {
             <TypographyMuted className="text-red-500">
               Chưa có nhóm
             </TypographyMuted>
+          );
+        },
+      });
+    }
+
+    // Thêm cột nộp vào CUỐI mảng (sau cột actions)
+    if (statuses?.includes(TopicStatus.MentorApproved)) {
+      updatedColumns.push({
+        id: "submit",
+        accessorKey: "submit",
+        header: () => null,
+        cell: ({ row }) => {
+          const topic = row.original;
+          const queryClient = useQueryClient();
+          const [isSubmitting, setIsSubmitting] = useState(false);
+          const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
+          const handleSubmit = async () => {
+            setIsSubmitting(true);
+            try {
+              if (!topic?.id) {
+                toast.error("Topic ID is missing");
+                return;
+              }
+              const res = await topicService.submitTopicOfStudentByLecturer(
+                topic.id
+              );
+              if (res.status != 1) {
+                toast.error(res.message);
+                return;
+              }
+
+              toast.success(res.message);
+              queryClient.refetchQueries({ queryKey: ["data"] });
+            } catch (error: any) {
+              toast.error(error?.message || "An unexpected error occurred");
+            } finally {
+              setIsSubmitting(false);
+              setShowConfirmDialog(false);
+            }
+          };
+
+          const hasManagerRequests =
+            topic?.topicRequests?.some(
+              (request) => request.role == "Manager"
+            ) && role == "Mentor";
+
+          const isMentorOfTopic = topic.mentorId == user?.id;
+
+          if (!isMentorOfTopic) return null;
+
+          return (
+            <>
+              <Button
+                variant={hasManagerRequests ? "secondary" : "default"}
+                size="sm"
+                onClick={() => setShowConfirmDialog(true)}
+                disabled={hasManagerRequests || isSubmitting}
+                className="gap-2"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : hasManagerRequests ? (
+                  <CheckCircle className="h-4 w-4" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
+                {hasManagerRequests ? "Đã nộp" : "Nộp"}
+              </Button>
+
+              <Dialog
+                open={showConfirmDialog}
+                onOpenChange={setShowConfirmDialog}
+              >
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Xác nhận nộp đề tài</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <p>Bạn có chắc chắn muốn nộp đề tài này?</p>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowConfirmDialog(false)}
+                        disabled={isSubmitting}
+                      >
+                        Hủy
+                      </Button>
+                      <Button onClick={handleSubmit} disabled={isSubmitting}>
+                        {isSubmitting && (
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        )}
+                        Xác nhận
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </>
           );
         },
       });

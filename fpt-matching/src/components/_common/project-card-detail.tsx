@@ -172,11 +172,11 @@ export const TeamInfoCard = ({
                     </div>
                     <div className="space-y-4">
                       <div className="space-y-1">
-                        <Label>Người hướng dẫn:</Label>
+                        <Label>Giảng viên hướng dẫn:</Label>
                         <p>{topic?.mentor?.email || "Chưa có"}</p>
                       </div>
                       <div className="space-y-1">
-                        <Label>Người hướng dẫn 2:</Label>
+                        <Label>Giảng viên hướng dẫn 2:</Label>
                         <p>{topic?.subMentor?.email || "Chưa có"}</p>
                       </div>
                     </div>

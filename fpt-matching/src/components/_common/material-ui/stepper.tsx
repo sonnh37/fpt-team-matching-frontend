@@ -98,7 +98,7 @@ export default function HorizontalLinearStepper({
         status: "approved",
       },
       {
-        label: "Duyệt bởi người hướng dẫn",
+        label: "Duyệt bởi giảng viên hướng dẫn",
         status: mentorApproval?.status === TopicVersionRequestStatus.Rejected
           ? "rejected"
           : mentorApproval?.status === TopicVersionRequestStatus.Approved
