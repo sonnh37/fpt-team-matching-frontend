@@ -1,5 +1,4 @@
 import { Const } from "@/lib/constants/const";
-import React from "react";
 import { BaseService } from "./_base/base-service";
 import { BusinessResult } from "@/types/models/responses/business-result";
 import axiosInstance from "@/lib/interceptors/axios-instance";
@@ -26,6 +25,11 @@ class StageTopicSerivce extends BaseService<StageTopic> {
     } catch (error) {
       return this.handleError(error);
     }
+  }
+
+  public async pubicStageTopic({stageTopicId}: { stageTopicId: string }): Promise<BusinessResult<void>> {
+    const response = await axiosInstance.get<BusinessResult<void>>(`${this.endpoint}/show-result/${stageTopicId}`);
+    return response.data
   }
 }
 
