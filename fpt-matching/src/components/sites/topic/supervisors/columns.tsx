@@ -19,7 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import {useCurrentRole, useCurrentSemester} from "@/hooks/use-current-role";
 import { mentortopicrequestService } from "@/services/mentor-topic-request-service";
 import { projectService } from "@/services/project-service";
 import { semesterService } from "@/services/semester-service";
@@ -35,6 +35,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { TopicDetailForm } from "../detail";
 import { MentorTopicRequestCreateCommand } from "@/types/models/commands/mentor-idea-requests/mentor-idea-request-create-command";
+import {useSelectorUser} from "@/hooks/use-auth";
 
 export const useTopicColumns = () => {
   // Fetch all required data once
@@ -43,6 +44,8 @@ export const useTopicColumns = () => {
     queryFn: () => semesterService.getCurrentSemester(),
     refetchOnWindowFocus: false,
   });
+  const user = useSelectorUser();
+
 
   if (isLoadingSemester) return [];
 
@@ -196,10 +199,10 @@ const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
       setIsSubmitting(false);
       setIsDialogOpen(false);
     }
-  };
-
-  console.log(semester != undefined)
-
+  }
+  const user = useSelectorUser()
+  const currSemester = useCurrentSemester().currentSemester
+  console.log(user)
   return (
     <>
       {role == "Student" && (
@@ -209,7 +212,7 @@ const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
               <Button
                 variant={hasSentRequest ? "secondary" : "default"}
                 disabled={
-                  hasSentRequest || semester == undefined
+                  hasSentRequest || semester == undefined || topic.isExistedTeam || user.projects?.find(x => x.semesterId ==  currSemester?.id)?.topicId != null
                 }
                 size="icon"
                 onClick={handleButtonClick}
