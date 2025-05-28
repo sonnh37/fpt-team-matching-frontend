@@ -13,7 +13,7 @@ import {
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogTitle
+  DialogTitle,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -40,6 +40,7 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { TopicDetailForm } from "../../detail";
+import { useCurrentRole } from "@/hooks/use-current-role";
 
 export const columns: ColumnDef<Topic>[] = [
   {
@@ -197,6 +198,7 @@ interface ActionsProps {
 const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const topic = row.original;
+  const role = useCurrentRole();
   const [isConverting, setIsConverting] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
@@ -204,7 +206,9 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const isSelectedAsProject = !!topic.project;
   const canConvert =
-    topic.status === TopicStatus.ManagerApproved && !isSelectedAsProject;
+    role == "Student" &&
+    topic.status === TopicStatus.ManagerApproved &&
+    !isSelectedAsProject;
 
   const handleConvertToProject = async () => {
     try {

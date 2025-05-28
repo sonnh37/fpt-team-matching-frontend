@@ -68,6 +68,7 @@ import { z } from "zod";
 import { useState } from "react";
 import { TopicApprovalStatus } from "@/app/(client)/(dashboard)/topic/idea-is-exist/page";
 import { UserGetAllInSemesterQuery } from "@/types/models/queries/users/user-get-all-in-semester-query";
+import { TopicCreateDraftCommand } from "@/types/models/commands/topic/topic-create-draft-command";
 // Các đuôi file cho phép
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
@@ -300,19 +301,21 @@ export const CreateProjectForm = () => {
 
   if (isStudent) {
     if (project) {
-      const isProjectNoTopic = !project?.topicId;
+      const isProjectHasTopic = !!project?.topicId;
       const isLeaderProject = project?.teamMembers.some(
         (m) => m.userId == user.id && m.role == TeamMemberRole.Leader
       );
 
-      if (!isProjectNoTopic) {
-        return <AlertMessage message="Bạn đã có đề tài." messageType="error" />;
-      }
-
-      if (!isLeaderProject) {
-        return (
-          <AlertMessage message="Bạn đang trong dự án." messageType="error" />
-        );
+      if (isProjectHasTopic) {
+        if (!isLeaderProject) {
+          return (
+            <AlertMessage message="Bạn đang trong dự án." messageType="error" />
+          );
+        } else {
+          return (
+            <AlertMessage message="Bạn đã có đề tài." messageType="info" />
+          );
+        }
       }
     } else {
       const messages = [];
@@ -424,30 +427,18 @@ export const CreateProjectForm = () => {
       }
 
       // Create daft based on user role
-      const commandStudent: TopicCreateCommand = {
+      const commandStudent: TopicCreateDraftCommand = {
         ...values,
         isEnterpriseTopic: isStudent ? false : values.isEnterpriseTopic,
         enterpriseName: isStudent ? undefined : values.enterpriseName,
-        mentorId: isLecturer ? undefined : values.mentorId,
         fileUrl: fileUpload.data,
-        status: TopicStatus.Draft,
-        type: TopicType.Student,
-        semesterId: currentSemester?.id,
-        ownerId: user?.id,
-        isExistedTeam: false,
       };
 
-      const commandLecture: TopicCreateCommand = {
+      const commandLecture: TopicCreateDraftCommand = {
         ...values,
         isEnterpriseTopic: isStudent ? false : values.isEnterpriseTopic,
         enterpriseName: isStudent ? undefined : values.enterpriseName,
-        mentorId: isLecturer ? undefined : values.mentorId,
         fileUrl: fileUpload.data,
-        status: TopicStatus.Draft,
-        type: TopicType.Lecturer,
-        semesterId: currentSemester?.id,
-        ownerId: user?.id,
-        isExistedTeam: false,
       };
       const res = isStudent
         ? await topicService.createDraft(commandStudent)

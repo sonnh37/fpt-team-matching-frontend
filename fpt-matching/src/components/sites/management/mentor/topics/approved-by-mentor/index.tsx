@@ -64,7 +64,12 @@ import {
   useCurrentSemesterId,
 } from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -77,43 +82,17 @@ const roles_options = [
 ];
 
 //#endregion
-interface TopicTableProps {
-  statuses?: TopicStatus[];
-}
-export default function TopicTable({ statuses }: TopicTableProps) {
+
+export default function TopicApprovedByMentorTable() {
   const searchParams = useSearchParams();
   const role = useCurrentRole();
   const user = useSelectorUser();
-  
-
+  const statues = [TopicStatus.MentorApproved];
   const getColumns = (statuses?: TopicStatus[]): ColumnDef<Topic>[] => {
     const updatedColumns = [...columns];
     const actionsIndex = updatedColumns.findIndex(
       (col) => col.id === "actions"
     );
-
-    // Thêm cột trạng thái nhóm nếu cần
-    if (
-      actionsIndex !== -1 &&
-      statuses?.includes(TopicStatus.ManagerApproved)
-    ) {
-      updatedColumns.splice(actionsIndex, 0, {
-        accessorKey: "groupStatus",
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title="Trạng thái nhóm" />
-        ),
-        cell: ({ row }) => {
-          const model = row.original;
-          return model.project?.teamCode ? (
-            <TypographyP>{model.project.teamCode}</TypographyP>
-          ) : (
-            <TypographyMuted className="text-red-500">
-              Chưa có nhóm
-            </TypographyMuted>
-          );
-        },
-      });
-    }
 
     // Thêm cột nộp vào CUỐI mảng (sau cột actions)
     if (statuses?.includes(TopicStatus.MentorApproved)) {
@@ -256,7 +235,7 @@ export default function TopicTable({ statuses }: TopicTableProps) {
       sorting
     );
 
-    params.statuses = statuses;
+    params.statuses = statues;
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -281,7 +260,7 @@ export default function TopicTable({ statuses }: TopicTableProps) {
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns: getColumns(statuses),
+    columns: getColumns(statues),
     pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,

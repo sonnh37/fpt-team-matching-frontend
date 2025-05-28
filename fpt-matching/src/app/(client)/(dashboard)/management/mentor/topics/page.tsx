@@ -7,37 +7,49 @@ import { topicService } from "@/services/topic-service";
 import { TopicStatus } from "@/types/enums/topic";
 import { TopicGetListForMentorQuery } from "@/types/models/queries/topics/topic-get-list-for-mentor-query";
 import { useQuery } from "@tanstack/react-query";
+import TopicAllTable from "@/components/sites/management/mentor/topics/all";
+import TopicApprovedByMentorTable from "@/components/sites/management/mentor/topics/approved-by-mentor";
+import TopicPendingTable from "@/components/sites/management/mentor/topics/pending";
+import TopicApprovedTable from "@/components/sites/management/mentor/topics/approved";
+import TopicRejectedTable from "@/components/sites/management/mentor/topics/rejected";
 
 const MENTOR_TABS = [
   {
     value: "all",
     label: "Tất cả",
+    component: <TopicAllTable />,
+    statuses: [
+      TopicStatus.MentorApproved,
+      TopicStatus.MentorSubmitted,
+      TopicStatus.ManagerPending,
+      TopicStatus.ManagerApproved,
+      TopicStatus.MentorRejected,
+      TopicStatus.ManagerRejected,
+    ],
   },
-
   {
     value: "approved-by-mentor",
     label: "Đã duyệt (bởi mentor)",
+    component: <TopicApprovedByMentorTable />,
     statuses: [TopicStatus.MentorApproved],
-  },
-  {
-    value: "submitted",
-    label: "Đã gửi",
-    statuses: [TopicStatus.MentorSubmitted],
   },
   {
     value: "pending-manager",
     label: "Chờ duyệt",
+    component: <TopicPendingTable />,
     statuses: [TopicStatus.ManagerPending],
   },
   {
     value: "approved",
     label: "Đã phê duyệt",
+    component: <TopicApprovedTable />,
     statuses: [TopicStatus.ManagerApproved],
   },
   {
     value: "rejected",
     label: "Đã từ chối",
-    statuses: [TopicStatus.MentorRejected, TopicStatus.ManagerRejected],
+    component: <TopicRejectedTable />,
+    statuses: [TopicStatus.ManagerRejected],
   },
 ];
 
@@ -57,14 +69,13 @@ export default function MentorTopicPage() {
 
   const topics = data?.data?.results || [];
 
-
   // Hàm đếm số lượng đề tài theo trạng thái
   const countTopicsByStatus = (statuses?: TopicStatus[]) => {
     return topics.filter((topic) =>
       statuses ? statuses.includes(topic.status as TopicStatus) : true
     ).length;
   };
-  
+
   const approvedByManagerCount = countTopicsByStatus([
     TopicStatus.ManagerApproved,
   ]);
@@ -120,7 +131,7 @@ export default function MentorTopicPage() {
 
         {MENTOR_TABS.map((tab) => (
           <TabsContent key={tab.value} value={tab.value}>
-            <TopicTable statuses={tab.statuses} />
+            {tab.component}
           </TabsContent>
         ))}
       </Tabs>

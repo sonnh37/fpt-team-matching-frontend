@@ -33,7 +33,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { topicService } from "@/services/topic-service";
 import { LoadingComponent } from "@/components/_common/loading-page";
 import ErrorSystem from "@/components/_common/errors/error-system";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import { useCurrentRole, useCurrentSemester } from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { TypographyP } from "@/components/_common/typography/typography-p";
 import { TopicRequest } from "@/types/topic-request";
@@ -60,6 +60,8 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
   const [selectedSubMentor, setSelectedSubMentor] = useState<string | null>(
     null
   );
+
+  const { currentSemester } = useCurrentSemester();
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -97,9 +99,11 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
     setSelectedSubMentor(mentorId);
   };
 
-  const isPendingInviteTopicRequestForMentor = topic.topicRequests.some(
-    (m) => m.role === "SubMentor" && m.status === TopicRequestStatus.Pending
-  );
+  const isPendingInviteTopicRequestForMentor =
+    topic.status == TopicStatus.ManagerApproved &&
+    topic.topicRequests.some(
+      (m) => m.role === "SubMentor" && m.status === TopicRequestStatus.Pending
+    );
 
   const handleConfirmSubMentor = async () => {
     if (!selectedSubMentor) return;
@@ -495,6 +499,13 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
     }
   };
 
+  const latestStageTopic = topic.semester?.stageTopics?.reduce(
+    (prev, current) => (prev.stageNumber > current.stageNumber ? prev : current)
+  );
+
+  const dateNow = Date.now();
+  const resultDate = new Date(latestStageTopic?.resultDate || 0);
+  const isResultDatePassed = dateNow > resultDate.getTime();
   return (
     <div className="space-y-6">
       {/* Team & Mentorship Section */}
@@ -502,7 +513,8 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
         <div className="flex items-center gap-2 text-lg font-semibold">
           <Users className="h-5 w-5" />
           <h3>
-            Thông tin chung <StatusBadge status={topic.status} />
+            Thông tin chung{" "}
+            {isResultDatePassed && <StatusBadge status={topic.status} />}
           </h3>
         </div>
         <Separator />
@@ -589,7 +601,9 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
                 <TypographyMuted>(Đang chờ phản hồi)</TypographyMuted>
               </div>
             ) : (
-              <p className="text-sm font-medium">Không có</p>
+              <p className="text-sm font-medium">
+                {topic.subMentor?.email || "Không xác định"}
+              </p>
             )}
           </div>
 
