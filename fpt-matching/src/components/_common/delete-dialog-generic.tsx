@@ -46,9 +46,9 @@ export function DeleteBaseEntitysDialog<TData>({
   showTrigger = true,
   list,
   onSuccess,
-  titleMessasge = "Are you absolutely sure?",
-  buttonLeftMessage = "Cancel",
-  buttonRightMessage = "Delete",
+  titleMessasge = "Bạn có chắc chắn muốn xoá kì này",
+  buttonLeftMessage = "Huỷ",
+  buttonRightMessage = "Đồng ý",
   deleteById,
   ...props
 }: DeleteBaseEntitysDialogProps<TData>) {

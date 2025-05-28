@@ -242,12 +242,12 @@ export const NAV_CONFIG = {
           icon: UserPlus,
           roles: ["Manager"],
         },
-        {
-          title: "Yêu cầu hội đồng",
-          url: "/management/users/councils/pending-requests",
-          icon: UserCog,
-          roles: ["Manager"],
-        },
+        // {
+        //   title: "Yêu cầu hội đồng",
+        //   url: "/management/users/councils/pending-requests",
+        //   icon: UserCog,
+        //   roles: ["Manager"],
+        // },
       ],
     },
     {

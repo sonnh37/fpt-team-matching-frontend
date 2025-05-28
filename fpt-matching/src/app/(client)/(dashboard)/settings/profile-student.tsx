@@ -154,7 +154,10 @@ export function ProfileStudentForm({ user }: { user?: User }) {
         const response = await profilestudentService.create(
           profileStudentCommand
         );
-        if (response.status !== 1) throw new Error(response.message);
+        if (response.status !== 1) {
+          toast.error(response.message);
+          return;
+        };
         toast.success("Cập nhật hồ sơ thành công!");
       } else {
         const profileStudentCommand: ProfileStudentUpdateCommand = {
@@ -164,7 +167,9 @@ export function ProfileStudentForm({ user }: { user?: User }) {
         const response = await profilestudentService.update(
           profileStudentCommand
         );
-        if (response.status !== 1) throw new Error(response.message);
+        if (response.status !== 1) {
+          toast.error(response.message);
+        }
         toast.success("Cập nhật hồ sơ thành công!");
       }
 
