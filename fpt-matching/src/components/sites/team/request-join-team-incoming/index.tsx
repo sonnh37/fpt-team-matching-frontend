@@ -109,7 +109,7 @@ export default function InvitationsInComingToLeaderTable({
     debugTable: true,
   });
   //#endregion
-
+  console.log(data)
   if (error) return <div>Error loading data</div>;
 
   return (

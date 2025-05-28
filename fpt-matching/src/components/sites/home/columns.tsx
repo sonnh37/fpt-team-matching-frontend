@@ -22,8 +22,8 @@ export const columns: ColumnDef<Project>[] = [
     header: () => <></>,
     cell: ({ row }) => {
       const project = row.original;
-      const topicVersion = project.topic?.topicVersion ?? {} as TopicVersion;
-      const leader = topicVersion?.topic?.owner ?? {} as User;
+      const topicVersion = project.topic ?? {} as Topic;
+      const leader = project?.leader ?? {} as User;
       
       const initials = `${leader.firstName?.charAt(0) ?? ''}${leader.lastName?.charAt(0) ?? ''}`.toUpperCase();
       
@@ -77,13 +77,13 @@ export const columns: ColumnDef<Project>[] = [
               <div className="flex-1 space-y-2">
                 <Link href={`/team-detail/${project.id}`} className="group block">
                   <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
-                    {topicVersion.englishName}
+                    {project.topic?.englishName}
                   </h3>
-                  {topicVersion.vietNamName && (
+                  {project.topic ? (
                     <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">
-                      {topicVersion.vietNamName}
+                      {project.topic.vietNameseName}
                     </p>
-                  )}
+                  ) : <div>Chưa có đề tài</div>}
                 </Link>
 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
