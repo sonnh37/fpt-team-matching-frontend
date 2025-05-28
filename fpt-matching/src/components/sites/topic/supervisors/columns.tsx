@@ -54,31 +54,31 @@ export const useTopicColumns = () => {
       ),
     },
     {
-      accessorKey: "topicVersion.englishName",
+      accessorKey: "englishName",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Tên đề tài" />
       ),
     },
     {
-      accessorKey: "topicVersion.teamSize",
+      accessorKey: "project.teamSize",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Số thành viên" />
       ),
     },
     {
-      accessorKey: "topicVersion.topic.specialty.profession.professionName",
+      accessorKey: "specialty.profession.professionName",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Ngành học" />
       ),
     },
+    // {
+    //   accessorKey: "specialty.specialtyName",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Chuyên ngành" />
+    //   ),
+    // },
     {
-      accessorKey: "topicVersion.topic.specialty.specialtyName",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Chuyên ngành" />
-      ),
-    },
-    {
-      accessorKey: "topicVersion.topic.mentor.email",
+      accessorKey: "mentor.email",
       header: ({ column }) => (
         <DataTableColumnHeader column={column} title="Giảng viên hướng dẫn" />
       ),
@@ -94,21 +94,21 @@ export const useTopicColumns = () => {
         </Button>
       ),
     },
-    {
-      accessorKey: "semesterStatus",
-      header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Trạng thái kỳ" />
-      ),
-      cell: ({ row }) => {
-        const isSemesterClosed = res_semester?.status == 1;
-        return isSemesterClosed ? (
-          <Badge variant="destructive">Đã đóng</Badge>
-        ) : (
-          <Badge variant="default">Mở</Badge>
-        );
-      },
-      filterFn: (row, id, value) => value.includes(row.getValue(id)),
-    },
+    // {
+    //   accessorKey: "semesterStatus",
+    //   header: ({ column }) => (
+    //     <DataTableColumnHeader column={column} title="Trạng thái kỳ" />
+    //   ),
+    //   cell: ({ row }) => {
+    //     const isSemesterClosed = res_semester?.status == 1;
+    //     return isSemesterClosed ? (
+    //       <Badge variant="destructive">Đã đóng</Badge>
+    //     ) : (
+    //       <Badge variant="default">Mở</Badge>
+    //     );
+    //   },
+    //   filterFn: (row, id, value) => value.includes(row.getValue(id)),
+    // },
     {
       accessorKey: "isExistedTeam",
       header: ({ column }) => (
@@ -198,6 +198,8 @@ const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
     }
   };
 
+  console.log(semester != undefined)
+
   return (
     <>
       {role == "Student" && (
@@ -207,7 +209,7 @@ const RequestAction: React.FC<{ row: Row<Topic>; semester?: Semester }> = ({
               <Button
                 variant={hasSentRequest ? "secondary" : "default"}
                 disabled={
-                  hasSentRequest || semester != undefined || semester != null
+                  hasSentRequest || semester == undefined
                 }
                 size="icon"
                 onClick={handleButtonClick}

@@ -333,7 +333,7 @@ export const CreateProjectForm = () => {
         );
       }
 
-      return <AlertMessage message="Bạn chưa tạo team." messageType="error" />;
+      return <AlertMessage message="Bạn cần là nhóm trưởng để được tạo đề tài." messageType="error" />;
     }
   }
 
