@@ -37,7 +37,7 @@ import { useEffect } from "react";
 // Schema validation
 const formSchema = z.object({
   id: z.string().optional(),
-  stageNumber: z.number().min(1, "Stage number is required"),
+  // stageNumber: z.number().min(1, "Stage number is required"),
   semesterId: z.string(),
   startDate: z.date(),
   endDate: z.date(),
@@ -113,7 +113,7 @@ export function StageTopicFormDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {stageTopic ? "Chỉnh sửa đợt đề tài" : "Tạo mới đợt đề tài"}
+            {stageTopic ? "Chỉnh sửa đợt duyệt" : "Tạo đợt duyệt"}
           </DialogTitle>
         </DialogHeader>
         <Form {...form}>
@@ -124,13 +124,13 @@ export function StageTopicFormDialog({
             }}
             className="space-y-4"
           >
-            <FormInputNumber
-              form={form}
-              name="stageNumber"
-              label="Đợt đánh giá"
-              decimalScale={0}
-              min={1}
-            />
+            {/*<FormInputNumber*/}
+            {/*  form={form}*/}
+            {/*  name="stageNumber"*/}
+            {/*  label="Đợt đánh giá"*/}
+            {/*  decimalScale={0}*/}
+            {/*  min={1}*/}
+            {/*/>*/}
             {/*<FormInputNumber*/}
             {/*  form={form}*/}
             {/*  name="numberReviewer"*/}

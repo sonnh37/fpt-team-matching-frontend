@@ -111,7 +111,10 @@ export function ProfileForm({ user }: { user?: User }) {
       };
 
       const response = await userService.update(updatedValues);
-      if (response.status !== 1) throw new Error(response.message);
+      if (response.status !== 1) {
+        toast.error(response.message);
+        return;
+      }
 
       toast.success("Cập nhật thông tin thành công");
       queryClient.refetchQueries({ queryKey: ["getUserInfo"] });

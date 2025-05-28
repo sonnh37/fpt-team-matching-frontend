@@ -26,7 +26,7 @@ import SamilaritiesProjectModels from "@/types/models/samilarities-project-model
 import { Topic } from "@/types/topic";
 import { Label } from "@radix-ui/react-label";
 import { Brain, Eye } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export const columns: ColumnDef<Topic>[] = [
   // {
@@ -71,58 +71,44 @@ interface ActionsProps {
   row: Row<Topic>;
 }
 const Actions: React.FC<ActionsProps> = ({ row }) => {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  // const [dialogOpen, setDialogOpen] = useState(false);
 
   const topic = row.original;
 
   const user = useSelectorUser();
   if (!user) return;
 
-  // const highestVersion =
-  //   topic.topicVersions.length > 0
-  //     ? topic.topicVersions.reduce((prev, current) =>
-  //         (prev.version ?? 0) > (current.version ?? 0) ? prev : current
-  //       )
-  //     : undefined;
+  const [loadingAI, setLoadingAI] = React.useState<boolean>(false);
+  const [samilaritiesProject, setSamilaritiesProject] = React.useState<
+    SamilaritiesProjectModels[]
+  >([]);
 
-  // const mentorRequest = highestVersion?.topicVersionRequests.find(
-  //   (m) =>
-  //     (m.role === "Mentor" || m.role === "SubMentor") &&
-  //     m.status === TopicVersionRequestStatus.Pending &&
-  //     m.reviewerId === user.id
-  // // );
+  // Load similar projects khi tab active
+  useEffect(() => {
+    const loadSimilarProjects = async () => {
+      if (topic?.description) {
+        setLoadingAI(true);
+        try {
+          const response = await apiHubsService.getSimilaritiesProject(
+            topic.description
+          );
+          if (response) {
+            setSamilaritiesProject(
+              (response as { similar_capstone: SamilaritiesProjectModels[] })
+                .similar_capstone
+            );
+          }
+          setLoadingAI(false);
+        } catch (error) {
+          console.error("Failed to load similar projects", error);
+        } finally {
+          setLoadingAI(false);
+        }
+      }
+    };
 
-  // const [loadingAI, setLoadingAI] = useState<boolean>(false);
-  // const [samilaritiesProject, setSamilaritiesProject] = useState<
-  //   SamilaritiesProjectModels[]
-  // >([]);
-
-  // // Load similar projects khi tab active
-  // useEffect(() => {
-  //   const loadSimilarProjects = async () => {
-  //     if (highestVersion?.description) {
-  //       setLoadingAI(true);
-  //       try {
-  //         const response = await apiHubsService.getSimilaritiesProject(
-  //           highestVersion.description
-  //         );
-  //         if (response) {
-  //           setSamilaritiesProject(
-  //             (response as { similar_capstone: SamilaritiesProjectModels[] })
-  //               .similar_capstone
-  //           );
-  //         }
-  //         setLoadingAI(false);
-  //       } catch (error) {
-  //         console.error("Failed to load similar projects", error);
-  //       } finally {
-  //         setLoadingAI(false);
-  //       }
-  //     }
-  //   };
-
-  //   loadSimilarProjects();
-  // }, [highestVersion]);
+    loadSimilarProjects();
+  }, [topic]);
 
   return (
     <div className="flex flex-row gap-2">
@@ -140,7 +126,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                 <TopicDetailForm topicId={topic.id} />
               </div>
             )}
-            {/* {loadingAI ? (
+            {loadingAI ? (
               <LoadingComponent />
             ) : (
               <div className="flex flex-col gap-10 h-screen overflow-auto">
@@ -176,7 +162,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
                   <p>No similar projects found</p>
                 )}
               </div>
-            )} */}
+            )}
           </div>
         </DialogContent>
       </Dialog>

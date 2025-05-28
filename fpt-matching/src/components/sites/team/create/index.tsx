@@ -53,7 +53,10 @@ export const TeamForm = () => {
         teamSize: 1,
       };
       const response = await projectService.createTeam(createdValues);
-      if (response.status !== 1) throw new Error(response.message);
+      if (response.status !== 1) {
+        toast.error(response.message);
+        return;
+      }
 
       toast.success(response.message);
       await queryClient.refetchQueries({ queryKey: ["getTeamInfo"] });

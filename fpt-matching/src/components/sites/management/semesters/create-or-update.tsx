@@ -60,7 +60,7 @@ const formSchema = z.object({
   maxTeamSize: z.number(),
   minTeamSize: z.number(),
   numberOfTeam: z.number(),
-  status: z.nativeEnum(SemesterStatus).nullable(),
+  // status: z.nativeEnum(SemesterStatus).nullable(),
 });
 
 export const SemesterForm: React.FC<SemesterFormProps> = ({
@@ -121,7 +121,10 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
           ...values,
         };
         const response = await semesterService.update(updatedValues);
-        if (response.status != 1) throw new Error(response.message);
+        if (response.status != 1) {
+          toast.error(response.message)
+          return;
+        }
         queryClient.refetchQueries({
           queryKey: ["fetchSemesterById", initialData.id],
         });
@@ -132,16 +135,14 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
         setShowConfirmationDialog(true);
       }
     } catch (error: any) {
-      console.error(error);
+
       toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateConfirmation = async (): Promise<
-    BusinessResult<Semester>
-  > => {
+  const handleCreateConfirmation = async () => {
     if (!pendingValues) {
       toast.error("không có giá trị đang chờ để tạo học kỳ.");
       return Promise.reject(new Error("No pending values"));
@@ -152,12 +153,14 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
         ...pendingValues,
       };
       const response = await semesterService.create(createdValues);
-      if (response.status !== 1) throw new Error(response.message);
+      if (response.status !== 1) {
+        toast.error(response.message);
+        return
+      };
 
       toast.success(response.message);
       setShowConfirmationDialog(false);
       setPendingValues(null);
-      setIsLoading(false);
 
       return response;
     } catch (error: any) {
@@ -165,8 +168,10 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
       toast.error(error.message || "Failed to create semester.");
       setShowConfirmationDialog(false);
       setPendingValues(null);
-      setIsLoading(false);
       return Promise.reject(error);
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -182,13 +187,14 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
         isLoading={isLoading}
         isOpen={showConfirmationDialog}
         onConfirm={handleCreateConfirmation}
-        onClose={async () => {
-          const res = await handleCreateConfirmation();
-          if (res.status != 1) {
-            return;
-          }
-          router.push(previousPath);
-        }}
+        // onClose={async () => {
+        //   const res = await handleCreateConfirmation();
+        //   if (res.status != 1) {
+        //     return;
+        //   }
+        //   router.push(previousPath);
+        // }}
+          onClose={() => setShowConfirmationDialog(false)}
         title="Bạn có muốn tiếp tục tạo mới không?"
         description="Nếu bạn tạo mới, tất cả dữ liệu sẽ được lưu lại và không thể hoàn tác."
         confirmText="Có"
@@ -245,32 +251,28 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                               label="Mã học kỳ"
                               placeholder="VD: HK2024"
                           />
-                          <FormSelectEnum
-                              form={form}
-                              name="status"
-                              label="Trạng thái"
-                              enumOptions={getEnumOptions(SemesterStatus)}
-                              default
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
+                          {/*<FormSelectEnum*/}
+                          {/*    form={form}*/}
+                          {/*    name="status"*/}
+                          {/*    label="Trạng thái"*/}
+                          {/*    enumOptions={getEnumOptions(SemesterStatus)}*/}
+                          {/*    default*/}
+                          {/*/>*/}
                           <FormInput
                               form={form}
                               name="semesterName"
                               label="Tên học kỳ"
                               placeholder="VD: Học kỳ 1 2024"
                           />
+                        </div>
 
+                        <div className="grid grid-cols-2 md:grid-cols-2 gap-6">
                           <FormInput
                               form={form}
                               name="semesterPrefixName"
                               label="Tên tiền tố"
                               placeholder="VD: Năm học 2023-2024"
                           />
-
-
                         </div>
                       </CardContent>
                     </div>
@@ -314,7 +316,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                         <FormInputNumber
                             form={form}
                             name="limitTopicMentorOnly"
-                            label="Mentor 1"
+                            label="Số lượng đề tài chỉ có mentor 1 (trên 1 giảng viên)"
                             placeholder="Nhập số lượng"
                             min={0}
                         />
@@ -322,7 +324,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                         <FormInputNumber
                             form={form}
                             name="limitTopicSubMentor"
-                            label="Mentor 2"
+                            label="Số lượng đề tài được làm mentor 2 (trên 1 giảng viên)"
                             placeholder="Nhập số lượng"
                             min={0}
                         />
@@ -330,7 +332,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                         <FormInputNumber
                             form={form}
                             name="minTeamSize"
-                            label="Số lượng thành viên tối thiểu"
+                            label="Số lượng thành viên tối thiểu của 1 nhóm"
                             placeholder="Nhập số lượng"
                             min={2}
                         />
@@ -338,7 +340,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                         <FormInputNumber
                             form={form}
                             name="maxTeamSize"
-                            label="Số lượng thành viên tối đa"
+                            label="Số lượng thành viên tối đa của 1 nhóm"
                             placeholder="Nhập số lượng"
                             min={0}
                         />
@@ -346,7 +348,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                         <FormInputNumber
                             form={form}
                             name="numberOfTeam"
-                            label="Số lượng Team trong kì này"
+                            label="Số lượng nhóm"
                             placeholder="Nhập số lượng"
                             min={0}
                         />
