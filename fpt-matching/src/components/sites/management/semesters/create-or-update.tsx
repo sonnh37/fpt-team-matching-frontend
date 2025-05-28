@@ -208,9 +208,9 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {title}
               </h1>
-              <p className="text-sm text-muted-foreground">
-                {initialData ? "Cập nhật thông tin học kỳ" : "Tạo học kỳ mới"}
-              </p>
+              {/*<p className="text-sm text-muted-foreground">*/}
+              {/*  {initialData ? "Cập nhật thông tin học kỳ" : "Tạo học kỳ mới"}*/}
+              {/*</p>*/}
               {initialData &&
                   <p className={"text-sm text-muted-foreground text-red-500"}>Chỉ được cập nhật trong kì của workspace</p>
               }
@@ -249,7 +249,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                               form={form}
                               name="semesterCode"
                               label="Mã học kỳ"
-                              placeholder="VD: HK2024"
+                              placeholder="VD: FA25"
                           />
                           {/*<FormSelectEnum*/}
                           {/*    form={form}*/}
@@ -262,7 +262,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                               form={form}
                               name="semesterName"
                               label="Tên học kỳ"
-                              placeholder="VD: Học kỳ 1 2024"
+                              placeholder="VD: Fall2025"
                           />
                         </div>
 
@@ -271,7 +271,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                               form={form}
                               name="semesterPrefixName"
                               label="Tên tiền tố"
-                              placeholder="VD: Năm học 2023-2024"
+                              placeholder="VD: G"
                           />
                         </div>
                       </CardContent>

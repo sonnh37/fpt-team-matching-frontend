@@ -211,6 +211,7 @@ export default function ProjectDetail() {
     return <LoadingComponent />;
   if (isErrorTopicCurrent || isErrorTeam) return <ErrorSystem />;
 
+  console.log(isInvited)
   return (
     <div className="container pt-6 max-w-4xl">
       <div className="space-y-6">
@@ -230,7 +231,7 @@ export default function ProjectDetail() {
                       Hủy yêu cầu
                     </Button>
                   ) : (
-                    !hasCurrentSemester && (
+                    hasCurrentSemester && (
                       <Dialog>
                         <DialogTrigger asChild>
                           <Button
