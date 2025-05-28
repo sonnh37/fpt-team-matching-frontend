@@ -64,12 +64,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import InviteUsersForm from "../topic/updateidea/page";
+import { useCurrentSemester } from "@/hooks/use-current-role";
 
 export default function TeamInfo() {
   const user = useSelectorUser();
   const [isEditing, setIsEditing] = useState(false);
   const [teamName, setTeamName] = useState("");
   const confirm = useConfirm();
+  const {currentSemester} = useCurrentSemester();
 
   const {
     data: teamInfo,
@@ -168,9 +170,7 @@ export default function TeamInfo() {
   );
 
   const isHasTopic = !!project.topicId;
-  const availableSlots = isHasTopic
-    ? (project?.teamSize ?? 0) - (project.teamMembers?.length ?? 0)
-    : 5 - (project.teamMembers?.length ?? 0);
+  const availableSlots = (currentSemester?.maxTeamSize ?? 0) - (project.teamMembers?.length ?? 0)
 
   const isLockTeamMember = availableSlots === 0;
 

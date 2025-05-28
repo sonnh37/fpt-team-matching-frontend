@@ -14,12 +14,11 @@ const defaultSchema = z.object({
 export function TopicPendingTable() {
   const queryParams: TopicGetCurrentByStatusQuery = {
     statusList: [
-      TopicStatus.StudentEditing,
-      TopicStatus.MentorPending,
-      TopicStatus.MentorApproved,
       TopicStatus.ManagerPending,
+      TopicStatus.MentorPending,
       TopicStatus.StudentEditing,
       TopicStatus.MentorSubmitted,
+      TopicStatus.MentorApproved,
     ],
     isPagination: false,
   };

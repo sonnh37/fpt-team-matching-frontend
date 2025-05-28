@@ -77,14 +77,12 @@ const roles_options = [
 ];
 
 //#endregion
-interface TopicTableProps {
-  statuses?: TopicStatus[];
-}
-export default function TopicTable({ statuses }: TopicTableProps) {
+
+export default function TopicApprovedTable() {
   const searchParams = useSearchParams();
   const role = useCurrentRole();
   const user = useSelectorUser();
-  
+  const statues = [TopicStatus.ManagerApproved];
 
   const getColumns = (statuses?: TopicStatus[]): ColumnDef<Topic>[] => {
     const updatedColumns = [...columns];
@@ -116,103 +114,7 @@ export default function TopicTable({ statuses }: TopicTableProps) {
     }
 
     // Thêm cột nộp vào CUỐI mảng (sau cột actions)
-    if (statuses?.includes(TopicStatus.MentorApproved)) {
-      updatedColumns.push({
-        id: "submit",
-        accessorKey: "submit",
-        header: () => null,
-        cell: ({ row }) => {
-          const topic = row.original;
-          const queryClient = useQueryClient();
-          const [isSubmitting, setIsSubmitting] = useState(false);
-          const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-
-          const handleSubmit = async () => {
-            setIsSubmitting(true);
-            try {
-              if (!topic?.id) {
-                toast.error("Topic ID is missing");
-                return;
-              }
-              const res = await topicService.submitTopicOfStudentByLecturer(
-                topic.id
-              );
-              if (res.status != 1) {
-                toast.error(res.message);
-                return;
-              }
-
-              toast.success(res.message);
-              queryClient.refetchQueries({ queryKey: ["data"] });
-            } catch (error: any) {
-              toast.error(error?.message || "An unexpected error occurred");
-            } finally {
-              setIsSubmitting(false);
-              setShowConfirmDialog(false);
-            }
-          };
-
-          const hasManagerRequests =
-            topic?.topicRequests?.some(
-              (request) => request.role == "Manager"
-            ) && role == "Mentor";
-
-          // const isMentorOfTopic = topic.mentorId == user?.id;
-
-          // if (!isMentorOfTopic) return null;
-
-          return (
-            <>
-              <Button
-                variant={hasManagerRequests ? "secondary" : "default"}
-                size="sm"
-                onClick={() => setShowConfirmDialog(true)}
-                disabled={hasManagerRequests || isSubmitting}
-                className="gap-2"
-              >
-                {isSubmitting ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : hasManagerRequests ? (
-                  <CheckCircle className="h-4 w-4" />
-                ) : (
-                  <Upload className="h-4 w-4" />
-                )}
-                {hasManagerRequests ? "Đã nộp" : "Nộp"}
-              </Button>
-
-              <Dialog
-                open={showConfirmDialog}
-                onOpenChange={setShowConfirmDialog}
-              >
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Xác nhận nộp đề tài</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <p>Bạn có chắc chắn muốn nộp đề tài này?</p>
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowConfirmDialog(false)}
-                        disabled={isSubmitting}
-                      >
-                        Hủy
-                      </Button>
-                      <Button onClick={handleSubmit} disabled={isSubmitting}>
-                        {isSubmitting && (
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        )}
-                        Xác nhận
-                      </Button>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </>
-          );
-        },
-      });
-    }
+    
 
     return updatedColumns;
   };
@@ -256,7 +158,7 @@ export default function TopicTable({ statuses }: TopicTableProps) {
       sorting
     );
 
-    params.statuses = statuses;
+    params.statuses = statues;
 
     return { ...params };
   }, [inputFields, columnFilters, pagination, sorting]);
@@ -281,7 +183,7 @@ export default function TopicTable({ statuses }: TopicTableProps) {
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
-    columns: getColumns(statuses),
+    columns: getColumns(statues),
     pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
     onPaginationChange: setPagination,

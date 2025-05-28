@@ -18,7 +18,8 @@ import {
   TopicSubmitForMentorByStudentCommand,
 } from "@/types/models/commands/topic/topic-student-create-pending-command";
 import { TopicUpdateAsProjectCommand } from "@/types/models/commands/topic/topic-update-as-project-command";
-import { TopicCreateOrUpdateDraftCommand } from "@/types/models/commands/topic/topic-create-or-update-draft";
+import { TopicCreateDraftCommand } from "@/types/models/commands/topic/topic-create-draft-command";
+import { TopicUpdateDraftCommand } from "@/types/models/commands/topic/topic-update-draft-command";
 
 class TopicService extends BaseService<Topic> {
   constructor() {
@@ -224,7 +225,7 @@ class TopicService extends BaseService<Topic> {
   }
 
   public createDraft = async (
-    command: TopicCreateOrUpdateDraftCommand
+    command: TopicCreateDraftCommand
   ): Promise<BusinessResult<Topic>> => {
     try {
       const response = await axiosInstance.post<BusinessResult<Topic>>(
@@ -238,7 +239,7 @@ class TopicService extends BaseService<Topic> {
   };
 
   public updateDraft = async (
-    command: TopicCreateOrUpdateDraftCommand
+    command: TopicUpdateDraftCommand
   ): Promise<BusinessResult<Topic>> => {
     try {
       const response = await axiosInstance.put<BusinessResult<Topic>>(
@@ -250,6 +251,7 @@ class TopicService extends BaseService<Topic> {
       return this.handleError(error);
     }
   };
+  
 }
 
 export const topicService = new TopicService();

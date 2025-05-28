@@ -48,6 +48,7 @@ import {
   TopicSubmitForMentorByStudentCommand,
 } from "@/types/models/commands/topic/topic-student-create-pending-command";
 import { TopicUpdateCommand } from "@/types/models/commands/topic/topic-update-command";
+import { TopicUpdateDraftCommand } from "@/types/models/commands/topic/topic-update-draft-command";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { Topic } from "@/types/topic";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -144,11 +145,11 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
         fileUrl = fileUpload.data;
       }
 
-      const command: TopicUpdateCommand = {
+      const command: TopicUpdateDraftCommand = {
+        id: topic.id,
         ...topic,
         ...values,
         fileUrl: fileUrl,
-        isExistedTeam: false,
       };
 
       // Create topic based on user role
