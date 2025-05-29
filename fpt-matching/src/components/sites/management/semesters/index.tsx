@@ -158,7 +158,7 @@ export default function SemesterTable() {
               name="semesterName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Tìm kiếm theo tên kì</FormLabel>
+                  <FormLabel className="text-sm font-medium">Tìm kiếm theo tên kỳ</FormLabel>
                   <div className="flex items-center gap-2 mt-2">
                     <FormControl>
                       <Input

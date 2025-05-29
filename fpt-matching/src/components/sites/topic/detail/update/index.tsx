@@ -175,7 +175,7 @@ export const TopicDetailForm = ({ topicId }: TopicUpdateFormProps) => {
             </div>
 
             <div className="space-y-1">
-              <Label className="italic">Kì:</Label>
+              <Label className="italic">Kỳ:</Label>
               <p className="text-sm">{version.semester?.semesterName || "-"}</p>
             </div>
           </div>

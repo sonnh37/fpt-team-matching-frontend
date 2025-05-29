@@ -38,7 +38,7 @@ function DropdownSemester({semesters, currentSemester, setCurrentSemester}: {sem
         //         {dictionary[currentSemester.id!].semesterCode} - {dictionary[currentSemester.id!].semesterName} <ChevronDown className="h-4 w-4" />
         //     </DropdownMenuTrigger>
         //     <DropdownMenuContent align="start">
-        //         <DropdownMenuLabel>Chọn kì</DropdownMenuLabel>
+        //         <DropdownMenuLabel>Chọn kỳ</DropdownMenuLabel>
         //         <DropdownMenuRadioGroup onValueChange={handleOnChange} >
         //             {semesters.map(semester => (
         //                 <DropdownMenuRadioItem key={semester.semesterCode} value={semester.id!}>{semester.semesterCode} - {semester.semesterName}</DropdownMenuRadioItem>
@@ -72,7 +72,7 @@ const ImportUser = ({role} : {role: string}) => {
         <Tabs defaultValue="one" className="p-8 w-full">
             {
                 role == "Student" ? <div className={"flex gap-2 justify-center items-center mb-8"}>
-                    Kì hiện tại <DropdownSemester currentSemester={wsSemester ?? semesters[0]} setCurrentSemester={setCurrentSemester} semesters={semesters} />
+                    Kỳ hiện tại <DropdownSemester currentSemester={wsSemester ?? semesters[0]} setCurrentSemester={setCurrentSemester} semesters={semesters} />
                 </div> : null
             }
             <div className={"w-full flex justify-center items-center"}>

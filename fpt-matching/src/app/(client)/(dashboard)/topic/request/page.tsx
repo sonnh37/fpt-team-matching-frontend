@@ -104,7 +104,7 @@ export default function TopicRequestPage() {
   if (!role || !user) return null;
   if (isLoading) return <LoadingComponent />;
   if (error) return <ErrorSystem />;
-  if (!currentSemester) return <>Chưa tới kì</>;
+  if (!currentSemester) return <>Chưa tới kỳ</>;
 
   const stageTopic = getLatestStageTopic(currentSemester);
   const resultDate = stageTopic?.resultDate;

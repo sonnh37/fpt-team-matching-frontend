@@ -268,7 +268,7 @@ export const CreateProjectForm = () => {
     return (
       <AlertMessage
         messageType="error"
-        message="Không tìm thấy học kì hiện tại. Vui lòng chọn học kì trước khi tạo dự án."
+        message="Không tìm thấy học kỳ hiện tại. Vui lòng chọn học kỳ trước khi tạo dự án."
       />
     );
   }
@@ -278,21 +278,21 @@ export const CreateProjectForm = () => {
       return (
         <AlertMessage
           messageType="error"
-          message="Học kì đã kết thúc. Không thể tạo dự án mới."
+          message="Học kỳ đã kết thúc. Không thể tạo dự án mới."
         />
       );
     case SemesterStatus.OnGoing:
       return (
         <AlertMessage
           messageType="warning"
-          message="Học kì đang diễn ra. Không thể tạo dự án mới vào lúc này."
+          message="Học kỳ đang diễn ra. Không thể tạo dự án mới vào lúc này."
         />
       );
     case SemesterStatus.NotStarted:
       return (
         <AlertMessage
           messageType="info"
-          message="Học kì chưa bắt đầu. Vui lòng đợi đến giai đoạn chuẩn bị để tạo dự án."
+          message="Học kỳ chưa bắt đầu. Vui lòng đợi đến giai đoạn chuẩn bị để tạo dự án."
         />
       );
   }

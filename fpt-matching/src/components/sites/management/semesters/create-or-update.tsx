@@ -67,7 +67,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
   initialData = null,
 }) => {
   const [loading, setLoading] = useState(false);
-  const title = initialData ? "Chỉnh sửa kì" : "Tạo mới kì";
+  const title = initialData ? "Chỉnh sửa kỳ" : "Tạo mới kỳ";
   const action = initialData ? "Lưu thay đổi" : "Tạo";
   const router = useRouter();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
@@ -210,14 +210,14 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
               {/*  {initialData ? "Cập nhật thông tin học kỳ" : "Tạo học kỳ mới"}*/}
               {/*</p>*/}
               {initialData &&
-                  <p className={"text-sm text-muted-foreground text-red-500"}>Chỉ được cập nhật trong kì của workspace</p>
+                  <p className={"text-sm text-muted-foreground text-red-500"}>Chỉ được cập nhật trong kỳ của workspace</p>
               }
             </div>
           </div>
           {initialData && (
               <Card>
                 <CardHeader className="border-b flex flex-row justify-between">
-                  <CardTitle className="text-lg">Giai đoạn của kì</CardTitle>
+                  <CardTitle className="text-lg">Giai đoạn của kỳ</CardTitle>
                   <div className="flex gap-2">
                     {initialData.status != SemesterStatus.Closed &&
                         (<UpdateStatusDialog semester={initialData} />)}

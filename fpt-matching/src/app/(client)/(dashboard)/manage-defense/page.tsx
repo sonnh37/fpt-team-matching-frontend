@@ -80,7 +80,7 @@ function DropdownSemester({semesters, currentSemester, setCurrentSemester}: {sem
                 {dictionary[currentSemester.id!].semesterCode} - {dictionary[currentSemester.id!].semesterName} <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-                <DropdownMenuLabel>Chọn kì</DropdownMenuLabel>
+                <DropdownMenuLabel>Chọn kỳ</DropdownMenuLabel>
                 <DropdownMenuRadioGroup onValueChange={handleOnChange} >
                     {semesters.map(semester => (
                         <DropdownMenuRadioItem key={semester.semesterCode} value={semester.id!}>{semester.semesterCode} - {semester.semesterName}</DropdownMenuRadioItem>
@@ -283,7 +283,7 @@ const Page = () => {
                     <div className={"flex flex-col items-center justify-center"}>
                         <div className={"flex flex-row gap-2"}>
                             <div>
-                                Kì
+                                Kỳ
                                 {/*<span className={"text-red-600 px-0.5"}> {currentSemester.semesterCode} - {currentSemester.semesterName} </span>*/}
                                 {/*vẫn chưa được thêm lịch bảo vệ.*/}
                             </div>
@@ -302,7 +302,7 @@ const Page = () => {
                         window.location = filePath
                     }}>Tải mẫu bảo vệ lần {stage} tại đây!</Button>
                     {currentSemester && currentSemester.id == semesterPresent?.id ?  <CapstoneDefenseImportExcel file={file} setFile={setFile} /> : (
-                        <div className={"mt-16"}>Bạn không thể import tại kì này. Vui lòng liên hệ để biết thêm chi tiết</div>
+                        <div className={"mt-16"}>Bạn không thể import tại kỳ này. Vui lòng liên hệ để biết thêm chi tiết</div>
                     )}
                     {capstoneScheduleData.length > 0 && (
                         <div className={"w-full flex flex-col items-center justify-center gap-4"}>
@@ -318,7 +318,7 @@ const Page = () => {
                            <>
                                <div className={"flex flex-row gap-2"}>
                                    <div>
-                                       Lịch bảo vệ kì
+                                       Lịch bảo vệ kỳ
                                    </div>
                                    <DropdownSemester currentSemester={currentSemester} setCurrentSemester={setCurrentSemester} semesters={semesters} />
                                </div>

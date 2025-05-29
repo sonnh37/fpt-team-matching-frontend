@@ -130,7 +130,7 @@ export default function Page ()  {
                 </div>
                 {<div className={"w-full flex justify-center items-center"}>
                     <div className={"font-bold text-2xl"}>
-                        Kì hiện tại: {currentSemester?.semesterName} - {currentSemester?.semesterCode}
+                        Kỳ hiện tại: {currentSemester?.semesterName} - {currentSemester?.semesterCode}
                     </div>
                 </div>}
             </div>

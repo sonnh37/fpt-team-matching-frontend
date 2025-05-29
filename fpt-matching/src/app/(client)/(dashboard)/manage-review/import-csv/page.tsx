@@ -192,7 +192,7 @@ export default function Page() {
                 setOpenFailReview(true)
             }
         } else {
-            toast.error("Không tìm thấy kì hiện tại")
+            toast.error("Không tìm thấy kỳ hiện tại")
         }
         setIsLoading(false)
     }

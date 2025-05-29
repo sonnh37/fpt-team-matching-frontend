@@ -179,7 +179,7 @@ const ImportManyCard = ({role, semesterId}: {role: string,semesterId: string | n
         let response;
         if (role == "Student") {
             if (semesterId == null) {
-                toast.error("Kì hiện tại đang không tồn tại")
+                toast.error("Kỳ hiện tại đang không tồn tại")
                 return;
             }
             response = await userService.createManyStudentByManager(file, semesterId);

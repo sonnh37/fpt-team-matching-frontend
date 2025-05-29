@@ -132,7 +132,7 @@ export const columns: ColumnDef<User>[] = [
                       <TableHead>Mã đề tài</TableHead>
                       <TableHead>Tên ý tưởng</TableHead>
                       {/*<TableHead>Phiên bản</TableHead>*/}
-                      <TableHead>Kì</TableHead>
+                      <TableHead>Kỳ</TableHead>
                       <TableHead>Giai đoạn</TableHead>
                     </TableRow>
                   </TableHeader>

@@ -50,7 +50,7 @@ export function UpdateStatusDialog({semester} : {semester: Semester}) {
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Xác nhận cập nhật giao đoạn của kì</DialogTitle>
+                    <DialogTitle>Xác nhận cập nhật giao đoạn của kỳ</DialogTitle>
                     <DialogDescription>
                         Bạn có chắc chắn muốn cập nhật sang giai đoạn {SemesterStatus[semester.status + 1]}
                     </DialogDescription>

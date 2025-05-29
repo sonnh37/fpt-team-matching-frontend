@@ -116,11 +116,11 @@ export function SemesterSwitcher() {
       ]);
 
       toast.success(
-        `Đã chuyển học kì "${semester.semesterName}" với role "${newRole}"`
+        `Đã chuyển học kỳ "${semester.semesterName}" với role "${newRole}"`
       );
     } catch (error) {
       console.error("Change semester error:", error);
-      toast.error((error as string) || "Có lỗi khi thay đổi học kì");
+      toast.error((error as string) || "Có lỗi khi thay đổi học kỳ");
       setActiveSemester(currentSemester || semesterList[0]);
     } finally {
       setIsChanging(false);
@@ -143,7 +143,7 @@ export function SemesterSwitcher() {
                 </div>
                 <div className="flex-1 min-w-0 flex items-center gap-2">
                   <TypographyP className="truncate text-sm">
-                    {activeSemester?.semesterName || "Chọn học kì"}
+                    {activeSemester?.semesterName || "Chọn học kỳ"}
                   </TypographyP>
                   <Badge
                     variant={statusBadgeVariants[activeSemester.status].variant}
