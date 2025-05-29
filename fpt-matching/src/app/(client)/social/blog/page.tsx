@@ -61,6 +61,7 @@ import {BlogRecommendations} from "@/types/blog-recommend-model";
 import BlogRecommend from '@/components/blogforuser/blog-recommend';
 import {Button} from "@/components/ui/button";
 import {Badge} from "@/components/ui/badge";
+import {ProjectStatus} from "@/types/enums/project";
 
 
 export default function Blog() {
@@ -84,6 +85,7 @@ export default function Blog() {
   const [recommendBlogs, setRecommendBlogs] = useState<BlogRecommendations[]>([]);
 
 
+  console.log(projectUser)
 
   // Hàm thay đổi bộ lọc và gọi API lại
   const handleFilterChange = (type: BlogType) => {
@@ -598,7 +600,8 @@ export default function Blog() {
                               {/*  <h4 className="text-red-400 text-sm mt-2">*Không có nhóm</h4>*/}
                               {/*)}*/}
                               {
-                                projectUser != null ? (
+                                projectUser != null ?
+                                    (
                                     <div>{projectUser?.teamName ?? "Chưa có tên"} - Số lượng thành viên: {projectUser?.teamSize}</div>
                                 ): <Badge variant={"destructive"} className={"hover:bg-red-300"}>Chưa tạo nhóm</Badge>
                               }
@@ -622,7 +625,7 @@ export default function Blog() {
                         variant={"default"}
                         onClick={() => handleSubmit()}
                         className=' h-3/4 w-1/3 mx-2 rounded-xl hover:text-black  mt-2 mb-4'
-                        disabled={postType === BlogType.Recruit && projectUser == null}
+                        disabled={postType === BlogType.Recruit && projectUser == null && projectUser != null ? projectUser?.status == ProjectStatus.Pending : true}
                     >
                       Đăng bài
                     </Button>
