@@ -58,16 +58,16 @@ export const columns: ColumnDef<Project>[] = [
       return project.teamCode;
     },
   },
-  {
-    accessorKey: "semester",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Kì" />
-    ),
-    cell: ({ row }) => {
-      const project = row.original;
-      return project.semester?.semesterName;
-    },
-  },
+  // {
+  //   accessorKey: "semester",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Kì" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const project = row.original;
+  //     return project.semester?.semesterName;
+  //   },
+  // },
   {
     accessorKey: "mentor",
     header: ({ column }) => (
@@ -160,34 +160,30 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const role = useCurrentRole();
   const project = row.original;
 
-
-
-
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-    try {
-      if (!project.id) {
-        toast.error("Topic ID is missing. Cannot delete the topic.");
-        return;
-      }
-      const res = await projectService.deletePermanent(project.id);
-      if (res.status != 1) {
-        toast.error(res.message);
-        return;
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      toast.success(res.message);
-      await queryClient.refetchQueries({ queryKey: ["data"] });
-      setIsDeleteDialogOpen(false);
-    } catch (error) {
-      console.error("Error deleting project:", error);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
+  // const handleDelete = async () => {
+  //   setIsDeleting(true);
+  //   try {
+  //     if (!project.id) {
+  //       toast.error("Topic ID is missing. Cannot delete the topic.");
+  //       return;
+  //     }
+  //     const res = await projectService.deletePermanent(project.id);
+  //     if (res.status != 1) {
+  //       toast.error(res.message);
+  //       return;
+  //     }
+  //
+  //     await new Promise((resolve) => setTimeout(resolve, 1000));
+  //
+  //     toast.success(res.message);
+  //     await queryClient.refetchQueries({ queryKey: ["data"] });
+  //     setIsDeleteDialogOpen(false);
+  //   } catch (error) {
+  //     console.error("Error deleting project:", error);
+  //   } finally {
+  //     setIsDeleting(false);
+  //   }
+  // };
 
   const confirm = useConfirm()
   const handleSubmitManagaer = async (projectId: string) => {
@@ -219,6 +215,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     }
   };
 
+  console.log(project)
   return (
     <div className="flex  gap-2">
       <Button size="sm" variant="default" type="button" onClick={() => handleSubmitManagaer(project?.id ?? "")}> Duyệt nhóm</Button>

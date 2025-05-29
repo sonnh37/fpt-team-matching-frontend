@@ -10,7 +10,7 @@ export interface SemesterUpdateCommand extends UpdateCommand {
   endDate?: Date;
   onGoingDate?: Date;
   publicTopicDate?: Date;
-  status: SemesterStatus;
+  // status: SemesterStatus;
   maxTeamSize: number;
   minTeamSize: number;
   numberOfTeam: number;

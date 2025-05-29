@@ -61,6 +61,8 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
     null
   );
 
+  console.log(topicId)
+
   const { currentSemester } = useCurrentSemester();
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
