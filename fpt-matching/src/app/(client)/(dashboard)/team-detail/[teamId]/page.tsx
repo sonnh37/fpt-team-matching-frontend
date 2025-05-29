@@ -90,7 +90,7 @@ export default function ProjectDetail() {
       res_current_semester?.data == undefined ||
       res_current_semester.data == null
     ) {
-      // Đang chưa vô kì nhưng vô đợt hoặc chưa vô đợt
+      // Đang chưa vô kỳ nhưng vô đợt hoặc chưa vô đợt
       return false;
     }
     return true;

@@ -61,7 +61,7 @@ export const columns: ColumnDef<Project>[] = [
   // {
   //   accessorKey: "semester",
   //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Kì" />
+  //     <DataTableColumnHeader column={column} title="Kỳ" />
   //   ),
   //   cell: ({ row }) => {
   //     const project = row.original;

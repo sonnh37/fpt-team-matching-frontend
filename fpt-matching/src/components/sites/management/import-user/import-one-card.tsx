@@ -61,7 +61,7 @@ export const ImportOneCard = ({role, semesterId}: {role: string, semesterId: str
         if (role == "Student") {
             console.log(semesterId);
             if (semesterId == null) {
-                toast.error("Kì hiện tại không tồn tại")
+                toast.error("Kỳ hiện tại không tồn tại")
                 return;
             }
             userCreateCommand.semesterId = semesterId;

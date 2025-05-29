@@ -98,7 +98,7 @@ function DropdownSemester({semesters, currentSemester, setCurrentSemester}: {sem
                 {dictionary[currentSemester.id!].semesterCode} - {dictionary[currentSemester.id!].semesterName} <ChevronDown className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
-                <DropdownMenuLabel>Chọn kì</DropdownMenuLabel>
+                <DropdownMenuLabel>Chọn kỳ</DropdownMenuLabel>
                 <DropdownMenuRadioGroup onValueChange={handleOnChange} >
                     {semesters.map(semester => (
                         <DropdownMenuRadioItem key={semester.semesterCode} value={semester.id!}>{semester.semesterCode} - {semester.semesterName}</DropdownMenuRadioItem>
@@ -418,7 +418,7 @@ const Page = () => {
                     <div className={"flex flex-col items-center justify-center"}>
                         <div className={"flex flex-row gap-2"}>
                             <div>
-                                Kì
+                                Kỳ
                             </div>
                             {semesters.length >0 && currentSemester &&  <DropdownSemester currentSemester={currentSemester} setCurrentSemester={setCurrentSemester} semesters={semesters} />}
                             {/*<div>vẫn chưa được thêm lịch bảo vệ.</div>*/}
@@ -698,7 +698,7 @@ const Page = () => {
 
                         )
                         :
-                        (<div className={"mt-16"}>Bạn không thể import tại kì này. Vui lòng liên hệ để biết thêm chi
+                        (<div className={"mt-16"}>Bạn không thể import tại kỳ này. Vui lòng liên hệ để biết thêm chi
                             tiết</div>)
                     }
 

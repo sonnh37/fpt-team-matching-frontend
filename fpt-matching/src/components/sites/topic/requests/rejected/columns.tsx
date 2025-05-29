@@ -30,7 +30,7 @@ export const columns: ColumnDef<Topic>[] = [
   {
     accessorKey: "semester",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Kì" />
+      <DataTableColumnHeader column={column} title="Kỳ" />
     ),
     cell: ({ row }) => {
       const topic = row.original;
