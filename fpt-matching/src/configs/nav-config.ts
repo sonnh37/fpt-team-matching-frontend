@@ -200,7 +200,7 @@ export const NAV_CONFIG = {
         
         {
           url: "/management/projects/add-to-project",
-          title: "Thêm sinh viên vào nhóm",
+          title: "Ghép nhóm cho sinh viên",
           icon: Briefcase,
           roles: ["Manager"],
         }
