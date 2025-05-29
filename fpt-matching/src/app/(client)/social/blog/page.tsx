@@ -625,7 +625,7 @@ export default function Blog() {
                         variant={"default"}
                         onClick={() => handleSubmit()}
                         className=' h-3/4 w-1/3 mx-2 rounded-xl hover:text-black  mt-2 mb-4'
-                        disabled={postType === BlogType.Recruit && projectUser == null && projectUser != null ? projectUser?.status == ProjectStatus.Pending : true}
+                        disabled={postType == BlogType.Recruit && projectUser == null && (projectUser != null ? projectUser?.status == ProjectStatus.Pending : true)}
                     >
                       Đăng bài
                     </Button>
