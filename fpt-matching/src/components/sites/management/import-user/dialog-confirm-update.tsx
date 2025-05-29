@@ -77,7 +77,7 @@ const DialogConfirmUpdate = ({open, setOpen, usersConfirm, role, semesterId} : {
             <DialogTrigger asChild>
                 {/*<Button onClick={() => setOpen(true)} className={"self-end mr-6"} variant="default">Tạo tài khoản</Button>*/}
             </DialogTrigger>
-            <DialogContent className="w-full">
+            <DialogContent className="w-full max-w-[70vw]">
                 <DialogHeader>
                     <DialogTitle>Xác nhận cập nhật</DialogTitle>
                 </DialogHeader>

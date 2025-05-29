@@ -29,6 +29,7 @@ import { Department } from "@/types/enums/user";
 import { roleService } from "@/services/role-service";
 import { columns } from "./columns";
 import {useCurrentRole, useCurrentSemester} from "@/hooks/use-current-role";
+import {semesterService} from "@/services/semester-service";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -43,6 +44,7 @@ export default function UserTable() {
     queryFn: () => roleService.getAll(),
     refetchOnWindowFocus: false,
   });
+  const currentSemester = useCurrentSemester().currentSemester
 
   const roles = res_role?.data?.results?.filter((m) => m.roleName != "Admin");
 
@@ -121,7 +123,7 @@ export default function UserTable() {
       sorting,
     );
 
-    return { ...params };
+    return { ...params, semesterId: currentSemester?.id };
   }, [formValues, columnFilters, pagination, sorting]);
 
   useEffect(() => {
@@ -153,9 +155,10 @@ export default function UserTable() {
 
   if (error) return <div>Error loading data</div>;
 
-  const currentSemester = useCurrentSemester().currentSemester
+  console.log(currentSemester)
+  console.log(data?.data?.results)
   const table = useReactTable({
-    data: data?.data?.results?.filter(x => x.userXRoles?.some(x => x.semesterId == currentSemester?.id)) ?? [],
+    data: data?.data?.results ?? [],
     columns,
     pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },

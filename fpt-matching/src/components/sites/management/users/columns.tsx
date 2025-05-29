@@ -15,7 +15,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import {useCurrentRole, useCurrentSemester} from "@/hooks/use-current-role";
 import { formatDate } from "@/lib/utils";
 import { userService } from "@/services/user-service";
 import { Department } from "@/types/enums/user";
@@ -121,9 +121,11 @@ export const columns: ColumnDef<User>[] = [
     ),
     cell: ({ row }) => {
       const roles = row.original.userXRoles
+          ?.filter(x => x.semesterId == useCurrentSemester().currentSemester?.id)
         ?.map((userXRole: UserXRole) => userXRole.role?.roleName)
-        .filter(Boolean);
+        // .filter(Boolean);
 
+      console.log(roles)
       return (
         <div className="flex flex-wrap gap-1 max-w-[200px]">
           {roles?.map((role, index) => (
