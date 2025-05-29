@@ -1,19 +1,10 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
 import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import { LoadingComponent } from "@/components/_common/loading-page";
-import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { isDeleted_options } from "@/lib/filter-options";
 import { userService } from "@/services/user-service";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
@@ -22,13 +13,11 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ColumnFiltersState,
   getCoreRowModel,
-  getFilteredRowModel,
   PaginationState,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 import { useEffect, useMemo, useState } from "react";
@@ -39,8 +28,7 @@ import { Department } from "@/types/enums/user";
 
 import { roleService } from "@/services/role-service";
 import { columns } from "./columns";
-import { semesterService } from "@/services/semester-service";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import {useCurrentRole, useCurrentSemester} from "@/hooks/use-current-role";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -48,7 +36,6 @@ const defaultSchema = z.object({
 });
 //#endregion
 export default function UserTable() {
-  const searchParams = useSearchParams();
   const columnSearch = "emailOrFullname";
   const roleCurrent = useCurrentRole();
   const { data: res_role } = useQuery({
@@ -59,11 +46,11 @@ export default function UserTable() {
 
   const roles = res_role?.data?.results?.filter((m) => m.roleName != "Admin");
 
-  const { data: res_semester } = useQuery({
-    queryKey: ["get-all-semester"],
-    queryFn: () => semesterService.getAll(),
-    refetchOnWindowFocus: false,
-  });
+  // const { data: res_semester } = useQuery({
+  //   queryKey: ["get-all-semester"],
+  //   queryFn: () => semesterService.getAll(),
+  //   refetchOnWindowFocus: false,
+  // });
 
   const filterEnums: FilterEnum[] = [
     {
@@ -76,16 +63,16 @@ export default function UserTable() {
         })) || [],
       type: "single",
     },
-    {
-      columnId: "semesterId",
-      title: "Semester",
-      options:
-        res_semester?.data?.results?.map((semester) => ({
-          label: semester.semesterName,
-          value: semester.id,
-        })) || [],
-      type: "single",
-    },
+    // {
+    //   columnId: "semesterId",
+    //   title: "Semester",
+    //   options:
+    //     res_semester?.data?.results?.map((semester) => ({
+    //       label: semester.semesterName,
+    //       value: semester.id,
+    //     })) || [],
+    //   type: "single",
+    // },
     {
       columnId: "department",
       title: "Department",
@@ -131,7 +118,7 @@ export default function UserTable() {
       formValues,
       columnFilters,
       pagination,
-      sorting
+      sorting,
     );
 
     return { ...params };
@@ -157,7 +144,7 @@ export default function UserTable() {
     }
   }, [formValues[columnSearch as keyof typeof formValues]]);
 
-  const { data, isFetching, error, refetch } = useQuery({
+  const { data, isFetching, error } = useQuery({
     queryKey: ["data", queryParams],
     queryFn: () => userService.getAll(queryParams),
     placeholderData: keepPreviousData,
@@ -166,8 +153,9 @@ export default function UserTable() {
 
   if (error) return <div>Error loading data</div>;
 
+  const currentSemester = useCurrentSemester().currentSemester
   const table = useReactTable({
-    data: data?.data?.results ?? [],
+    data: data?.data?.results?.filter(x => x.userXRoles?.some(x => x.semesterId == currentSemester?.id)) ?? [],
     columns,
     pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
