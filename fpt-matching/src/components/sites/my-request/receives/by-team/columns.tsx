@@ -171,6 +171,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       }
 
       toast.success(res.message);
+      window.location.reload();
       queryClient.refetchQueries({ queryKey: ["data"] });
     } catch (error) {
       toast.error(error as string);
