@@ -1,19 +1,17 @@
 "use client"
-import React, { useEffect, useState } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React, {useEffect, useState} from 'react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
 import {
-  faThumbsUp,
+  faCircleUser,
   faComment,
   faEarthAmericas,
-  faPaperclip,
-  faUser,
-  faVideo,
-  faFaceSmile,
-  faPhotoFilm,
-  faPencil,
+  faFaceSmile, faLayerGroup, faListCheck,
   faNoteSticky,
+  faPaperclip,
+  faPencil,
   faShare,
-  faCircleUser
+  faThumbsUp,
+  faUserPlus
 } from "@fortawesome/free-solid-svg-icons";
 import {
   DropdownMenu,
@@ -23,36 +21,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalTrigger,
-  ModalClose,
-  ModalFooter,
-} from "@/components/ui/animated-modal";
+import {Modal, ModalBody, ModalClose, ModalContent, ModalFooter, ModalTrigger,} from "@/components/ui/animated-modal";
 
-import {
-  Pagination
-} from "@/components/ui/pagination"
+import {Pagination} from "@/components/ui/pagination"
 
-import { useSelector } from 'react-redux';
-import { useQuery } from '@tanstack/react-query';
-import { RootState } from '@/lib/redux/store';
-import { blogService } from '@/services/blog-service';
-import { BlogGetAllQuery } from '@/types/models/queries/blog/blog-get-all-query';
+import {useSelector} from 'react-redux';
+import {useQuery} from '@tanstack/react-query';
+import {RootState} from '@/lib/redux/store';
+import {blogService} from '@/services/blog-service';
+import {BlogGetAllQuery} from '@/types/models/queries/blog/blog-get-all-query';
 import CommentBlog from '@/components/_common/comment/comment';
-import { toast } from 'sonner';
-import { BlogStatus, BlogType } from '@/types/enums/blog';
-import { BlogCreateCommand } from '@/types/models/commands/blog/blog-create-command';
+import {toast} from 'sonner';
+import {BlogStatus, BlogType} from '@/types/enums/blog';
+import {BlogCreateCommand} from '@/types/models/commands/blog/blog-create-command';
 import LikeBlog from '@/components/_common/likeblog/like-blog';
-import { projectService } from '@/services/project-service';
-import { Project } from '@/types/project';
+import {projectService} from '@/services/project-service';
+import {Project} from '@/types/project';
 import ProjectInfo from '@/components/_common/projectInfo/project-info';
 import UploadCv from '@/components/_common/uploadCv/upload-cv';
-import { DirectionAwareHover } from '@/components/ui/direction-aware-hover';
-import { FaXTwitter, FaFacebookF, FaGithub, FaInstagram, FaTwitch, FaMastodon } from "react-icons/fa6";
-import { PiButterflyFill, PiGearSixBold } from 'react-icons/pi';
+import {DirectionAwareHover} from '@/components/ui/direction-aware-hover';
+import {FaFacebookF, FaGithub, FaInstagram, FaMastodon, FaTwitch, FaXTwitter} from "react-icons/fa6";
+import {PiButterflyFill, PiGearSixBold} from 'react-icons/pi';
 import {
   Select,
   SelectContent,
@@ -62,14 +51,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { profilestudentService } from "@/services/profile-student-service";
-import { ProfileStudent } from "@/types/profile-student";
-import { apiHubsService } from "@/services/api-hubs-service";
-import { BlogRecommendations } from "@/types/blog-recommend-model";
+import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
+import {Input} from "@/components/ui/input";
+import {Textarea} from "@/components/ui/textarea";
+import {profilestudentService} from "@/services/profile-student-service";
+import {ProfileStudent} from "@/types/profile-student";
+import {apiHubsService} from "@/services/api-hubs-service";
+import {BlogRecommendations} from "@/types/blog-recommend-model";
 import BlogRecommend from '@/components/blogforuser/blog-recommend';
+import {Button} from "@/components/ui/button";
+import {Badge} from "@/components/ui/badge";
 
 
 export default function Blog() {
@@ -442,7 +433,7 @@ export default function Blog() {
                 <div className="flex mt-3 ">
                   <div className="flex space-x-4 justify-center w-full">
                     <button className="text-red-500 hover:text-gray-800 w-1/2">
-                      <FontAwesomeIcon icon={faVideo} />
+                      <FontAwesomeIcon icon={faUserPlus} />
                       <span> </span>
                       Bài tuyển thành viên
                     </button>
@@ -462,30 +453,32 @@ export default function Blog() {
 
               </ModalTrigger>
 
-              <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%]'>
+              <ModalBody className='min-h-[60%] max-h-[90%] md:max-w-[40%] border-0'>
                 <ModalContent>
-                  <div className="header-blog mb-4 py-4 border-b-slate-100 h-1/6 bg-[#ff9240]">
+                  <div className="header-blog mb-4 py-4 h-1/6 bg-[#ff9240] border-0">
                     <h4 className='text-lg md:text-2xl text-white dark:text-neutral-100 font-bold text-center'>
                       Tạo bài viết mới
                     </h4>
                   </div>
                   <div className='body-blog w-full h-4/5'>
-                    <div className='headerbody pb-4 gap-2 flex items-center w-full h-1/4 px-3'>
+                    <div className='headerbody gap-4 flex items-center w-full h-1/4 px-4'>
                       {/*<img*/}
                       {/*  src={user?.avatar || "/user-avatardefault.jpg"}*/}
                       {/*  alt="Avatar"*/}
                       {/*  className="w-12 h-12 rounded-full"*/}
                       {/*/>*/}
-                      <Avatar>
-                        <AvatarImage src="/user-avatardefault.jpg" alt="@shadcn" />
-                        <AvatarFallback>CN</AvatarFallback>
-                      </Avatar>
-                      <div className='w-full ml-3'>
-                        <div className=' '>
-                          <p className="text-lg font-semibold text-gray-800">
-                            <FontAwesomeIcon
-                              icon={faUser} /> {user?.lastName} {user?.firstName}</p>
-                        </div>
+                      <div className={"w-1/5 flex items-center"}>
+                        <Avatar className={""}>
+                          <AvatarImage src="/user-avatardefault.jpg" alt="@shadcn" />
+                          <AvatarFallback>CN</AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <div className='w-full ml-8'>
+                        {/*<div className=' '>*/}
+                        {/*  <p className="text-lg font-semibold text-gray-800">*/}
+                        {/*    <FontAwesomeIcon*/}
+                        {/*      icon={faUser} /> {user?.lastName} {user?.firstName}</p>*/}
+                        {/*</div>*/}
 
                         <Select value={postType.toString()}
                           defaultValue={BlogType.Share.toString()}
@@ -496,7 +489,7 @@ export default function Blog() {
                               [status]: parseInt(e),
                             }));
                           }}>
-                          <SelectTrigger className={"w-1/3"}>
+                          <SelectTrigger className={"w-3/4 px-4"}>
                             <SelectValue placeholder="Chọn thể loại" />
                           </SelectTrigger>
                           <SelectContent>
@@ -515,7 +508,7 @@ export default function Blog() {
                       {/* Tiêu đề */}
                       <div className="flex items-center gap-4">
                         <div className="w-1/5 flex items-center">
-                          <h3 className="text-nowrap"><FontAwesomeIcon icon={faPencil} className="pr-1.5" /> Tiêu đề:</h3>
+                          <h3 className="text-nowrap font-bold float-left"><FontAwesomeIcon icon={faPencil} className="pr-1.5" /> Tiêu đề:</h3>
                         </div>
                         <div className="w-3/5">
                           <Input
@@ -523,7 +516,7 @@ export default function Blog() {
                             type="text"
                             value={formData.title}
                             onChange={handleChange}
-                            placeholder="Nhập tựa đề ở đây"
+                            placeholder="Nhập tiêu đề đề ở đây"
                             className="w-full"
                           />
                         </div>
@@ -532,7 +525,7 @@ export default function Blog() {
                       {/* Nội dung */}
                       <div className="flex items-center gap-4">
                         <div className="w-1/5 flex items-center">
-                          <h3 className="text-nowrap"><FontAwesomeIcon icon={faNoteSticky} className="pr-1.5" /> Nội dung:</h3>
+                          <h3 className="text-nowrap font-bold float-left"><FontAwesomeIcon icon={faNoteSticky} className="pr-1.5" /> Nội dung:</h3>
                         </div>
                         <div className="w-3/5">
                           <Textarea
@@ -551,7 +544,7 @@ export default function Blog() {
                           {/* Kỹ năng yêu cầu */}
                           <div className="flex items-center gap-4">
                             <div className="w-1/5 flex items-center">
-                              <h3 className="text-nowrap">Kỹ năng yêu cầu:</h3>
+                              <h3 className="text-nowrap font-bold float-left"><FontAwesomeIcon icon={faListCheck} className="pr-1.5" />Kỹ năng yêu cầu:</h3>
                             </div>
                             <div className="w-3/5">
                               <Textarea
@@ -566,11 +559,11 @@ export default function Blog() {
 
                           {/* Team của bạn */}
                           <div className="flex items-start gap-4 mt-4 min-h-28">
-                            <div className="w-1/5 flex flex-col p-2">
-                              <h3 className="text-nowrap">Team của bạn:</h3>
+                            <div className="w-1/5 flex flex-col ">
+                              <h3 className="text-nowrap font-bold float-left"><FontAwesomeIcon icon={faLayerGroup} className="pr-1.5" /> Nhóm của bạn:</h3>
 
                             </div>
-                            <div className="w-3/5">
+                            <div className="w-3/5 pt-2">
                               {/* {!projectUser?.id ? (
                                 <h4 className="text-red-400 text-sm mt-2">*Không có nhóm</h4>
                               ):(
@@ -578,34 +571,39 @@ export default function Blog() {
                                    {projectUser?.teamName}
                               </div>
                               )} */}
-                                        <Select
-                                name="projectId"
-                                value={formData.projectId}
-                                defaultValue={undefined}
-                                onValueChange={(e) => {
-                                  setFormData((prev) => ({
-                                    ...prev,
-                                    projectId: e,
-                                  }));
-                                }}
-                              >
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Chọn dự án" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectGroup>
-                                    <SelectLabel>Dự án của bạn</SelectLabel>
-                                    {projectUser?.id && (
-                                      <SelectItem value={projectUser.id}>{projectUser.teamName}</SelectItem>
-                                    )}
-                                  </SelectGroup>
-                                </SelectContent>
-                              </Select>
-                              {!projectUser?.id && (
-                                <h4 className="text-red-400 text-sm mt-2">*Không có nhóm</h4>
-                              )}
-                              <h4 className="text-red-400 text-sm">*Không bắt buộc</h4>
-                              <h4 className="text-red-400 text-sm">{messageUser}</h4>
+                              {/*          <Select*/}
+                              {/*  name="projectId"*/}
+                              {/*  value={formData.projectId}*/}
+                              {/*  defaultValue={undefined}*/}
+                              {/*  onValueChange={(e) => {*/}
+                              {/*    setFormData((prev) => ({*/}
+                              {/*      ...prev,*/}
+                              {/*      projectId: e,*/}
+                              {/*    }));*/}
+                              {/*  }}*/}
+                              {/*>*/}
+                              {/*  <SelectTrigger className="w-full">*/}
+                              {/*    <SelectValue placeholder="Chọn dự án" />*/}
+                              {/*  </SelectTrigger>*/}
+                              {/*  <SelectContent>*/}
+                              {/*    <SelectGroup>*/}
+                              {/*      <SelectLabel>Dự án của bạn</SelectLabel>*/}
+                              {/*      {projectUser?.id && (*/}
+                              {/*        <SelectItem value={projectUser.id}>{projectUser.teamName}</SelectItem>*/}
+                              {/*      )}*/}
+                              {/*    </SelectGroup>*/}
+                              {/*  </SelectContent>*/}
+                              {/*</Select>*/}
+                              {/*{!projectUser?.id && (*/}
+                              {/*  <h4 className="text-red-400 text-sm mt-2">*Không có nhóm</h4>*/}
+                              {/*)}*/}
+                              {
+                                projectUser != null ? (
+                                    <div>{projectUser?.teamName ?? "Chưa có tên"} - Số lượng thành viên: {projectUser?.teamSize}</div>
+                                ): <Badge variant={"destructive"} className={"hover:bg-red-300"}>Chưa tạo nhóm</Badge>
+                              }
+                              {/*<h4 className="text-red-400 text-sm">*Không bắt buộc</h4>*/}
+                              {/*<h4 className="text-red-400 text-sm">{messageUser}</h4>*/}
                             </div>
                           </div>
                         </div>
@@ -620,10 +618,14 @@ export default function Blog() {
                 <ModalFooter>
                   <div
                     className='flex w-full h-14 sticky bottom-0  items-center justify-center'>
-                    <button onClick={() => handleSubmit()}
-                      className='bg-blue-500 h-3/4 w-1/3 mx-2 rounded-xl hover:bg-blue-400 hover:text-black  mt-2 mb-4'>Post
-                      Bài
-                    </button>
+                    <Button
+                        variant={"default"}
+                        onClick={() => handleSubmit()}
+                        className=' h-3/4 w-1/3 mx-2 rounded-xl hover:text-black  mt-2 mb-4'
+                        disabled={postType === BlogType.Recruit && projectUser == null}
+                    >
+                      Đăng bài
+                    </Button>
                   </div>
                 </ModalFooter>
               </ModalBody>

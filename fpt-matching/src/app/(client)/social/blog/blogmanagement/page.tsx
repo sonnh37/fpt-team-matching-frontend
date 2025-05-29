@@ -430,7 +430,7 @@ export default function Blogmanagement() {
                                                                 // value={formData.title}
                                                                 // name="title"
                                                                 // onChange={handleChange}
-                                                                placeholder='Nhập tựa đề ở đây' />
+                                                                placeholder='Nhập tiêu đề ở đây' />
                                                         </div>
                                                         <div className='flex mt-2 h-full'>
                                                             <div className='w-1/4 items-center p-2 '>
