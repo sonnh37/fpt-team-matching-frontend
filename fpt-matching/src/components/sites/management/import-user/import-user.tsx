@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {ChevronDown} from "lucide-react";
 import {semesterService} from "@/services/semester-service";
+import {useCurrentSemester} from "@/hooks/use-current-role";
 function DropdownSemester({semesters, currentSemester, setCurrentSemester}: {semesters: Semester[], currentSemester: Semester, setCurrentSemester: Dispatch<SetStateAction<Semester | undefined>>}) {
     if(!semesters) return;
     const dictionary: Record<string, Semester> = semesters.reduce(
@@ -32,25 +33,30 @@ function DropdownSemester({semesters, currentSemester, setCurrentSemester}: {sem
     }
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger value={currentSemester.id!}  className="flex items-center text-red-600 gap-1">
-                {dictionary[currentSemester.id!].semesterCode} - {dictionary[currentSemester.id!].semesterName} <ChevronDown className="h-4 w-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-                <DropdownMenuLabel>Chọn kì</DropdownMenuLabel>
-                <DropdownMenuRadioGroup onValueChange={handleOnChange} >
-                    {semesters.map(semester => (
-                        <DropdownMenuRadioItem key={semester.semesterCode} value={semester.id!}>{semester.semesterCode} - {semester.semesterName}</DropdownMenuRadioItem>
-                    ))}
-                </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-        </DropdownMenu>
+        // <DropdownMenu>
+        //     <DropdownMenuTrigger value={currentSemester.id!}  className="flex items-center text-red-600 gap-1">
+        //         {dictionary[currentSemester.id!].semesterCode} - {dictionary[currentSemester.id!].semesterName} <ChevronDown className="h-4 w-4" />
+        //     </DropdownMenuTrigger>
+        //     <DropdownMenuContent align="start">
+        //         <DropdownMenuLabel>Chọn kì</DropdownMenuLabel>
+        //         <DropdownMenuRadioGroup onValueChange={handleOnChange} >
+        //             {semesters.map(semester => (
+        //                 <DropdownMenuRadioItem key={semester.semesterCode} value={semester.id!}>{semester.semesterCode} - {semester.semesterName}</DropdownMenuRadioItem>
+        //             ))}
+        //         </DropdownMenuRadioGroup>
+        //     </DropdownMenuContent>
+        // </DropdownMenu>
+        <div className="flex items-center text-red-600 gap-1">
+            {currentSemester.semesterCode} - {currentSemester.semesterName}
+        </div>
     )
 }
 const ImportUser = ({role} : {role: string}) => {
     const [currentSemester, setCurrentSemester] = useState<Semester>();
     const [semesters, setSemesters] = useState<Semester[]>([]);
+    const wsSemester = useCurrentSemester().currentSemester
     useEffect(() => {
+
         const fetchData = async () => {
             const fetch_current_semester = await semesterService.getCurrentSemester();
             const fetch_all_semester = await semesterService.getAll();
@@ -66,7 +72,7 @@ const ImportUser = ({role} : {role: string}) => {
         <Tabs defaultValue="one" className="p-8 w-full">
             {
                 role == "Student" ? <div className={"flex gap-2 justify-center items-center mb-8"}>
-                    Chọn kì <DropdownSemester currentSemester={currentSemester ?? semesters[0]} setCurrentSemester={setCurrentSemester} semesters={semesters} />
+                    Kì hiện tại <DropdownSemester currentSemester={wsSemester ?? semesters[0]} setCurrentSemester={setCurrentSemester} semesters={semesters} />
                 </div> : null
             }
             <div className={"w-full flex justify-center items-center"}>
