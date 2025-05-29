@@ -8,6 +8,7 @@ import { columns } from "./columns";
 import { projectService } from "@/services/project-service";
 import { ProjectGetAllQuery } from "@/types/models/queries/projects/project-get-all-query";
 import { ProjectStatus } from "@/types/enums/project";
+import {useCurrentSemester} from "@/hooks/use-current-role";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -18,6 +19,7 @@ export function ManageProjectSubmit() {
   const queryParams: ProjectGetAllQuery = {
     status: ProjectStatus.Pending,
     isPagination: false,
+    semesterId: useCurrentSemester().currentSemester?.id
   };
 
   const { data, isFetching, error, refetch } = useQuery({
@@ -27,7 +29,6 @@ export function ManageProjectSubmit() {
     refetchOnWindowFocus: false,
   });
 
-  console.log(data?.data?.results,"test")
 
   if (error) return <div>Error loading data</div>;
 

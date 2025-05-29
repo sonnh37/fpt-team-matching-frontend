@@ -47,19 +47,19 @@ interface SemesterFormProps {
 
 const formSchema = z.object({
   id: z.string().optional(),
-  semesterCode: z.string().nullable(),
+  semesterCode: z.string().nonempty({message: "Không được để trống field"}),
   // criteriaFormId: z.string().nullable(),
-  semesterName: z.string().nullable(),
-  semesterPrefixName: z.string().nullable(),
-  limitTopicSubMentor: z.number(),
-  limitTopicMentorOnly: z.number(),
+  semesterName: z.string().nonempty({message: "Không được để trống field"}),
+  semesterPrefixName: z.string().nonempty({message: "Không được để trống field"}),
+  limitTopicSubMentor: z.number().min(1, "Phải lớn hơn 0"),
+  limitTopicMentorOnly: z.number().min(1, "Phải lớn hơn 0"),
   startDate: z.date(),
   endDate: z.date(),
   publicTopicDate: z.date(),
   onGoingDate: z.date(),
-  maxTeamSize: z.number(),
-  minTeamSize: z.number(),
-  numberOfTeam: z.number(),
+  maxTeamSize: z.number().min(1, "Phải lớn hơn 0"),
+  minTeamSize: z.number().min(1, "Phải lớn hơn 0"),
+  numberOfTeam: z.number().min(1, "Phải lớn hơn 0"),
   // status: z.nativeEnum(SemesterStatus).nullable(),
 });
 
@@ -69,7 +69,6 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
   const [loading, setLoading] = useState(false);
   const title = initialData ? "Chỉnh sửa kì" : "Tạo mới kì";
   const action = initialData ? "Lưu thay đổi" : "Tạo";
-  const [firebaseLink, setFirebaseLink] = useState<string | null>(null);
   const router = useRouter();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [pendingValues, setPendingValues] = useState<z.infer<
@@ -77,7 +76,6 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
   > | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const previousPath = usePreviousPath();
-  const [file, setFile] = useState<File | null>(null);
   const queryClient = useQueryClient();
   const currentSemester = useCurrentSemester().currentSemester;
   if (!currentSemester) {
@@ -244,7 +242,12 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                       </CardHeader>
                       <CardContent className="pt-6 grid gap-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
+                          <FormInput
+                              form={form}
+                              name="semesterName"
+                              label="Tên học kỳ"
+                              placeholder="VD: Fall2025"
+                          />
                           <FormInput
                               form={form}
                               name="semesterCode"
@@ -258,12 +261,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
                           {/*    enumOptions={getEnumOptions(SemesterStatus)}*/}
                           {/*    default*/}
                           {/*/>*/}
-                          <FormInput
-                              form={form}
-                              name="semesterName"
-                              label="Tên học kỳ"
-                              placeholder="VD: Fall2025"
-                          />
+
                         </div>
 
                         <div className="grid grid-cols-2 md:grid-cols-2 gap-6">
