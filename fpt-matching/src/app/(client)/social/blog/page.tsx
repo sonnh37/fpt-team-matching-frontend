@@ -112,36 +112,36 @@ export default function Blog() {
     if (isSubmitting) return; // Chặn nếu đang submit
     setIsSubmitting(true);
 
-    // Hiện loading toast
-    const toastId = toast.loading("⏳ Đang tạo blog, vui lòng chờ...");
     
     try {
       if (!formData.title || !formData.content) {
-        toast.dismiss(toastId);
+  
         toast.error("⚠️ Vui lòng nhập tiêu đề hoặc nội dung!");
         return;
       }
 
       if (!formData.title || formData.title.trim().length < 10) {
-        toast.dismiss(toastId);
+     
         toast.error("⚠️ Tiêu đề phải có ít nhất 10 ký tự!");
         return;
       }
 
       if (!formData.content || formData.content.trim().length < 10) {
-        toast.dismiss(toastId);
+
         toast.error("⚠️ Nội dung phải có ít nhất 10 ký tự!");
         return;
       }
       if(postType == BlogType.Recruit){
         if (!formData.skillRequired || formData.skillRequired.trim().length < 5) {
-          toast.dismiss(toastId);
+  
           toast.error("⚠️ Kỹ năng yêu cầu phải có ít nhất 5 ký tự!");
           return;
         }
       }
 
    
+    // Hiện loading toast
+     const toastId = toast.loading("⏳ Đang tạo blog, vui lòng chờ...");
       const blognew: BlogCreateCommand = {
         title: formData.title,
         content: formData.content,
