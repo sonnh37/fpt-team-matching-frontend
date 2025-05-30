@@ -744,8 +744,8 @@ export default function TeamInfo() {
               </p>
               {project.topicId &&
               (availableSlots == 0 || availableSlots == 1) ? (
-                <Link href={`/submit/${project.id}`}>
-                  <Button className="w-full"> Nộp đề tài</Button>
+                <Link href={`submit/${project.id}`}>
+                  <Button className="w-full">Nộp</Button>
                 </Link>
               ) : (
                 <Button className="w-full" disabled>
