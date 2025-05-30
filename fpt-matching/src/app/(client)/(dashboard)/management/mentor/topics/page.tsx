@@ -23,7 +23,7 @@ const MENTOR_TABS = [
       TopicStatus.MentorSubmitted,
       TopicStatus.ManagerPending,
       TopicStatus.ManagerApproved,
-      TopicStatus.MentorRejected,
+      // TopicStatus.MentorRejected,
       TopicStatus.ManagerRejected,
     ],
   },
