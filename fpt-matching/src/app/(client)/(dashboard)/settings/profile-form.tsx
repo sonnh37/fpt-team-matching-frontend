@@ -147,7 +147,7 @@ export function ProfileForm({ user }: { user?: User }) {
                     name="avatar"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <FormLabel className="block text-sm text-gray-700 dark:text-gray-300 font-bold">
                           Ảnh đại diện
                         </FormLabel>
                         <FormControl>

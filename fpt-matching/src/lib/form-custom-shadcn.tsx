@@ -451,7 +451,7 @@ export const FormInputPhone = <TFieldValues extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className={"font-bold"}>{label}</FormLabel>
           <FormControl>
             <PhoneInput
               placeholder="Placeholder"
@@ -750,7 +750,7 @@ export const FormInputDateTimePicker = <TFieldValues extends FieldValues>({
 
         return (
           <FormItem className="flex flex-col w-full">
-            <FormLabel>{label}</FormLabel>
+            <FormLabel className={"font-bold"}>{label}</FormLabel>
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>
