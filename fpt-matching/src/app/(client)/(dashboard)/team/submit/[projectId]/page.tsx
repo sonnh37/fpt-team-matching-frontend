@@ -397,7 +397,7 @@ const SubmitTopic = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Giảng viên hướng dẫn</FormLabel>
-                        <p>{mentor ? `${mentor.lastName} ${mentor.firstName}` : "Chưa chọn"}</p>
+                        <p>{mentor ? `${mentor.lastName} ${mentor.firstName} (${mentor.code})` : "Không có"}</p>
                       </FormItem>
                     )}
                   />
@@ -416,7 +416,7 @@ const SubmitTopic = () => {
                           <FormLabel>
                             Giảng viên hướng dẫn 2 (Tùy chọn)
                           </FormLabel>
-                          <p>{subMentor ? `${subMentor.lastName} ${subMentor.firstName}` : "Không có"}</p>
+                          <p>{subMentor ? `${subMentor.lastName} ${subMentor.firstName} (${subMentor.code})` : "Không có"}</p>
                         </FormItem>
                       );
                     }}
