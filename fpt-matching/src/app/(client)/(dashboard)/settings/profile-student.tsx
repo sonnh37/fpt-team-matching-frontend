@@ -363,10 +363,15 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                         </FormControl>
                         <FormMessage className="text-xs" />
                       </FormItem>
+
                     )}
                   />
-
-
+                  <FormInput
+                      label="Thành tích"
+                      name="achievement"
+                      form={form}
+                      placeholder="Nhập các thành tích đạt được"
+                  />
                 </div>
 
                 {/* Cột 2 */}
@@ -385,25 +390,20 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                     placeholder="Nhập sở thích cá nhân"
                   />
 
-                  <FormInput
-                    label="Thành tích"
-                    name="achievement"
-                    form={form}
-                    placeholder="Nhập các thành tích đạt được"
-                  />
+                  {/* Kinh nghiệm dự án */}
+                  <div className="space-y-4">
+                    <FormInputTextArea
+                        label="Kinh nghiệm dự án"
+                        name="experienceProject"
+                        form={form}
+                        placeholder="Mô tả các dự án đã tham gia, vai trò và kinh nghiệm đạt được"
+                        rows={4}
+                    />
+                  </div>
                 </div>
               </div>
 
-              {/* Kinh nghiệm dự án */}
-              <div className="space-y-4">
-                <FormInputTextArea
-                  label="Kinh nghiệm dự án"
-                  name="experienceProject"
-                  form={form}
-                  placeholder="Mô tả các dự án đã tham gia, vai trò và kinh nghiệm đạt được"
-                  rows={4}
-                />
-              </div>
+
             </div>
 
             <div className="flex justify-end gap-4 pt-4">
