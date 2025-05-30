@@ -196,7 +196,7 @@ const SubmitTopic = () => {
       toast.error("Nhóm đã vượt quá số lượng thành viên");
       return
     }
-    if (result_project?.data?.topicId) {
+    if (!result_project?.data?.topicId) {
       toast.error("Nhóm chưa có đề tài");
       return
     }
