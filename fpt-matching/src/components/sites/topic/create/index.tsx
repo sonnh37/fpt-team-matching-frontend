@@ -914,16 +914,17 @@ export const CreateProjectForm = () => {
               {isStudent && (
                 <div className="rounded-lg border p-4 space-y-2">
                   <h3 className="text-lg font-medium">Thành viên Nhóm</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Bạn sẽ là trưởng nhóm của dự án này
-                  </p>
+                  {/*<p className="text-sm text-muted-foreground">*/}
+                  {/*  Bạn sẽ là trưởng nhóm của dự án này*/}
+                  {/*</p>*/}
                   {(teamMembers?.length ?? 0) > 0 ? (
                     <>
                       {teamMembers?.map((member) => {
                         const userInTeam = member.user;
-                        if (!userInTeam) return null;
+
+                        if (!userInTeam || member.leaveDate != null) return null;
                         return (
-                          <div className="flex items-center justify-between p-3 rounded-md bg-muted/50">
+                          <div key={member.user?.code} className="flex items-center justify-between p-3 rounded-md bg-muted/50">
                             <div className="flex items-center gap-3">
                               <div className="flex flex-col">
                                 <span className="font-medium">
