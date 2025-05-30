@@ -117,7 +117,7 @@ export const FormInputTextArea = <TFieldValues extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className={"font-bold"} >{label}</FormLabel>
           <FormControl>
             <Textarea {...field} {...props} />
           </FormControl>
@@ -274,7 +274,7 @@ export const FormRadioGroup = <TFieldValues extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem className="space-y-3">
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className={"font-bold"}>{label}</FormLabel>
           <FormControl>
             <RadioGroup
               onValueChange={(value) => {

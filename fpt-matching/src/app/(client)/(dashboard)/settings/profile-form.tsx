@@ -35,6 +35,7 @@ import { Loader2 } from "lucide-react";
 
 const profileFormSchema = z.object({
   id: z.string().optional(),
+  code: z.string().optional(),
   firstName: z
     .string()
     .min(1, { message: "Họ không được để trống" })
@@ -249,7 +250,13 @@ export function ProfileForm({ user }: { user?: User }) {
                     placeholder="Nhập tên của bạn"
                     description="Ví dụ: Văn A, Thị B,..."
                   />
-
+                  <FormInput
+                      label="Mã người dùng"
+                      name="code"
+                      disabled={true}
+                      form={form}
+                      placeholder="Nhập Mã người dùng"
+                  />
                   <FormInput
                     type="email"
                     disabled
