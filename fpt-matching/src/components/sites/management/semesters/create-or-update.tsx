@@ -71,6 +71,19 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
   const action = initialData ? "Lưu thay đổi" : "Tạo";
   const router = useRouter();
   const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: initialData
+        ? {
+          ...initialData,
+          startDate: new Date(initialData.startDate ?? new Date()),
+          endDate: new Date(initialData.endDate ?? new Date()),
+          publicTopicDate: new Date(initialData.publicTopicDate ?? new Date()),
+          onGoingDate: new Date(initialData.onGoingDate ?? new Date()),
+        }
+        : {},
+  });
+
   const [pendingValues, setPendingValues] = useState<z.infer<
     typeof formSchema
   > | null>(null);
@@ -81,18 +94,6 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
   if (!currentSemester) {
     return null;
   }
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: initialData
-      ? {
-          ...initialData,
-          startDate: new Date(initialData.startDate ?? new Date()),
-          endDate: new Date(initialData.endDate ?? new Date()),
-          publicTopicDate: new Date(initialData.publicTopicDate ?? new Date()),
-          onGoingDate: new Date(initialData.onGoingDate ?? new Date()),
-        }
-      : {},
-  });
 
   const [
     {

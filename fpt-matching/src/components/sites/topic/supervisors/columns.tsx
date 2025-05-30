@@ -42,7 +42,7 @@ export const useTopicColumns = () => {
   const { data: res_semester, isLoading: isLoadingSemester } = useQuery({
     queryKey: ["current-semester-columns"],
     queryFn: () => semesterService.getCurrentSemester(),
-    refetchOnWindowFocus: false,
+    // refetchOnWindowFocus: falseCol,
   });
   const user = useSelectorUser();
 
@@ -118,9 +118,9 @@ export const useTopicColumns = () => {
         <DataTableColumnHeader column={column} title="Trạng thái nhóm" />
       ),
       cell: ({ row }) => {
-        const project = row.original.project;
-        const hasTeam = project != undefined || project != null;
-        return hasTeam ? (
+        const topic = row.original;
+        // const hasTeam = project != undefined || project != null;
+        return topic.isExistedTeam ? (
           <Badge variant="secondary">Đã có nhóm</Badge>
         ) : (
           <Badge variant="outline">Chưa có nhóm</Badge>
