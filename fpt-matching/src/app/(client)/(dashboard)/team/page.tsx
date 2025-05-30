@@ -744,7 +744,7 @@ export default function TeamInfo() {
               </p>
               {project.topicId &&
               (availableSlots == 0 || availableSlots == 1) ? (
-                <Link href={`submit/${project.id}`}>
+                <Link href={`/team/submit/${project.id}`}>
                   <Button className="w-full">Nộp</Button>
                 </Link>
               ) : (
