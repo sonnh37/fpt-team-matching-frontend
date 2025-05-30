@@ -134,7 +134,7 @@ export default function TopicAllTable() {
       TopicStatus.MentorSubmitted,
       TopicStatus.ManagerPending,
       TopicStatus.ManagerApproved,
-      TopicStatus.MentorRejected,
+      // TopicStatus.MentorRejected,
       TopicStatus.ManagerRejected,
     ];
 
