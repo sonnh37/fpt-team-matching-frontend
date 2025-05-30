@@ -118,7 +118,7 @@ const InviteUsersForm = () => {
 
   const invitationPending = res_invitations_pending?.data?.results || [];
 
-  const sortedMembers = project?.teamMembers
+  let sortedMembers = project?.teamMembers
     ?.slice()
     .sort((a, b) =>
       a.role === TeamMemberRole.Leader
