@@ -13,11 +13,14 @@ export default function SettingsProfilePage() {
       <div>
         <div className="flex flex-row items-center gap-3">
           <h3 className="text-lg font-medium">Profile</h3>
-          <Badge className="!rounded-2xl">
-            {user?.userXRoles
-              .map((element) => element.role?.roleName)
-              .join(", ")}
-          </Badge>
+            <Badge className="!rounded-2xl">
+                {user?.userXRoles && user?.userXRoles
+                    .map((element) => element.role?.roleName)
+                    .filter((roleName, index, array) =>
+                        roleName && array.indexOf(roleName) === index
+                    )
+                    .join(", ")}
+            </Badge>
         </div>
         <p className="text-sm text-muted-foreground">
           Updated date: {formatDate(user?.updatedDate)}
