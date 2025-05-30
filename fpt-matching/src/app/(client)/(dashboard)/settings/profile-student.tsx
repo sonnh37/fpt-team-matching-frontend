@@ -58,7 +58,7 @@ const profileFormSchema = z.object({
   specialtyId: z.string().nullable().optional(),
   semesterId: z.string().nullable().optional(),
   bio: z.string().nullable().optional(),
-  code: z.string().nullable().optional(),
+  // code: z.string().nullable().optional(),
   achievement: z.string().nullable().optional(),
   experienceProject: z.string().nullable().optional(),
   interest: z.string().nullable().optional(),
@@ -308,7 +308,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                 {/* Cột 1 */}
                 <div className="space-y-4">
                   <FormItem>
-                    <FormLabel className="block text-sm font-medium">
+                    <FormLabel className="block text-sm font-bold">
                       Ngành học
                     </FormLabel>
                     <Select
@@ -341,7 +341,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                     name="specialtyId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="block text-sm font-medium ">
+                        <FormLabel className="block text-sm font-bold ">
                           Chuyên ngành
                         </FormLabel>
                         <FormControl>
@@ -366,12 +366,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                     )}
                   />
 
-                  <FormInput
-                    label="Mã người dùng"
-                    name="code"
-                    form={form}
-                    placeholder="Nhập Mã người dùng"
-                  />
+
                 </div>
 
                 {/* Cột 2 */}
