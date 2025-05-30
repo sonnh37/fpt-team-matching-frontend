@@ -85,6 +85,7 @@ export default function TopicRequestPage() {
     refetchOnWindowFocus: false,
   });
 
+
   // Handle tab change
   const handleTabChange = (value: string) => {
     const newSearchParams = new URLSearchParams(searchParams.toString());
@@ -110,14 +111,14 @@ export default function TopicRequestPage() {
   const resultDate = stageTopic?.resultDate;
 
   // Process topics data
-  const topics = data?.data?.map((topic) => {
+  const topics = data?.data ?  data?.data?.map((topic) => {
     const dateNow = new Date();
     const publicDate = new Date(resultDate ?? 0);
-    
+
     if (
-      dateNow <= publicDate &&
-      (topic.status === TopicStatus.ManagerApproved ||
-        topic.status === TopicStatus.ManagerRejected)
+        dateNow <= publicDate &&
+        (topic.status === TopicStatus.ManagerApproved ||
+            topic.status === TopicStatus.ManagerRejected)
     ) {
       return {
         ...topic,
@@ -125,7 +126,7 @@ export default function TopicRequestPage() {
       };
     }
     return topic;
-  });
+  }) : [];
 
   // Count topics by status
   const countTopicsByStatus = (statuses: TopicStatus[]) => {
