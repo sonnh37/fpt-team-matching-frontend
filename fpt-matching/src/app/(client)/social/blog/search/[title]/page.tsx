@@ -412,7 +412,7 @@ export default function Search() {
                                   {/* Header - Cố định khi cuộn */}
                                   <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                                     <div className="flex justify-center w-full">
-                                      Bài viết của {post?.user?.username}
+                                      Bài viết của {post?.user?.firstName} + {post.user?.lastName}
                                     </div>
                                     <ModalClose className="absolute top-2 right-2">X</ModalClose>
                                   </div>

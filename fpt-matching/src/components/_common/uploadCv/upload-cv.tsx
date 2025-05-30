@@ -64,7 +64,7 @@ const UploadCv = ({ blogId }: { blogId: string }) => {
     if (isSubmitting) return; // Nếu API đang chạy, không cho phép bấm tiếp
     setIsSubmitting(true); // Đánh dấu API đang chạy
 
-    if (prj !== ProjectStatus.Pending) {
+    if (prj !== ProjectStatus.Forming) {
       // toast.dismiss(uploaddId);
       toast.error("Bạn không thể gửi vì nhóm này đang trong quá trình làm!");
       setIsSubmitting(false);

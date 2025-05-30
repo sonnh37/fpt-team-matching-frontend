@@ -718,7 +718,7 @@ export default function Blog() {
                           />
                           <div className='flex w-full justify-between'>
                             <div>
-                              <p className="text-lg font-semibold text-gray-800">{post.user?.firstName} {post.user?.firstName}</p>
+                              <p className="text-lg font-semibold text-gray-800">{post.user?.firstName} {post.user?.lastName}</p>
                               <p className="text-sm text-gray-500">
                                 {post?.createdDate
                                   ? new Date(post.createdDate).toLocaleString("vi-VN", {
@@ -775,7 +775,7 @@ export default function Blog() {
                                 <div
                                   className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                                   <div className="flex justify-center w-full">
-                                    Bài viết của {post.user?.firstName} {post.user?.firstName}
+                                    Bài viết của {post.user?.firstName} {post.user?.lastName}
                                   </div>
                                   <ModalClose
                                     className="absolute top-2 right-2">X</ModalClose>
@@ -789,7 +789,7 @@ export default function Blog() {
                                     />
                                     <div className='flex w-full justify-between'>
                                       <div>
-                                        <p className="text-lg font-semibold text-gray-800">{post?.user?.lastName} {post?.user?.firstName}</p>
+                                        <p className="text-lg font-semibold text-gray-800">{post?.user?.firstName} {post?.user?.lastName}</p>
                                         <p className="text-sm text-gray-500">
                                           {post?.createdDate
                                             ? new Date(post.createdDate).toLocaleString("vi-VN", {
@@ -1058,7 +1058,7 @@ export default function Blog() {
                               {/* Header - Cố định khi cuộn */}
                               <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                                 <div className="flex justify-center w-full">
-                                  Bài viết của {blogfpt.user?.firstName} {blogfpt.user?.firstName}
+                                  Bài viết của {blogfpt.user?.firstName} {blogfpt.user?.lastName}
                                 </div>
                                 <ModalClose className="absolute top-2 right-2">X</ModalClose>
                               </div>
@@ -1071,7 +1071,7 @@ export default function Blog() {
                                   />
                                   <div className='flex w-full justify-between'>
                                     <div>
-                                      <p className="text-lg font-semibold text-gray-800">{blogfpt?.user?.lastName} {blogfpt?.user?.firstName}</p>
+                                      <p className="text-lg font-semibold text-gray-800">{blogfpt?.user?.firstName} {blogfpt?.user?.lastName}</p>
                                       <p className="text-sm text-gray-500">
                                         {blogfpt?.createdDate
                                           ? new Date(blogfpt.createdDate).toLocaleString("vi-VN", {
@@ -1206,7 +1206,7 @@ export default function Blog() {
                             {/* Header - Cố định khi cuộn */}
                             <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                               <div className="flex justify-center w-full">
-                                Bài viết của {postNt.user?.firstName} {postNt.user?.firstName}
+                                Bài viết của {postNt.user?.firstName} {postNt.user?.lastName}
                               </div>
                               <ModalClose className="absolute top-2 right-2">X</ModalClose>
                             </div>
@@ -1219,7 +1219,7 @@ export default function Blog() {
                                 />
                                 <div className='flex w-full justify-between'>
                                   <div>
-                                    <p className="text-lg font-semibold text-gray-800">{postNt?.user?.lastName} {postNt?.user?.firstName}</p>
+                                    <p className="text-lg font-semibold text-gray-800">{postNt?.user?.firstName} {postNt?.user?.lastName}</p>
                                     <p className="text-sm text-gray-500">
                                       {postNt?.createdDate
                                         ? new Date(postNt.createdDate).toLocaleString("vi-VN", {
