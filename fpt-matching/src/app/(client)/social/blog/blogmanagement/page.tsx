@@ -237,7 +237,7 @@ export default function Blogmanagement() {
                             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div>
                                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user?.lastName} {user?.firstName}</h1>
-                                    <p className="text-purple-600 dark:text-purple-400">Node.js Developer & Frontend Expert</p>
+                                    {/*<p className="text-purple-600 dark:text-purple-400">Node.js Developer & Frontend Expert</p>*/}
                                 </div>
                                 {user?.profileStudent?.fileCv && (
                                         <a
