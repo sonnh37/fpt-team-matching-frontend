@@ -731,7 +731,8 @@ export default function TeamInfo() {
 
       <div className="lg:col-span-1 space-y-6">
         {/* Card đăng ký nhóm */}
-        {project.status !== ProjectStatus.Pending && (
+        {project.status == ProjectStatus.Forming ?
+            (
           <Card className="rounded-lg">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Đăng ký nhóm</CardTitle>
@@ -755,7 +756,7 @@ export default function TeamInfo() {
               )}
             </CardContent>
           </Card>
-        )}
+        ) : null}
 
         {/* Card xin đề tài từ GV (nếu có) */}
         {!teamInfo?.data?.topicId && (
