@@ -108,7 +108,7 @@ export default function TopicRequestPage() {
   if (!currentSemester) return <>Chưa tới kỳ</>;
 
   const stageTopic = getLatestStageTopic(currentSemester);
-  const resultDate = stageTopic?.resultDate;
+  const resultDate = stageTopic ? stageTopic.resultDate : null;
 
   // Process topics data
   const topics = data?.data ?  data?.data?.map((topic) => {
@@ -144,7 +144,7 @@ export default function TopicRequestPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-primary">Quản lý ý tưởng</h1>
+      <h1 className="text-2xl font-bold text-primary">Quản lý đề tài</h1>
 
       <Tabs 
         value={activeTab}

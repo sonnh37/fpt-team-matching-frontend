@@ -44,6 +44,17 @@ import { useCurrentRole } from "@/hooks/use-current-role";
 
 export const columns: ColumnDef<Topic>[] = [
   {
+    accessorKey: "topicCode",
+    header: ({ column }) => (
+        <DataTableColumnHeader column={column} title="Mã đề tài" />
+    ),
+    cell: ({ row }) => {
+      const topic = row.original;
+      if (!topic.topicCode) return "Chưa có";
+      return topic?.topicCode;
+    },
+  },
+  {
     accessorKey: "englishName",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Tên tiếng anh" />
@@ -73,18 +84,18 @@ export const columns: ColumnDef<Topic>[] = [
   //   },
   // },
 
-  {
-    accessorKey: "semester",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Kỳ" />
-    ),
-    cell: ({ row }) => {
-      const topic = row.original;
-      if (!topic.topicVersions) return;
-
-      return topic.semester?.semesterName || "-";
-    },
-  },
+  // {
+  //   accessorKey: "semester",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Kỳ" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const topic = row.original;
+  //     if (!topic.topicVersions) return;
+  //
+  //     return topic.semester?.semesterName || "-";
+  //   },
+  // },
   {
     accessorKey: "stage",
     header: ({ column }) => (
