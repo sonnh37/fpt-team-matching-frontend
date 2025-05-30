@@ -36,7 +36,7 @@ import { FormInput, FormSwitch } from "@/lib/form-custom-shadcn";
 import { projectService } from "@/services/project-service";
 import { professionService } from "@/services/profession-service";
 import { useQuery } from "@tanstack/react-query";
-import { useCurrentRole } from "@/hooks/use-current-role";
+import {useCurrentRole, useCurrentSemester} from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useParams } from "next/navigation";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
@@ -111,6 +111,7 @@ const SubmitTopic = () => {
   const { projectId } = useParams();
   const role = useCurrentRole();
   const user = useSelectorUser();
+  const currentSemester =  useCurrentSemester().currentSemester
   // Check user role
   const isStudent = role == "Student";
 
@@ -183,8 +184,16 @@ const SubmitTopic = () => {
       confirmText: "Có,đồng ý",
       cancelText: "Không,cảm ơn",
     });
-    if ((teamMembers?.length ?? 0) >= 4) {
+    if (!currentSemester){
+      toast.error("Không tìm thấy học kỳ trong Workspace")
+      return
+    }
+    if ((project?.teamSize ?? 0) < currentSemester.minTeamSize) {
       toast.error("Nhóm chưa đủ số lượng thành viên");
+      return
+    }
+    if ((project?.teamSize ?? 0) > currentSemester.maxTeamSize) {
+      toast.error("Nhóm đã vượt quá số lượng thành viên");
       return
     }
     if (result_project?.data?.topicId) {
