@@ -180,7 +180,7 @@ class ProjectSerivce extends BaseService<Project> {
     try {
       const response = await axiosInstance.put<BusinessResult<Project>>(
           `${this.endpoint}/block-project-by-manager/${projectId}`,
-          status
+          {status}
       );
       return response.data;
     } catch (error) {
