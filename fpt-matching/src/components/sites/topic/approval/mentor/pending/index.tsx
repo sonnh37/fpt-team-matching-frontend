@@ -94,7 +94,7 @@ export function TopicPendingByMentorTable() {
       sorting
     );
     params.status = TopicRequestStatus.Pending;
-    params.topicStatus = TopicStatus.MentorPending;
+    // params.topicStatus = TopicStatus.MentorPending;
     params.roles = ["Mentor"];
     return { ...params };
   }, [formValues, columnFilters, pagination, sorting]);
