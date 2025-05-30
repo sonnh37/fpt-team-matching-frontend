@@ -112,7 +112,7 @@ export function getEnumOptions(enumObject: any) {
 }
 
 export const getLatestStageTopic = (semester: Semester) => {
-  return semester.stageTopics?.reduce((prev, current) => 
+  return  semester.stageTopics?.length != 0 && semester.stageTopics?.reduce((prev, current) =>
     (prev?.stageNumber > current?.stageNumber) ? prev : current
   );
 };
