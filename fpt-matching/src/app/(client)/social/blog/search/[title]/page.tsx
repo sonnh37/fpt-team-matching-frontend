@@ -406,7 +406,7 @@ export default function Search() {
                           <div className="text-lg md:text-xl font-bold text-gray-900 leading-tight pt-3 mt-2">
                             <Modal>
                               <ModalTrigger className="text-xl  ">
-                                <div className='hover:text-orange-300 text-left'>  <div className='text-left '> {post?.type === BlogType.Recruit && (<div>[🔎Đăng tuyển,tìm thành viên]</div>)}</div>
+                                <div className='hover:text-orange-300 text-left'>  <div className='text-left '> {post?.type === BlogType.Recruit && (<div>🔎 Tuyển thành viên</div>)}</div>
                                   <span className={` ${post?.type === BlogType.Recruit ? "text-none font-medium text-lg" : ""}`}>
                                     {post.title}
                                   </span> </div>
@@ -639,7 +639,7 @@ export default function Search() {
                       <h2 className="font-bold  text-gray-700  ">
                         <Modal >
                           <ModalTrigger >
-                            <div className='hover:text-orange-300 text-left'>  <div className='text-left '> {postNt?.type === BlogType.Recruit && (<div>[🔎Đăng tuyển,tìm thành viên]</div>)}</div>
+                            <div className='hover:text-orange-300 text-left'>  <div className='text-left '> {postNt?.type === BlogType.Recruit && (<div>🔎 Tuyển thành viên</div>)}</div>
                               <span className={` ${postNt?.type === BlogType.Recruit ? "text-none font-medium text-lg" : "text-lg"}`}>
                                 {postNt.title}
                               </span> </div>
@@ -797,7 +797,7 @@ export default function Search() {
                       <h2 className="font-bold  text-gray-700  ">
                         <Modal >
                           <ModalTrigger >
-                            <div className='hover:text-orange-300 text-left'>  <div className='text-left '> {blogfpt?.type === BlogType.Recruit && (<div>[🔎Đăng tuyển,tìm thành viên]</div>)}</div>
+                            <div className='hover:text-orange-300 text-left'>  <div className='text-left '> {blogfpt?.type === BlogType.Recruit && (<div>🔎 Tuyển thành viên</div>)}</div>
                               <span className={` ${blogfpt?.type === BlogType.Recruit ? "text-none font-medium text-lg" : ""}`}>
                                 {blogfpt.title}
                               </span> </div>
