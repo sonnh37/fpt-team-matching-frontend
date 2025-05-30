@@ -172,8 +172,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     const confirmed = await confirm({
       title: "Bạn có muốn nộp đơn này lên hệ thống",
       description: "Khi nộp nhóm bạn sẽ khóa lại",
-      confirmText: "Có,đồng ý",
-      cancelText: "Không,cảm ơn",
+      confirmText: "Đồng ý",
+      cancelText: "Từ chối",
     });
 
     try {
