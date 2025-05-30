@@ -7,6 +7,7 @@ import { TeamCreateCommand } from "@/types/models/commands/projects/team-create-
 import { ProjectGetListForMentorQuery } from "@/types/models/queries/projects/project-get-list-for-mentor-query";
 import { cleanQueryParams } from "@/lib/utils";
 import { ProjectSearchQuery } from "@/types/models/queries/projects/project-search-query";
+import {ProjectStatus} from "@/types/enums/project";
 
 class ProjectSerivce extends BaseService<Project> {
   constructor() {
@@ -173,11 +174,14 @@ class ProjectSerivce extends BaseService<Project> {
   };
   
   public BlockProjectByManager = async (
-    projectId: string
+    projectId: string,
+    status: ProjectStatus
   ): Promise<BusinessResult<Project>> => {
     try {
       const response = await axiosInstance.put<BusinessResult<Project>>(
-        `${this.endpoint}/block-project-by-manager/${projectId}`
+        `${this.endpoint}/block-project-by-manager/${projectId}`, {
+            status
+          }
       );
       return response.data;
     } catch (error) {
