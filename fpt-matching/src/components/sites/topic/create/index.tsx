@@ -988,7 +988,7 @@ export const CreateProjectForm = () => {
                 className="gap-2 border-primary text-primary hover:text-primary"
               >
                 <Send className="h-4 w-4" /> {/* Icon cho nộp ý tưởng */}
-                Nộp ý tưởng
+                Nộp
               </Button>
             </CardFooter>
           </Card>

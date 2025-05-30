@@ -506,7 +506,7 @@ const SubmitTopic = () => {
               Hủy bỏ
             </Button>
             <Button type="button" onClick={() => handleSubmit(result_project?.data?.id ?? "")} className="w-full ml-2 md:w-auto">
-              Nộp ý tưởng
+              Nộp
             </Button>
           </CardFooter>
         </Card>

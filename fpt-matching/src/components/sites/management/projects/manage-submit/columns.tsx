@@ -1,38 +1,19 @@
 "use client";
 
-import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import { useConfirm } from "@/components/_common/formdelete/confirm-context";
-import TimeStageTopic from "@/components/_common/time-stage-idea";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import { TopicDetailForm } from "@/components/sites/topic/detail";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { useCurrentRole } from "@/hooks/use-current-role";
-import { projectService } from "@/services/project-service";
-import { semesterService } from "@/services/semester-service";
-import { topicService } from "@/services/topic-service";
-import { ProjectStatus } from "@/types/enums/project";
-import { TopicStatus } from "@/types/enums/topic";
-import { Project } from "@/types/project";
-import { Topic } from "@/types/topic";
-import { useQueryClient } from "@tanstack/react-query";
-import { ColumnDef, Row } from "@tanstack/react-table";
-import { useState } from "react";
-import { toast } from "sonner";
+import {DataTableColumnHeader} from "@/components/_common/data-table-api/data-table-column-header";
+import {useConfirm} from "@/components/_common/formdelete/confirm-context";
+import {TopicDetailForm} from "@/components/sites/topic/detail";
+import {Badge} from "@/components/ui/badge";
+import {Button} from "@/components/ui/button";
+import {Dialog, DialogContent, DialogTrigger,} from "@/components/ui/dialog";
+import {useCurrentRole} from "@/hooks/use-current-role";
+import {projectService} from "@/services/project-service";
+import {ProjectStatus} from "@/types/enums/project";
+import {Project} from "@/types/project";
+import {useQueryClient} from "@tanstack/react-query";
+import {ColumnDef, Row} from "@tanstack/react-table";
+import {useState} from "react";
+import {toast} from "sonner";
 
 
 export const columns: ColumnDef<Project>[] = [
@@ -196,8 +177,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     });
 
     try {
-    
-      const res = await projectService.BlockProjectByManager(project.id ?? "");
+
+      const res = await projectService.BlockProjectByManager(project.id ?? "", confirmed ? ProjectStatus.InProgress : ProjectStatus.Forming);
       if (res.status != 1) {
         toast.error(res.message);
         return;
