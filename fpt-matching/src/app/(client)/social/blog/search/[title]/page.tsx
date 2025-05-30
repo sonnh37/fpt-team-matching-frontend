@@ -2,7 +2,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faUser, faVideo, faFaceSmile, faPhotoFilm, faPencil, faNoteSticky, faShareFromSquare, faComments, faHouse, faShare, faCircleUser, faMessage } from "@fortawesome/free-solid-svg-icons";
+import { faThumbsUp, faComment, faEarthAmericas, faPaperclip, faShare, faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,30 +15,20 @@ import {
   Modal,
   ModalBody,
   ModalContent,
-  ModalFooter,
   ModalTrigger,
   ModalClose,
 } from "@/components/ui/animated-modal";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+
 import {
   Pagination
 } from "@/components/ui/pagination"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Meteors } from '@/components/ui/meteors'
+
 import { useSelector } from 'react-redux';
 import { useQuery } from '@tanstack/react-query';
 import { RootState } from '@/lib/redux/store';
 import { blogService } from '@/services/blog-service';
 import { BlogGetAllQuery } from '@/types/models/queries/blog/blog-get-all-query';
 import CommentBlog from '@/components/_common/comment/comment';
-import { toast } from 'sonner';
-import { BlogStatus, BlogType } from '@/types/enums/blog';
-import BlogDetail from '@/components/_common/blogdetail/blog-detail';
 import LikeBlog from '@/components/_common/likeblog/like-blog';
 import { projectService } from '@/services/project-service';
 import { Project } from '@/types/project';
@@ -49,6 +39,7 @@ import { FaXTwitter, FaFacebookF, FaGithub, FaInstagram, FaTwitch, FaMastodon } 
 import { PiButterflyFill, PiGearSixBold } from 'react-icons/pi';
 import { useParams } from 'next/navigation';
 import { BackgroundLines } from "@/components/ui/background-lines";
+import { BlogType } from '@/types/enums/blog';
 
 
 
@@ -634,7 +625,7 @@ export default function Search() {
                 </div>
                 {sortedNotification.slice(0, 4).map((postNt, index) => (
 
-                  <div className='w-full h-auto border-b-2 border-gray-200 px-5 py-2'>
+                  <div key={index} className='w-full h-auto border-b-2 border-gray-200 px-5 py-2'>
                     <div className=''>
                       <h2 className="font-bold  text-gray-700  ">
                         <Modal >
@@ -792,7 +783,7 @@ export default function Search() {
                 </div>
                 {sortFpt.slice(0, 4).map((blogfpt, index) => (
 
-                  <div className='w-full h-auto border-b-2 border-gray-200 px-5 py-2'>
+                  <div key={index} className='w-full h-auto border-b-2 border-gray-200 px-5 py-2'>
                     <div className=''>
                       <h2 className="font-bold  text-gray-700  ">
                         <Modal >

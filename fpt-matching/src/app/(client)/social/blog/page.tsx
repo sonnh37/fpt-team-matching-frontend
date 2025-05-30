@@ -1040,7 +1040,7 @@ export default function Blog() {
                 </div>
                 {sortedNotification.slice(0, 4).map((blogfpt, index) => (
 
-                  <div className='w-full h-auto border-b-2 border-gray-200 px-5 py-2'>
+                  <div key={index} className='w-full h-auto border-b-2 border-gray-200 px-5 py-2'>
                     <div className=''>
                       <h2 className="font-bold  text-gray-700  ">
                         <Modal >
@@ -1058,7 +1058,7 @@ export default function Blog() {
                               {/* Header - Cố định khi cuộn */}
                               <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                                 <div className="flex justify-center w-full">
-                                  Bài viết của {post.user?.firstName} {post.user?.firstName}
+                                  Bài viết của {blogfpt.user?.firstName} {blogfpt.user?.firstName}
                                 </div>
                                 <ModalClose className="absolute top-2 right-2">X</ModalClose>
                               </div>
@@ -1190,7 +1190,7 @@ export default function Blog() {
               <div className='text-black  text-lg font-semibold pl-11 border-b-2 pb-2 border-gray-200 '>🔥🔥 Trending 🔥🔥</div>
               {/*Handle load recommend*/}
               {sortedNotification.slice(0, 4).map((postNt, index) => (
-                <div className='title-trending pl-6  hover:bg-gray-100 hover:text-blue-900 '>
+                <div key={index} className='title-trending pl-6  hover:bg-gray-100 hover:text-blue-900 '>
 
                   <div className=''>
                     <h2 className="font-bold  text-gray-700  ">
@@ -1206,7 +1206,7 @@ export default function Blog() {
                             {/* Header - Cố định khi cuộn */}
                             <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                               <div className="flex justify-center w-full">
-                                Bài viết của {post.user?.firstName} {post.user?.firstName}
+                                Bài viết của {postNt.user?.firstName} {postNt.user?.firstName}
                               </div>
                               <ModalClose className="absolute top-2 right-2">X</ModalClose>
                             </div>
