@@ -108,32 +108,66 @@ export default function Blog() {
   //   handleChange(e);
   // };
   // tạo blog
-  const handleSubmit = async (projectId: string) => {
+  const handleSubmit = async () => {
+    if (isSubmitting) return; // Chặn nếu đang submit
+    setIsSubmitting(true);
 
-    const confirmed = await confirm({
-      title: "Bạn có muốn nộp đơn này lên hệ thống",
-      description: "Khi nộp nhóm bạn sẽ khóa lại",
-      confirmText: "Có,đồng ý",
-      cancelText: "Không,cảm ơn",
-    });
-    if ((teamMembers?.length ?? 0) >= 4) {
-      toast.error("Nhóm chưa đủ số lượng thành viên");
-      return
-    }
-    if (result_project?.data?.topicId) {
-      toast.error("Nhóm chưa có đề tài");
-      return
-    }
-    if (confirmed) {
-      if (projectId) {
-        const result = await projectService.submitBlockProjectByStudent(projectId);
-        if (result?.status === 1) {
-          toast.success("Nộp đề tài thành công");
-          // TODO: Gọi lại data / chuyển trang nếu cần
-        } else {
-          toast.error(result?.message || "Có lỗi xảy ra khi nộp đề tài");
+
+    try {
+      if (!formData.title || !formData.content) {
+
+        toast.error("⚠️ Vui lòng nhập tiêu đề hoặc nội dung!");
+        return;
+      }
+
+      if (!formData.title || formData.title.trim().length < 10) {
+
+        toast.error("⚠️ Tiêu đề phải có ít nhất 10 ký tự!");
+        return;
+      }
+
+      if (!formData.content || formData.content.trim().length < 10) {
+
+        toast.error("⚠️ Nội dung phải có ít nhất 10 ký tự!");
+        return;
+      }
+      if(postType == BlogType.Recruit){
+        if (!formData.skillRequired || formData.skillRequired.trim().length < 5) {
+
+          toast.error("⚠️ Kỹ năng yêu cầu phải có ít nhất 5 ký tự!");
+          return;
         }
       }
+
+
+    // Hiện loading toast
+     const toastId = toast.loading("⏳ Đang tạo blog, vui lòng chờ...");
+      const blognew: BlogCreateCommand = {
+        title: formData.title,
+        content: formData.content,
+        skillRequired: formData.skillRequired,
+        type: postType,
+        status: formData.status,
+        // projectId: projectUser?.id || ""
+        ...(formData.projectId ? { projectId: formData.projectId } : {})
+      };
+
+      const result = await blogService.create(blognew);
+      toast.dismiss(toastId);
+
+      if (result?.status === 1) {
+        toast.success("🎉 Chúc mừng bạn đã tạo blog thành công!");
+        refetch(); // Refresh danh sách blog
+        setFormData({ projectId: "", title: "", content: "", skillRequired: "", status: BlogStatus.Public }); // Reset form
+        setPostType(BlogType.Share); // Reset lại kiểu bài viết
+      } else {
+        toast.error("🚨 Có lỗi xảy ra khi tạo blog, vui lòng thử lại!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi tạo blog:", error);
+      toast.error("⚠️ Lỗi hệ thống, vui lòng thử lại sau!");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
