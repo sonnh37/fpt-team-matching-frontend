@@ -84,7 +84,7 @@ export const FormInput = <TFieldValues extends FieldValues>({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel className={"font-bold"}>{label}</FormLabel>
           <FormControl>
             <Input {...props} {...field} />
           </FormControl>
