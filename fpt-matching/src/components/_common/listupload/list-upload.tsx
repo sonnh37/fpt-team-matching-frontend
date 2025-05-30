@@ -52,7 +52,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
 
   const tabs = {
     form: "Gợi ý người dùng phù hợp",
-    upload: "Quản lí các đơn nộp vào team  ",
+    upload: "Quản lí các đơn ứng tuyển  ",
   };
 
   let query: BlogCvGetAllQuery = {
@@ -112,9 +112,9 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
     //     toast.error("Nhóm của bạn đã đủ thành viên")
     //     return
     // }
-    if (prj !== ProjectStatus.Pending) {
+    if (prj !== ProjectStatus.Forming) {
       toast.error(
-        "Nhóm của bạn đang trong quá trình làm hoặc chưa có nhóm.Không thể mời"
+        "Nhóm của bạn đang trong quá trình làm hoặc chưa có nhóm. Không thể mời"
       );
       setIsSubmitting(false);
       return;
@@ -220,13 +220,13 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
               <DialogTitle className="text-lg">
                 Một số gợi ý sinh viên đạt đủ chỉ tiêu
               </DialogTitle>
-              <DialogDescription className="text-base">
-                Đây là nơi bạn sẽ sẽ xem danh sách học sinh đã nộp ứng tuyển vào
-                team
-              </DialogDescription>
+              {/*<DialogDescription className="text-base">*/}
+              {/*  Đây là nơi bạn sẽ sẽ xem danh sách học sinh đã nộp ứng tuyển vào*/}
+              {/*  team*/}
+              {/*</DialogDescription>*/}
             </DialogHeader>
             <Table>
-              <TableCaption>Danh sách nộp ứng tuyển.</TableCaption>
+              {/*<TableCaption>Danh sách nộp ứng tuyển.</TableCaption>*/}
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[100px]">Số thứ tự</TableHead>
@@ -288,20 +288,20 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
               <DialogTitle className="text-lg">
                 Danh sách nộp đơn ứng tuyển
               </DialogTitle>
-              <DialogDescription className="text-base">
-                Đây là nơi bạn sẽ sẽ xem danh sách học sinh đã nộp ứng tuyển vào
-                team
-              </DialogDescription>
+              {/*<DialogDescription className="text-base">*/}
+              {/*  Đây là nơi bạn sẽ sẽ xem danh sách học sinh đã nộp ứng tuyển vào*/}
+              {/*  team*/}
+              {/*</DialogDescription>*/}
             </DialogHeader>
             <Table>
-              <TableCaption>Danh sách nộp ứng tuyển.</TableCaption>
+              {/*<TableCaption>Danh sách nộp ứng tuyển.</TableCaption>*/}
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[100px]">Số thứ tự</TableHead>
                   <TableHead>Ngày nộp</TableHead>
                   <TableHead>Tên người nộp</TableHead>
                   <TableHead>Email</TableHead>
-                  <TableHead>Department</TableHead>
+                  {/*<TableHead>Department</TableHead>*/}
                   <TableHead className="max-h-[500px] overflow-x-auto whitespace-nowrap">
                     File CV
                   </TableHead>
@@ -312,7 +312,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
               <TableBody>
                 {post?.data?.results?.map((cv, index) => (
                   <TableRow key={cv.id}>
-                    <TableCell className="font-medium">{index}</TableCell>
+                    <TableCell className="font-medium">{index + 1}</TableCell>
                     <TableCell className="font-medium">
                       {cv.createdDate
                         ? new Date(cv.createdDate).toLocaleString("vi-VN", {
@@ -327,9 +327,9 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                       {cv.user?.lastName} {cv.user?.firstName}{" "}
                     </TableCell>
                     <TableCell>{cv.user?.email}</TableCell>
-                    <TableCell>
-                      {Department[cv.user?.department ?? 0]}
-                    </TableCell>
+                    {/*<TableCell>*/}
+                    {/*  {Department[cv.user?.department ?? 0]}*/}
+                    {/*</TableCell>*/}
                     <TableCell className="max-w-[400px] overflow-x-auto whitespace-nowrap">
                       {cv.fileCv && (
                         <a
