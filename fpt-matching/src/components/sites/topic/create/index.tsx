@@ -69,6 +69,7 @@ import { useState } from "react";
 import { TopicApprovalStatus } from "@/app/(client)/(dashboard)/topic/idea-is-exist/page";
 import { UserGetAllInSemesterQuery } from "@/types/models/queries/users/user-get-all-in-semester-query";
 import { TopicCreateDraftCommand } from "@/types/models/commands/topic/topic-create-draft-command";
+import {values} from "lodash";
 // Các đuôi file cho phép
 const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
@@ -436,6 +437,7 @@ export const CreateProjectForm = () => {
         isEnterpriseTopic: isStudent ? false : values.isEnterpriseTopic,
         enterpriseName: isStudent ? undefined : values.enterpriseName,
         fileUrl: fileUpload.data,
+
       };
 
       const commandLecture: TopicCreateDraftCommand = {
@@ -969,7 +971,7 @@ export const CreateProjectForm = () => {
                   setDialogAction("draft");
                   setIsConfirmDialogOpen(true);
                 }}
-                disabled={isSubmitting}
+                disabled={isSubmitting || form.getValues("mentorId") != null || form.getValues("subMentorId") != null}
                 className="gap-2"
               >
                 <FileArchive className="h-4 w-4" /> {/* Icon cho bản nháp */}
