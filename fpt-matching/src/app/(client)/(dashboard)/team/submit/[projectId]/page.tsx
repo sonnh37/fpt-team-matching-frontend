@@ -205,6 +205,7 @@ const SubmitTopic = () => {
         const result = await projectService.submitBlockProjectByStudent(projectId);
         if (result?.status === 1) {
           toast.success("Nộp đề tài thành công");
+          window.location.href = "/team"
           // TODO: Gọi lại data / chuyển trang nếu cần
         } else {
           toast.error(result?.message || "Có lỗi xảy ra khi nộp đề tài");
