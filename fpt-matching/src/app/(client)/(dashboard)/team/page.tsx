@@ -327,10 +327,6 @@ export default function TeamInfo() {
                       <DialogContent className="max-w-4xl">
                         <DialogHeader>
                           <DialogTitle>Mời thành viên mới</DialogTitle>
-                          <DialogDescription>
-                            Thêm thành viên vào nhóm bằng email hoặc mã sinh
-                            viên
-                          </DialogDescription>
                         </DialogHeader>
                         <div className="p-4">
                           <InviteUsersForm />
