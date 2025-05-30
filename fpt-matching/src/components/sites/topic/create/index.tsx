@@ -51,7 +51,7 @@ import { InvitationGetByStatudQuery } from "@/types/models/queries/invitations/i
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, FileArchive, Send } from "lucide-react";
+import { AlertCircle, Asterisk, FileArchive, Send } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -74,8 +74,8 @@ const ALLOWED_EXTENSIONS = [".doc", ".docx", ".pdf"];
 
 const formSchema = z.object({
   englishName: z
-    .string({ required_error: "Vui lòng nhập tên tiếng Anh" })
-    .min(2, { message: "Tên tiếng Anh phải có ít nhất 2 ký tự" }),
+      .string({ required_error: "Vui lòng nhập tên tiếng Anh" })
+      .min(2, { message: "Tên tiếng Anh phải có ít nhất 2 ký tự" }),
 
   // teamSize: z
   //   .number({
@@ -357,6 +357,10 @@ export const CreateProjectForm = () => {
     try {
       // Hiển thị loading khi bắt đầu xử lý
 
+      if (values.englishName?.trim() == null || values.vietNameseName?.trim() == null || values.abbreviation?.trim() == null || values.description?.trim() == null) {
+        toast.error("Vui lòng điền đầy đủ các field yêu cầu")
+        return ;
+      }
       // Check mentor availability
       const mentorCheck =
         await userService.checkMentorAndSubMentorSlotAvailability({
@@ -637,7 +641,7 @@ export const CreateProjectForm = () => {
                     name="englishName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tên tiếng Anh</FormLabel>
+                        <FormLabel className={"flex items-center gap-1"}>Tên tiếng Anh <span><Asterisk className={"size-3 text-red-500"} /></span></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Tên dự án bằng tiếng Anh"
@@ -658,7 +662,7 @@ export const CreateProjectForm = () => {
                     name="vietNameseName"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Tên tiếng Việt</FormLabel>
+                        <FormLabel className={"flex items-center gap-1"}>Tên tiếng Việt <span><Asterisk className={"size-3 text-red-500"} /></span></FormLabel>
                         <FormControl>
                           <Input
                             placeholder="Tên dự án bằng tiếng Việt"
@@ -677,7 +681,7 @@ export const CreateProjectForm = () => {
                   name="abbreviation"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Viết tắt</FormLabel>
+                      <FormLabel className={"flex items-center gap-1"}>Viết tắt <span><Asterisk className={"size-3 text-red-500"} /></span></FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Tên viết tắt của dự án"
@@ -696,7 +700,7 @@ export const CreateProjectForm = () => {
                   name="description"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Mô tả</FormLabel>
+                      <FormLabel className={"flex items-center gap-1"}>Mô tả <span><Asterisk className={"size-3 text-red-500"} /></span></FormLabel>
                       <FormControl>
                         <Textarea
                           placeholder="Mô tả chi tiết về dự án của bạn..."
@@ -752,7 +756,7 @@ export const CreateProjectForm = () => {
                       name="mentorId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Giảng viên hướng dẫn</FormLabel>
+                          <FormLabel className={"flex items-center gap-1"}>Giảng viên hướng dẫn <span><Asterisk className={"size-3 text-red-500"} /></span></FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             value={field.value}
@@ -883,7 +887,7 @@ export const CreateProjectForm = () => {
                   name="fileschema"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Tài liệu Dự án</FormLabel>
+                      <FormLabel className={"flex items-center gap-1"}>Tài liệu dự án <span><Asterisk className={"size-3 text-red-500"} /></span></FormLabel>
                       <FormControl>
                         <div className="flex items-center gap-2">
                           <Input

@@ -50,6 +50,12 @@ class TeamMemberSerivce extends BaseService<TeamMember> {
       })
       return response.data
   }
+
+  public async kickMember ({teamMemberId} : {teamMemberId: string}) : Promise<BusinessResult<void>> {
+      const response = await axiosInstance.put<BusinessResult<void>>(`${this.endpoint}/kick-member/${teamMemberId}`, {})
+      return response.data
+
+  }
 }
 
 export const teammemberService = new TeamMemberSerivce();
