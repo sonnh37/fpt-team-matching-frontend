@@ -501,9 +501,9 @@ export const TopicDetailForm = ({ topicId }: TopicDetailFormProps) => {
     }
   };
 
-  const latestStageTopic = topic.semester?.stageTopics?.reduce(
+  const latestStageTopic = (topic.semester?.stageTopics && topic.semester?.stageTopics.length != 0)? topic.semester?.stageTopics?.reduce(
     (prev, current) => (prev.stageNumber > current.stageNumber ? prev : current)
-  );
+  ) : null;
 
   const dateNow = Date.now();
   const resultDate = new Date(latestStageTopic?.resultDate || 0);
