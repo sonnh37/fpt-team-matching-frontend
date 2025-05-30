@@ -128,10 +128,11 @@ const InviteUsersForm = () => {
         : 0
     );
 
+  sortedMembers = sortedMembers?.filter(x => x.leaveDate == null)
   const isHasTopic = !!project?.topicId;
 
   let availableSlots = res_current_semester?.data?.maxTeamSize ?? 5;
-  availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
+  availableSlots = availableSlots - (project?.teamSize ?? 0);
 
   const handleInvite = useCallback(
     async (emailToInvite: string) => {
