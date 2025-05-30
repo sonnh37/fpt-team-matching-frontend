@@ -236,7 +236,7 @@ export function ProfileForm({ user }: { user?: User }) {
 
                   <FormInput 
                     label="Họ" 
-                    name="firstName" 
+                    name="lastName"
                     form={form}
                     placeholder="Nhập họ của bạn"
                     description="Ví dụ: Nguyễn, Trần, Lê,..."
@@ -244,7 +244,7 @@ export function ProfileForm({ user }: { user?: User }) {
 
                   <FormInput 
                     label="Tên" 
-                    name="lastName" 
+                    name="firstName"
                     form={form}
                     placeholder="Nhập tên của bạn"
                     description="Ví dụ: Văn A, Thị B,..."
