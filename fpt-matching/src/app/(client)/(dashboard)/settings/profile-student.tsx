@@ -366,7 +366,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
 
                     )}
                   />
-                  <FormInput
+                  <FormInputTextArea
                       label="Thành tích"
                       name="achievement"
                       form={form}
@@ -380,6 +380,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                     label="Giới thiệu bản thân"
                     name="bio"
                     form={form}
+                    className={"px-3 py-2"}
                     placeholder="Mô tả ngắn về bản thân"
                   />
 
@@ -387,6 +388,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                     label="Sở thích"
                     name="interest"
                     form={form}
+                    className={"px-3 py-2"}
                     placeholder="Nhập sở thích cá nhân"
                   />
 
@@ -396,6 +398,7 @@ export function ProfileStudentForm({ user }: { user?: User }) {
                         label="Kinh nghiệm dự án"
                         name="experienceProject"
                         form={form}
+                        className={"px-3 py-2"}
                         placeholder="Mô tả các dự án đã tham gia, vai trò và kinh nghiệm đạt được"
                         rows={4}
                     />
