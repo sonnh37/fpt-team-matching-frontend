@@ -1,7 +1,7 @@
 export enum Gender {
-    Male,
-    Female,
-    Other,
+    Nam,
+    Nữ,
+    Khác,
 }
 
 export enum UserStatus {
