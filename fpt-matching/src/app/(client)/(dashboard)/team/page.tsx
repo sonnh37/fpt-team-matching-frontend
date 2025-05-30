@@ -171,7 +171,7 @@ export default function TeamInfo() {
   sortedMembers = sortedMembers.filter(x => x.leaveDate == null)
 
   const isHasTopic = !!project.topicId;
-  const availableSlots = (currentSemester?.maxTeamSize ?? 0) - (project.teamMembers?.length ?? 0)
+  const availableSlots = (currentSemester?.maxTeamSize ?? 0) - (project.teamSize ?? 0)
 
   const isLockTeamMember = availableSlots === 0;
 
