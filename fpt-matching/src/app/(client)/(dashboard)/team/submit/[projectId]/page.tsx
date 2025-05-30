@@ -217,10 +217,10 @@ const SubmitTopic = () => {
             <CardTitle className="text-3xl font-bold tracking-tight">
               Đơn nộp xác thực lại đề tài và nhóm
             </CardTitle>
-            <CardDescription className="text-muted-foreground">
-              Điền đầy đủ thông tin bên dưới để đăng ký ý tưởng dự án. Tất cả
-              các trường đều bắt buộc trừ khi có ghi chú khác.
-            </CardDescription>
+            {/*<CardDescription className="text-muted-foreground">*/}
+            {/*  Điền đầy đủ thông tin bên dưới để đăng ký ý tưởng dự án. Tất cả*/}
+            {/*  các trường đều bắt buộc trừ khi có ghi chú khác.*/}
+            {/*</CardDescription>*/}
           </CardHeader>
 
           <CardContent className="space-y-6">
@@ -228,7 +228,7 @@ const SubmitTopic = () => {
 
             {/* Profession & Specialty Section */}
             <div className="space-y-4 rounded-lg border p-4">
-              <h3 className="text-lg font-medium">Thông tin Học thuật</h3>
+              <h3 className="text-lg font-bold">Thông tin học thuật</h3>
 
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -298,7 +298,7 @@ const SubmitTopic = () => {
 
             {/* Topic Details Section */}
             <div className="space-y-4 rounded-lg border p-4">
-              <h3 className="text-lg font-medium">Chi tiết Ý tưởng</h3>
+              <h3 className="text-lg font-bold">Chi tiết đề tài</h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
@@ -315,9 +315,9 @@ const SubmitTopic = () => {
                           readOnly
                         />
                       </FormControl>
-                      <FormDescription>
-                        Tên chính thức của dự án
-                      </FormDescription>
+                      {/*<FormDescription>*/}
+                      {/*  Tên chính thức của dự án*/}
+                      {/*</FormDescription>*/}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -357,7 +357,7 @@ const SubmitTopic = () => {
                         readOnly
                       />
                     </FormControl>
-                    <FormDescription>Tối đa 20 ký tự</FormDescription>
+                    {/*<FormDescription>Tối đa 20 ký tự</FormDescription>*/}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -377,7 +377,7 @@ const SubmitTopic = () => {
                         readOnly
                       />
                     </FormControl>
-                    <FormDescription>Tối thiểu 10 ký tự</FormDescription>
+                    {/*<FormDescription>Tối thiểu 10 ký tự</FormDescription>*/}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -386,7 +386,7 @@ const SubmitTopic = () => {
 
             {/* Team & File Section */}
             <div className="space-y-4 rounded-lg border p-4">
-              <h3 className="text-lg font-medium">Nhóm & Tài liệu</h3>
+              <h3 className="text-lg font-bold">Nhóm & Tài liệu</h3>
 
               {/* Mentor Selection - Only for Students */}
               {isStudent && (
@@ -397,7 +397,7 @@ const SubmitTopic = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Giảng viên hướng dẫn</FormLabel>
-                        <p>{mentor ? `${mentor.lastName} ${mentor.firstName}` : "Chưa chọn"}</p>
+                        <p>{mentor ? `${mentor.lastName} ${mentor.firstName} (${mentor.code})` : "Không có"}</p>
                       </FormItem>
                     )}
                   />
@@ -416,7 +416,7 @@ const SubmitTopic = () => {
                           <FormLabel>
                             Giảng viên hướng dẫn 2 (Tùy chọn)
                           </FormLabel>
-                          <p>{subMentor ? `${subMentor.lastName} ${subMentor.firstName}` : "Không có"}</p>
+                          <p>{subMentor ? `${subMentor.lastName} ${subMentor.firstName} (${subMentor.code})` : "Không có"}</p>
                         </FormItem>
                       );
                     }}
@@ -444,10 +444,10 @@ const SubmitTopic = () => {
 
                       </div>
                     </FormControl>
-                    <FormDescription>
-                      Định dạng chấp nhận: {ALLOWED_EXTENSIONS.join(", ")} (tối
-                      đa 10MB)
-                    </FormDescription>
+                    {/*<FormDescription>*/}
+                    {/*  Định dạng chấp nhận: {ALLOWED_EXTENSIONS.join(", ")} (tối*/}
+                    {/*  đa 10MB)*/}
+                    {/*</FormDescription>*/}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -457,16 +457,16 @@ const SubmitTopic = () => {
             {/* Current User Info - Only for Students */}
             {isStudent && (
               <div className="rounded-lg border p-4 space-y-2">
-                <h3 className="text-lg font-medium">Thành viên Nhóm</h3>
-                <p className="text-sm text-muted-foreground">
-                  Bạn sẽ là trưởng nhóm của dự án này
-                </p>
+                <h3 className="text-lg font-bold">Thành viên Nhóm</h3>
+                {/*<p className="text-sm text-muted-foreground">*/}
+                {/*  Bạn sẽ là trưởng nhóm của dự án này*/}
+                {/*</p>*/}
                 <>
-                  {teamMembers?.map((member) => {
+                  {teamMembers?.map((member, index) => {
                     const userInTeam = member.user;
-                    if (!userInTeam) return null;
+                    if (!userInTeam || member.leaveDate != null) return null;
                     return (
-                      <div className="flex items-center justify-between p-3 rounded-md bg-muted/50">
+                      <div key={index} className="flex items-center justify-between p-3 rounded-md bg-muted/50">
                         <div className="flex items-center gap-3">
                           <div className="flex flex-col">
                             <span className="font-medium">
