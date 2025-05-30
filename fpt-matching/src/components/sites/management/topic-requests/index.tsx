@@ -36,7 +36,7 @@ export function TopicRequestAllManagerTable() {
     <>
       <div className="space-y-8">
         <div className="">
-          <DataOnlyTable data={data?.data?.results ?? []} columns={columns} />
+          <DataOnlyTable data={data?.data?.results?.filter(x => x.status == TopicStatus.ManagerApproved || x.status == TopicStatus.ManagerRejected || x.status == TopicStatus.ManagerPending) ?? []} columns={columns} />
         </div>
       </div>
     </>
