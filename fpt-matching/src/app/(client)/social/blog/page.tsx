@@ -148,7 +148,7 @@ export default function Blog() {
         skillRequired: formData.skillRequired,
         type: postType,
         status: formData.status,
-        // projectId: projectUser?.id || ""
+        projectId: projectUser?.id || "",
         ...(formData.projectId ? { projectId: formData.projectId } : {})
       };
 
@@ -603,7 +603,7 @@ export default function Blog() {
                                 projectUser != null ?
                                     (
                                     <div>{projectUser?.teamName ?? "Chưa có tên"} - Số lượng thành viên: {projectUser?.teamSize}</div>
-                                ): <Badge variant={"destructive"} className={"hover:bg-red-300"}>Chưa tạo nhóm</Badge>
+                                ): <Badge variant={"destructive"} className={"hover:bg-red-300"}>Chưa hỗ trợ đăng tìm thành viên</Badge>
                               }
                               {/*<h4 className="text-red-400 text-sm">*Không bắt buộc</h4>*/}
                               {/*<h4 className="text-red-400 text-sm">{messageUser}</h4>*/}
@@ -718,7 +718,7 @@ export default function Blog() {
                           />
                           <div className='flex w-full justify-between'>
                             <div>
-                              <p className="text-lg font-semibold text-gray-800">{post.user?.username}</p>
+                              <p className="text-lg font-semibold text-gray-800">{post.user?.firstName} {post.user?.firstName}</p>
                               <p className="text-sm text-gray-500">
                                 {post?.createdDate
                                   ? new Date(post.createdDate).toLocaleString("vi-VN", {
@@ -756,7 +756,7 @@ export default function Blog() {
                               <div className='hover:text-orange-300 text-left'>
                                 <div
                                   className='text-left '> {post?.type === BlogType.Recruit && (
-                                    <div>[🔎Đăng tuyển,tìm thành viên]</div>)}</div>
+                                    <div>🔎 Tuyển thành viên</div>)}</div>
                                 <span
                                   className={` ${post?.type === BlogType.Recruit ? "text-none font-medium text-lg" : ""}`}>
                                   {post.title}
@@ -775,7 +775,7 @@ export default function Blog() {
                                 <div
                                   className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                                   <div className="flex justify-center w-full">
-                                    Bài viết của {post?.user?.username}
+                                    Bài viết của {post.user?.firstName} {post.user?.firstName}
                                   </div>
                                   <ModalClose
                                     className="absolute top-2 right-2">X</ModalClose>
@@ -1045,7 +1045,7 @@ export default function Blog() {
                       <h2 className="font-bold  text-gray-700  ">
                         <Modal >
                           <ModalTrigger >
-                            <div className='hover:text-orange-300 text-left'>  <div className='text-left '> {blogfpt?.type === BlogType.Recruit && (<div>[🔎Đăng tuyển,tìm thành viên]</div>)}</div>
+                            <div className='hover:text-orange-300 text-left'>  <div className='text-left '> {blogfpt?.type === BlogType.Recruit && (<div>🔎 Tuyển thành viên</div>)}</div>
                               <span className={` ${blogfpt?.type === BlogType.Recruit ? "text-none font-medium text-lg" : "text-lg"}`}>
                                 {blogfpt.title}
                               </span> </div>
@@ -1058,7 +1058,7 @@ export default function Blog() {
                               {/* Header - Cố định khi cuộn */}
                               <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                                 <div className="flex justify-center w-full">
-                                  Bài viết của {blogfpt?.user?.username}
+                                  Bài viết của {post.user?.firstName} {post.user?.firstName}
                                 </div>
                                 <ModalClose className="absolute top-2 right-2">X</ModalClose>
                               </div>
@@ -1113,8 +1113,8 @@ export default function Blog() {
                                     <div className="mt-1 text-gray-700 font-medium text-base px-4 ">
                                       {blogfpt?.skillRequired ?? "Hiện tại chưa có."}
                                       {/* <getByProjectId id={post?.id}/> */}
-                                      <h4 className='text-lg mt-1 font-bold  text-gray-900'>Thông tin của team :</h4>
-                                      <ProjectInfo id={blogfpt.projectId ?? ""} />
+                                      {/*<h4 className='text-lg mt-1 font-bold  text-gray-900'>Thông tin của team :</h4>*/}
+                                      {/*<ProjectInfo id={blogfpt.projectId ?? ""} />*/}
                                     </div>
                                   </div>
 
@@ -1206,7 +1206,7 @@ export default function Blog() {
                             {/* Header - Cố định khi cuộn */}
                             <div className="header-post w-full h-auto border-gray-500 p-4 border-b-2 bg-white dark:bg-black sticky top-0 z-10">
                               <div className="flex justify-center w-full">
-                                Bài viết của {postNt?.user?.username}
+                                Bài viết của {post.user?.firstName} {post.user?.firstName}
                               </div>
                               <ModalClose className="absolute top-2 right-2">X</ModalClose>
                             </div>
