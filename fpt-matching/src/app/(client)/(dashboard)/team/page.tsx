@@ -161,13 +161,14 @@ export default function TeamInfo() {
   const isLeader = currentUserMember?.role === TeamMemberRole.Leader;
 
   // Sort members with leaders first
-  const sortedMembers = [...(project.teamMembers ?? [])].sort((a, b) =>
+  let sortedMembers = [...(project.teamMembers ?? [])].sort((a, b) =>
     a.role === TeamMemberRole.Leader
       ? -1
       : b.role === TeamMemberRole.Leader
       ? 1
       : 0
   );
+  sortedMembers = sortedMembers.filter(x => x.leaveDate == null)
 
   const isHasTopic = !!project.topicId;
   const availableSlots = (currentSemester?.maxTeamSize ?? 0) - (project.teamMembers?.length ?? 0)
