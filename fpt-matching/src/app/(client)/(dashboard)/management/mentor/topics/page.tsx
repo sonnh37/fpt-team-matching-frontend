@@ -12,6 +12,7 @@ import TopicApprovedByMentorTable from "@/components/sites/management/mentor/top
 import TopicPendingTable from "@/components/sites/management/mentor/topics/pending";
 import TopicApprovedTable from "@/components/sites/management/mentor/topics/approved";
 import TopicRejectedTable from "@/components/sites/management/mentor/topics/rejected";
+import {TopicRequestStatus} from "@/types/enums/topic-request";
 
 const MENTOR_TABS = [
   {
@@ -67,12 +68,24 @@ export default function MentorTopicPage() {
     return <LoadingComponent />;
   }
 
-  const topics = data?.data?.results || [];
+  const topics = data?.data?.results?.map(x => {
+    if (x.stageTopic && new Date(x.stageTopic?.resultDate)> new Date(Date.now())){
+      return {
+        ...x,
+        status: TopicStatus.ManagerPending,
+        topicRequests: x.topicRequests.find(x => x.role == "Manager" && x.status != TopicRequestStatus.Pending)?.status == TopicRequestStatus.Pending
+      };
+    } else {
+      if (x.status == TopicStatus.ManagerPending){
+        return x
+      }
+    }
+  }) ?? []
 
   // Hàm đếm số lượng đề tài theo trạng thái
   const countTopicsByStatus = (statuses?: TopicStatus[]) => {
     return topics.filter((topic) =>
-      statuses ? statuses.includes(topic.status as TopicStatus) : true
+      statuses ? statuses.includes(topic?.status as TopicStatus) : true
     ).length;
   };
 

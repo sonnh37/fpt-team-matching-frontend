@@ -152,8 +152,10 @@ export default function TopicRejectedTable() {
 
   const table = useReactTable({
     data: data?.data?.results?.map(x => {
-      if (x.stageTopic && x.stageTopic.resultDate > new Date(Date.now())){
-        return {} as Topic;
+      if (x.stageTopic && new Date(x.stageTopic?.resultDate)> new Date(Date.now())){
+        return;
+      } else {
+        return x;
       }
     }) ?? [],
     columns,
