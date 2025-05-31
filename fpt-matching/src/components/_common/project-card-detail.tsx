@@ -34,9 +34,9 @@ export const TeamInfoCard = ({
   availableSlots,
 }: TeamInfoCardProps) => {
   const latestTopicVersion = project.topic?.topicVersions?.[0];
-  const topic = project.topic?.topicVersion?.topic;
+  const topic = project.topic;
 
-  const sortedMembers = project?.teamMembers
+  let sortedMembers = project?.teamMembers
     ?.slice()
     .sort((a, b) =>
       a.role === TeamMemberRole.Leader
@@ -45,6 +45,7 @@ export const TeamInfoCard = ({
         ? 1
         : 0
     );
+  sortedMembers = sortedMembers.filter(x => x.leaveDate == null);
 
   return (
     <Card className="rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -62,14 +63,14 @@ export const TeamInfoCard = ({
             </p>
           </div>
           <div>
-            <MenuAction topicId={project?.topic?.topicVersion?.id!} />
+            <MenuAction topicId={project?.topic?.id ?? ""} />
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="p-6 space-y-8">
         {/* Thông tin đề tài */}
-        {project.topic?.topicVersion != null ? (
+        {project.topic != null ? (
           <>
             <div className="space-y-6">
               <h3 className="text-xl font-semibold text-foreground">
@@ -88,19 +89,19 @@ export const TeamInfoCard = ({
                     <div className="space-y-1">
                       <Label>Viết tắt:</Label>
                       <p>
-                        {project.topic.topicVersion.abbreviations || "Chưa có"}
+                        {project.topic?.abbreviation || "Chưa có"}
                       </p>
                     </div>
                     <div className="space-y-1">
                       <Label>Tên tiếng Việt:</Label>
                       <p>
-                        {project.topic.topicVersion.vietNamName || "Chưa có"}
+                        {project.topic.vietNameseName || "Chưa có"}
                       </p>
                     </div>
                     <div className="space-y-1">
                       <Label>Tên tiếng Anh:</Label>
                       <p>
-                        {project.topic.topicVersion.englishName || "Chưa có"}
+                        {project.topic.englishName || "Chưa có"}
                       </p>
                     </div>
                   </CardContent>
@@ -139,7 +140,7 @@ export const TeamInfoCard = ({
                   </CardHeader>
                   <CardContent>
                     <p className="whitespace-pre-line">
-                      {project.topic.topicVersion.description || "Chưa có mô tả"}
+                      {project.topic.description || "Chưa có mô tả"}
                     </p>
                   </CardContent>
                 </Card>
@@ -155,16 +156,16 @@ export const TeamInfoCard = ({
                       <div className="space-y-1">
                         <Label>Đề tài doanh nghiệp:</Label>
                         <p>
-                          {project.topic.topicVersion.topic?.isEnterpriseTopic
+                          {project.topic?.isEnterpriseTopic
                             ? "Có"
                             : "Không"}
                         </p>
                       </div>
-                      {project.topic.topicVersion.topic?.isEnterpriseTopic && (
+                      {project.topic?.isEnterpriseTopic && (
                         <div className="space-y-1">
                           <Label>Tên doanh nghiệp:</Label>
                           <p>
-                            {project.topic.topicVersion.enterpriseName ||
+                            {project.topic.enterpriseName ||
                               "Chưa có"}
                           </p>
                         </div>
@@ -182,7 +183,7 @@ export const TeamInfoCard = ({
                     </div>
                     <div className="space-y-1">
                       <Label>Số lượng thành viên tối đa:</Label>
-                      <p>{project.topic.topicVersion.teamSize || "Chưa có"}</p>
+                      <p>{project.topic.teamSize || "Chưa có"}</p>
                     </div>
                     <div className="space-y-1">
                       <Label>Tệp đính kèm:</Label>
@@ -316,10 +317,10 @@ export const TeamInfoCard = ({
                   variant: "destructive",
                 },
               };
-              const mentorConclusionInfo =
-                member.mentorConclusion !== undefined
-                  ? mentorConclusionMap[member.mentorConclusion]
-                  : null;
+              // const mentorConclusionInfo =
+              //   member.mentorConclusion !== undefined
+              //     ? mentorConclusionMap[member.mentorConclusion]
+              //     : null;
 
               return (
                 <Card
@@ -355,11 +356,11 @@ export const TeamInfoCard = ({
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                          <Badge variant={roleInfo.variant as any}>
+                          <Badge variant={roleInfo.variant as string}>
                             {roleInfo.text}
                           </Badge>
                           <Badge
-                            variant={statusInfo.variant as any}
+                            variant={statusInfo.variant as string}
                             className={cn(
                               statusInfo.variant === "info"
                                 ? "bg-green-500 text-white dark:text-black hover:bg-green-600"

@@ -84,9 +84,6 @@ const roles_options = [
 //#endregion
 
 export default function TopicAllTable() {
-  const searchParams = useSearchParams();
-  const role = useCurrentRole();
-  const user = useSelectorUser();
 
  
   const filterEnums: FilterEnum[] = [

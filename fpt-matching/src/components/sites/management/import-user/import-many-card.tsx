@@ -196,7 +196,9 @@ const ImportManyCard = ({role, semesterId}: {role: string,semesterId: string | n
                     setUsersConfirm(response.data)
                     setOpenConfirmDialog(true)
                     setLoading(false)
+                    return;
                 }
+                window.location.href = "management/users"
                 return;
             }
             if (response.status == 3) {
@@ -205,7 +207,9 @@ const ImportManyCard = ({role, semesterId}: {role: string,semesterId: string | n
                     setLoading(false)
                     setUsersConfirm(response.data)
                     setOpenConfirmDialog(true)
+                    return;
                 }
+                window.location.href = "management/users"
                 return;
             }
             setLoading(false)
@@ -227,7 +231,9 @@ const ImportManyCard = ({role, semesterId}: {role: string,semesterId: string | n
                     setUsersConfirm(response.data)
                     setOpenConfirmDialog(true)
                     setLoading(false)
+                    return;
                 }
+                window.location.href = "management/users"
                 return;
             }
             if (response.status == 3) {
@@ -236,7 +242,9 @@ const ImportManyCard = ({role, semesterId}: {role: string,semesterId: string | n
                     setLoading(false)
                     setUsersConfirm(response.data)
                     setOpenConfirmDialog(true)
+                    return;
                 }
+                window.location.href = "management/users"
                 return;
             }
             setLoading(false)

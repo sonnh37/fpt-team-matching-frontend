@@ -177,6 +177,9 @@ export function DataTableComponent<TData>({
             ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => {
                 const model = row.original as any;
+                if (!model) {
+                  return ;
+                }
                 const isDeleted = model.isDeleted;
                 const id = model.id as string;
                 return (

@@ -64,13 +64,14 @@ export default function ProjectDetail() {
   const project = result?.data;
 
   // Sắp xếp leader lên đầu
-  const sortedMembers = [...project.teamMembers].sort((a, b) =>
+  let sortedMembers = [...project.teamMembers].sort((a, b) =>
     a.role === TeamMemberRole.Leader
       ? -1
       : b.role === TeamMemberRole.Leader
       ? 1
       : 0
   );
+  sortedMembers = sortedMembers.filter(x => x.leaveDate == null)
 
   //  Tính số slot trống
   const isHasTopic = project?.topicId ? true : false;

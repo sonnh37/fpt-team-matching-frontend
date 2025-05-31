@@ -1,58 +1,33 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
-import { TypographyH2 } from "@/components/_common/typography/typography-h2";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useQueryParams } from "@/hooks/use-query-params";
-import { professionService } from "@/services/profession-service";
-import { Profession } from "@/types/profession";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import {
   ColumnDef,
   ColumnFiltersState,
   getCoreRowModel,
-  getFilteredRowModel,
   PaginationState,
   Row,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { MoreHorizontal, Search } from "lucide-react";
+import { MoreHorizontal} from "lucide-react";
 import {
   useParams,
-  usePathname,
-  useRouter,
   useSearchParams,
 } from "next/navigation";
 import * as React from "react";
 import {Dispatch, SetStateAction, useEffect, useMemo, useState} from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 import { columns } from "./columns";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { isDeleted_options } from "@/lib/filter-options";
-import { StageTopicGetAllQuery } from "@/types/models/queries/stage-topics/stage-topic-get-all-query";
+// import { StageTopicGetAllQuery } from "@/types/models/queries/stage-topics/stage-topic-get-all-query";
 import { stagetopicService } from "@/services/stage-topic-service";
 import {
   DropdownMenu,
@@ -60,15 +35,13 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { StageTopic } from "@/types/stage-topic";
-import { DeleteBaseEntitysDialog } from "@/components/_common/delete-dialog-generic";
 import { StageTopicFormDialog } from "./create-or-update-dialog";
-import { LoadingComponent } from "@/components/_common/loading-page";
 import {useCurrentSemester} from "@/hooks/use-current-role";
 import {PublicResultDialog} from "@/components/sites/management/semesters/stage-idea/public-result-dialog";
+import {StageTopicGetAllQuery} from "@/types/models/queries/stage-ideas/stage-idea-get-all-query";
 //#region INPUT
 const defaultSchema = z.object({
   emailOrFullname: z.string().optional(),
@@ -121,9 +94,9 @@ export default function StageTopicTable() {
   const currentSemester = useCurrentSemester().currentSemester
   const [openPublicStage, setOpenPublicStage] = React.useState<boolean>(false)
   const [selectedStageTopic, setSelectedStageTopic] = React.useState<StageTopic | null>(null)
-  const filterEnums: FilterEnum[] = [
-    { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
-  ];
+  // const filterEnums: FilterEnum[] = [
+  //   { columnId: "isDeleted", title: "Is deleted", options: isDeleted_options },
+  // ];
   //#region DEFAULT
   const [sorting, setSorting] = React.useState<SortingState>([
     {
@@ -166,6 +139,7 @@ export default function StageTopicTable() {
       sorting
     );
 
+
     params.semesterId = params_.semesterId as string;
 
     return { ...params };
@@ -205,7 +179,7 @@ export default function StageTopicTable() {
     },
   ];
   const table = useReactTable({
-    data: data?.data?.results ?? [],
+    data: data?.data?.results?.filter(x => x.semesterId == semesterId) ?? [],
     columns: columns_,
     pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },

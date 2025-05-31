@@ -58,10 +58,10 @@ function UserConfirmationTable({users} : {users: User[]}) {
 
 const DialogConfirmUpdate = ({open, setOpen, usersConfirm, role, semesterId} : {open: boolean, setOpen: Dispatch<SetStateAction<boolean>>, usersConfirm: User[], role: string, semesterId: string}) => {
     const [loading, setLoading] = useState(false);
-    const handleSaveChange = async () => {
+    const handleSaveChangeStudents = async () => {
         setLoading(true);
 
-        const response = await userService.updateExistedUser({users: usersConfirm, semesterId});
+        const response = await userService.updateExistedStudent({users: usersConfirm, semesterId});
         if (response.status && response.status !== 1) {
             toast.error(response.status);
             setLoading(false);
@@ -71,6 +71,22 @@ const DialogConfirmUpdate = ({open, setOpen, usersConfirm, role, semesterId} : {
         setLoading(false);
         setOpen(false)
         toast.success(response.message)
+        window.location.href = "/management/users"
+    }
+    const handleSaveChangeLecturers = async () => {
+        setLoading(true);
+
+        const response = await userService.updateExistedLecturer({users: usersConfirm, semesterId});
+        if (response.status && response.status !== 1) {
+            toast.error(response.status);
+            setLoading(false);
+            setOpen(false);
+            return;
+        }
+        setLoading(false);
+        setOpen(false)
+        toast.success(response.message)
+        window.location.href = "/management/users"
     }
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -100,13 +116,9 @@ const DialogConfirmUpdate = ({open, setOpen, usersConfirm, role, semesterId} : {
                             Đang xử lí
                         </Button> :
                        <>
-                       {
-                            role == "Student" && (
-                               <Button
-                                   onClick={() => handleSaveChange()}
-                                   type="submit">Xác nhận</Button>
-                           )
-                       }
+                           <Button
+                               onClick={() => role == "Student" ? handleSaveChangeStudents() : handleSaveChangeLecturers()}
+                               type="submit">Xác nhận</Button>
                            <Button onClick={() => {
                                setOpen(false);
                            }} variant={"outline"} type={"submit"}>Không cập nhật</Button>

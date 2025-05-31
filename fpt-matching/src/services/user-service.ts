@@ -205,10 +205,18 @@ class UserService extends BaseService<User> {
     return response.data;
   };
 
-  public updateExistedUser = async ({ users, semesterId }: { users: User[], semesterId: string }) => {
+  public updateExistedStudent = async ({ users, semesterId }: { users: User[], semesterId: string }) => {
     const response = await axiosInstance.put<BusinessResult<void>>(
       `${this.endpoint}/import/students/update-existed?semesterId=${semesterId}`,
       [...users]
+    );
+    return response.data;
+  };
+
+  public updateExistedLecturer = async ({ users, semesterId }: { users: User[], semesterId: string }) => {
+    const response = await axiosInstance.put<BusinessResult<void>>(
+        `${this.endpoint}/import/lecturers/update-existed?semesterId=${semesterId}`,
+        [...users]
     );
     return response.data;
   };
