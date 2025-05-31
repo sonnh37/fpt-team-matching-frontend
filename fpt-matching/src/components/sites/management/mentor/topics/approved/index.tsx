@@ -182,13 +182,15 @@ export default function TopicApprovedTable() {
   if (error) return <div>Error loading data</div>;
 
   const table = useReactTable({
-    data: data?.data?.results?.map(x => {
-      if (x.stageTopic && new Date(x.stageTopic?.resultDate)> new Date(Date.now())){
-        return;
-      } else {
-        return x;
-      }
-    }) ?? [],
+    // data: data?.data?.results?.map(x => {
+    //   console.log(new Date(x.stageTopic?.resultDate)> new Date(Date.now()))
+    //   if (x.stageTopic && new Date(x.stageTopic?.resultDate)> new Date(Date.now())){
+    //     return;
+    //   } else {
+    //     return x;
+    //   }
+    // }) ?? [],
+    data: data?.data?.results?.filter(x => x.stageTopic && (new Date(x.stageTopic.resultDate) <= new Date(Date.now()))) ?? [],
     columns: getColumns(statues),
     pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },

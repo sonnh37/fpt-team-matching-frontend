@@ -1,75 +1,31 @@
-import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
-import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
-import { DataTableSkeleton } from "@/components/_common/data-table-api/data-table-skelete";
-import { TypographyH2 } from "@/components/_common/typography/typography-h2";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import {DataTableComponent} from "@/components/_common/data-table-api/data-table-component";
+import {DataTablePagination} from "@/components/_common/data-table-api/data-table-pagination";
+import {Card} from "@/components/ui/card";
+import {useQueryParams} from "@/hooks/use-query-params";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {keepPreviousData, useQuery,} from "@tanstack/react-query";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useQueryParams } from "@/hooks/use-query-params";
-import { professionService } from "@/services/profession-service";
-import { Profession } from "@/types/profession";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  keepPreviousData,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-import {
-  ColumnDef,
   ColumnFiltersState,
   getCoreRowModel,
-  getFilteredRowModel,
   PaginationState,
   SortingState,
   useReactTable,
   VisibilityState,
 } from "@tanstack/react-table";
-import { Badge, CheckCircle, Loader2, Search, Upload } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import {useSearchParams} from "next/navigation";
 import * as React from "react";
-import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { z } from "zod";
-import { columns } from "./columns";
-import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import { FilterEnum } from "@/types/models/filter-enum";
-import { isDeleted_options } from "@/lib/filter-options";
-import { TopicGetListForMentorQuery } from "@/types/models/queries/topics/topic-get-list-for-mentor-query";
-import { LoadingComponent } from "@/components/_common/loading-page";
-import { topicService } from "@/services/topic-service";
-import { TopicStatus } from "@/types/enums/topic";
-import { Topic } from "@/types/topic";
-import { DataTableColumnHeader } from "@/components/_common/data-table-api/data-table-column-header";
-import { TypographyP } from "@/components/_common/typography/typography-p";
-import { TypographyMuted } from "@/components/_common/typography/typography-muted";
-import {
-  useCurrentRole,
-  useCurrentSemester,
-  useCurrentSemesterId,
-} from "@/hooks/use-current-role";
-import { useSelectorUser } from "@/hooks/use-auth";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import {useEffect, useMemo, useState} from "react";
+import {useForm} from "react-hook-form";
+import {z} from "zod";
+import {columns} from "./columns";
+import {DataTableToolbar} from "@/components/_common/data-table-api/data-table-toolbar";
+import {FilterEnum} from "@/types/models/filter-enum";
+import {TopicGetListForMentorQuery} from "@/types/models/queries/topics/topic-get-list-for-mentor-query";
+import {topicService} from "@/services/topic-service";
+import {TopicStatus} from "@/types/enums/topic";
+import {useCurrentRole,} from "@/hooks/use-current-role";
+import {useSelectorUser} from "@/hooks/use-auth";
+import {TopicRequestStatus} from "@/types/enums/topic-request";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -131,6 +87,8 @@ export default function TopicPendingTable() {
 
     params.statuses = [
       TopicStatus.ManagerPending,
+      TopicStatus.ManagerApproved,
+      TopicStatus.ManagerRejected,
     ];
 
     return { ...params };
@@ -155,7 +113,19 @@ export default function TopicPendingTable() {
   if (error) return <div>Error loading data</div>;
 
   const table = useReactTable({
-    data: data?.data?.results ?? [],
+    data: data?.data?.results?.map(x => {
+      if (x.stageTopic && new Date(x.stageTopic?.resultDate)> new Date(Date.now())){
+        return {
+          ...x,
+          status: TopicStatus.ManagerPending,
+          topicRequests: x.topicRequests.find(x => x.role == "Manager" && x.status != TopicRequestStatus.Pending)?.status == TopicRequestStatus.Pending
+        };
+      } else {
+        if (x.status == TopicStatus.ManagerPending){
+          return x
+        }
+      }
+    }) ?? [],
     columns,
     pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },
