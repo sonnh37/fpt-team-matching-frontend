@@ -22,7 +22,7 @@ const TimeStageTopic = ({ stageTopic }: StageTopicProps) => {
         <CardHeader className="pb-3">
           <CardTitle className="text-xl font-semibold flex items-center gap-2">
             <CalendarDays className="h-5 w-5 text-primary" />
-            <span>Thông tin Giai đoạn Đánh giá Ý tưởng</span>
+            <span>Thông tin giai đoạn đánh giá đề tài</span>
           </CardTitle>
           <Separator />
         </CardHeader>
@@ -38,7 +38,7 @@ const TimeStageTopic = ({ stageTopic }: StageTopicProps) => {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-medium">Thời gian đánh giá</h3>
+                  <h3 className="font-medium">Thời gian nộp đề tài</h3>
                   <div className="mt-1 flex flex-wrap gap-2">
                     <Badge variant="secondary" className="text-sm font-normal">
                       {formatDate(stageTopic.startDate)}
@@ -48,9 +48,9 @@ const TimeStageTopic = ({ stageTopic }: StageTopicProps) => {
                       {formatDate(stageTopic.endDate)}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Thời gian nộp và đánh giá ý tưởng
-                  </p>
+                  {/*<p className="text-xs text-muted-foreground mt-2">*/}
+                  {/*  Thời gian nộp và đánh giá ý tưởng*/}
+                  {/*</p>*/}
                 </div>
               </div>
 
@@ -68,9 +68,9 @@ const TimeStageTopic = ({ stageTopic }: StageTopicProps) => {
                       {formatDate(stageTopic.resultDate)}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Ngày công bố kết quả đánh giá cuối cùng
-                  </p>
+                  {/*<p className="text-xs text-muted-foreground mt-2">*/}
+                  {/*  Ngày công bố kết quả đánh giá cuối cùng*/}
+                  {/*</p>*/}
                 </div>
               </div>
             </div>
