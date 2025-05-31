@@ -43,6 +43,7 @@ import { Department } from "@/types/enums/user";
 import { FilterEnum } from "@/types/models/filter-enum";
 import { z } from "zod";
 import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
+import { useCurrentSemester, useCurrentSemesterId } from "@/hooks/use-current-role";
 
 const formSchema = z.object({
   searchTerm: z.string().optional(),
@@ -50,6 +51,7 @@ const formSchema = z.object({
 
 export default function DanhSachGiangVien() {
   const searchParams = useSearchParams();
+  const semesterId = useCurrentSemester().currentSemester?.id;
   const filterEnums: FilterEnum[] = [
     {
       columnId: "department",
@@ -80,30 +82,24 @@ export default function DanhSachGiangVien() {
 
   const [searchTerm, setSearchTerm] = useState<string>();
 
-  const queryParams = useMemo(() => {
-    const params: UserGetAllInSemesterQuery = useQueryParams(
+  const queryParams: UserGetAllQuery = {
+    ...useQueryParams(
       { emailOrFullname: searchTerm },
       columnFilters,
       pagination,
       sorting
-    );
-    params.role = "Mentor";
-    return params;
-  }, [searchTerm, columnFilters, pagination, sorting]);
+    ),
+    role: "Mentor",
+    semesterId: semesterId,
+  };
 
   const { data, isFetching, error } = useQuery({
     queryKey: ["giang-vien", queryParams],
-    queryFn: () => userService.getUsersInSemester(queryParams),
+    queryFn: () => userService.getAll(queryParams),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
-  const { data: res_semester } = useQuery({
-    queryKey: ["get-current-semester"],
-    queryFn: () => semesterService.getCurrentSemester(),
-    placeholderData: keepPreviousData,
-    refetchOnWindowFocus: false,
-  });
   //#endregion
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
@@ -139,9 +135,7 @@ export default function DanhSachGiangVien() {
             <TypographyH2 className="text-primary">
               Danh Sách Giảng Viên Hướng Dẫn
             </TypographyH2>
-            <Badge variant="outline" className="text-sm font-normal">
-              Học kỳ hiện tại: {res_semester?.data?.semesterName || "N/A"}
-            </Badge>
+            
           </div>
 
           <Separator />
