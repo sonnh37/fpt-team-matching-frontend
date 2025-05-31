@@ -138,6 +138,7 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
   const queryClient = useQueryClient();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isSubmitting,setIsSubmitting] = useState(false);
   const role = useCurrentRole();
   const project = row.original;
 
@@ -168,6 +169,8 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   const confirm = useConfirm()
   const handleSubmitManagaer = async (projectId: string) => {
+    if (isSubmitting) return; // Chặn nếu đang submit
+    setIsSubmitting(true);
     setIsDeleting(true);
     const confirmed = await confirm({
       title: "Bạn có muốn nộp đơn này lên hệ thống",
@@ -177,13 +180,14 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
     });
 
     try {
+      const toastId = toast.loading("⏳Vui lòng chờ trong giây...");
 
       const res = await projectService.BlockProjectByManager(project.id ?? "", confirmed ? ProjectStatus.InProgress : ProjectStatus.Forming);
       if (res.status != 1) {
         toast.error(res.message);
         return;
       }
-
+      toast.dismiss(toastId);
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
       toast.success(res.message);

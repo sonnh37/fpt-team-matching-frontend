@@ -36,7 +36,7 @@ import { FormInput, FormSwitch } from "@/lib/form-custom-shadcn";
 import { projectService } from "@/services/project-service";
 import { professionService } from "@/services/profession-service";
 import { useQuery } from "@tanstack/react-query";
-import {useCurrentRole, useCurrentSemester} from "@/hooks/use-current-role";
+import { useCurrentRole, useCurrentSemester } from "@/hooks/use-current-role";
 import { useSelectorUser } from "@/hooks/use-auth";
 import { useParams } from "next/navigation";
 import { UserGetAllQuery } from "@/types/models/queries/users/user-get-all-query";
@@ -109,9 +109,10 @@ const formSchema = z.object({
 
 const SubmitTopic = () => {
   const { projectId } = useParams();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const role = useCurrentRole();
   const user = useSelectorUser();
-  const currentSemester =  useCurrentSemester().currentSemester
+  const currentSemester = useCurrentSemester().currentSemester
   // Check user role
   const isStudent = role == "Student";
 
@@ -177,6 +178,8 @@ const SubmitTopic = () => {
 
   const confirm = useConfirm()
   const handleSubmit = async (projectId: string) => {
+    if (isSubmitting) return; // Chặn nếu đang submit
+    setIsSubmitting(true);
 
     const confirmed = await confirm({
       title: "Bạn có muốn nộp đơn này lên hệ thống",
@@ -184,7 +187,7 @@ const SubmitTopic = () => {
       confirmText: "Có,đồng ý",
       cancelText: "Không,cảm ơn",
     });
-    if (!currentSemester){
+    if (!currentSemester) {
       toast.error("Không tìm thấy học kỳ trong Workspace")
       return
     }
@@ -200,17 +203,26 @@ const SubmitTopic = () => {
       toast.error("Nhóm chưa có đề tài");
       return
     }
+
     if (confirmed) {
+       // Hiện loading toast
+     const toastId = toast.loading("⏳Vui lòng chờ trong giây...");
+
       if (projectId) {
         const result = await projectService.submitBlockProjectByStudent(projectId);
         if (result?.status === 1) {
+          toast.dismiss(toastId);
           toast.success("Nộp đề tài thành công");
           window.location.href = "/team"
           // TODO: Gọi lại data / chuyển trang nếu cần
         } else {
+          toast.dismiss(toastId);
           toast.error(result?.message || "Có lỗi xảy ra khi nộp đề tài");
         }
       }
+      toast.dismiss(toastId);
+      
+
     }
   };
 

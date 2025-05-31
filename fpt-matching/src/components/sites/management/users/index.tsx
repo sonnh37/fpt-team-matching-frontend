@@ -136,15 +136,13 @@ export default function UserTable() {
   }, [columnFilters, inputFields]);
 
   useEffect(() => {
-    const field = formValues[columnSearch as keyof typeof formValues] as
-      | string
-      | undefined;
-    if (field && field.length > 0) {
+    const value = formValues?.[columnSearch as keyof typeof formValues];
+    if (typeof value === "string" && value.length > 0) {
       setIsTyping(true);
     } else {
       setIsTyping(false);
     }
-  }, [formValues[columnSearch as keyof typeof formValues]]);
+  }, [formValues, columnSearch]);
 
   const { data, isFetching, error } = useQuery({
     queryKey: ["data", queryParams],
@@ -155,8 +153,7 @@ export default function UserTable() {
 
   if (error) return <div>Error loading data</div>;
 
-  console.log(currentSemester)
-  console.log(data?.data?.results)
+
   const table = useReactTable({
     data: data?.data?.results ?? [],
     columns,
