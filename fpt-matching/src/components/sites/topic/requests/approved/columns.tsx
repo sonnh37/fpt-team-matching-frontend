@@ -286,12 +286,11 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
       <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Xác nhận chọn làm project</DialogTitle>
+            <DialogTitle>Xác nhận chọn đề tài</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <TypographyP>
-              Bạn có chắc chắn muốn chọn đề tài "{topic.vietNameseName}" làm
-              project không?
+              Bạn có chắc chắn muốn chọn đề tài <span className={"font-bold"}>&quot;{topic.vietNameseName}&quot;</span> không?
             </TypographyP>
             {topic.project && (
               <Alert variant="destructive">
