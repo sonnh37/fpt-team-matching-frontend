@@ -28,10 +28,11 @@ import { UserXRole } from "@/types/user-x-role";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueries, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
-import { useEffect } from "react";
+import React, {useEffect, useState} from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import {Loader2} from "lucide-react";
 
 const formSchema = z.object({
   id: z.string().optional(),
@@ -56,6 +57,7 @@ export function UserXRoleFormDialog({
 }: UserXRoleFormDialogProps) {
   const queryClient = useQueryClient();
   const params = useParams();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const getDefaultValues = () => {
     if (userXRole) {
@@ -123,6 +125,7 @@ export function UserXRoleFormDialog({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      setLoading(true);
       const res_user = await userService.getById(params.userId.toString());
       if (res_user.status != 1) {
         toast.error(res_user.message);
@@ -159,8 +162,14 @@ export function UserXRoleFormDialog({
 
       if (userXRole) {
         const res = await userxroleService.update(values);
-        if (res.status == 1) toast.success(res.message);
-        else throw Error(res.message);
+        if (res.status == 1) {
+          toast.success(res.message);
+          window.location.reload();
+          return;
+        }
+        else {
+          toast.error(res.message);
+        };
       } else {
         const createCommand: UserXRoleCreateCommand = {
           userId: values.userId,
@@ -171,7 +180,12 @@ export function UserXRoleFormDialog({
         const res = await userxroleService.create(createCommand);
         if (res.status == 1) {
           toast.success(res.message);
-        } else throw Error(res.message);
+          window.location.reload();
+          return;
+        } else {
+          toast.error(res.message);
+          return;
+        };
       }
 
       onOpenChange(false);
@@ -179,6 +193,9 @@ export function UserXRoleFormDialog({
       queryClient.invalidateQueries({ queryKey: ["getUserInfo"] });
     } catch (error) {
       toast.error(error as string);
+    }
+    finally {
+      setLoading(false);
     }
   };
 
@@ -237,9 +254,15 @@ export function UserXRoleFormDialog({
               >
                 Hủy bỏ
               </Button>
-              <Button type="submit">
-                {userXRole ? "Cập nhật" : "Tạo mới"}
-              </Button>
+              {loading ?
+                  <Button disabled>
+                    <Loader2 className="animate-spin"/>
+                    Đang xử lí
+                  </Button> :
+                  <Button type="submit">
+                    {userXRole ? "Cập nhật" : "Tạo mới"}
+                  </Button>
+              }
             </div>
           </form>
         </Form>

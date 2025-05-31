@@ -84,11 +84,7 @@ const roles_options = [
 //#endregion
 
 export default function TopicRejectedTable() {
-  const searchParams = useSearchParams();
-  const role = useCurrentRole();
-  const user = useSelectorUser();
 
- 
   const filterEnums: FilterEnum[] = [
     { columnId: "roles", title: "Phân loại vị trí", options: roles_options },
   ];
@@ -155,7 +151,11 @@ export default function TopicRejectedTable() {
   if (error) return <div>Error loading data</div>;
 
   const table = useReactTable({
-    data: data?.data?.results ?? [],
+    data: data?.data?.results?.map(x => {
+      if (x.stageTopic && x.stageTopic.resultDate > new Date(Date.now())){
+        return {} as Topic;
+      }
+    }) ?? [],
     columns,
     pageCount: data?.data?.totalPages ?? 0,
     state: { pagination, sorting, columnFilters, columnVisibility },

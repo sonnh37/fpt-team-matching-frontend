@@ -53,7 +53,7 @@ export default function ProjectDetail() {
   const project = result?.data;
 
   let availableSlots = res_current_semester?.data?.maxTeamSize ?? 5;
-  availableSlots = availableSlots - (project?.teamMembers?.length ?? 0);
+  availableSlots = availableSlots - (project?.teamSize ?? 0);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 p-4 gap-6">

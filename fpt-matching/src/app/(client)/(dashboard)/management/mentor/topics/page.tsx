@@ -37,7 +37,7 @@ const MENTOR_TABS = [
     value: "pending-manager",
     label: "Chờ duyệt",
     component: <TopicPendingTable />,
-    statuses: [TopicStatus.ManagerPending],
+    statuses: [TopicStatus.ManagerPending, TopicStatus.MentorApproved, TopicStatus.ManagerRejected],
   },
   {
     value: "approved",
