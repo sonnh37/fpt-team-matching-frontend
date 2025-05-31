@@ -24,17 +24,19 @@ import SaveChangeExistingProjectAddTeamDialog
 import {TeamMember} from "@/types/team-member";
 import {Semester} from "@/types/semester";
 import {ProjectStatus} from "@/types/enums/project";
-import { Topic } from '@/types/topic';
+import {Topic} from '@/types/topic';
 import {ViewTopicDetail} from "@/components/sites/management/student-do-not-have-team/view-detail/view-topic-detail";
 import {
     CancelExistingProjectDialog
 } from "@/components/sites/management/student-do-not-have-team/project-add-student-card/cancel-existing-project-dialog";
 import {toast} from "sonner";
 import {teammemberService} from "@/services/team-member-service";
+import {projectService} from "@/services/project-service";
+import {ProjectUpdateCommand} from "@/types/models/commands/projects/project-update-command";
 
 function SelectTopic({topics, setProject, project, setTopics} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>, project: Project, setTopics: Dispatch<SetStateAction<Topic[]>>}) {
     return (
-        <Select defaultValue={project.topicId ?? undefined} onValueChange={(value) => {
+        <Select value={project.topicId ?? undefined} onValueChange={(value) => {
             setProject((prevState) => {
                 const updatedProject = {...prevState ?? {} as Project};
                 updatedProject.topicId = value;
@@ -76,38 +78,76 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
     const handleRemoveTeamMember = async (member: TeamMember) => {
         if (!project)
             return;
-        const foundExistingStudent=  updatedTeamMembers.some(x => x.userId == member.userId);
+        const foundExistingStudent = updatedTeamMembers.some(x => x.userId == member.userId);
+        console.log(foundExistingStudent)
+
+        if (member.role == TeamMemberRole.Leader) {
+            toast.error("Bạn không thể huỷ nhóm trưởng của nhóm")
+            return;
+        }
+
         if (foundExistingStudent) {
             setProject((prevState) => {
-                if (!prevState) {
+                console.log(prevState)
+                if (prevState == null) {
                     return prevState;
                 }
-                const memberRemove = project.teamMembers.find(member => member.userId == member.userId);
-                if (!memberRemove) {
+
+                // Sửa lại logic tìm member - đang bị trùng tên biến
+                const memberRemove = prevState.teamMembers.find(teamMember => teamMember.userId == member.userId);
+                console.log(memberRemove)
+                if (memberRemove == null) {
                     return prevState;
                 }
-                setStudents((prevState) => {
-                    const updatedTeamMembers = [...(prevState || [])];
-                    if (memberRemove.user)
-                        updatedTeamMembers.push(memberRemove.user)
-                    return updatedTeamMembers;
-                })
-                const remaining = project?.teamMembers.filter(student => student.userId != member.userId);
+
+                // Cập nhật students list
+                setStudents((prevStudents) => {
+                    console.log("Previous students:", prevStudents);
+                    console.log("Adding user:", memberRemove.user);
+
+                    if (memberRemove.user != null) {
+                        const updatedStudents = [...(prevStudents || []), memberRemove.user];
+                        console.log("Updated students:", updatedStudents);
+                        return updatedStudents;
+                    }
+                    return prevStudents;
+                });
+
+                // Remove từ team members
+                const remaining = prevState.teamMembers.filter(student => student.userId != member.userId);
 
                 return {
                     ...prevState,
                     teamMembers: remaining,
                 };
-            })
-            toast.success("Xoá thành viên thành công")
+            });
+
+            toast.success("Xoá thành viên thành công");
             return;
         } else {
-            member.leaveDate = new Date(Date.now())
+            member.leaveDate = new Date(Date.now());
             const response = await teammemberService.update(member);
+            const response2 = await projectService.update({
+                ...project,
+                teamSize: (project.teamSize ?? 0) - 1
+            } as ProjectUpdateCommand)
             if (response.status != 1){
-                toast.error(response.message)
+                toast.error(response.message);
                 return;
             }
+
+            setStudents((prevStudents) => {
+                console.log("Previous students (else block - API success):", prevStudents);
+                console.log("Adding user (else block - API success):", member.user);
+
+                if (member.user != null) {
+                    const updatedStudents = [...(prevStudents || []), member.user];
+                    console.log("Updated students (else block - API success):", updatedStudents);
+                    return updatedStudents;
+                }
+                return prevStudents;
+            });
+
             toast.success(response.message);
             return;
         }
@@ -123,8 +163,8 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
                     <Label>Chọn nhóm để thêm sinh viên</Label>
                     <Select
                         onValueChange={(value) => {
-                            const selectedProject = projects.find((selectedProject) => selectedProject.id === value);
-                            if (selectedProject) {
+                            const selectedProject = projects.find((selectedProject) => selectedProject.id == value);
+                            if (selectedProject != null) {
                                 setProject(selectedProject);
                             }
                             setAddTeam(true);
@@ -164,7 +204,7 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
                                     </TableHeader>
                                     <TableBody>
                                         {
-                                            project?.teamMembers != null && project?.teamMembers.map((member, index) => (
+                                            project?.teamMembers != null && project?.teamMembers.filter((x => x.leaveDate== null )).map((member, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell className="font-medium">{member.user?.code}</TableCell>
                                                     <TableCell>{member.user?.firstName} {member.user?.lastName}</TableCell>
@@ -178,6 +218,36 @@ const ExistingProjectAddStudentCard = ({setStudents, projects, project, setProje
                                                             }} variant={"destructive" }>Huỷ</Button>
                                                         }
                                                     </TableCell>
+                                                    {/*<TableCell>*/}
+                                                    {/*    {updatedTeamMembers?.some(student => student.id === member.userId || student.userId === member.userId) && (*/}
+                                                    {/*        <Button onClick={(e) => {*/}
+                                                    {/*            e.preventDefault();*/}
+                                                    {/*            setProject((prevState) => {*/}
+                                                    {/*                if (!prevState) {*/}
+                                                    {/*                    return prevState;*/}
+                                                    {/*                }*/}
+                                                    {/*                const memberRemove = project.teamMembers.find(teamMember => teamMember.userId == member.userId);*/}
+                                                    {/*                if (!memberRemove) {*/}
+                                                    {/*                    return prevState;*/}
+                                                    {/*                }*/}
+                                                    {/*                setStudents((prevState) => {*/}
+                                                    {/*                    const updatedTeamMembers = [...(prevState || [])];*/}
+                                                    {/*                    if (memberRemove.user)*/}
+                                                    {/*                        updatedTeamMembers.push(memberRemove.user)*/}
+                                                    {/*                    return updatedTeamMembers;*/}
+                                                    {/*                })*/}
+                                                    {/*                const remaining = project?.teamMembers.filter(student => student.userId != member.userId);*/}
+
+                                                    {/*                return {*/}
+                                                    {/*                    ...prevState,*/}
+                                                    {/*                    teamMembers: remaining,*/}
+                                                    {/*                };*/}
+                                                    {/*            })*/}
+                                                    {/*        }} variant={"destructive"}>*/}
+                                                    {/*            Huỷ*/}
+                                                    {/*        </Button>*/}
+                                                    {/*    )}*/}
+                                                    {/*</TableCell>*/}
                                                 </TableRow>
                                             ))
                                         }

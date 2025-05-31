@@ -76,7 +76,7 @@ export const columnsStudentTable = ({ setProject, currentSemester, setTeamMember
                                         return prevState;
                                     }
                                     const updatedTeamMembers = [...(prevState.teamMembers || [])];
-                                    if (prevState.teamMembers && currentSemester.maxTeamSize <= prevState.teamMembers.length) {
+                                    if (prevState.teamSize && (currentSemester.maxTeamSize <= prevState.teamSize)) {
                                         toast.error("Số lượng thành viên đã tới giới hạn")
                                         return prevState;
                                     }
@@ -90,12 +90,14 @@ export const columnsStudentTable = ({ setProject, currentSemester, setTeamMember
                                     if (updatedTeamMembers.length == 1){
                                         return {
                                             ...prevState,
+                                            teamSize: (prevState.teamSize ?? 0) + 1,
                                             teamMembers: updatedTeamMembers,
                                             leaderId: user.id,
                                         };
                                     }
                                     return {
                                         ...prevState,
+                                        teamSize: (prevState.teamSize ?? 0) + 1,
                                         teamMembers: updatedTeamMembers,
                                     };
                                 });

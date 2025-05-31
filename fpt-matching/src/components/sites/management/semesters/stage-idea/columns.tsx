@@ -24,12 +24,12 @@ export const columns: ColumnDef<StageTopic>[] = [
       <DataTableColumnHeader column={column} title="Đợt" />
     ),
   },
-  {
-    accessorKey: "numberReviewer",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Số lượng người đánh giá" />
-    ),
-  },
+  // {
+  //   accessorKey: "numberReviewer",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Số lượng người đánh giá" />
+  //   ),
+  // },
   {
     accessorKey: "startDate",
     header: ({ column }) => (

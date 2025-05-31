@@ -38,7 +38,7 @@ const MENTOR_TABS = [
     value: "pending-manager",
     label: "Chờ duyệt",
     component: <TopicPendingTable />,
-    statuses: [TopicStatus.ManagerPending, TopicStatus.MentorApproved, TopicStatus.ManagerRejected],
+    statuses: [TopicStatus.ManagerPending],
   },
   {
     value: "approved",
@@ -70,20 +70,20 @@ export default function MentorTopicPage() {
 
   const topics = data?.data?.results?.map(x => {
     if (x.stageTopic && new Date(x.stageTopic?.resultDate)> new Date(Date.now())){
+      console.log("handle change status")
       return {
         ...x,
         status: TopicStatus.ManagerPending,
         topicRequests: x.topicRequests.find(x => x.role == "Manager" && x.status != TopicRequestStatus.Pending)?.status == TopicRequestStatus.Pending
       };
     } else {
-      if (x.status == TopicStatus.ManagerPending){
-        return x
-      }
+      return x
     }
   }) ?? []
 
   // Hàm đếm số lượng đề tài theo trạng thái
   const countTopicsByStatus = (statuses?: TopicStatus[]) => {
+    console.log(topics);
     return topics.filter((topic) =>
       statuses ? statuses.includes(topic?.status as TopicStatus) : true
     ).length;
