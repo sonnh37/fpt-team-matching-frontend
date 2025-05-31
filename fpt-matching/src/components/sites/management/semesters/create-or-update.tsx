@@ -160,7 +160,7 @@ export const SemesterForm: React.FC<SemesterFormProps> = ({
       toast.success(response.message);
       setShowConfirmationDialog(false);
       setPendingValues(null);
-
+      router.push(previousPath);
       return response;
     } catch (error: any) {
       console.error("Error creating semester:", error);

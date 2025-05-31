@@ -67,7 +67,6 @@ const ImportUser = ({role} : {role: string}) => {
         }
         fetchData()
     }, []);
-    console.log(semesters)
     return semesters.length > 0 && (
         <Tabs defaultValue="one" className="p-8 w-full">
             {
