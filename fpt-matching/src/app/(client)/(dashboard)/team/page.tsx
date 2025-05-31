@@ -119,7 +119,7 @@ export default function TeamInfo() {
   const project = currentSemesterTeam?.data ?? teamInfo?.data;
   if (!project) return <NoTeam />;
 
-  const isLockProject = project.status !== ProjectStatus.Pending;
+  const isLockProject = project.status !== ProjectStatus.Forming;
   const isLockTrash = project.topicId != undefined || project.topicId != null;
   const latestTopicVersion = (project.topic?.topicVersions ?? []).sort(
     (a, b) =>
@@ -173,7 +173,7 @@ export default function TeamInfo() {
   const isHasTopic = !!project.topicId;
   const availableSlots = (currentSemester?.maxTeamSize ?? 0) - (project.teamSize ?? 0)
 
-  const isLockTeamMember = availableSlots === 0;
+  const isLockTeamMember = project?.status !== ProjectStatus.Forming;
 
   const handleAction = async (
     action: () => Promise<any>,
@@ -275,6 +275,7 @@ export default function TeamInfo() {
                     {/* Nút yêu cầu tham gia */}
                     <Dialog>
                       <DialogTrigger asChild>
+
                         <Button
                           variant="outline"
                           disabled={isLockTeamMember}
