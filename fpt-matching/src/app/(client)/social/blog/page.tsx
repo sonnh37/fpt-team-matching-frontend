@@ -1,6 +1,6 @@
 "use client"
-import React, {useEffect, useState} from 'react';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import React, { useEffect, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faCircleUser,
   faComment,
@@ -11,6 +11,7 @@ import {
   faPencil,
   faShare,
   faThumbsUp,
+  faUser,
   faUserPlus
 } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -21,27 +22,27 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {Modal, ModalBody, ModalClose, ModalContent, ModalFooter, ModalTrigger,} from "@/components/ui/animated-modal";
+import { Modal, ModalBody, ModalClose, ModalContent, ModalFooter, ModalTrigger, } from "@/components/ui/animated-modal";
 
-import {Pagination} from "@/components/ui/pagination"
+import { Pagination } from "@/components/ui/pagination"
 
-import {useSelector} from 'react-redux';
-import {useQuery} from '@tanstack/react-query';
-import {RootState} from '@/lib/redux/store';
-import {blogService} from '@/services/blog-service';
-import {BlogGetAllQuery} from '@/types/models/queries/blog/blog-get-all-query';
+import { useSelector } from 'react-redux';
+import { useQuery } from '@tanstack/react-query';
+import { RootState } from '@/lib/redux/store';
+import { blogService } from '@/services/blog-service';
+import { BlogGetAllQuery } from '@/types/models/queries/blog/blog-get-all-query';
 import CommentBlog from '@/components/_common/comment/comment';
-import {toast} from 'sonner';
-import {BlogStatus, BlogType} from '@/types/enums/blog';
-import {BlogCreateCommand} from '@/types/models/commands/blog/blog-create-command';
+import { toast } from 'sonner';
+import { BlogStatus, BlogType } from '@/types/enums/blog';
+import { BlogCreateCommand } from '@/types/models/commands/blog/blog-create-command';
 import LikeBlog from '@/components/_common/likeblog/like-blog';
-import {projectService} from '@/services/project-service';
-import {Project} from '@/types/project';
+import { projectService } from '@/services/project-service';
+import { Project } from '@/types/project';
 import ProjectInfo from '@/components/_common/projectInfo/project-info';
 import UploadCv from '@/components/_common/uploadCv/upload-cv';
-import {DirectionAwareHover} from '@/components/ui/direction-aware-hover';
-import {FaFacebookF, FaGithub, FaInstagram, FaMastodon, FaTwitch, FaXTwitter} from "react-icons/fa6";
-import {PiButterflyFill, PiGearSixBold} from 'react-icons/pi';
+import { DirectionAwareHover } from '@/components/ui/direction-aware-hover';
+import { FaFacebookF, FaGithub, FaInstagram, FaMastodon, FaTwitch, FaXTwitter } from "react-icons/fa6";
+import { PiButterflyFill, PiGearSixBold } from 'react-icons/pi';
 import {
   Select,
   SelectContent,
@@ -51,17 +52,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar';
-import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {profilestudentService} from "@/services/profile-student-service";
-import {ProfileStudent} from "@/types/profile-student";
-import {apiHubsService} from "@/services/api-hubs-service";
-import {BlogRecommendations} from "@/types/blog-recommend-model";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { profilestudentService } from "@/services/profile-student-service";
+import { ProfileStudent } from "@/types/profile-student";
+import { apiHubsService } from "@/services/api-hubs-service";
+import { BlogRecommendations } from "@/types/blog-recommend-model";
 import BlogRecommend from '@/components/blogforuser/blog-recommend';
-import {Button} from "@/components/ui/button";
-import {Badge} from "@/components/ui/badge";
-import {ProjectStatus} from "@/types/enums/project";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ProjectStatus } from "@/types/enums/project";
 
 
 export default function Blog() {
@@ -131,7 +132,7 @@ export default function Blog() {
         toast.error("⚠️ Nội dung phải có ít nhất 10 ký tự!");
         return;
       }
-      if(postType == BlogType.Recruit){
+      if (postType == BlogType.Recruit) {
         if (!formData.skillRequired || formData.skillRequired.trim().length < 5) {
 
           toast.error("⚠️ Kỹ năng yêu cầu phải có ít nhất 5 ký tự!");
@@ -140,8 +141,8 @@ export default function Blog() {
       }
 
 
-    // Hiện loading toast
-     const toastId = toast.loading("⏳ Đang tạo blog, vui lòng chờ...");
+      // Hiện loading toast
+      const toastId = toast.loading("⏳ Đang tạo blog, vui lòng chờ...");
       const blognew: BlogCreateCommand = {
         title: formData.title,
         content: formData.content,
@@ -258,7 +259,7 @@ export default function Blog() {
 
   const sendMessage = async () => {
     toast.error("Đây không phải bài tuyển dụng")
-   }
+  }
 
   return (
     <div className='bg-slate-100'>
@@ -463,24 +464,22 @@ export default function Blog() {
                     </h4>
                   </div>
                   <div className='body-blog w-full h-4/5'>
-                    <div className='headerbody gap-4 flex items-center w-full h-1/4 px-4'>
+                    <div className='headerbody pb-4 gap-2 flex items-center w-full h-1/4 px-3'>
                       {/*<img*/}
                       {/*  src={user?.avatar || "/user-avatardefault.jpg"}*/}
                       {/*  alt="Avatar"*/}
                       {/*  className="w-12 h-12 rounded-full"*/}
                       {/*/>*/}
-                      <div className={"w-1/5 flex items-center"}>
-                        <Avatar className={""}>
-                          <AvatarImage src="/user-avatardefault.jpg" alt="@shadcn" />
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                      </div>
-                      <div className='w-full ml-8'>
-                        {/*<div className=' '>*/}
-                        {/*  <p className="text-lg font-semibold text-gray-800">*/}
-                        {/*    <FontAwesomeIcon*/}
-                        {/*      icon={faUser} /> {user?.lastName} {user?.firstName}</p>*/}
-                        {/*</div>*/}
+                      <Avatar>
+                        <AvatarImage src="/user-avatardefault.jpg" alt="@shadcn" />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                      <div className='w-full ml-3'>
+                        <div className=' '>
+                          <p className="text-lg font-semibold text-gray-800">
+                            <FontAwesomeIcon
+                              icon={faUser} /> {user?.lastName} {user?.firstName}</p>
+                        </div>
 
                         <Select value={postType.toString()}
                           defaultValue={BlogType.Share.toString()}
@@ -491,7 +490,7 @@ export default function Blog() {
                               [status]: parseInt(e),
                             }));
                           }}>
-                          <SelectTrigger className={"w-3/4 px-4"}>
+                          <SelectTrigger className={"w-1/3"}>
                             <SelectValue placeholder="Chọn thể loại" />
                           </SelectTrigger>
                           <SelectContent>
@@ -601,16 +600,16 @@ export default function Blog() {
                               {/*)}*/}
                               {
                                 projectUser != null ?
-                                    (
+                                  (
                                     <div>{projectUser?.teamName ?? "Chưa có tên"} - Số lượng thành viên: {projectUser?.teamSize}</div>
-                                ): <Badge variant={"destructive"} className={"hover:bg-red-300"}>Chưa hỗ trợ đăng tìm thành viên</Badge>
+                                  ) : <Badge variant={"destructive"} className={"hover:bg-red-300"}>Chưa hỗ trợ đăng tìm thành viên</Badge>
                               }
                               {/*<h4 className="text-red-400 text-sm">*Không bắt buộc</h4>*/}
                               {/*<h4 className="text-red-400 text-sm">{messageUser}</h4>*/}
                             </div>
                           </div>
                         </div>
-                      ) : ( 
+                      ) : (
                         <div></div>
                       )}
                     </div>
@@ -622,10 +621,10 @@ export default function Blog() {
                   <div
                     className='flex w-full h-14 sticky bottom-0  items-center justify-center'>
                     <Button
-                        variant={"default"}
-                        onClick={() => handleSubmit()}
-                        className=' h-3/4 w-1/3 mx-2 rounded-xl hover:text-black  mt-2 mb-4'
-                        disabled={postType == BlogType.Recruit && projectUser == null && (projectUser != null ? projectUser?.status == ProjectStatus.Pending : true)}
+                      variant={"default"}
+                      onClick={() => handleSubmit()}
+                      className=' h-3/4 w-1/3 mx-2 rounded-xl hover:text-black  mt-2 mb-4'
+                      disabled={postType == BlogType.Recruit && projectUser == null && (projectUser != null ? projectUser?.status == ProjectStatus.Pending : true)}
                     >
                       Đăng bài
                     </Button>
@@ -852,7 +851,7 @@ export default function Blog() {
                                     <div
                                       className="flex text-xl text-gray-600 justify-between items-center w-full px-2">
                                       <span className="flex items-center ml-3">
-                                     <LikeBlog  postId={post?.id ?? ""}/>
+                                        <LikeBlog postId={post?.id ?? ""} />
                                       </span>
                                       <div className='flex'>
                                         <span className="flex items-center">
@@ -878,7 +877,7 @@ export default function Blog() {
                                     className="flex w-full text-base justify-between  items-center space-x-4">
                                     <span className="flex items-center">
                                       <i className="fas fa-thumbs-up text-blue-500"></i>
-                                      <span className="ml-2">  <LikeBlog postId={post?.id ?? ""}/> </span>
+                                      <span className="ml-2">  <LikeBlog postId={post?.id ?? ""} /> </span>
                                     </span>
                                     <span className="flex items-center">
                                       <i className="fas fa-comment text-green-500"></i>
@@ -923,7 +922,7 @@ export default function Blog() {
                               </span>
                             ) : (
 
-                              <button onClick={() =>sendMessage() }
+                              <button onClick={() => sendMessage()}
                                 className="ml-2 text-base ">{post.blogCvs?.length ?? 0} Nộp CV <FontAwesomeIcon
                                   icon={faPaperclip} /></button>
                             )}
