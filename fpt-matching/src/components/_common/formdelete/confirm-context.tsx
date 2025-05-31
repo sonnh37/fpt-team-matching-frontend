@@ -75,7 +75,7 @@ export function ConfirmProvider({ children }: { children: React.ReactNode }) {
               </AlertDialogCancel>
   
               {/* Nút Confirm */}
-              <Button variant="destructive" onClick={handleConfirm}>
+              <Button variant="default" onClick={handleConfirm}>
                 {options.confirmText ?? "Yes"}
               </Button>
             </AlertDialogFooter>
