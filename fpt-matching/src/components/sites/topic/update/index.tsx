@@ -230,12 +230,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
     }
   }
 
-  let valueSelectMentor;
-  if (isStudent) {
-    valueSelectMentor = form.watch("mentorId");
-  } else {
-    valueSelectMentor = form.watch("subMentorId");
-  }
+ 
 
   return (
     <Form {...form}>
@@ -560,10 +555,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
                   setIsConfirmDialogOpen(true);
                 }}
                 disabled={
-                  isSubmitting ||
-                  valueSelectMentor == undefined ||
-                  valueSelectMentor == null ||
-                  valueSelectMentor == ""
+                  isSubmitting
                 }
               >
                 {isSubmitting ? "Đang xử lý..." : "Nộp"}
@@ -579,10 +571,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
                   setIsConfirmDialogOpen(true);
                 }}
                 disabled={
-                  isSubmitting ||
-                  valueSelectMentor == undefined ||
-                  valueSelectMentor == null ||
-                  valueSelectMentor == ""
+                  isSubmitting 
                 }
               >
                 {isSubmitting ? "Đang xử lý..." : "Nộp"}
