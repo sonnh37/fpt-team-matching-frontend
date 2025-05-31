@@ -85,7 +85,7 @@ export default function MentorTopicPage() {
   // Hàm đếm số lượng đề tài theo trạng thái
   const countTopicsByStatus = (statuses?: TopicStatus[]) => {
     return topics.filter((topic) =>
-      statuses ? statuses.includes(topic.status as TopicStatus) : true
+      statuses ? statuses.includes(topic?.status as TopicStatus) : true
     ).length;
   };
 
