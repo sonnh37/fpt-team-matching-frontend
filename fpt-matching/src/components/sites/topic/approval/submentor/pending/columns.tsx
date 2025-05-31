@@ -26,7 +26,7 @@ import SamilaritiesProjectModels from "@/types/models/samilarities-project-model
 import { Topic } from "@/types/topic";
 import { Label } from "@radix-ui/react-label";
 import { Brain, Eye } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export const columns: ColumnDef<Topic>[] = [
   // {
@@ -123,7 +123,37 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
 
   //   loadSimilarProjects();
   // }, [highestVersion]);
+  const [loadingAI, setLoadingAI] = React.useState<boolean>(false);
+  const [samilaritiesProject, setSamilaritiesProject] = React.useState<
+      SamilaritiesProjectModels[]
+  >([]);
 
+  // Load similar projects khi tab active
+  useEffect(() => {
+    const loadSimilarProjects = async () => {
+      if (topic?.description) {
+        setLoadingAI(true);
+        try {
+          const response = await apiHubsService.getSimilaritiesProject(
+              topic.description
+          );
+          if (response) {
+            setSamilaritiesProject(
+                (response as { similar_capstone: SamilaritiesProjectModels[] })
+                    .similar_capstone
+            );
+          }
+          setLoadingAI(false);
+        } catch (error) {
+          console.error("Failed to load similar projects", error);
+        } finally {
+          setLoadingAI(false);
+        }
+      }
+    };
+
+    loadSimilarProjects();
+  }, [topic]);
   return (
     <div className="flex flex-row gap-2">
       {/* Nút xem nhanh trong dialog */}
@@ -139,6 +169,43 @@ const Actions: React.FC<ActionsProps> = ({ row }) => {
               <div className="col-span-2">
                 <TopicDetailForm topicId={topic.id} />
               </div>
+            )}
+            {loadingAI ? (
+                <LoadingComponent />
+            ) : (
+                <div className="flex flex-col gap-10 h-screen overflow-auto">
+                  <div className="text-lg font-semibold flex gap-2">
+                    <Brain className="h-5 w-5" />
+                    <h3>Các đề tài tương đồng đã tồn tại</h3>
+                  </div>
+                  {samilaritiesProject && samilaritiesProject.length > 0 ? (
+                      samilaritiesProject.map((project, index) => (
+                          <Card key={index}>
+                            <CardHeader>
+                              <CardTitle>{project.name}</CardTitle>
+                              <CardDescription>
+                                Độ tương đồng:{" "}
+                                {(Number(project.similarity.toFixed(2)) ?? 0) * 100}%
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="space-y-2">
+                                <div className={"flex gap-4"}>
+                                  <Label className="font-bold">Mã đề tài:</Label>
+                                  <p>{project.project_code}</p>
+                                </div>
+                                <div>
+                                  <Label className={"font-bold"}>Mô tả:</Label>
+                                  <p>{project.context}</p>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                      ))
+                  ) : (
+                      <p>No similar projects found</p>
+                  )}
+                </div>
             )}
             {/* {loadingAI ? (
               <LoadingComponent />
