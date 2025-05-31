@@ -1,14 +1,6 @@
 import React, {Dispatch, SetStateAction} from 'react';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table"
+import {Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow,} from "@/components/ui/table"
 
 import {Button} from "@/components/ui/button";
 import {Project} from "@/types/project";
@@ -132,6 +124,11 @@ const ProjectAddStudentCard = ({setStudents,numberOfTeam, projects, setCountProj
                                                     <TableCell>
                                                         <Button onClick={(e) => {
                                                             e.preventDefault();
+
+                                                            if (member.role == TeamMemberRole.Leader) {
+                                                                toast.error("Bạn không thể nhóm trưởng của nhóm")
+                                                                return;
+                                                            }
                                                            setProject((prevState) => {
                                                                if (!prevState) {
                                                                    return prevState;

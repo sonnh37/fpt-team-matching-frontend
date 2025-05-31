@@ -6,9 +6,6 @@ import {Button} from "@/components/ui/button";
 import {Project} from "@/types/project";
 
 import {User} from '@/types/user';
-import {
-    CancelProjectAddTeamDialog
-} from "@/components/sites/management/student-do-not-have-team/project-add-student-card/cancel-project-add-team-dialog";
 import {TeamMemberRole} from "@/types/enums/team-member";
 import {Badge} from "@/components/ui/badge";
 import {
@@ -31,9 +28,15 @@ import {Topic} from "@/types/topic";
 import {
     CancelExistingProjectDialog
 } from "@/components/sites/management/student-do-not-have-team/project-add-student-card/cancel-existing-project-dialog";
+import {toast} from "sonner";
+import {teammemberService} from "@/services/team-member-service";
+import {projectService} from "@/services/project-service";
+import {ProjectUpdateCommand} from "@/types/models/commands/projects/project-update-command";
 function SelectTopic({topics, setProject, project} : {topics: Topic[], setProject: Dispatch<SetStateAction<Project | null>>, project: Project}) {
     return (
-        <Select defaultValue={project.topicId ?? undefined} onValueChange={(value) => {
+        <Select
+            value={project.topicId ?? ""}
+             onValueChange={(value) => {
             setProject((prevState) => {
                 const updatedProject = {...prevState ?? {} as Project};
                 updatedProject.topicId = value;
@@ -70,6 +73,83 @@ const InprogressProjectAddStudentCard = ({setStudents, projects, project, setPro
     topics: Topic[]
 }) => {
     const [addTeam, setAddTeam] = React.useState(false);
+    const handleRemoveTeamMember = async (member: TeamMember) => {
+        if (!project)
+            return;
+        const foundExistingStudent = updatedTeamMembers.some(x => x.userId == member.userId);
+        console.log(foundExistingStudent)
+
+        if (member.role == TeamMemberRole.Leader) {
+            toast.error("Bạn không thể huỷ nhóm trưởng của nhóm")
+            return;
+        }
+
+        if (foundExistingStudent) {
+            setProject((prevState) => {
+                console.log(prevState)
+                if (prevState == null) {
+                    return prevState;
+                }
+
+                // Sửa lại logic tìm member - đang bị trùng tên biến
+                const memberRemove = prevState.teamMembers.find(teamMember => teamMember.userId == member.userId);
+                console.log(memberRemove)
+                if (memberRemove == null) {
+                    return prevState;
+                }
+
+                // Cập nhật students list
+                setStudents((prevStudents) => {
+                    console.log("Previous students:", prevStudents);
+                    console.log("Adding user:", memberRemove.user);
+
+                    if (memberRemove.user != null) {
+                        const updatedStudents = [...(prevStudents || []), memberRemove.user];
+                        console.log("Updated students:", updatedStudents);
+                        return updatedStudents;
+                    }
+                    return prevStudents;
+                });
+
+                // Remove từ team members
+                const remaining = prevState.teamMembers.filter(student => student.userId != member.userId);
+
+                return {
+                    ...prevState,
+                    teamMembers: remaining,
+                };
+            });
+
+            toast.success("Xoá thành viên thành công");
+            return;
+        } else {
+            member.leaveDate = new Date(Date.now());
+            const response = await teammemberService.update(member);
+            const response2 = await projectService.update({
+                ...project,
+                teamSize: (project.teamSize ?? 0) - 1
+            } as ProjectUpdateCommand)
+            if (response.status != 1){
+                toast.error(response.message);
+                return;
+            }
+
+            setStudents((prevStudents) => {
+                console.log("Previous students (else block - API success):", prevStudents);
+                console.log("Adding user (else block - API success):", member.user);
+
+                if (member.user != null) {
+                    const updatedStudents = [...(prevStudents || []), member.user];
+                    console.log("Updated students (else block - API success):", updatedStudents);
+                    return updatedStudents;
+                }
+                return prevStudents;
+            });
+
+            toast.success(response.message);
+            return;
+        }
+    }
     return (
         <Card className="w-[30vw]">
             <CardHeader>
@@ -123,38 +203,49 @@ const InprogressProjectAddStudentCard = ({setStudents, projects, project, setPro
                                     </TableHeader>
                                     <TableBody>
                                         {
-                                            project?.teamMembers != null && project?.teamMembers.map((member, index) => (
+                                            project?.teamMembers != null && project?.teamMembers.filter(x => x.leaveDate == null).map((member, index) => (
                                                 <TableRow key={index}>
                                                     <TableCell className="font-medium">{member.user?.code}</TableCell>
                                                     <TableCell>{member.user?.firstName} {member.user?.lastName}</TableCell>
                                                     <TableCell>{member.user?.email}</TableCell>
                                                     <TableCell><Badge variant={member.role == TeamMemberRole.Leader ? "default" : "outline"}>{TeamMemberRole[member.role!]}</Badge></TableCell>
+                                                    {/*<TableCell>*/}
+                                                    {/*    {updatedTeamMembers?.some(student => student.id === member.userId || student.userId === member.userId) && (*/}
+                                                    {/*        <Button onClick={(e) => {*/}
+                                                    {/*            e.preventDefault();*/}
+                                                    {/*            setProject((prevState) => {*/}
+                                                    {/*                if (!prevState) {*/}
+                                                    {/*                    return prevState;*/}
+                                                    {/*                }*/}
+                                                    {/*                const memberRemove = project.teamMembers.find(teamMember => teamMember.userId == member.userId);*/}
+                                                    {/*                if (!memberRemove) {*/}
+                                                    {/*                    return prevState;*/}
+                                                    {/*                }*/}
+                                                    {/*                setStudents((prevState) => {*/}
+                                                    {/*                    const updatedTeamMembers = [...(prevState || [])];*/}
+                                                    {/*                    if (memberRemove.user)*/}
+                                                    {/*                        updatedTeamMembers.push(memberRemove.user)*/}
+                                                    {/*                    return updatedTeamMembers;*/}
+                                                    {/*                })*/}
+                                                    {/*                const remaining = project?.teamMembers.filter(student => student.userId != member.userId);*/}
+
+                                                    {/*                return {*/}
+                                                    {/*                    ...prevState,*/}
+                                                    {/*                    teamMembers: remaining,*/}
+                                                    {/*                };*/}
+                                                    {/*            })*/}
+                                                    {/*        }} variant={"destructive"}>*/}
+                                                    {/*            Huỷ*/}
+                                                    {/*        </Button>*/}
+                                                    {/*    )}*/}
+                                                    {/*</TableCell>*/}
+
                                                     <TableCell>
                                                         {
-                                                            updatedTeamMembers.some(x => x.userId == member.userId) ? <Button onClick={(e) => {
+                                                            <Button onClick={(e) => {
                                                                 e.preventDefault();
-                                                                setProject((prevState) => {
-                                                                    if (!prevState) {
-                                                                        return prevState;
-                                                                    }
-                                                                    const memberRemove = project.teamMembers.find(member => member.userId == member.userId);
-                                                                    if (!memberRemove) {
-                                                                        return prevState;
-                                                                    }
-                                                                    setStudents((prevState) => {
-                                                                        const updatedTeamMembers = [...(prevState || [])];
-                                                                        if (memberRemove.user)
-                                                                            updatedTeamMembers.push(memberRemove.user)
-                                                                        return updatedTeamMembers;
-                                                                    })
-                                                                    const remaining = project?.teamMembers.filter(student => student.userId != member.userId);
-
-                                                                    return {
-                                                                        ...prevState,
-                                                                        teamMembers: remaining,
-                                                                    };
-                                                                })
-                                                            }} variant={"destructive" }>Huỷ</Button> : null
+                                                                handleRemoveTeamMember(member)
+                                                            }} variant={"destructive" }>Huỷ</Button>
                                                         }
                                                     </TableCell>
                                                 </TableRow>

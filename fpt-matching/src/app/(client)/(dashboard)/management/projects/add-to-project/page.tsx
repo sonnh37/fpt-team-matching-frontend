@@ -40,7 +40,7 @@ const Page = () => {
     useEffect(() => {
         if (!project?.teamMembers)
             return;
-        const memberIds = project.teamMembers.map(member => member.userId);
+        const memberIds = project.teamMembers.filter(x => x.leaveDate == null).map(member => member.userId);
         const remaining = students.filter(student => !memberIds.includes(student.id));
 
         setStudents(remaining);
@@ -55,7 +55,7 @@ const Page = () => {
                 return;
             const response = await userService.getStudentDoNotHaveTeam({semesterId: semesterId})
             if (response.status != 1) {
-                toast.error(response.message)
+                // toast.error(response.message)
                 return;
             }
             if (response.data) {
@@ -107,7 +107,7 @@ const Page = () => {
                 <div className={"mt-[4.6rem]"}>
                     { (
                         <Tabs onValueChange={() => {
-                            semester.currentSemester?.numberOfTeam && setCountProject(semester.currentSemester?.numberOfTeam - projects.length)
+                            semester?.currentSemester?.numberOfTeam && setCountProject(semester.currentSemester?.numberOfTeam - projects.length)
                             setProject(null)
                             setTeamMembersUpdated([])
                         }} defaultValue="create-team" className="w-full">
