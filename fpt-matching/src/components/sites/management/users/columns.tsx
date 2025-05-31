@@ -18,7 +18,7 @@ import {
 import {useCurrentRole, useCurrentSemester} from "@/hooks/use-current-role";
 import { formatDate } from "@/lib/utils";
 import { userService } from "@/services/user-service";
-import { Department } from "@/types/enums/user";
+import { Department, Gender } from "@/types/enums/user";
 import { User } from "@/types/user";
 import { UserXRole } from "@/types/user-x-role";
 import { ColumnDef, Row } from "@tanstack/react-table";
@@ -204,6 +204,7 @@ export const columns: ColumnDef<User>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Gender" />
     ),
+    cell: ({ row }) => Gender[row.original.gender ?? 2 ] || "N/A",
     size: 100,
   },
   {
@@ -219,7 +220,8 @@ export const columns: ColumnDef<User>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Phone" />
     ),
-    size: 120,
+    cell: ({ row }) => [row.original.phone ?? 0] || "",
+    size: 150,
   },
   {
     accessorKey: "address",
