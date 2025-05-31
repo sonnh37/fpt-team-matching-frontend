@@ -119,7 +119,7 @@ export default function TeamInfo() {
   const project = currentSemesterTeam?.data ?? teamInfo?.data;
   if (!project) return <NoTeam />;
 
-  const isLockProject = project.status !== ProjectStatus.Pending;
+  const isLockProject = project.status !== ProjectStatus.Forming;
   const isLockTrash = project.topicId != undefined || project.topicId != null;
   const latestTopicVersion = (project.topic?.topicVersions ?? []).sort(
     (a, b) =>
@@ -281,7 +281,7 @@ export default function TeamInfo() {
                           size="sm"
                           className="relative"
                         >
-                          <Users className="mr-2 h-4 w-4" />
+                          <Users className="h-4 w-4" />
                           Yêu cầu
                           {pendingInvitations.length > 0 && (
                             <Badge
@@ -688,7 +688,7 @@ export default function TeamInfo() {
                                 <Link
                                   href={`/profile-detail/${member.user?.id}`}
                                 >
-                                  <User className="mr-2 h-4 w-4" />
+                                  <User className="h-4 w-4" />
                                   Xem hồ sơ
                                 </Link>
                               </DropdownMenuItem>
@@ -709,7 +709,7 @@ export default function TeamInfo() {
                                         )
                                       }
                                     >
-                                      <Trash2 className="mr-2 h-4 w-4" />
+                                      <Trash2 className="h-4 w-4" />
                                       Xóa thành viên
                                     </DropdownMenuItem>
                                   </>

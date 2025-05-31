@@ -1,9 +1,7 @@
 import { DataTableComponent } from "@/components/_common/data-table-api/data-table-component";
 import { DataTablePagination } from "@/components/_common/data-table-api/data-table-pagination";
 import { DataTableToolbar } from "@/components/_common/data-table-api/data-table-toolbar";
-import {
-  Form,
-} from "@/components/ui/form";
+import { Form } from "@/components/ui/form";
 import { useQueryParams } from "@/hooks/use-query-params";
 import { userService } from "@/services/user-service";
 import { FilterEnum } from "@/types/models/filter-enum";
@@ -28,8 +26,8 @@ import { Department } from "@/types/enums/user";
 
 import { roleService } from "@/services/role-service";
 import { columns } from "./columns";
-import {useCurrentRole, useCurrentSemester} from "@/hooks/use-current-role";
-import {semesterService} from "@/services/semester-service";
+import { useCurrentRole, useCurrentSemester } from "@/hooks/use-current-role";
+import { semesterService } from "@/services/semester-service";
 
 //#region INPUT
 const defaultSchema = z.object({
@@ -44,7 +42,7 @@ export default function UserTable() {
     queryFn: () => roleService.getAll(),
     refetchOnWindowFocus: false,
   });
-  const currentSemester = useCurrentSemester().currentSemester
+  const currentSemester = useCurrentSemester().currentSemester;
 
   const roles = res_role?.data?.results?.filter((m) => m.roleName != "Admin");
 
@@ -115,16 +113,10 @@ export default function UserTable() {
     useState<z.infer<typeof defaultSchema>>();
 
   // default field in table
-  const queryParams = useMemo(() => {
-    const params: UserGetAllQuery = useQueryParams(
-      formValues,
-      columnFilters,
-      pagination,
-      sorting,
-    );
-
-    return { ...params, semesterId: currentSemester?.id };
-  }, [formValues, columnFilters, pagination, sorting]);
+  const params: UserGetAllQuery = {
+    ...useQueryParams(formValues, columnFilters, pagination, sorting),
+    semesterId: currentSemester?.id,
+  };
 
   useEffect(() => {
     if (columnFilters.length > 0 || inputFields) {
@@ -145,14 +137,13 @@ export default function UserTable() {
   }, [formValues, columnSearch]);
 
   const { data, isFetching, error } = useQuery({
-    queryKey: ["data", queryParams],
-    queryFn: () => userService.getAll(queryParams),
+    queryKey: ["data", params],
+    queryFn: () => userService.getAll(params),
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
   if (error) return <div>Error loading data</div>;
-
 
   const table = useReactTable({
     data: data?.data?.results ?? [],
