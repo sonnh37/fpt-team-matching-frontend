@@ -21,6 +21,13 @@ import { TopicDraftTable } from "@/components/sites/topic/draft";
 
 const TAB_CONFIG = [
   {
+    value: "draft",
+    label: "Bản nháp",
+    statuses: [TopicStatus.Draft],
+    component: TopicDraftTable,
+    show: true,
+  },
+  {
     value: "pending",
     label: "Chờ duyệt",
     statuses: [
@@ -42,18 +49,12 @@ const TAB_CONFIG = [
   },
   {
     value: "approved",
-    label: "Đã phê duyệt", 
+    label: "Đã phê duyệt",
     statuses: [TopicStatus.ManagerApproved],
     component: TopicApprovedTable,
     show: true,
   },
-  {
-    value: "draft",
-    label: "Bản nháp",
-    statuses: [TopicStatus.Draft],
-    component: TopicDraftTable,
-    show: true,
-  },
+
   {
     value: "rejected",
     label: "Đã từ chối",
@@ -73,9 +74,10 @@ export default function TopicRequestPage() {
   // Get tab from URL or use default
   const tabParam = searchParams.get("tab");
   const defaultTab = "pending";
-  const activeTab = tabParam && TAB_CONFIG.some(tab => tab.value === tabParam) 
-    ? tabParam 
-    : defaultTab;
+  const activeTab =
+    tabParam && TAB_CONFIG.some((tab) => tab.value === tabParam)
+      ? tabParam
+      : defaultTab;
 
   // Fetch topics data
   const { data, isLoading, error } = useQuery({
@@ -84,7 +86,6 @@ export default function TopicRequestPage() {
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
-
 
   // Handle tab change
   const handleTabChange = (value: string) => {
@@ -95,7 +96,7 @@ export default function TopicRequestPage() {
 
   // Clean invalid tab params
   useEffect(() => {
-    if (tabParam && !TAB_CONFIG.some(tab => tab.value === tabParam)) {
+    if (tabParam && !TAB_CONFIG.some((tab) => tab.value === tabParam)) {
       const newSearchParams = new URLSearchParams(searchParams.toString());
       newSearchParams.delete("tab");
       router.replace(`/topic/request?${newSearchParams.toString()}`);
@@ -111,28 +112,31 @@ export default function TopicRequestPage() {
   const resultDate = stageTopic ? stageTopic.resultDate : null;
 
   // Process topics data
-  const topics = data?.data ?  data?.data?.map((topic) => {
-    const dateNow = new Date();
-    const publicDate = new Date(resultDate ?? 0);
+  const topics = data?.data
+    ? data?.data?.map((topic) => {
+        const dateNow = new Date();
+        const publicDate = new Date(resultDate ?? 0);
 
-    if (
-        dateNow <= publicDate &&
-        (topic.status === TopicStatus.ManagerApproved ||
+        if (
+          dateNow <= publicDate &&
+          (topic.status === TopicStatus.ManagerApproved ||
             topic.status === TopicStatus.ManagerRejected)
-    ) {
-      return {
-        ...topic,
-        status: TopicStatus.ManagerPending,
-      };
-    }
-    return topic;
-  }) : [];
+        ) {
+          return {
+            ...topic,
+            status: TopicStatus.ManagerPending,
+          };
+        }
+        return topic;
+      })
+    : [];
 
   // Count topics by status
   const countTopicsByStatus = (statuses: TopicStatus[]) => {
     return (
       topics?.filter(
-        (t) => t.status !== undefined && statuses.includes(t.status as TopicStatus)
+        (t) =>
+          t.status !== undefined && statuses.includes(t.status as TopicStatus)
       ).length || 0
     );
   };
@@ -146,7 +150,7 @@ export default function TopicRequestPage() {
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-primary">Quản lý đề tài</h1>
 
-      <Tabs 
+      <Tabs
         value={activeTab}
         defaultValue={defaultTab}
         className="w-full"

@@ -15,7 +15,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {useCurrentRole, useCurrentSemester} from "@/hooks/use-current-role";
+import {useCurrentRole, useCurrentSemester, useCurrentSemesterId} from "@/hooks/use-current-role";
 import { formatDate } from "@/lib/utils";
 import { userService } from "@/services/user-service";
 import { Department, Gender } from "@/types/enums/user";
@@ -120,15 +120,16 @@ export const columns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="Role" />
     ),
     cell: ({ row }) => {
+      const semesterId = useCurrentSemesterId();
       const roles = row.original.userXRoles
-          ?.filter(x => x.semesterId == useCurrentSemester().currentSemester?.id)
+          ?.filter(x => x.semesterId == semesterId)
         ?.map((userXRole: UserXRole) => userXRole.role?.roleName)
-        // .filter(Boolean);
+        .filter(Boolean);
 
       console.log(roles)
       return (
         <div className="flex flex-wrap gap-1 max-w-[200px]">
-          {roles?.map((role, index) => (
+          {roles && roles?.map((role, index) => (
             <span
               key={index}
               className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary"

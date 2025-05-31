@@ -130,7 +130,6 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
     try {
       // Hiển thị loading khi bắt đầu xử lý
 
-
       let fileUrl = topic.fileUrl; // Giả sử nếu fileschema là string (URL cũ)
 
       // Chỉ upload file nếu fileschema là File object (file mới)
@@ -155,7 +154,6 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
       // Create topic based on user role
       const res = await topicService.updateDraft(command);
 
-
       if (res.status == 1) {
         toast.success(res.message);
         onSuccess?.();
@@ -168,7 +166,7 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Đã xảy ra lỗi");
     } finally {
-      setIsSubmitting(false); 
+      setIsSubmitting(false);
     }
   }
 
@@ -231,6 +229,14 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
       setIsSubmitting(false);
     }
   }
+
+  let valueSelectMentor;
+  if (isStudent) {
+    valueSelectMentor = form.watch("mentorId");
+  } else {
+    valueSelectMentor = form.watch("subMentorId");
+  }
+
   return (
     <Form {...form}>
       <form className="space-y-8 p-1 md:p-6 flex justify-center">
@@ -553,7 +559,12 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
                   setDialogAction("submit");
                   setIsConfirmDialogOpen(true);
                 }}
-                disabled={isSubmitting}
+                disabled={
+                  isSubmitting ||
+                  valueSelectMentor == undefined ||
+                  valueSelectMentor == null ||
+                  valueSelectMentor == ""
+                }
               >
                 {isSubmitting ? "Đang xử lý..." : "Nộp"}
               </Button>
@@ -567,7 +578,12 @@ export function TopicUpdateForm({ topic, onSuccess }: TopicUpdateFormProps) {
                   setDialogAction("submit");
                   setIsConfirmDialogOpen(true);
                 }}
-                disabled={isSubmitting}
+                disabled={
+                  isSubmitting ||
+                  valueSelectMentor == undefined ||
+                  valueSelectMentor == null ||
+                  valueSelectMentor == ""
+                }
               >
                 {isSubmitting ? "Đang xử lý..." : "Nộp"}
               </Button>
