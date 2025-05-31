@@ -66,7 +66,7 @@ import {
 } from "@/components/ui/dialog";
 import { z } from "zod";
 import { useState } from "react";
-import { TopicApprovalStatus } from "@/app/(client)/(dashboard)/topic/idea-is-exist/page";
+import { TopicApprovalStatus } from "@/app/(client)/(dashboard)/topic/idea-is-exist/topic-approval-status";
 import { UserGetAllInSemesterQuery } from "@/types/models/queries/users/user-get-all-in-semester-query";
 import { TopicCreateDraftCommand } from "@/types/models/commands/topic/topic-create-draft-command";
 import {values} from "lodash";
