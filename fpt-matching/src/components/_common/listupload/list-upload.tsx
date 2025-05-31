@@ -334,7 +334,7 @@ const ListUploadCv = ({ blogId }: { blogId: string }) => {
                       {cv.fileCv && (
                         <a
                           href={cv.fileCv}
-                          className="border-b-2 border-black "
+                          className="border-b-2 border-blue-400 text-blue-400 hover:text-black hover:border-black"
                         >
                           Link Download
                         </a>

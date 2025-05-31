@@ -291,7 +291,7 @@ export default function Blog() {
                 <li className="px-4 cursor-pointer hover:bg-blue-300">
                   <a className="py-3 flex items-center" href="/social/blog/blogmanagement">
                     👥
-                    Users
+                    Trang cá nhân
                   </a>
                 </li>
                 <li className="px-4 py-2 text-[12px] uppercase tracking-wider text-gray-500 font-bold">Blog
